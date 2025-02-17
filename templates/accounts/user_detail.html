@@ -1,0 +1,33 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<h1>詳細情報</h1>
+<p><strong>名前:</strong> {{ user.username }}</p>
+<a href="{% url 'user_messages:send_message' user.username %}" class="btn btn-primary">メッセージを送る</a>
+
+<p><strong>性別:</strong> {{ user.get_gender_display }}</p>
+<p><strong>年齢:</strong> {{ user.get_age }}歳</p>
+
+<h1>{{ user.username }}さんの公開日記</h1>
+
+<ul>
+    {% for page in public_pages %}
+    <li>
+        <h2>{{ page.title }}</h2>
+        <p>作成日: {{ page.page_date }}</p>
+        <p>{{ page.content }}</p>
+        <p>
+            <strong>
+                {{ page.unique_likes_count }}人のユーザーから、{{ page.likes }} 👍頂いている日記です。
+            </strong>
+        </p>
+        <a href="{% url 'diary:page_detail' page.id %}">詳細を見る</a>
+    </li>
+    {% empty %}
+    <p>公開されている日記はありません。</p>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'accounts:user_list' %}">ユーザー一覧に戻る</a>
+
+{% endblock %}

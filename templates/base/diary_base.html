@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日記</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'diary/css/base.css' %}">
+    <script src="{% static 'diary/js/base.js' %}"></script>
+    <!-- blog.js の読み込み -->
+    <script src="{% static 'blog/js/blog.js' %}"></script>
+</head>
+
+<body>
+    <header>
+        <h1><a href="{% url 'diary:index' %}">喋る場</a></h1>
+        <div style="position: absolute; top: 10px; right: 20px;">
+            {% if user.is_authenticated %}
+            <span>こんにちは、{{ request.user.username }} さん</span>
+            <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">ログアウト</button>
+            </form>
+            {% else %}
+            <span>未ログイン</span>
+            <a href="{% url 'accounts:login' %}">ログイン</a>
+            <a href="{% url 'accounts:signup' %}">新規登録</a>
+            {% endif %}
+            <p>ログイン中のユーザー数: {{ logged_in_users_count }}</p>
+        </div>
+    </header>
+    {% block body %}
+    {% endblock %}
+</body>
+
+</html>

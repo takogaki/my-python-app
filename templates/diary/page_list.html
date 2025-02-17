@@ -1,0 +1,38 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<h1>{{ request.user.username }} の日記一覧</h1>
+<ul>
+    {% for diary in diaries %}
+    <li>
+        <strong>{{ diary.title }}</strong> ({{ diary.created_at|date:"Y-m-d" }})
+        <p>{{ diary.content }}</p>
+        <p>公開設定: {{ diary.is_public|yesno:"公開,非公開" }}</p>
+    </li>
+    {% endfor %}
+</ul>
+
+<ul>
+    {% for page in page_list %}
+    <p>
+        {% if page.is_public %}
+        <span style="color: blue; font-weight: bold;">公開中</span>
+        {% else %}
+        <span style="color: red; font-weight: bold;">非公開</span>
+        {% endif %}
+    </p>
+        <li>{{ page.page_date }}: 
+            <a href="{% url 'diary:page_detail' page.id %}">{{ page.title }}</a>
+            <br>
+                <strong>
+                    {{ page.unique_likes_count }}人のユーザーから、{{ page.likes }} 👍頂いている日記です。
+                </strong>
+            <hr>
+        </li>
+    {% empty %}
+        <div>日記のページが１つもありません。</div>
+    {% endfor %}
+</ul>
+<br>
+
+{% endblock %}

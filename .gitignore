@@ -1,15 +1,20 @@
-# 環境変数ファイル（重要情報を含むのでGit管理しない）
+# 環境変数ファイル
 .env
 
-# SQLiteのデータベースファイル（本番環境ではMySQLを使うため不要）
-# db.sqlite3
+# SQLiteのデータベース（本番ではMySQLを使うので無視）
+db.sqlite3
+db.json
 
-# Pythonのキャッシュファイル（不要なため無視）
-# __pycache__/
-# *.pyc
+# Pythonのキャッシュ
+__pycache__/
+*.pyc
 
-# 仮想環境フォルダ（ローカル環境専用のためGit管理しない）
+# 仮想環境（ローカルのみなので無視）
 venv/
 
-# 静的ファイル（Djangoが生成するためGit管理不要）
+# 静的ファイル（Djangoが自動生成する）
 staticfiles/
+static/
+
+# メディアファイル（アップロードデータ）
+media/

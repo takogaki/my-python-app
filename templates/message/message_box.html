@@ -1,0 +1,24 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<h2>メッセージボックス</h2>
+
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>
+        <p><strong>From:</strong> {{ message.sender.username }}</p>
+        <p><strong>Message:</strong> {{ message.content }}</p>
+        <p><strong>Sent at:</strong> {{ message.sent_at }}</p>
+
+        <!-- 返信ボタン -->
+        <a href="{% url 'user_messages:send_message' username=message.sender.username %}">
+            <button type="button">返信</button>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>まだメッセージはありません。</p>
+{% endif %}
+{% endblock %}

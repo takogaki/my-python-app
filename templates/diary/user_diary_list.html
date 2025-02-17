@@ -1,0 +1,50 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<h1>{{ user.username }} の公開日記</h1>
+<ul>
+    {% for diary in diaries %}
+    <li>
+        <strong>{{ diary.title }}</strong> ({{ diary.created_at|date:"Y-m-d" }})
+        <p>{{ diary.content }}</p>
+    </li>
+    {% endfor %}
+</ul>
+
+{% for diary in diaries %}
+<article class="media">
+    <div class="media-content">
+        <h2>{{ diary.title }}</h2>
+        <p>{{ diary.content }}</p>
+        <small>投稿者: {{ diary.author.username }}</small>
+        <p>👍 <span id="likes-{{ diary.id }}">{{ diary.likes }}</span></p>
+        <button class="like-button" data-diary-id="{{ diary.id }}">いいね</button>
+    </div>
+</article>
+<hr>
+{% endfor %}
+
+<script>
+    // いいねボタンをクリックしたときの処理
+    document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const diaryId = this.dataset.diaryId;  // 日記IDを取得
+            const likesSpan = document.getElementById(`likes-${diaryId}`);  // いいね数の表示部分
+
+            // Ajaxでいいね数を更新
+            fetch(`/diary/like/${diaryId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',  // CSRFトークンを送信
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    likesSpan.textContent = data.likes;  // 更新されたいいね数を表示
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<style>
+    /* コンテンツ全体を中央揃えにする */
+    .content-container {
+        max-width: 800px;
+        /* 最大幅を設定 */
+        margin: 0 auto;
+        /* 左右中央揃え */
+        padding: 20px;
+        /* 内側に余白を追加 */
+    }
+
+    .post {
+        background-color: #f9f9f9;
+        /* 背景色 */
+        padding: 20px;
+        border-radius: 8px;
+        /* 角を丸める */
+        margin-bottom: 20px;
+        /* 下の余白 */
+    }
+
+    .post h2 {
+        font-size: 1.5rem;
+        /* タイトルのサイズ調整 */
+    }
+
+    .post small {
+        font-size: 0.9rem;
+        color: gray;
+    }
+
+    .post a {
+        color: #007bff;
+        /* リンク色 */
+        text-decoration: none;
+    }
+
+    .post a:hover {
+        text-decoration: underline;
+        /* ホバー時に下線 */
+    }
+</style>
+
+<h2>口を開く</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">口を閉じる</button>
+</form>
+
+{% for post in posts %}
+{{ some_variable }}
+
+<a href="{% url 'blog:post_detail' slug=post.slug %}">{{ post.title }}</a>
+
+<div class="post block">
+    <!-- 投稿者名を表示 -->
+    <p><strong>投稿者: </strong>{{ post.name }}</p>
+    <h2 class="subtitle">{{post.title}}</h2>
+    <small>Posted at {{post.posted_date}}</small>
+    <p>{{post.intro}}</p>
+    <a href="{% url 'post_detail' post.slug %}">もっと読む</a>
+<br>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,29 @@
+<!-- templates/chat/chat_input.html -->
+{% extends "base/diary_base.html" %}
+{% block body %}
+<h2>入室キーを入力してください</h2>
+<form id="chat-form" method="post" action="{% url 'chat:save_room_key' %}">
+    {% csrf_token %}
+    <input type="text" name="roomKey" id="roomKey" placeholder="入室キーを入力">
+    <button type="submit">入室</button>
+</form>
+<script>
+    function redirectToRoom() {
+        const roomKey = document.getElementById('roomKey').value.trim();
+        if (roomKey) {
+            window.location.href = `/chat/${roomKey}/`;  // 動的なURLを生成してリダイレクト
+        } else {
+            alert('入室キーを入力してください。');
+        }
+    }
+</script>
+
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

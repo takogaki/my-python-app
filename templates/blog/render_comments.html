@@ -1,0 +1,40 @@
+{% load comment_tags %}
+
+<style>
+    .reply-indented {
+    margin-left: 20px; /* 子コメントのインデント */
+    border-left: 1px solid #ddd;
+    padding-left: 10px;
+}
+</style>
+
+{% for comment in comments %}
+<div class="content">
+    <p>
+        <strong>{{ comment.name }}</strong>
+        >>> <strong>{{ comment.reply_to }}</strong>
+        <small>{{ comment.posted_date }}</small>
+        <br>{{ comment.body }}
+    </p>
+</div>
+
+<!-- 子コメントへの返信フォーム -->
+<button class="show-reply-button" onclick="showReplyForm({{ comment.id }})">返信</button>
+<div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none;">
+    <p>返信先: <strong>{{ comment.name }}</strong></p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="parent_comment" value="{{ comment.id }}">
+        <input type="hidden" name="reply_to" value="{{ comment.name }}"> <!-- 宛名をセット -->
+        <button class="button is-small is-success">返信を送信</button>
+    </form>
+</div>
+
+<!-- 子コメントがさらにある場合 -->
+{% if comment.replies.all %}
+<div class="reply-indented">
+    {% include "blog/render_comments.html" with comments=comment.replies.all %}
+</div>
+{% endif %}
+{% endfor %}

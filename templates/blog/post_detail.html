@@ -1,0 +1,205 @@
+{% extends "base/diary_base.html" %}
+{% load comment_tags %}
+{% block body %}
+
+<style>
+    /* 投稿タイトルの中央揃え */
+    h1.title.has-text-centered {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    /* 投稿日時のスタイル */
+    small.has-text-grey {
+        font-size: 0.9rem;
+        color: #7a7a7a;
+    }
+
+    /* 投稿内容 */
+    p.content {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    /* コメントエリア */
+    h2.subtitle {
+        font-size: 1.8rem;
+        margin-top: 40px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    /* コメントリスト */
+    .media {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .media-left img {
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+    }
+
+    .media-content {
+        padding-left: 15px;
+    }
+
+    .media-content .content {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    /* コメントフォーム */
+    .field {
+        margin-top: 20px;
+    }
+
+    .control button {
+        background-color: #ff3860;
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+    }
+
+    /* コメントなし時の通知メッセージ */
+    .notification.is-info {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    /* 返信フォーム */
+    .reply-form {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f1f1f1;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .reply-form input,
+    .reply-form textarea {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    /* コメントの返信 */
+    .reply-indented {
+        margin-left: 40px;
+        background-color: #f7f7f7;
+        border-left: 4px solid #ddd;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+
+    .has-text-centered a.button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #48c774;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    /* 返信フォームの表示ボタン */
+    .show-reply-button {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #007bff;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .show-reply-button:hover {
+        text-decoration: underline;
+    }
+
+    .reply-indented {
+    margin-left: 30px;
+    padding-left: 15px;
+    border-left: 2px solid #ddd;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+}
+
+.tag.is-primary {
+    background-color: #48c774;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    margin-left: 10px;
+}
+</style>
+
+<!-- 投稿のタイトルと内容 -->
+<h1 class="title">{{ post.title }}</h1>
+<small>Posted at {{ post.posted_date }}</small>
+<p>{{ post.body }}</p>
+
+<h2 class="subtitle">投稿者へのコメント</h2>
+<div id="author-comment-form" class="field">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="to_author" value="true"> <!-- 投稿者へのコメントを示す -->
+        <button class="button is-success">投稿者にコメントする</button>
+    </form>
+</div>
+
+<hr>
+
+<!-- コメント一覧 -->
+<h2 class="subtitle">コメント</h2>
+<div id="comments">
+    <!-- 親コメントの新しい順で表示 -->
+    {% for parent in parent_comments %}
+    <article class="media">
+        <div class="media-content">
+            <div class="content">
+                <p>
+                    <strong>{{ parent.name }}</strong>
+                    <small>{{ parent.posted_date }}</small>
+                    <br>{{ parent.body }}
+                </p>
+            </div>
+        </div>
+
+        <!-- 親コメントへの返信フォーム -->
+        <button class="show-reply-button" onclick="showReplyForm({{ parent.id }})">返信</button>
+        <div id="reply-form-{{ parent.id }}" class="reply-form" style="display:none;">
+            <p>返信先: <strong>{{ parent.name }}</strong></p>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="hidden" name="parent_comment" value="{{ parent.id }}">
+                <input type="hidden" name="reply_to" value="{{ parent.name }}"> <!-- 宛名をセット -->
+                <button class="button is-small is-success">返信を送信</button>
+            </form>
+        </div>
+
+        <!-- 子コメントを新しい順で表示 -->
+        {% if parent.replies.all %}
+        <div class="media-content reply-indented">
+            {% include "blog/render_comments.html" with comments=parent.replies.all %}
+        </div>
+        {% endif %}
+    </article>
+    <hr>
+    {% empty %}
+    <p>コメントはまだありません。</p>
+    {% endfor %}
+</div>
+
+<a href="{% url 'blog:frontpage' %}">戻る</a>
+
+{% endblock %}

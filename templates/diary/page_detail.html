@@ -1,0 +1,66 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<h2>{{ page.title }}</h2>
+<div>{{ page.page_date }}</div>
+<div>{{ page.body | linebreaksbr }}</div>
+
+{% if page.picture %}
+<img src="{{ page.picture.url }}" alt="日記の写真" />
+{% endif %}
+
+<br>
+
+<!-- 作成者のみが編集・削除可能 -->
+{% if page.author == request.user %}
+<a href="{% url 'diary:page_update' page.id %}">編集</a>
+<a href="{% url 'diary:page_delete' page.id %}">削除</a>
+{% endif %}
+
+<br>
+
+<!-- 自分の日記かどうかで分岐 -->
+{% if page.author == request.user %}
+<!-- 自分の日記の場合は👍数とユニークユーザー数のみ表示 -->
+<p>
+    <strong>
+        {{ page.unique_likes_count }}人のユーザーから、{{ page.likes }} 👍頂いている日記です。
+    </strong>
+</p>
+{% else %}
+<!-- 他人の日記の場合は👍ボタンを表示 -->
+<p>現在の👍数: <span id="likes-count">{{ page.likes }}</span></p>
+<p>👍を押したユニークなユーザー数: <span id="unique-users-count">{{ page.unique_likes_count }}</span></p>
+<p>あなたがこの日記に押した👍の回数: <span id="user-likes-count">0</span></p>
+
+<!-- いいねボタン -->
+<button id="like-button">👍 良いねする</button>
+
+<!-- JavaScript部分 -->
+<script>
+    // いいねボタンのクリックイベント
+        document.getElementById('like-button').addEventListener('click', function () {
+            fetch(`/diary/like/{{ page.id }}/`, { // いいねAPIにリクエストを送信
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}', // CSRFトークンを送信
+                },
+            })
+                .then(response => response.json()) // レスポンスをJSON形式で受け取る
+                .then(data => {
+                    // 👍数とユニークユーザー数を更新
+                    document.getElementById('likes-count').textContent = data.likes;
+                    document.getElementById('unique-users-count').textContent = data.unique_users;
+
+                    // ユーザーごとのいいね回数を表示
+                    document.getElementById('user-likes-count').textContent = data.user_like_count;
+                })
+                .catch(error => console.error('Error:', error)); // エラー処理
+        });
+</script>
+{% endif %}
+
+<br>
+<button onclick="history.back()">戻る</button>
+
+{% endblock %}

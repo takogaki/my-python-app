@@ -1,0 +1,15 @@
+{% extends "base/diary_base.html" %}
+
+{% block body %}
+
+<h1>{{ recipient.username }}さんにメッセージを送る</h1>
+<form method="POST">
+    {% csrf_token %}
+    <label for="message">メッセージ:</label>
+    <textarea id="message" name="message" required></textarea>
+    <button type="submit">送信</button>
+</form>
+
+<a href="{% url 'accounts:user_detail' recipient.username %}">戻る</a>
+
+{% endblock %}

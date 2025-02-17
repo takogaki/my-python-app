@@ -1,0 +1,24 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<!-- メッセージボックス -->
+        <a href="{% url 'user_messages:message_box' %}" class="button">メッセージボックス</a>
+        <br>
+        <div id="clock"></div>
+        <br>
+        <a href="{% url 'diary:page_create' %}" class="button">日記を書く</a>
+        <br>
+        <a href="{% url 'diary:page_list' %}" class="button">日記一覧</a>
+        <br>
+        <hr>
+        <a href="{% url 'blog:frontpage' %}" class="button">喋る場入り口</a>
+        <br>
+        <hr>
+        <a href="{% url 'chat:start_stream' %}" class="button">先に1人で始める</a>
+        <br>
+        <a href="{% url 'chat:chat_home' %}" class="button">みんなと合流する</a>
+        <br>
+        <hr>
+        <a href="{% url 'accounts:user_list' %}" class="button">登録ユーザー一覧</a>
+
+        {% endblock %}

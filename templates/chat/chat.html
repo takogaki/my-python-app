@@ -1,0 +1,38 @@
+{% extends "base/diary_base.html" %}
+
+{% block body %}
+<h1>配信中のライブ一覧</h1>
+
+{% if live_rooms %}
+<ul>
+    {% for room in live_rooms %}
+    <li>
+        {% if room.end_time %}
+        <!-- 終了時刻が設定されている場合はリンクを無効化 -->
+        <span style="color: gray; cursor: not-allowed;">
+            {{ room.room_id }} - 開始時刻: {{ room.start_time }}<br>終了時刻: {{ room.end_time }}<br>
+            ユーザー名: {{ room.user.username }}<br>
+            年齢: {{ room.user.age }} 性別: {{ room.user.gender }}
+        </span>
+        {% else %}
+        <!-- 終了時刻が設定されていない場合は通常のリンク -->
+        <a href="{% url 'chat:room' room_id=room.room_id %}">
+            {{ room.room_id }} - 開始時刻: {{ room.start_time }}<br>終了時刻: {{ room.end_time }}<br>
+            ユーザー名: {{ room.host.username }}<br>
+            性別: {{ room.host.get_gender_display }}
+            年齢: {{ room.host.get_age }}歳
+        </a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>現在ライブ配信中のユーザーはありません。</p>
+{% endif %}
+
+<form action="{% url 'accounts:logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">ログアウト</button>
+</form>
+
+{% endblock %}

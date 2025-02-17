@@ -1,0 +1,29 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block body %}
+
+<h1>ルームID: {{ room.room_id }}</h1>
+
+<div id="video-chat">
+    <video id="localVideo" autoplay playsinline muted></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+</div>
+
+{% if user == room.host %}
+<!-- 配信者用：配信終了ボタン -->
+<form method="POST" action="{% url 'chat:end_stream' room.room_id %}">
+    {% csrf_token %}
+    <button type="submit">配信を終了する</button>
+</form>
+{% else %}
+<!-- 参加者用：退出ボタン -->
+<form method="POST" action="{% url 'chat:leave_room' room.room_id %}">
+    {% csrf_token %}
+    <button type="submit">退出する</button>
+</form>
+{% endif %}
+
+<script src="{% static 'chat/js/video_chat.js' %}"></script>
+
+{% endblock %}

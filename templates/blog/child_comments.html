@@ -1,0 +1,11 @@
+{% load comment_tags %}
+
+{% for comment in comments %}
+<div style="margin-left: 20px;">
+    <p><strong>{{ comment.name }}</strong> >>> {{ comment.reply_to }}: {{ comment.content }}</p>
+    <p>投稿日: {{ comment.posted_date }}</p>
+
+    <!-- 再帰的に子コメントを表示 -->
+    {% include "blog/child_comments.html" with comments=comment.replies.all parent=comment %}
+</div>
+{% endfor %}
