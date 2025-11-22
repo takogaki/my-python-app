@@ -2,7 +2,7 @@ from django.db import models
 from faker import Faker
 from django.utils.text import slugify
 from unicodedata
-
+import unicodedata
 
 fake = Faker()  # Fakerのインスタンスを作成
 
@@ -20,7 +20,7 @@ class Post(models.Model):
 
         if not self.slug:
             # 日本語をローマ字に変換した後にslugを生成
-            original_slug = slugify(unidecode(self.title))
+            original_slug = slugify(unicodedata(self.title))
             self.slug = original_slug
             # ユニークなslugを作成
             counter = 1
