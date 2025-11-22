@@ -1,7 +1,8 @@
 from django.db import models
 from faker import Faker
 from django.utils.text import slugify
-from unidecode import unidecode
+from unicodedata
+
 
 fake = Faker()  # Fakerのインスタンスを作成
 
