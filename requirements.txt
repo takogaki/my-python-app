@@ -384,4 +384,4 @@ python-dotenv==1.0.0
 django-extensions==3.2.1
 unicodedata2==14.0.0
 psycopg2-binary
-djangorestfremework==3.14.0
+djangorestfremework
