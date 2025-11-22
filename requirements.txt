@@ -381,3 +381,4 @@ wheel==0.43.0
 #zstandard @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_054juzz3it/croot/zstandard_1714677666952/work
 gunicorn==20.1.0
 python-dotenv==1.0.0
+django-extensions==3.2.1
