@@ -1,7 +1,10 @@
 from pathlib import Path
 import os
+import dj_database_url  # ※requirements.txtにdj-database-urlが必要です
 from dotenv import load_dotenv
 load_dotenv()
+
+
 
 # ==============================
 # .envファイルを自動選択読み込み
@@ -102,17 +105,43 @@ CHANNEL_LAYERS = {
 # ----------------------------------
 # データベース設定
 # ----------------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "diary"),
-        "USER": os.getenv("DB_USER", "takogaki"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "atjwbg28509224"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": int(os.getenv("DB_PORT", 3306)),
-        "OPTIONS": {"charset": "utf8mb4"},
+#DATABASES = {
+#    "default": {
+#        "ENGINE": "django.db.backends.mysql",
+#        "NAME": os.getenv("DB_NAME", "diary"),
+#        "USER": os.getenv("DB_USER", "takogaki"),
+#        "PASSWORD": os.getenv("DB_PASSWORD", "atjwbg28509224"),
+#        "HOST": os.getenv("DB_HOST", "localhost"),
+#        "PORT": int(os.getenv("DB_PORT", 3306)),
+#        "OPTIONS": {"charset": "utf8mb4"},
+#    }
+#}
+
+# ---------------------------------------------
+# データベース設定 (ローカル/本番 環境変数切り替え)
+# ---------------------------------------------
+# 環境変数 'DATABASE_URL' が設定されていれば、Render環境と判断し、
+# dj_database_urlを使って接続情報を取得する。
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600  # Render推奨
+        )
     }
-}
+else:
+    # 環境変数がない場合（ローカル開発環境）
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv("DB_NAME", "diary"),
+            'USER': os.getenv("DB_USER", "takogaki"),
+            'PASSWORD': os.getenv("DB_PASSWORD", "atijwbq28509224"),
+            'HOST': 'localhost',  # ローカル開発用の設定
+            'PORT': '3306',
+            "OPTIONS": {"charset": "utf8mb4"},
+        }
+    }
 
 # ----------------------------------
 # 認証・パスワード
