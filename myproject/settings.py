@@ -1,8 +1,8 @@
 from pathlib import Path
 import os
-import dj_database_url  # ※requirements.txtにdj-database-urlが必要です
-from dotenv import load_dotenv
-load_dotenv()
+import dj_database_url   # ※requirements.txtにdj-database-urlが必要です
+#from dotenv import load_dotenv
+import load_dotenv()
 
 
 
@@ -122,11 +122,14 @@ CHANNEL_LAYERS = {
 # ---------------------------------------------
 # 環境変数 'DATABASE_URL' が設定されていれば、Render環境と判断し、
 # dj_database_urlを使って接続情報を取得する。
+# settings.py の修正案
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
             default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600  # Render推奨
+            conn_max_age=600,
+            # ここを追記/修正: OPTIONSを明示的に設定
+            OPTIONS={'charset': 'utf8mb4'} 
         )
     }
 else:
@@ -136,11 +139,11 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.getenv("DB_NAME", "diary"),
             'USER': os.getenv("DB_USER", "takogaki"),
-            'PASSWORD': os.getenv("DB_PASSWORD", "atijwbq28509224"),
+            'PASSWORD': os.getenv("DB_PASSWORD", "atjwbq28509224"),
             'HOST': 'localhost',  # ローカル開発用の設定
             'PORT': '3306',
             "OPTIONS": {"charset": "utf8mb4"},
-        }
+        },
     }
 
 # ----------------------------------
