@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 import dj_database_url   # ※requirements.txtにdj-database-urlが必要です
 #from dotenv import load_dotenv
-import load_dotenv()
+#import load_dotenv()
 
 
 
@@ -11,7 +11,7 @@ import load_dotenv()
 # ==============================
 BASE_DIR = Path(__file__).resolve().parent.parent
 env_file = BASE_DIR / (".env.production" if os.getenv("DJANGO_ENV") == "production" else ".env.development")
-load_dotenv(env_file)
+#load_dotenv(env_file)
 
 # ==============================
 # 基本設定
