@@ -129,7 +129,7 @@ if os.environ.get('DATABASE_URL'):
             default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
             # ここを追記/修正: OPTIONSを明示的に設定
-            OPTIONS={'charset': 'utf8mb4'} 
+            #OPTIONS={'charset': 'utf8mb4'} 
         )
     }
 else:
