@@ -138,7 +138,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.getenv("DB_NAME", "diary"),
             'USER': os.getenv("DB_USER", "takogaki"),
-            'PASSWORD': os.getenv("DB_PASSWORD", "atjwbq28509224"),
+            'PASSWORD': os.getenv("DB_PASSWORD", "atjwbg28509224"),
             'HOST': 'localhost',  # ローカル開発用の設定
             'PORT': '3306',
             "OPTIONS": {"charset": "utf8mb4"},
