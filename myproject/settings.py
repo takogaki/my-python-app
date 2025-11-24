@@ -1,9 +1,8 @@
 from pathlib import Path
 import os
 import dj_database_url   # ※requirements.txtにdj-database-urlが必要です
-#from dotenv import load_dotenv
-#import load_dotenv()
-
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # ==============================
@@ -11,7 +10,7 @@ import dj_database_url   # ※requirements.txtにdj-database-urlが必要です
 # ==============================
 BASE_DIR = Path(__file__).resolve().parent.parent
 env_file = BASE_DIR / (".env.production" if os.getenv("DJANGO_ENV") == "production" else ".env.development")
-#load_dotenv(env_file)
+load_dotenv(env_file)
 
 # ==============================
 # 基本設定
@@ -102,26 +101,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-# ----------------------------------
-# データベース設定
-# ----------------------------------
-#DATABASES = {
-#    "default": {
-#        "ENGINE": "django.db.backends.mysql",
-#        "NAME": os.getenv("DB_NAME", "diary"),
-#        "USER": os.getenv("DB_USER", "takogaki"),
-#        "PASSWORD": os.getenv("DB_PASSWORD", "atjwbg28509224"),
-#        "HOST": os.getenv("DB_HOST", "localhost"),
-#        "PORT": int(os.getenv("DB_PORT", 3306)),
-#        "OPTIONS": {"charset": "utf8mb4"},
-#    }
-#}
 
-# ---------------------------------------------
-# データベース設定 (ローカル/本番 環境変数切り替え)
-# ---------------------------------------------
-# 環境変数 'DATABASE_URL' が設定されていれば、Render環境と判断し、
-# dj_database_urlを使って接続情報を取得する。
 # settings.py の修正案
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
@@ -192,10 +172,13 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.getenv("DJANGO_EMAIL", "noreply@example.com")
 
+# Gmailアプリパスワード
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+# 差出人メール（Gmailを使う！）
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # ----------------------------------
 # リダイレクト設定
 # ----------------------------------

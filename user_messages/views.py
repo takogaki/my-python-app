@@ -104,6 +104,10 @@ def success(request):
     return render(request, "message/success.html")
 
 
+@login_required
+def failure(request):
+    return render(request, "message/failure.html")
+
 
 
 
