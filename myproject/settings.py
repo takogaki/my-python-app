@@ -17,7 +17,8 @@ load_dotenv(env_file)
 # ==============================
 DJANGO_ENV = os.getenv("DJANGO_ENV", "development")
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+#SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key")
 
 # ----------------------------------
 # セキュリティ設定
@@ -89,41 +90,39 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "myproject.wsgi.application"
-ASGI_APPLICATION = "myproject.routing.application"
+# ASGI_APPLICATION = "myproject.routing.application"
 
-# ----------------------------------
-# Channels（リアルタイム通信設定）
-# ----------------------------------
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-    },
-}
+# # ----------------------------------
+# # Channels（リアルタイム通信設定）
+# # ----------------------------------
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+#     },
+# }
 
+REDIS_URL = os.getenv('REDIS_URL')
 
-# settings.py の修正案
-if os.environ.get('DATABASE_URL'):
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            # 追記したOPTIONSの行を完全に削除してください
-        )
-    }
-else:
-    # 環境変数がない場合（ローカル開発環境）
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv("DB_NAME", "diary"),
-            'USER': os.getenv("DB_USER", "takogaki"),
-            'PASSWORD': os.getenv("DB_PASSWORD", "atjwbg28509224"),
-            'HOST': 'localhost',  # ローカル開発用の設定
-            'PORT': '3306',
-            "OPTIONS": {"charset": "utf8mb4"},
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [REDIS_URL]},
         },
     }
+
+
+
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
+
 
 # ----------------------------------
 # 認証・パスワード
@@ -147,12 +146,25 @@ USE_TZ = True
 # ----------------------------------
 # 静的・メディアファイル
 # ----------------------------------
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "myproject.middleware.VisitorTrackingMiddleware",
+]
+
+
 
 # ----------------------------------
 # CORS / CSRF
@@ -161,9 +173,22 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
 ]
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0"]
-if DJANGO_ENV == "development":
-    ALLOWED_HOSTS = ["*"]
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+RENDER_INTERNAL_HOSTNAME = os.environ.get('RENDER_INTERNAL_HOSTNAME')
+if RENDER_INTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_INTERNAL_HOSTNAME)
+
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # ----------------------------------
 # メール設定
