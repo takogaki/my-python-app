@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     "diary.apps.DiaryConfig",
     "blog.apps.BlogConfig",
     #"chat",
-    "channels",
+    #"channels",
     "accounts",
     "user_messages",
     "django_extensions",
