@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "diary.apps.DiaryConfig",
     "blog.apps.BlogConfig",
-    "chat",
+    #"chat",
     "channels",
     "accounts",
     "user_messages",
