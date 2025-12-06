@@ -141,65 +141,51 @@
 }
 </style>
 
-<!-- 投稿のタイトルと内容 -->
 <h1 class="title">{{ post.title }}</h1>
 <small>Posted at {{ post.posted_date }}</small>
 <p>{{ post.body }}</p>
 
-<h2 class="subtitle">投稿者へのコメント</h2>
-<div id="author-comment-form" class="field">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="hidden" name="to_author" value="true"> <!-- 投稿者へのコメントを示す -->
-        <button class="button is-success">投稿者にコメントする</button>
-    </form>
-</div>
+<h2 class="subtitle">コメントを書く</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="button is-success">コメントを投稿</button>
+</form>
 
 <hr>
 
-<!-- コメント一覧 -->
-<h2 class="subtitle">コメント</h2>
-<div id="comments">
-    <!-- 親コメントの新しい順で表示 -->
-    {% for comment in comments %}
-    <article class="media">
-        <div class="media-content">
-            <div class="content">
-                <p>
-                    <strong>{{ parent.name }}</strong>
-                    <small>{{ parent.posted_date }}</small>
-                    <br>{{ parent.body }}
-                </p>
-            </div>
-        </div>
+<h2 class="subtitle">コメント一覧</h2>
 
-        <!-- 親コメントへの返信フォーム -->
-        <button class="show-reply-button" onclick="showReplyForm({{ parent.id }})">返信</button>
-        <div id="reply-form-{{ parent.id }}" class="reply-form" style="display:none;">
-            <p>返信先: <strong>{{ parent.name }}</strong></p>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <input type="hidden" name="parent_comment" value="{{ parent.id }}">
-                <input type="hidden" name="reply_to" value="{{ parent.name }}"> <!-- 宛名をセット -->
-                <button class="button is-small is-success">返信を送信</button>
-            </form>
-        </div>
+{% for comment in parent_comments %}
+<article class="media">
 
-        <!-- 子コメントを新しい順で表示 -->
-        {% if parent.replies.all %}
-        <div class="media-content reply-indented">
-            {% include "blog/render_comments.html" with comments=parent.replies.all %}
-        </div>
-        {% endif %}
-    </article>
-    <hr>
-    {% empty %}
-    <p>コメントはまだありません。</p>
-    {% endfor %}
-</div>
+    <div class="media-content">
+        <p>
+            <strong>{{ comment.name }}</strong>
+            <small>{{ comment.posted_date }}</small><br>
+            {{ comment.body }}
+        </p>
+    </div>
 
-<a href="{% url 'blog:frontpage' %}">戻る</a>
+    <button onclick="showReplyForm({{ comment.id }})">返信</button>
 
-{% endblock %}
+    <div id="reply-form-{{ comment.id }}" style="display:none;">
+        <form method="post">
+            {% csrf_token %}
+            {{ reply_forms.comment.id.as_p }}
+            <input type="hidden" name="parent_comment" value="{{ comment.id }}">
+            <input type="hidden" name="reply_to" value="{{ comment.name }}">
+            <button class="button is-small is-success">返信を送信</button>
+        </form>
+    </div>
+
+    {% if comment.replies.all %}
+    <div class="reply-indented">
+        {% include "blog/render_comments.html" with comments=comment.replies.all reply_forms=reply_forms %}
+    </div>
+    {% endif %}
+
+</article>
+<hr>
+{% endfor %}

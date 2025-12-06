@@ -3,35 +3,41 @@
 {% block body %}
 
 <div class="media-content reply-indented">
+
     <div class="content">
         <p>
             <strong>{{ comment.name }}</strong>
-            {% if comment.parent %}
-            >>> <strong>{{ comment.parent.name }}</strong>
+
+            {% if comment.reply_to %}
+            >>> <strong>{{ comment.reply_to }}</strong>
             {% endif %}
-            <small>{{ comment.posted_date }}</small>
-            <br>{{ comment.body }}
+
+            <small>{{ comment.posted_date }}</small><br>
+            {{ comment.body }}
         </p>
     </div>
 
     <!-- 返信ボタン -->
-    <button class="show-reply-button" onclick="showReplyForm({{ comment.id }})">返信</button>
+    <button onclick="showReplyForm({{ comment.id }})">返信</button>
 
     <!-- 返信フォーム -->
-    <div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none;">
-        <p>返信先: <strong>{{ comment.name }}</strong></p>
+    <div id="reply-form-{{ comment.id }}" style="display:none;">
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ reply_forms.comment.id.as_p }}
             <input type="hidden" name="parent_comment" value="{{ comment.id }}">
+            <input type="hidden" name="reply_to" value="{{ comment.name }}">
             <button class="button is-small is-success">返信を送信</button>
         </form>
     </div>
 
-    <!-- 子コメントを再帰的に表示 -->
-    {% for reply in comment.replies.all %}
-    {% render_comment_tree reply %}
-    {% endfor %}
+    <!-- 子コメント（再帰表示） -->
+    {% if comment.replies.all %}
+    <div class="reply-indented">
+        {% include "blog/render_comments.html" with comments=comment.replies.all reply_forms=reply_forms %}
+    </div>
+    {% endif %}
+
 </div>
 
 {% endblock %}

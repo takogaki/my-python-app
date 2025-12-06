@@ -1,11 +1,35 @@
 {% load comment_tags %}
 
 {% for comment in comments %}
-<div style="margin-left: 20px;">
-    <p><strong>{{ comment.name }}</strong> >>> {{ comment.reply_to }}: {{ comment.content }}</p>
-    <p>投稿日: {{ comment.posted_date }}</p>
 
-    <!-- 再帰的に子コメントを表示 -->
-    {% include "blog/child_comments.html" with comments=comment.replies.all parent=comment %}
+<div class="reply-indented">
+    <p>
+        <strong>{{ comment.name }}</strong>
+        >>> <strong>{{ comment.reply_to }}</strong>
+        <small>{{ comment.posted_date }}</small><br>
+        {{ comment.body }}
+    </p>
+
+    <!-- 返信ボタン -->
+    <button onclick="showReplyForm({{ comment.id }})">返信</button>
+
+    <div id="reply-form-{{ comment.id }}" style="display:none;">
+        <form method="post">
+            {% csrf_token %}
+            {{ reply_forms.comment.id.as_p }}
+            <input type="hidden" name="parent_comment" value="{{ comment.id }}">
+            <input type="hidden" name="reply_to" value="{{ comment.name }}">
+            <button class="button is-small is-success">返信</button>
+        </form>
+    </div>
+
+    <!-- 子コメントがあれば再帰 -->
+    {% if comment.replies.all %}
+    <div class="reply-indented">
+        {% include "blog/child_comments.html" with comments=comment.replies.all reply_forms=reply_forms %}
+    </div>
+    {% endif %}
+
 </div>
+
 {% endfor %}
