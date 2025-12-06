@@ -14,10 +14,10 @@ urlpatterns = [
     path("diary/", include("diary.urls")),
     path('blog/', include('blog.urls')),  
     path('accounts/', include('accounts.urls')),
-    path('', include('django.contrib.auth.urls')),
+    #path('', include('django.contrib.auth.urls')),
 
-    path("", frontpage, name="frontpage"),
-    path("posts/<slug:slug>/", post_detail, name="post_detail"),
+    #path("", frontpage, name="frontpage"),
+    #path("posts/<slug:slug>/", post_detail, name="post_detail"),
 
     # path('videos/', include('video_platform.urls', namespace='video_platform')),
 
