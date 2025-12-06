@@ -46,7 +46,7 @@ def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
 
     # 親コメントを新しい順で取得
-    parent_comments = Comment.objects.filter(post=post, parent=None).order_by('-posted_date')
+    comments = Comment.objects.filter(post=post, parent__isnull=True).order_by('-posted_date')
 
     # 子コメントも新しい順でプリフェッチ
     parent_comments = parent_comments.prefetch_related(
@@ -73,5 +73,6 @@ def post_detail(request, slug):
     else:
         form = CommentForm()
 
-    return render(request, "blog/post_detail.html", {"post": post, "parent_comments": parent_comments, "form": form})
+    return render(request, "blog/post_detail.html", {"post": post, "comments": parent_comments, "form": form})
+
 post_create = PostCreateView.as_view()

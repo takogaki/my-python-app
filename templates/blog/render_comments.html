@@ -32,7 +32,7 @@
 </div>
 
 <!-- 子コメントがさらにある場合 -->
-{% if comment.replies.all %}
+{% if comment.replies.exists %}
 <div class="reply-indented">
     {% include "blog/render_comments.html" with comments=comment.replies.all %}
 </div>
