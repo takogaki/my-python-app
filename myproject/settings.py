@@ -212,3 +212,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 if DJANGO_ENV == "development":
     SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = None
+
+
+
+
+    STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
