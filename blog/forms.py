@@ -17,6 +17,14 @@ class PostForm(forms.ModelForm):
 fake = Faker()
 
 class CommentForm(forms.ModelForm):
+    from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ["title", "content"]  # モデルに合わせて調整
+
     class Meta:
         model = Comment
         fields = ["name", "body"]  # 自分の名前とコメント本文のみをフォームに表示

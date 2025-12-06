@@ -96,6 +96,7 @@ from faker import Faker
 from .forms import CommentForm, PostForm
 from .models import Post, Comment
 from django.db.models import Prefetch
+from .forms import PostForm  # ← forms.py がある前提
 
 fake = Faker()
 
@@ -183,3 +184,16 @@ def post_detail(request, slug):
         "form": form,
         "reply_forms": reply_forms
     })
+
+
+
+def post_create(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("post_list")  # 適宜変更
+    else:
+        form = PostForm()
+    return render(request, "blog/post_form.html", {"form": form})
+
