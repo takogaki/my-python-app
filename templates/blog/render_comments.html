@@ -8,6 +8,7 @@
 }
 </style>
 
+
 {% for comment in comments %}
 <div class="content">
     <p>
@@ -24,9 +25,9 @@
     <p>返信先: <strong>{{ comment.name }}</strong></p>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ reply_forms.comment.id.as_p }}
         <input type="hidden" name="parent_comment" value="{{ comment.id }}">
-        <input type="hidden" name="reply_to" value="{{ comment.name }}"> <!-- 宛名をセット -->
+        <input type="hidden" name="reply_to" value="{{ comment.name }}">
         <button class="button is-small is-success">返信を送信</button>
     </form>
 </div>

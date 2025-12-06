@@ -41,6 +41,11 @@ class PostCreateView(View):
         return render(request, "blog/frontpage.html", {"form": form})
     
 
+def get_comment_form(parent=None):
+    from .forms import CommentForm
+    return CommentForm(parent=parent)
+
+
 # 投稿の詳細ビュー
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
