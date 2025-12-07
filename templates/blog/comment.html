@@ -22,7 +22,7 @@
 
     <!-- 返信フォーム -->
     <div id="reply-form-{{ comment.id }}" style="display:none;">
-        <form method="post">
+        <form method="post" action="{% url 'blog:post_detail' slug=comment.post.slug %}">
             {% csrf_token %}
             {{ reply_forms.comment.id.as_p }}
             <input type="hidden" name="parent_comment" value="{{ comment.id }}">
@@ -31,10 +31,10 @@
         </form>
     </div>
 
-    <!-- 子コメント（再帰表示） -->
     {% if comment.replies.all %}
     <div class="reply-indented">
-        {% include "blog/render_comments.html" with comments=comment.replies.all reply_forms=reply_forms %}
+        {% include "blog/render_comments.html" with comments=comment.replies.all reply_forms=reply_forms
+        post=comment.post %}
     </div>
     {% endif %}
 

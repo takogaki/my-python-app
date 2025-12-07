@@ -147,7 +147,7 @@
 
 <h2 class="subtitle">コメントを書く</h2>
 
-<form method="post">
+<form method="post" action="{% url 'blog:post_detail' slug=post.slug %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button class="button is-success">コメントを投稿</button>
@@ -168,10 +168,12 @@
         </p>
     </div>
 
+    <!-- 返信ボタン -->
     <button onclick="showReplyForm({{ comment.id }})">返信</button>
 
+    <!-- 返信フォーム -->
     <div id="reply-form-{{ comment.id }}" style="display:none;">
-        <form method="post">
+        <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}">
             {% csrf_token %}
             {{ reply_forms.comment.id.as_p }}
             <input type="hidden" name="parent_comment" value="{{ comment.id }}">
@@ -182,7 +184,7 @@
 
     {% if comment.replies.all %}
     <div class="reply-indented">
-        {% include "blog/render_comments.html" with comments=comment.replies.all reply_forms=reply_forms %}
+        {% include "blog/render_comments.html" with comments=comment.replies.all reply_forms=reply_forms post=post %}
     </div>
     {% endif %}
 
