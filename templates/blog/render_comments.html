@@ -2,19 +2,21 @@
 
 <style>
     .reply-indented {
-    margin-left: 20px; /* 子コメントのインデント */
-    border-left: 1px solid #ddd;
-    padding-left: 10px;
-}
+        margin-left: 20px;
+        /* 子コメントのインデント */
+        border-left: 1px solid #ddd;
+        padding-left: 10px;
+    }
 </style>
-
 
 {% for comment in comments %}
 
 <div class="content">
     <p>
         <strong>{{ comment.name }}</strong>
+        {% if comment.reply_to %}
         >>> <strong>{{ comment.reply_to }}</strong>
+        {% endif %}
         <small>{{ comment.posted_date }}</small><br>
         {{ comment.body }}
     </p>
@@ -23,7 +25,8 @@
 <button onclick="showReplyForm({{ comment.id }})">返信</button>
 
 <div id="reply-form-{{ comment.id }}" style="display:none;">
-    <form method="post">
+    <!-- ここに action を必ず付ける -->
+    <form method="post" action="{% url 'blog:post_detail' slug=comment.post.slug %}">
         {% csrf_token %}
         {{ reply_forms.comment.id.as_p }}
         <input type="hidden" name="parent_comment" value="{{ comment.id }}">
