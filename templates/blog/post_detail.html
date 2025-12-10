@@ -175,9 +175,12 @@
     <div id="reply-form-{{ comment.id }}" style="display:none;">
         <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}">
             {% csrf_token %}
+
             {{ reply_forms.comment.id.as_p }}
+
             <input type="hidden" name="parent_comment" value="{{ comment.id }}">
             <input type="hidden" name="reply_to" value="{{ comment.name }}">
+
             <button class="button is-small is-success">返信を送信</button>
         </form>
     </div>
