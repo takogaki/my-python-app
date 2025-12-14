@@ -1,35 +1,96 @@
 {% load comment_tags %}
 
-{% for comment in comments %}
+<style>
+    /* コメント共通 */
+.comment {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border-left: 4px solid #cbd5e1;
+    transition: background-color 0.2s;
+}
 
-<div class="reply-indented">
+/* シマシマ（奇数） */
+.comment:nth-of-type(odd) {
+    background-color: #f9fafb;
+}
+
+/* シマシマ（偶数） */
+.comment:nth-of-type(even) {
+    background-color: #eef2ff;
+}
+
+/* ホバー時 */
+.comment:hover {
+    background-color: #dde7ff;
+}
+
+/* 投稿者名 */
+.comment strong {
+    font-size: 0.95rem;
+    color: #1f2937;
+}
+
+/* 投稿日時 */
+.comment small {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* 返信ボタン */
+.comment button {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+}
+
+.comment button:hover {
+    text-decoration: underline;
+}
+
+/* 深い階層ほど色を少し変える */
+.comment[style*="60px"] {
+    border-left-color: #93c5fd;
+    background-color: #f0f7ff;
+}
+
+.comment[style*="90px"] {
+    border-left-color: #60a5fa;
+    background-color: #e6f0ff;
+}
+</style>
+
+{% load comment_tags %}
+
+{% for comment in comments %}
+<div class="comment" style="margin-left: {{ level }}px; margin-top:10px;">
+
     <p>
         <strong>{{ comment.name }}</strong>
-        >>> <strong>{{ comment.reply_to }}</strong>
         <small>{{ comment.posted_date }}</small><br>
         {{ comment.body }}
     </p>
 
     <!-- 返信ボタン -->
-    <button onclick="showReplyForm({{ comment.id }})">返信</button>
+    <button type="button" onclick="toggleReply({{ comment.id }})">
+        返信
+    </button>
 
-    <div id="reply-form-{{ comment.id }}" style="display:none;">
-        <form method="post" action="{% url 'blog:post_detail' slug=comment.post.slug %}">
+    <!-- 返信フォーム（最初は非表示） -->
+    <div id="reply-form-{{ comment.id }}" style="display:none; margin-left:20px;">
+        <form method="post">
             {% csrf_token %}
-            {{ reply_forms|dict_get:comment.id.as_p }}
-            <input type="hidden" name="parent_comment" value="{{ comment.id }}">
-            <input type="hidden" name="reply_to" value="{{ comment.name }}">
-            <button class="button is-small is-success">返信</button>
+            {{ form.as_p }}
+            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+            <button class="button is-small is-success">送信</button>
         </form>
     </div>
 
-    <!-- 子コメントがあれば再帰 -->
+    <!-- 子コメント（再帰） -->
     {% if comment.replies.all %}
-    <div class="reply-indented">
-        {% include "blog/child_comments.html" with comments=comment.replies.all reply_forms=reply_forms %}
-    </div>
+    {% include "blog/child_comments.html" with comments=comment.replies.all level=level|add:30 %}
     {% endif %}
-
 </div>
-
 {% endfor %}

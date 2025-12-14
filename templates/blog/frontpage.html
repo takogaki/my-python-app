@@ -48,11 +48,10 @@
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">口を閉じる</button>
+    <button type="submit" name="create_post">口を閉じる</button>
 </form>
 
 {% for post in posts %}
-{{ some_variable }}
 
 <a href="{% url 'blog:post_detail' slug=post.slug %}">{{ post.title }}</a>
 
@@ -63,10 +62,9 @@
     <small>Posted at {{post.posted_date}}</small>
     <p>{{post.intro}}</p>
     <a href="{% url 'blog:post_detail' slug=post.slug %}">もっと読む</a>
-<br>
+    <br>
 
 </div>
 
 {% endfor %}
-
 {% endblock %}

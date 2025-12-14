@@ -15,12 +15,17 @@ def frontpage(request):
     form = PostForm()
 
     if request.method == "POST":
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.name = post.name or fake.name()
-            post.save()
-            return redirect("blog:frontpage")
+        # 投稿フォームだけを処理する
+        if "create_post" in request.POST:
+            form = PostForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.name = post.name or fake.name()
+                post.save()
+                return redirect("blog:frontpage")
+
+        # 投稿フォーム以外の POST は無視
+        return redirect("blog:frontpage")
 
     return render(request, "blog/frontpage.html", {"posts": posts, "form": form})
 
@@ -52,48 +57,32 @@ def get_comment_form(parent=None):
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
 
-    # 親コメントを新しい順で取得
+    # 親コメント
     parent_comments = Comment.objects.filter(
-        post=post, parent__isnull=True
-    ).order_by('-posted_date')
+        post=post,
+        parent__isnull=True
+    ).order_by('posted_date').prefetch_related('replies__replies')
 
-    # 子コメントもプリフェッチ
-    parent_comments = parent_comments.prefetch_related(
-        Prefetch(
-            'replies',
-            queryset=Comment.objects.filter(post=post).order_by('-posted_date')
-        )
-    )
-
-    # コメント投稿時
+    # コメント投稿処理
     if request.method == "POST":
-        parent_id = request.POST.get("parent_comment")
-        reply_to_name = request.POST.get("reply_to")
+        parent_id = request.POST.get("parent_id")
+        parent = Comment.objects.get(id=parent_id) if parent_id else None
 
-        parent_comment = Comment.objects.get(id=parent_id) if parent_id else None
-        form = CommentForm(request.POST, parent=parent_comment)
-
+        form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
-            comment.parent = parent_comment
-            comment.reply_to = reply_to_name
+            comment.parent = parent
             comment.save()
-            return redirect("blog:post_detail", slug=post.slug)
-
+            return redirect("blog:post_detail", slug=slug)
     else:
         form = CommentForm()
-
-    # 親コメントごとに返信フォームを作る
-    reply_forms = {c.id: CommentForm(parent=c) for c in parent_comments}
 
     return render(request, "blog/post_detail.html", {
         "post": post,
         "parent_comments": parent_comments,
         "form": form,
-        "reply_forms": reply_forms
     })
-
 
 
 def post_create(request):
