@@ -5,9 +5,21 @@ from .forms import CommentForm, PostForm
 from .models import Post, Comment
 from django.db.models import Prefetch
 from .forms import PostForm  # ← forms.py がある前提
+import uuid
+
 
 
 fake = Faker()
+
+def get_anonymous_id(request):
+    anon_id = request.COOKIES.get("anon_id")
+    if not anon_id:
+        anon_id = uuid.uuid4().hex
+    return anon_id
+
+def get_anonymous_name(request):
+    anon_id = get_anonymous_id(request)
+    return f"匿名{anon_id[:4].upper()}"
 
 
 def frontpage(request):
@@ -54,27 +66,48 @@ def get_comment_form(parent=None):
 
 
 # ✨ 投稿の詳細（コメント付き）
+# views.py
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
 
-    # 親コメント
     parent_comments = Comment.objects.filter(
         post=post,
         parent__isnull=True
-    ).order_by('posted_date').prefetch_related('replies__replies')
+    ).order_by("-posted_date")
 
-    # コメント投稿処理
     if request.method == "POST":
         parent_id = request.POST.get("parent_id")
         parent = Comment.objects.get(id=parent_id) if parent_id else None
 
         form = CommentForm(request.POST)
+
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
-            comment.parent = parent
+
+            anon_id = get_anonymous_id(request)
+
+            # 名前未入力なら匿名名
+            if not comment.name:
+                comment.name = f"匿名{anon_id[:4].upper()}"
+
+            if parent:
+                comment.parent = parent.root_parent
+                comment.reply_to = request.POST.get("reply_to")
+
             comment.save()
-            return redirect("blog:post_detail", slug=slug)
+
+            response = redirect("blog:post_detail", slug=slug)
+
+            if not request.COOKIES.get("anon_id"):
+                response.set_cookie(
+                    "anon_id",
+                    anon_id,
+                    max_age=60 * 60 * 24 * 365,
+                )
+
+            return response
+
     else:
         form = CommentForm()
 

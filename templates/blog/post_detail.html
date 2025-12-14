@@ -139,6 +139,24 @@
     padding: 5px 10px;
     margin-left: 10px;
 }
+
+.comment.reply {
+    margin-left: 20px; /* 固定 */
+}
+
+.show-replies-button {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: #065fd4;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.show-replies-button:hover {
+    text-decoration: underline;
+}
+
 </style>
 
 <h1 class="title">{{ post.title }}</h1>
@@ -158,13 +176,22 @@
 
 <h2 class="subtitle">コメント一覧</h2>
 
-{% include "blog/child_comments.html" with comments=parent_comments level=0 %}
+{% include "blog/child_comments.html" with comments=parent_comments form=form %}
+
+
+</div>
+<hr>
 
 <script>
     function toggleReply(id) {
         const el = document.getElementById(`reply-form-${id}`);
         el.style.display = el.style.display === "none" ? "block" : "none";
     }
+            function toggleReplies(id) {
+    const el = document.getElementById(`replies-${id}`);
+    if (!el) return;
+    el.style.display = el.style.display === "none" ? "block" : "none";
+}
 </script>
 
 {% endblock %}

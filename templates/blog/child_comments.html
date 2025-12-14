@@ -60,37 +60,76 @@
     border-left-color: #60a5fa;
     background-color: #e6f0ff;
 }
+
 </style>
 
 {% load comment_tags %}
 
 {% for comment in comments %}
-<div class="comment" style="margin-left: {{ level }}px; margin-top:10px;">
+<div class="comment parent">
 
     <p>
-        <strong>{{ comment.name }}</strong>
-        <small>{{ comment.posted_date }}</small><br>
+        <strong>{{ comment.name }}</strong><br>
         {{ comment.body }}
     </p>
 
-    <!-- 返信ボタン -->
+    <!-- 返信を見るボタン -->
+    {% if comment.replies.all %}
+    <button type="button" class="show-replies-button" onclick="toggleReplies({{ comment.id }})">
+        返信を見る（{{ comment.replies.count }}件）
+    </button>
+    {% endif %}
+
+    <!-- 返信一覧（最初は非表示） -->
+    <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
+
+        {% for reply in comment.replies.all|dictsort:"posted_date" %}
+        <div class="comment reply">
+
+            <p>
+                ∟ <strong>{{ reply.name }}</strong>
+                ＞＞＞ <strong>{{ reply.reply_to }}</strong><br>
+                {{ reply.body }}
+            </p>
+
+            <!-- 返信への返信 -->
+            <button type="button" onclick="toggleReply({{ reply.id }})">
+                返信
+            </button>
+
+            <div id="reply-form-{{ reply.id }}" style="display:none; margin-left:20px;">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                    <input type="hidden" name="reply_to" value="{{ reply.name }}">
+                    <button type="submit">送信</button>
+                </form>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- 親コメントへの返信 -->
     <button type="button" onclick="toggleReply({{ comment.id }})">
         返信
     </button>
 
-    <!-- 返信フォーム（最初は非表示） -->
     <div id="reply-form-{{ comment.id }}" style="display:none; margin-left:20px;">
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="hidden" name="parent_id" value="{{ comment.id }}">
-            <button class="button is-small is-success">送信</button>
+            <input type="hidden" name="reply_to" value="{{ comment.name }}">
+            <button type="submit">送信</button>
         </form>
     </div>
 
-    <!-- 子コメント（再帰） -->
-    {% if comment.replies.all %}
-    {% include "blog/child_comments.html" with comments=comment.replies.all level=level|add:30 %}
-    {% endif %}
 </div>
+<hr>
 {% endfor %}
+
+
+</div>

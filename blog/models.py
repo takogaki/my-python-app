@@ -54,3 +54,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.name} >>> {self.reply_to}: {self.body[:20]}"
+
+    @property
+    def root_parent(self):
+        """必ず一番上の親コメントを返す"""
+        comment = self
+        while comment.parent:
+            comment = comment.parent
+        return comment
+
+class Meta:
+        ordering = ['posted_date']  # ← ★ここを追加（返信は古い順）
