@@ -61,6 +61,29 @@
     background-color: #e6f0ff;
 }
 
+.media-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.comment-media-thumb {
+    max-width: 160px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.video-thumb {
+    display: inline-block;
+    cursor: pointer;
+    padding: 6px 10px;
+    background: #222;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
 </style>
 
 {% load comment_tags %}
@@ -80,25 +103,51 @@
     </button>
     {% endif %}
 
+        <div class="media-wrapper">
+        
+            {% if comment.image %}
+            <img src="{{ comment.image.url }}" class="comment-media-thumb"
+                onclick="openMedia('{{ comment.image.url }}', 'image')">
+            {% endif %}
+        
+            {% if comment.video %}
+            <div class="video-thumb" onclick="openMedia('{{ comment.video.url }}', 'video')">
+                ▶ 動画を見る
+            </div>
+            {% endif %}
+        
+        </div>
+
+
     <!-- 返信一覧（最初は非表示） -->
     <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
 
         {% for reply in comment.replies.all|dictsort:"posted_date" %}
         <div class="comment reply">
-
+        
             <p>
                 ∟ <strong>{{ reply.name }}</strong>
                 ＞＞＞ <strong>{{ reply.reply_to }}</strong><br>
                 {{ reply.body }}
             </p>
-
+        
+            {% if reply.image %}
+            <img src="{{ reply.image.url }}" class="comment-media-thumb" onclick="openMedia('{{ reply.image.url }}', 'image')">
+            {% endif %}
+        
+            {% if reply.video %}
+            <div class="video-thumb" onclick="openMedia('{{ reply.video.url }}', 'video')">
+                ▶ 動画を見る
+            </div>
+            {% endif %}
+        
             <!-- 返信への返信 -->
             <button type="button" onclick="toggleReply({{ reply.id }})">
                 返信
             </button>
-
+        
             <div id="reply-form-{{ reply.id }}" style="display:none; margin-left:20px;">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
                     <input type="hidden" name="parent_id" value="{{ comment.id }}">
@@ -106,7 +155,7 @@
                     <button type="submit">送信</button>
                 </form>
             </div>
-
+        
         </div>
         {% endfor %}
 
@@ -118,7 +167,7 @@
     </button>
 
     <div id="reply-form-{{ comment.id }}" style="display:none; margin-left:20px;">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="hidden" name="parent_id" value="{{ comment.id }}">

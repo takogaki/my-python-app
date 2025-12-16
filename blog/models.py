@@ -14,6 +14,28 @@ class Post(models.Model):
     body        = models.TextField(verbose_name="本文")
     posted_date = models.DateTimeField(auto_now_add=True, verbose_name="作成日時")
 
+    image = models.ImageField(
+        upload_to="post_images/",
+        null=True,
+        blank=True
+    )
+    video = models.FileField(
+        upload_to="post_videos/",
+        null=True,
+        blank=True
+    )
+
+    posted_date = models.DateTimeField(auto_now_add=True)
+
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="replies"
+    )
+    reply_to = models.CharField(max_length=50, null=True, blank=True)
+
     def save(self, *args, **kwargs):
         # ランダムな名前
         if not self.name:
@@ -50,8 +72,29 @@ class Comment(models.Model):
     parent = models.ForeignKey(
         'self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies'
     )
-    reply_to = models.CharField(max_length=50, null=True, blank=True)
 
+# 🔽 追加
+    image = models.ImageField(
+        upload_to="comment_images/",
+        null=True,
+        blank=True
+    )
+    video = models.FileField(
+        upload_to="comment_videos/",
+        null=True,
+        blank=True
+    )
+
+    posted_date = models.DateTimeField(auto_now_add=True)
+
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="replies"
+    )
+    reply_to = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self):
         return f"{self.name} >>> {self.reply_to}: {self.body[:20]}"
 

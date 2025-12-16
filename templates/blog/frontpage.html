@@ -42,13 +42,48 @@
         text-decoration: underline;
         /* ホバー時に下線 */
     }
+
+    .post-media-thumb {
+    max-width: 200px;
+    max-height: 200px;
+    cursor: pointer;
+    margin: 10px 0;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.video-thumb {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #333;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.media-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.media-modal img,
+.media-modal video {
+    max-width: 90%;
+    max-height: 90%;
+}
 </style>
 
 <h2>口を開く</h2>
-<form method="POST">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" name="create_post">口を閉じる</button>
+    <button type="submit">口をとじる</button>
 </form>
 
 {% for post in posts %}
@@ -56,15 +91,66 @@
 <a href="{% url 'blog:post_detail' slug=post.slug %}">{{ post.title }}</a>
 
 <div class="post block">
-    <!-- 投稿者名を表示 -->
+    <!-- 投稿者名 -->
     <p><strong>投稿者: </strong>{{ post.name }}</p>
-    <h2 class="subtitle">{{post.title}}</h2>
-    <small>Posted at {{post.posted_date}}</small>
-    <p>{{post.intro}}</p>
-    <a href="{% url 'blog:post_detail' slug=post.slug %}">もっと読む</a>
-    <br>
 
+    <h2 class="subtitle">{{ post.title }}</h2>
+    <small>Posted at {{ post.posted_date }}</small>
+
+    <p>{{ post.intro }}</p>
+
+    <!-- 🔽 画像サムネ -->
+    {% if post.image %}
+    <img src="{{ post.image.url }}" class="post-media-thumb" onclick="openMedia('{{ post.image.url }}', 'image')">
+    {% endif %}
+
+    <!-- 🔽 動画サムネ -->
+    {% if post.video %}
+    <div class="video-thumb" onclick="openMedia('{{ post.video.url }}', 'video')">
+        ▶ 動画を見る
+    </div>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'blog:post_detail' slug=post.slug %}">もっと読む</a>
 </div>
 
 {% endfor %}
+
+<!-- 🔽 メディア表示用モーダル（必須） -->
+<div id="media-modal" class="media-modal" onclick="closeMedia()">
+    <div id="media-content"></div>
+</div>
+
+<script>
+    function openMedia(url, type) {
+        const modal = document.getElementById("media-modal");
+        const content = document.getElementById("media-content");
+
+        if (!modal || !content) {
+            console.error("media modal not found");
+            return;
+        }
+
+        content.innerHTML = "";
+
+        if (type === "image") {
+            content.innerHTML = `<img src="${url}" style="max-width:90vw; max-height:90vh;">`;
+        } else {
+            content.innerHTML = `<video src="${url}" controls autoplay style="max-width:90vw; max-height:90vh;"></video>`;
+        }
+
+        modal.style.display = "flex";
+    }
+
+    function closeMedia() {
+        const modal = document.getElementById("media-modal");
+        const content = document.getElementById("media-content");
+        if (!modal || !content) return;
+
+        content.innerHTML = "";
+        modal.style.display = "none";
+    }
+</script>
+
 {% endblock %}

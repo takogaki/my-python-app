@@ -157,20 +157,98 @@
     text-decoration: underline;
 }
 
+.comment-media-thumb {
+    max-width: 120px;
+    cursor: pointer;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+
+.video-thumb {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.video-thumb:hover {
+    text-decoration: underline;
+}
+
+.media-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.media-modal img,
+.media-modal video {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.media-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.comment-media-thumb {
+    max-width: 160px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.video-thumb {
+    display: inline-block;
+    cursor: pointer;
+    padding: 6px 10px;
+    background: #222;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
 </style>
 
-<h1 class="title">{{ post.title }}</h1>
 <small>Posted at {{ post.posted_date }}</small>
+<br>
+<small>投稿者： {{ post.name }}</small>
+
+<h1 class="title">{{ post.title }}</h1>
+
 <p>{{ post.body }}</p>
+
+<div class="media-wrapper">
+
+    {% if post.image %}
+    <img src="{{ post.image.url }}" class="comment-media-thumb" onclick="openMedia('{{ post.image.url }}', 'image')">
+    {% endif %}
+
+    {% if post.video %}
+    <div class="video-thumb" onclick="openMedia('{{ post.video.url }}', 'video')">
+        ▶ 動画を見る
+    </div>
+    {% endif %}
+
+</div>
+
 
 <hr>
 
 <h2 class="subtitle">コメントを書く</h2>
-<form method="post">
+
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button class="button is-success">コメントを投稿</button>
 </form>
+
 
 <hr>
 
@@ -178,9 +256,12 @@
 
 {% include "blog/child_comments.html" with comments=parent_comments form=form %}
 
-
-</div>
 <hr>
+
+<div id="media-modal" class="media-modal" onclick="closeMedia()">
+    <div id="media-content"></div>
+</div>
+
 
 <script>
     function toggleReply(id) {
@@ -192,6 +273,30 @@
     if (!el) return;
     el.style.display = el.style.display === "none" ? "block" : "none";
 }
+</script>
+<script>
+    function openMedia(url, type) {
+        const modal = document.getElementById("media-modal");
+        const content = document.getElementById("media-content");
+
+        content.innerHTML = "";
+
+        if (type === "image") {
+            content.innerHTML = `<img src="${url}">`;
+        } else {
+            content.innerHTML = `<video src="${url}" controls autoplay></video>`;
+        }
+
+        modal.style.display = "flex";
+    }
+
+    function closeMedia() {
+        const modal = document.getElementById("media-modal");
+        const content = document.getElementById("media-content");
+
+        content.innerHTML = "";
+        modal.style.display = "none";
+    }
 </script>
 
 {% endblock %}

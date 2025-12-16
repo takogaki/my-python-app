@@ -10,7 +10,7 @@ fake = Faker()
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["name", "title", "body"]   # カイト様の元の通り
+        fields = ["name", "title", "body", 'image', 'video']   # カイト様の元の通り
 
 
 # =======================
@@ -19,13 +19,13 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ["name", "body"]   # コメントに必要な2つだけ
+        fields = ["name", "body", "image", "video"]   # コメントに必要な2つだけ
         widgets = {
             "name": forms.TextInput(attrs={
                 "placeholder": "匿名可",
             }),
         }
-        
+
         name = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):

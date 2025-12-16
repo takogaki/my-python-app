@@ -24,23 +24,21 @@ def get_anonymous_name(request):
 
 def frontpage(request):
     posts = Post.objects.all().order_by('-posted_date')
-    form = PostForm()
 
     if request.method == "POST":
-        # 投稿フォームだけを処理する
-        if "create_post" in request.POST:
-            form = PostForm(request.POST)
-            if form.is_valid():
-                post = form.save(commit=False)
-                post.name = post.name or fake.name()
-                post.save()
-                return redirect("blog:frontpage")
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.name = post.name or fake.name()
+            post.save()
+            return redirect("blog:frontpage")
+    else:
+        form = PostForm()
 
-        # 投稿フォーム以外の POST は無視
-        return redirect("blog:frontpage")
-
-    return render(request, "blog/frontpage.html", {"posts": posts, "form": form})
-
+    return render(request, "blog/frontpage.html", {
+        "posts": posts,
+        "form": form
+    })
 
 
 class PostCreateView(View):
@@ -79,7 +77,7 @@ def post_detail(request, slug):
         parent_id = request.POST.get("parent_id")
         parent = Comment.objects.get(id=parent_id) if parent_id else None
 
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request.FILES)
 
         if form.is_valid():
             comment = form.save(commit=False)
