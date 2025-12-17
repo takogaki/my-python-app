@@ -43,7 +43,7 @@ def frontpage(request):
 
 class PostCreateView(View):
     def get(self, request):
-        form = PostForm()
+        form = PostForm(request.POST, request.FILES)
         return render(request, "blog/frontpage.html", {"form": form})
 
     def post(self, request):
