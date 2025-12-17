@@ -41,19 +41,19 @@ def frontpage(request):
     })
 
 
-class PostCreateView(View):
-    def get(self, request):
-        form = PostForm(request.POST, request.FILES)
-        return render(request, "blog/frontpage.html", {"form": form})
+# class PostCreateView(View):
+#     def get(self, request):
+#         form = PostForm(request.POST, request.FILES)
+#         return render(request, "blog/frontpage.html", {"form": form})
 
-    def post(self, request):
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.name = post.name or fake.name()
-            post.save()
-            return redirect("blog:frontpage")
-        return render(request, "blog/frontpage.html", {"form": form})
+#     def post(self, request):
+#         form = PostForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.name = post.name or fake.name()
+#             post.save()
+#             return redirect("blog:frontpage")
+#         return render(request, "blog/frontpage.html", {"form": form})
 
 
 
