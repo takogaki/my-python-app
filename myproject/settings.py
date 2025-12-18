@@ -179,7 +179,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
 ]
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*",
+    "my-python-app-0t2k.onrender.com",
+    ".onrender.com",
+]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
