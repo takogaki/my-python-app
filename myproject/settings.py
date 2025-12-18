@@ -18,6 +18,22 @@ load_dotenv(env_file)
 DJANGO_ENV = os.getenv("DJANGO_ENV", "development")
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+DEBUG = True  # ← 今は強制で True にする
+
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY",
+    "dev-secret-key-unsafe"
+)
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "my-python-app-0t2k.onrender.com",
+    ".onrender.com",
+]
 #SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key")
 
 # ----------------------------------
@@ -179,10 +195,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
 ]
 
-ALLOWED_HOSTS = ["*",
-    "my-python-app-0t2k.onrender.com",
-    ".onrender.com",
-]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
@@ -230,3 +242,23 @@ if DJANGO_ENV == "development":
     SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = None
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
