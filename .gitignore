@@ -14,7 +14,7 @@ venv/
 
 # 静的ファイル（Djangoが自動生成する）
 staticfiles/
-static/
+# static/
 
 # メディアファイル（アップロードデータ）
 media/
