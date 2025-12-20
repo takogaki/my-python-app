@@ -48,12 +48,12 @@
                 {{ reply.body }}
             </p>
         
-            {% if reply.image %}
-            <img src="{{ reply.image.url }}" class="comment-media-thumb" onclick="openMedia('{{ reply.image.url }}', 'image')">
+            {% if reply.image and reply.image.name %}
+            <img src="{{ reply.image.url }}" class="comment-media-thumb">
             {% endif %}
         
-            {% if reply.video %}
-            <button class="video-thumb" data-video-url="{{ post.video.url }}">
+            {% if reply.video and reply.video.name %}
+            <button class="video-thumb" data-video-url="{{ reply.video.url }}">
                 ▶ 動画を見る
             </button>
             {% endif %}

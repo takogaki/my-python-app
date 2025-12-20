@@ -26,12 +26,12 @@
 <p>{{ post.body|truncatechars:120 }}</p>
 
     <!-- 🔽 画像サムネ -->
-    {% if post.image %}
-    <img src="{{ post.image.url }}" class="post-media-thumb" onclick="openMedia('{{ post.image.url }}', 'image')">
+    {% if post.image and post.image.name %}
+    <img src="{{ post.image.url }}" class="comment-media-thumb">
     {% endif %}
 
     <!-- 🔽 動画サムネ -->
-    {% if post.video %}
+    {% if post.video and post.video.name %}
     <button class="video-thumb" data-video-url="{{ post.video.url }}">
         ▶ 動画を見る
     </button>
