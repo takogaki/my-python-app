@@ -1,0 +1,241 @@
+/* =========================
+  投稿ページ 基本スタイル
+========================= */
+
+h1.title.has-text-centered {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+small.has-text-grey {
+    font-size: 0.9rem;
+    color: #7a7a7a;
+}
+
+p.content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    word-break: break-word;
+}
+
+/* =========================
+  コメントエリア
+========================= */
+
+h2.subtitle {
+    font-size: 1.6rem;
+    margin-top: 40px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.comment {
+    padding: 12px 14px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border-left: 4px solid #cbd5e1;
+    background-color: #f9fafb;
+    transition: background-color 0.2s;
+}
+
+.comment:nth-of-type(even) {
+    background-color: #eef2ff;
+}
+
+.comment:hover {
+    background-color: #dde7ff;
+}
+
+.comment strong {
+    font-size: 0.95rem;
+    color: #1f2937;
+}
+
+.comment small {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.comment button {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+}
+
+.comment button:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+  返信（階層）
+========================= */
+
+.reply-indented {
+    margin-left: 24px;
+    padding-left: 12px;
+    border-left: 2px solid #ddd;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+}
+
+.comment[style*="60px"] {
+    border-left-color: #93c5fd;
+}
+
+.comment[style*="90px"] {
+    border-left-color: #60a5fa;
+}
+
+/* =========================
+  補助UI
+========================= */
+
+.tag.is-primary {
+    background-color: #48c774;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    margin-left: 8px;
+}
+
+.notification.is-info {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* =========================
+  返信フォーム
+========================= */
+
+.reply-form {
+    margin-top: 20px;
+    padding: 14px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+}
+
+.reply-form input,
+.reply-form textarea {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.show-reply-button,
+.show-replies-button {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: #065fd4;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* =========================
+  メディア（サムネイル）
+========================= */
+
+.media-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.comment-media-thumb,
+.post-media-thumb {
+    max-width: 160px;
+    max-height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.video-thumb {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #222;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* =========================
+  モーダル（画像・動画）
+========================= */
+
+.media-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.media-inner {
+    width: 100%;
+    max-width: 960px;
+    padding: 12px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.media-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 28px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+#media-content {
+    display: flex;
+    justify-content: center;
+}
+
+#media-content img,
+#media-content video {
+    width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    background: #000;
+    border-radius: 6px;
+}
+
+/* =========================
+  スマホ最適化
+========================= */
+
+@media (max-width: 767px) {
+
+    h1.title.has-text-centered {
+        font-size: 1.6rem;
+    }
+
+    p.content {
+        font-size: 1rem;
+    }
+
+    .reply-indented {
+        margin-left: 16px;
+    }
+
+    .media-inner {
+        max-width: 100%;
+        padding: 0;
+    }
+}
