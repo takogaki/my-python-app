@@ -53,7 +53,11 @@
             {% endif %}
         
             {% if reply.video %}
-            <div class="video-thumb" onclick="openMedia('{{ reply.video.url }}', 'video')">
+            <!-- <div class="video-thumb" onclick="openMedia('{{ reply.video.url }}', 'video')">
+                ▶ 動画を見る
+            </div> -->
+
+            <div class="video-thumb" data-video-url="{{ comment.video.url }}">
                 ▶ 動画を見る
             </div>
             {% endif %}
@@ -97,5 +101,6 @@
 <hr>
 {% endfor %}
 
-
 </div>
+
+<script src="{% static 'blog/js/blog.js' %}"></script>

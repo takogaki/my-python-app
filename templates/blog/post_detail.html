@@ -19,7 +19,11 @@
     {% endif %}
 
     {% if post.video %}
-    <div class="video-thumb" onclick="openMedia('{{ post.video.url }}', 'video')">
+    <!-- <div class="video-thumb" onclick="openMedia('{{ post.video.url }}', 'video')">
+        ▶ 動画を見る
+    </div> -->
+
+    <div class="video-thumb" data-video-url="{{ comment.video.url }}">
         ▶ 動画を見る
     </div>
     {% endif %}
@@ -51,40 +55,6 @@
 </div>
 
 
-<script>
-    function toggleReply(id) {
-        const el = document.getElementById(`reply-form-${id}`);
-        el.style.display = el.style.display === "none" ? "block" : "none";
-    }
-            function toggleReplies(id) {
-    const el = document.getElementById(`replies-${id}`);
-    if (!el) return;
-    el.style.display = el.style.display === "none" ? "block" : "none";
-}
-</script>
-<script>
-    function openMedia(url, type) {
-        const modal = document.getElementById("media-modal");
-        const content = document.getElementById("media-content");
-
-        content.innerHTML = "";
-
-        if (type === "image") {
-            content.innerHTML = `<img src="${url}">`;
-        } else {
-            content.innerHTML = `<video src="${url}" controls autoplay></video>`;
-        }
-
-        modal.style.display = "flex";
-    }
-
-    function closeMedia() {
-        const modal = document.getElementById("media-modal");
-        const content = document.getElementById("media-content");
-
-        content.innerHTML = "";
-        modal.style.display = "none";
-    }
-</script>
+<script src="{% static 'blog/js/blog.js' %}"></script>
 
 {% endblock %}
