@@ -53,13 +53,9 @@
             {% endif %}
         
             {% if reply.video %}
-            <!-- <div class="video-thumb" onclick="openMedia('{{ reply.video.url }}', 'video')">
+            <button class="video-thumb" data-video-url="{{ post.video.url }}">
                 ▶ 動画を見る
-            </div> -->
-
-            <div class="video-thumb" data-video-url="{{ comment.video.url }}">
-                ▶ 動画を見る
-            </div>
+            </button>
             {% endif %}
         
             <!-- 返信への返信 -->
