@@ -31,10 +31,12 @@
     {% endif %}
 
     <!-- 🔽 動画サムネ -->
-    {% if post.video and post.video.name %}
-    <button class="video-thumb" data-video-url="{{ post.video.url }}">
-        ▶ 動画を見る
-    </button>
+    {% if post.youtube_url %}
+    <div class="video-wrapper">
+        <iframe src="https://www.youtube.com/embed/{{ post.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
+            loading="lazy">
+        </iframe>
+    </div>
     {% endif %}
 
     <br>

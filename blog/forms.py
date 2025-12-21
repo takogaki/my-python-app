@@ -10,7 +10,7 @@ fake = Faker()
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["name", "title", "body", 'image', 'video']   # カイト様の元の通り
+        fields = ["title", "body", "image", "youtube_url"]   # カイト様の元の通り
 
 
 # =======================
@@ -19,7 +19,7 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ["name", "body", "image", "video"]   # コメントに必要な2つだけ
+        fields = ["title", "body", "image", "youtube_url"]   # コメントに必要な2つだけ
         widgets = {
             "name": forms.TextInput(attrs={
                 "placeholder": "匿名可",

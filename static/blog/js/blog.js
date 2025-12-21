@@ -25,7 +25,7 @@ function toggleReplies(id) {
 
 
 /* =========================
-   メディアモーダル（共通）
+   画像モーダル（共通）
 ========================= */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -34,52 +34,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById("media-content");
     const closeBtn = document.querySelector(".media-close");
 
-    if (!modal || !content) {
-        console.error("media modal elements not found");
-        return;
-    }
+    // モーダルが存在しないページでは何もしない
+    if (!modal || !content) return;
 
-    /* ===== モーダルを開く ===== */
-    function openMedia({ url, type }) {
+    /* ===== モーダルを開く（画像のみ） ===== */
+    function openImage(url) {
         content.innerHTML = "";
 
-        if (type === "image") {
-            const img = document.createElement("img");
-            img.src = url;
-            img.style.maxWidth = "100%";
-            img.style.maxHeight = "90vh";
-            img.style.objectFit = "contain";
-            content.appendChild(img);
-        }
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "image preview";
+        img.style.width = "100%";
+        img.style.maxHeight = "90vh";
+        img.style.objectFit = "contain";
 
-        if (type === "video") {
-            const video = document.createElement("video");
-            video.src = url;
-            video.controls = true;
-            video.autoplay = true;
-            video.playsInline = true;       // iOS対策
-            video.preload = "metadata";     // ストリーミング
-            video.style.width = "100%";
-            video.style.maxHeight = "90vh";
-            content.appendChild(video);
-        }
-
+        content.appendChild(img);
         modal.style.display = "flex";
     }
 
     /* ===== モーダルを閉じる ===== */
-    function closeMedia() {
+    function closeModal() {
         content.innerHTML = "";
         modal.style.display = "none";
     }
 
     if (closeBtn) {
-        closeBtn.addEventListener("click", closeMedia);
+        closeBtn.addEventListener("click", closeModal);
     }
 
     modal.addEventListener("click", (e) => {
         if (e.target === modal) {
-            closeMedia();
+            closeModal();
         }
     });
 
@@ -88,29 +73,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================= */
     document.addEventListener("click", (e) => {
 
-        /* 動画を見る */
-        const videoBtn = e.target.closest(".video-thumb");
-        if (videoBtn) {
-            const url = videoBtn.dataset.videoUrl;
-            if (!url) return;
-
-            openMedia({ url, type: "video" });
-            return;
-        }
-
-        /* 画像クリック */
+        // 画像サムネイル
         const imgThumb = e.target.closest(".comment-media-thumb, .post-media-thumb");
         if (imgThumb) {
             const url = imgThumb.dataset.imageUrl || imgThumb.src;
             if (!url) return;
 
-            openMedia({ url, type: "image" });
-            return;
+            openImage(url);
         }
 
-        /* 閉じるボタン */
+        // 閉じるボタン
         if (e.target.classList.contains("media-close")) {
-            closeMedia();
+            closeModal();
         }
     });
 });

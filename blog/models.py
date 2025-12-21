@@ -15,7 +15,12 @@ class Post(models.Model):
     posted_date = models.DateTimeField(auto_now_add=True)
 
     image = models.ImageField(upload_to="post_images/", null=True, blank=True)
-    video = models.FileField(upload_to="post_videos/", null=True, blank=True)
+    
+    youtube_url = models.URLField(
+    blank=True,
+    null=True,
+    help_text="YouTubeのURL（限定公開OK）"
+)
 
     def save(self, *args, **kwargs):
         if not self.name:
@@ -59,7 +64,12 @@ class Comment(models.Model):
     reply_to = models.CharField(max_length=50, null=True, blank=True)
 
     image = models.ImageField(upload_to="comment_images/", null=True, blank=True)
-    video = models.FileField(upload_to="comment_videos/", null=True, blank=True)
+    
+    youtube_url = models.URLField(
+    blank=True,
+    null=True,
+    help_text="YouTubeのURL（限定公開OK）"
+)
 
     def __str__(self):
         return self.body[:20]
