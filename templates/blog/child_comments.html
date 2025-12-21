@@ -27,9 +27,11 @@
                 onclick="openMedia('{{ comment.image.url }}', 'image')">
             {% endif %}
         
-            {% if comment.video %}
-            <div class="video-thumb" onclick="openMedia('{{ comment.video.url }}', 'video')">
-                ▶ 動画を見る
+            {% if post.youtube_url %}
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/{{ post.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
+                    loading="lazy">
+                </iframe>
             </div>
             {% endif %}
         
