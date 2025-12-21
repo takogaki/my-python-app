@@ -27,9 +27,9 @@
                 onclick="openMedia('{{ comment.image.url }}', 'image')">
             {% endif %}
         
-            {% if post.youtube_url %}
+            {% if comment.youtube_url %}
             <div class="video-wrapper">
-                <iframe src="https://www.youtube.com/embed/{{ post.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
+                <iframe src="https://www.youtube.com/embed/{{ comment.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
                     loading="lazy">
                 </iframe>
             </div>
@@ -54,9 +54,9 @@
             <img src="{{ reply.image.url }}" class="comment-media-thumb">
             {% endif %}
         
-            {% if post.youtube_url %}
+            {% if reply.youtube_url %}
             <div class="video-wrapper">
-                <iframe src="https://www.youtube.com/embed/{{ post.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
+                <iframe src="https://www.youtube.com/embed/{{ reply.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
                     loading="lazy">
                 </iframe>
             </div>
