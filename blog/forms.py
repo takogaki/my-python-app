@@ -11,7 +11,11 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ["title", "body", "image", "youtube_url"]   # カイト様の元の通り
-
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "placeholder": "匿名可",
+            }),
+        }
 
 # =======================
 # コメントフォーム
@@ -19,7 +23,7 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ["title", "body", "image", "youtube_url"]   # コメントに必要な2つだけ
+        fields = ["body", "image", "youtube_url"]   # コメントに必要な2つだけ
         widgets = {
             "name": forms.TextInput(attrs={
                 "placeholder": "匿名可",
