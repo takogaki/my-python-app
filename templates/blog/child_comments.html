@@ -1,74 +1,69 @@
 {% load comment_tags %}
 {% load youtube_extras %}
-{% load static %}
-{% extends "base.html" %}
-
-<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
-
-{% load comment_tags %}
 
 {% for comment in comments %}
 <div class="comment parent">
 
     <p>
-        <strong>{{ comment.name }}</strong><br>
+        <strong>{{ comment.name|default:"匿名" }}</strong><br>
         {{ comment.body }}
     </p>
 
-    <!-- 返信を見るボタン -->
-    {% if comment.replies.all %}
+    {% if comment.replies.exists %}
     <button type="button" class="show-replies-button" onclick="toggleReplies({{ comment.id }})">
         返信を見る（{{ comment.replies.count }}件）
     </button>
     {% endif %}
 
-        <div class="media-wrapper">
-        
-            {% if comment.image %}
-            <img src="{{ comment.image.url }}" class="comment-media-thumb"
-                onclick="openMedia('{{ comment.image.url }}', 'image')">
-            {% endif %}
-        
-            {% if comment.youtube_url %}
-            <div class="video-wrapper">
-                <iframe src="https://www.youtube.com/embed/{{ comment.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
-                    loading="lazy">
-                </iframe>
-            </div>
-            {% endif %}
-        
+    <div class="media-wrapper">
+
+        {% if comment.image %}
+        <img src="{{ comment.image.url }}" class="comment-media-thumb"
+            onclick="openMedia('{{ comment.image.url }}', 'image')">
+        {% endif %}
+
+        {% if comment.youtube_url %}
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/{{ comment.youtube_url|youtube_id }}" frameborder="0"
+                allowfullscreen loading="lazy">
+            </iframe>
         </div>
+        {% endif %}
 
+    </div>
 
-    <!-- 返信一覧（最初は非表示） -->
+    <!-- 子コメント（返信） -->
     <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
 
-        {% for reply in comment.replies.all|dictsort:"posted_date" %}
+        {% for reply in comment.replies.all %}
         <div class="comment reply">
-        
+
             <p>
-                ∟ <strong>{{ reply.name }}</strong>
-                ＞＞＞ <strong>{{ reply.reply_to }}</strong><br>
+                ∟ <strong>{{ reply.name|default:"匿名" }}</strong>
+                {% if reply.reply_to %}
+                ＞＞＞ <strong>{{ reply.reply_to }}</strong>
+                {% endif %}
+                <br>
                 {{ reply.body }}
             </p>
-        
-            {% if reply.image and reply.image.name %}
+
+            {% if reply.image %}
             <img src="{{ reply.image.url }}" class="comment-media-thumb">
             {% endif %}
-        
+
             {% if reply.youtube_url %}
             <div class="video-wrapper">
-                <iframe src="https://www.youtube.com/embed/{{ reply.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
-                    loading="lazy">
+                <iframe src="https://www.youtube.com/embed/{{ reply.youtube_url|youtube_id }}" frameborder="0"
+                    allowfullscreen loading="lazy">
                 </iframe>
             </div>
             {% endif %}
-        
+
             <!-- 返信への返信 -->
             <button type="button" onclick="toggleReply({{ reply.id }})">
                 返信
             </button>
-        
+
             <div id="reply-form-{{ reply.id }}" style="display:none; margin-left:20px;">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
@@ -78,7 +73,7 @@
                     <button type="submit">送信</button>
                 </form>
             </div>
-        
+
         </div>
         {% endfor %}
 
@@ -101,8 +96,6 @@
 
 </div>
 <hr>
+{% empty %}
+<p>コメントはまだありません。</p>
 {% endfor %}
-
-</div>
-
-<script src="{% static 'blog/js/blog.js' %}"></script>
