@@ -1,7 +1,9 @@
 {% extends "base/diary_base.html" %}
+{% load youtube_extras %}
 {% load comment_tags %}
-{% block body %}
 {% load static %}
+
+{% block body %}
 <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
 <small>Posted at {{ post.posted_date }}</small>
