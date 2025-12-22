@@ -11,6 +11,15 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">口をとじる</button>
+    <br>
+    <div class="notification is-light">
+        <strong>📺 YouTube動画の貼り方</strong><br>
+        ① YouTubeで動画を開く<br>
+        ② 「共有」を押す<br>
+        ③ 表示されたURLをコピー<br>
+        ④ そのまま貼り付けてください（限定公開でもOK）
+    </div>
+    <br>
 </form>
 
 {% for post in posts %}
