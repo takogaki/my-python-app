@@ -24,9 +24,16 @@
 
         {% if comment.youtube_url %}
         <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/{{ comment.youtube_url|youtube_id }}" frameborder="0"
-                allowfullscreen loading="lazy">
+            <iframe src="https://www.youtube.com/embed/{{ comment.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
+                loading="lazy">
             </iframe>
+        
+            <p class="youtube-link">
+                ▶ 再生できない場合は
+                <a href="{{ comment.youtube_url }}" target="_blank" rel="noopener">
+                    YouTubeで見る
+                </a>
+            </p>
         </div>
         {% endif %}
 
@@ -53,9 +60,16 @@
 
             {% if reply.youtube_url %}
             <div class="video-wrapper">
-                <iframe src="https://www.youtube.com/embed/{{ reply.youtube_url|youtube_id }}" frameborder="0"
-                    allowfullscreen loading="lazy">
+                <iframe src="https://www.youtube.com/embed/{{ reply.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
+                    loading="lazy">
                 </iframe>
+            
+                <p class="youtube-link">
+                    ▶ 再生できない場合は
+                    <a href="{{ reply.youtube_url }}" target="_blank" rel="noopener">
+                        YouTubeで見る
+                    </a>
+                </p>
             </div>
             {% endif %}
 

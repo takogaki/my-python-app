@@ -37,6 +37,13 @@
         <iframe src="https://www.youtube.com/embed/{{ post.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
             loading="lazy">
         </iframe>
+    
+        <p class="youtube-link">
+            ▶ 再生できない場合は
+            <a href="{{ post.youtube_url }}" target="_blank" rel="noopener">
+                YouTubeで見る
+            </a>
+        </p>
     </div>
     {% endif %}
 

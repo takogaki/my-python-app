@@ -276,3 +276,18 @@ h2.subtitle {
         padding: 0;
     }
 }
+
+.youtube-link {
+    text-align: left;
+    margin-top: 8px;
+}
+
+.youtube-link a {
+    color: #e53935;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.youtube-link a:hover {
+    text-decoration: underline;
+}
