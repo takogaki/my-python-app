@@ -1,32 +1,18 @@
 from pathlib import Path
 import os
-import dj_database_url   # ※requirements.txtにdj-database-urlが必要です
-from dotenv import load_dotenv
-load_dotenv()
-
-
-# ==============================
-# .envファイルを自動選択読み込み
-# ==============================
-BASE_DIR = Path(__file__).resolve().parent.parent
-env_file = BASE_DIR / (".env.production" if os.getenv("DJANGO_ENV") == "production" else ".env.development")
-load_dotenv(env_file)
+import dj_database_url
 
 # ==============================
 # 基本設定
 # ==============================
-DJANGO_ENV = os.getenv("DJANGO_ENV", "development")
-DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# DEBUG = True  # ← 今は強制で True にする
+DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
+DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
-SECRET_KEY = os.getenv(
-    "DJANGO_SECRET_KEY",
-    "dev-secret-key-unsafe"
-)
+# ★ SECRET_KEY は Render の Environment Variables からのみ取得
+# ★ fallback / dotenv / 二重定義は一切しない
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -34,31 +20,33 @@ ALLOWED_HOSTS = [
     "my-python-app-0t2k.onrender.com",
     ".onrender.com",
 ]
-#SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key")
 
+# Render 固有ホスト
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+RENDER_INTERNAL_HOSTNAME = os.environ.get("RENDER_INTERNAL_HOSTNAME")
+if RENDER_INTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_INTERNAL_HOSTNAME)
 
 # ----------------------------------
 # セキュリティ設定
 # ----------------------------------
 if DJANGO_ENV == "production":
-    # HTTPS 強制
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    # Cookie（Render + HTTPS 必須）
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-    # ★ これがログイン不能の最大原因だった部分
     SESSION_COOKIE_SAMESITE = "None"
     CSRF_COOKIE_SAMESITE = "None"
 
-    # CSRF 許可ドメイン（本番URL）
     CSRF_TRUSTED_ORIGINS = [
         "https://my-python-app-0t2k.onrender.com",
     ]
 
-    # セキュリティヘッダ
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_SECONDS = 31536000
@@ -66,7 +54,6 @@ if DJANGO_ENV == "production":
     SECURE_HSTS_PRELOAD = True
 
 else:
-    # 開発環境（ローカル）
     SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = None
 
@@ -81,8 +68,6 @@ else:
         "http://localhost:8000",
     ]
 
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
 # ----------------------------------
 # アプリケーション定義
 # ----------------------------------
@@ -92,12 +77,11 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    'whitenoise.runserver_nostatic',
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "diary.apps.DiaryConfig",
     "blog.apps.BlogConfig",
     "chat",
-    #"channels",
     "accounts",
     "user_messages",
     "django_extensions",
@@ -135,65 +119,43 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "myproject.wsgi.application"
-# ASGI_APPLICATION = "myproject.routing.application"
 
-# # ----------------------------------
-# # Channels（リアルタイム通信設定）
-# # ----------------------------------
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-#     },
-# }
-
-REDIS_URL = os.getenv('REDIS_URL')
-
-if REDIS_URL:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {"hosts": [REDIS_URL]},
-        },
-    }
-
-
-import dj_database_url
-
-if 'DATABASE_URL' in os.environ:
-    # Render / 本番環境（PostgreSQL）
+# ----------------------------------
+# データベース
+# ----------------------------------
+if "DATABASE_URL" in os.environ:
     DATABASES = {
-        'default': dj_database_url.config(
+        "default": dj_database_url.config(
             conn_max_age=600,
             ssl_require=True
         )
     }
 else:
-    # ローカル開発環境（SQLite）
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
-
-
-
-
 # ----------------------------------
-# 認証・パスワード
+# 認証
 # ----------------------------------
+AUTH_USER_MODEL = "accounts.CustomUser"
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
-AUTH_USER_MODEL = "accounts.CustomUser"
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/diary/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 # ----------------------------------
-# 言語・タイムゾーン
+# 言語・時間
 # ----------------------------------
 LANGUAGE_CODE = "ja"
 TIME_ZONE = "Asia/Tokyo"
@@ -201,92 +163,28 @@ USE_I18N = True
 USE_TZ = True
 
 # ----------------------------------
-# 静的・メディアファイル
+# 静的ファイル
 # ----------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-
-
 # ----------------------------------
-# CORS / CSRF
-# ----------------------------------
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-    "https://my-python-app-0t2k.onrender.com",
-]
-
-
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-RENDER_INTERNAL_HOSTNAME = os.environ.get('RENDER_INTERNAL_HOSTNAME')
-if RENDER_INTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_INTERNAL_HOSTNAME)
-
-
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-# ----------------------------------
-# メール設定
+# メール
 # ----------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-# Gmailアプリパスワード
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-
-# 差出人メール（Gmailを使う！）
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-# ----------------------------------
-# リダイレクト設定
-# ----------------------------------
-LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/diary/"
-LOGOUT_REDIRECT_URL = "/accounts/login/"
-SIGNUP_REDIRECT_URL = "/diary/"
 
 # ----------------------------------
-# デフォルト主キー設定
+# その他
 # ----------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-if DJANGO_ENV == "development":
-    SECURE_SSL_REDIRECT = False
-    SECURE_PROXY_SSL_HEADER = None
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "DEBUG",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-    },
-}
