@@ -21,7 +21,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = True  # ← 今は強制で True にする
+# DEBUG = True  # ← 今は強制で True にする
 
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
