@@ -99,15 +99,17 @@ class SignUpView(generic.CreateView):
 
 def activate(request, uidb64, token):
     try:
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = CustomUser.objects.get(pk=uid)
-    except Exception:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
 
-    if user and default_token_generator.check_token(user, token):
+    if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        return render(request, "accounts/activate_success.html")
+
+        messages.success(request, "アカウントが有効化されました。ログインしてください。")
+        return redirect("accounts:login")
 
     return render(request, "accounts/activate_failed.html")
 
