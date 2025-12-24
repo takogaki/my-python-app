@@ -1,0 +1,15 @@
+{% extends "base/diary_base.html" %}
+
+{% block body %}
+<h2>認証に失敗しました</h2>
+
+<p>
+    この認証リンクは無効、または期限切れです。
+</p>
+
+<p>
+    すでに登録が完了している場合は、そのままログインしてください。
+</p>
+
+<a href="{% url 'accounts:login' %}">ログイン画面へ</a>
+{% endblock %}
