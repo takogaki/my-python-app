@@ -9,6 +9,9 @@ urlpatterns = [
     # 認証
     path("signup/", SignUpView.as_view(), name="signup"),
     path("signup/done/", views.signup_done, name="signup_done"),
+# ★ これが最重要
+    path("activate/<uidb64>/<token>/", views.activate, name="activate"),
+
     path("login/", LoginView.as_view(template_name="accounts/login.html"), name="login"),
     path("logout/", LogoutView.as_view(template_name="accounts/logout.html"), name="logout"),
 
