@@ -1,6 +1,8 @@
 from pathlib import Path
 import os
 import dj_database_url
+from dotenv import load_dotenv
+load_dotenv()
 
 # ==============================
 # 基本設定
@@ -12,7 +14,10 @@ DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
 # ★ SECRET_KEY は Render の Environment Variables からのみ取得
 # ★ fallback / dotenv / 二重定義は一切しない
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "dev-secret-key-unsafe"
+)
 
 ALLOWED_HOSTS = [
     "localhost",
