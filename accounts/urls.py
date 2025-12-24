@@ -14,6 +14,6 @@ urlpatterns = [
     path('user_list/', views.user_list, name='user_list'),
     path('user_detail/<int:pk>/', views.user_detail, name='user_detail'),
     path("user/<str:username>/", UserDetailView.as_view(), name="user_detail"),
-    path("activate/<uidb64>/<token>/", views.activate, name="activate"),
+    path("activate/<int:uid>/<token>/", views.activate, name="activate"),
     path("signup/done/", views.signup_done, name="signup_done"),
 ]
