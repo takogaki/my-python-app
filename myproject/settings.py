@@ -36,26 +36,53 @@ ALLOWED_HOSTS = [
 ]
 #SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key")
 
+
 # ----------------------------------
 # セキュリティ設定
 # ----------------------------------
 if DJANGO_ENV == "production":
+    # HTTPS 強制
     SECURE_SSL_REDIRECT = True
-    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+    # Cookie（Render + HTTPS 必須）
     SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # ★ これがログイン不能の最大原因だった部分
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "None"
+
+    # CSRF 許可ドメイン（本番URL）
+    CSRF_TRUSTED_ORIGINS = [
+        "https://my-python-app-0t2k.onrender.com",
+    ]
+
+    # セキュリティヘッダ
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
 else:
-    # 開発環境ではHTTPSを無効化
+    # 開発環境（ローカル）
     SECURE_SSL_REDIRECT = False
-    CSRF_COOKIE_SECURE = False
+    SECURE_PROXY_SSL_HEADER = None
+
     SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
+
+    CSRF_TRUSTED_ORIGINS = [
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ]
+
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-
 # ----------------------------------
 # アプリケーション定義
 # ----------------------------------
@@ -193,6 +220,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
+    "https://my-python-app-0t2k.onrender.com",
 ]
 
 
