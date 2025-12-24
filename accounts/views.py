@@ -14,6 +14,8 @@ from django.utils.http import (
     urlsafe_base64_encode,
     urlsafe_base64_decode
 )
+
+from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 
 from .forms import CustomUserCreationForm
