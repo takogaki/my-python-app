@@ -162,19 +162,6 @@ def activate(request, uid, token):
     return render(request, "accounts/activate_failed.html")
 
 
-def activate(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = CustomUser.objects.get(pk=uid)
-    except Exception:
-        user = None
-
-    if user and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        return redirect("accounts:login")
-
-    return render(request, "accounts/activation_failed.html")
 
 # =========================
 # （未使用だが既存のまま残す）
