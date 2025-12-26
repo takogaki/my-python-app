@@ -17,7 +17,7 @@ urlpatterns = [
 
     # ユーザー一覧・詳細
     path("users/", views.user_list, name="user_list"),
-    path("users/<int:pk>/", views.user_detail, name="user_detail"),
+    path("users/<str:username>/", views.UserDetailView.as_view(), name="user_detail"),
 
     # ユーザー公開ページ（username指定）
     path("user/<str:username>/", UserDetailView.as_view(), name="user_detail_by_username"),
