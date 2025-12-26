@@ -18,6 +18,8 @@ from .forms import CustomUserCreationForm
 from .models import CustomUser
 from diary.models import Page
 
+import uuid
+
 User = get_user_model()
 
 # =========================
@@ -65,60 +67,36 @@ class SignUpView(generic.CreateView):
     def form_valid(self, form):
         user = form.save(commit=False)
         user.is_active = False
+        user.activation_token = uuid.uuid4()
         user.save()
-
-        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
 
         activation_url = self.request.build_absolute_uri(
             reverse(
                 "accounts:activate",
-                kwargs={"uidb64": uidb64, "token": token}
+                args=[str(user.activation_token)]
             )
         )
 
         send_mail(
             subject="【本登録のご案内】",
-            message=(
-                "以下のリンクをクリックして登録を完了してください。\n\n"
-                f"{activation_url}\n\n"
-                "※このメールに心当たりがない場合は破棄してください。"
-            ),
+            message=f"以下のリンクをクリックしてください。\n\n{activation_url}",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
-            fail_silently=False,
         )
-
         return super().form_valid(form)
+    
 
 
 # =========================
-# ★ 本登録（100%通る）
+# ★ 本登録（UUID方式・最終確定版）
 # =========================
 
-def activate(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except Exception:
-        user = None
+def activate(request, token):
+    user = get_object_or_404(CustomUser, activation_token=token)
 
-    if user and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save(update_fields=["is_active"])
+    user.is_active = True
+    user.activation_token = None
+    user.save(update_fields=["is_active", "activation_token"])
 
-        messages.success(
-            request,
-            "アカウントが有効化されました。ログインしてください。"
-        )
-        return redirect("accounts:login")
-
-    return render(request, "accounts/activate_failed.html")
-
-
-# =========================
-# ★ 仮登録完了画面
-# =========================
-
-def signup_done(request):
-    return render(request, "accounts/signup_done.html")
+    messages.success(request, "アカウントが有効化されました。ログインしてください。")
+    return redirect("accounts:login")

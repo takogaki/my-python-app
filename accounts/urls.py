@@ -23,5 +23,5 @@ urlpatterns = [
     path("user/<str:username>/", UserDetailView.as_view(), name="user_detail_by_username"),
 
     # メール認証（★これが唯一の activate）
-    path("activate/<uidb64>/<token>/", views.activate, name="activate"),
+    path("activate/<uuid:token>/", views.activate, name="activate")
 ]
