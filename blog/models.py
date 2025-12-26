@@ -16,11 +16,13 @@ class Post(models.Model):
 
     image = models.ImageField(upload_to="post_images/", null=True, blank=True)
     
-    youtube_url = models.URLField(
-    blank=True,
-    null=True,
-    help_text="YouTubeのURL（限定公開OK）"
-)
+    # ★ すべての動画SNS用
+    video_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="YouTube / TikTok / Instagram / X / Facebook の動画URL"
+    )
+
 
     def save(self, *args, **kwargs):
         if not self.name:
@@ -65,11 +67,11 @@ class Comment(models.Model):
 
     image = models.ImageField(upload_to="comment_images/", null=True, blank=True)
     
-    youtube_url = models.URLField(
-    blank=True,
-    null=True,
-    help_text="YouTubeのURL（限定公開OK）"
-)
+    video_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="動画URL（YouTube / TikTok / Instagram / X / Facebook）"
+    )
 
     def __str__(self):
         return self.body[:20]

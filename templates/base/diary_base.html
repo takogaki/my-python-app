@@ -32,7 +32,7 @@
             <a href="{% url 'accounts:login' %}">ログイン</a>
             <a href="{% url 'accounts:signup' %}">新規登録</a>
             {% endif %}
-            <p>ログイン中のユーザー数: {{ logged_in_users_count }}</p>
+            <p>登録ユーザー数: {{ logged_in_users_count }}</p>
         </div>
     </header>
     {% block body %}

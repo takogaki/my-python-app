@@ -22,19 +22,8 @@
             onclick="openMedia('{{ comment.image.url }}', 'image')">
         {% endif %}
 
-        {% if comment.youtube_url %}
-        <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/{{ comment.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
-                loading="lazy">
-            </iframe>
-        
-            <p class="youtube-link">
-                ▶ 再生できない場合は
-                <a href="{{ comment.youtube_url }}" target="_blank" rel="noopener">
-                    YouTubeで見る
-                </a>
-            </p>
-        </div>
+        {% if comment.video_url %}
+        {% include "blog/video_embed.html" with video_url=comment.video_url %}
         {% endif %}
 
     </div>
@@ -58,19 +47,8 @@
             <img src="{{ reply.image.url }}" class="comment-media-thumb">
             {% endif %}
 
-            {% if reply.youtube_url %}
-            <div class="video-wrapper">
-                <iframe src="https://www.youtube.com/embed/{{ reply.youtube_url|youtube_id }}" frameborder="0" allowfullscreen
-                    loading="lazy">
-                </iframe>
-            
-                <p class="youtube-link">
-                    ▶ 再生できない場合は
-                    <a href="{{ reply.youtube_url }}" target="_blank" rel="noopener">
-                        YouTubeで見る
-                    </a>
-                </p>
-            </div>
+            {% if reply.video_url %}
+            {% include "blog/video_embed.html" with video_url=reply.video_url %}
             {% endif %}
 
             <!-- 返信への返信 -->

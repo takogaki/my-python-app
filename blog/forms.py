@@ -20,7 +20,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ["name", "title", "body", "image", "youtube_url"]
+        fields = ["name", "title", "body", "image", "video_url"]
         widgets = {
             "title": forms.TextInput(attrs={
                 "placeholder": "タイトル",
@@ -56,7 +56,7 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ["name", "body", "image", "youtube_url"]
+        fields = ["name", "body", "image", "video_url"]
         widgets = {
             "body": forms.Textarea(attrs={
                 "placeholder": "コメントを書く",

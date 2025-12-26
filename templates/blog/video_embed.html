@@ -1,0 +1,20 @@
+{% if "youtube" in video_url %}
+<iframe
+    src="https://www.youtube.com/embed/{{ video_url|cut:'https://youtu.be/'|cut:'https://www.youtube.com/watch?v=' }}"
+    width="560" height="315" frameborder="0" allowfullscreen></iframe>
+
+{% elif "tiktok.com" in video_url %}
+<iframe src="https://www.tiktok.com/embed/v2/{{ video_url|slice:'-19:' }}" width="325" height="580"
+    frameborder="0"></iframe>
+
+{% elif "instagram.com" in video_url %}
+<iframe src="{{ video_url }}embed" width="400" height="480" frameborder="0"></iframe>
+
+{% elif "twitter.com" in video_url or "x.com" in video_url %}
+<blockquote class="twitter-tweet"><a href="{{ video_url }}"></a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js"></script>
+
+{% elif "facebook.com" in video_url %}
+<iframe src="https://www.facebook.com/plugins/video.php?href={{ video_url|urlencode }}" width="500" height="280"
+    frameborder="0"></iframe>
+{% endif %}
