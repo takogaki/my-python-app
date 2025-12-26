@@ -73,6 +73,7 @@ if DJANGO_ENV == "production":
     ]
 
     SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = None  # ← DENY を無効化する
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -218,36 +219,43 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # =========================
-# Content Security Policy
+# Content Security Policy (django-csp 4.x+)
 # =========================
 
-CSP_DEFAULT_SRC = ("'self'",)
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": (
+            "'self'",
+        ),
 
-CSP_FRAME_SRC = (
-    "'self'",
-    "https://www.youtube.com",
-    "https://www.youtube-nocookie.com",
-    "https://www.tiktok.com",
-    "https://www.instagram.com",
-    "https://www.facebook.com",
-    "https://platform.twitter.com",
-)
+        "frame-src": (
+            "'self'",
+            "https://www.youtube.com",
+            "https://www.youtube-nocookie.com",
+            "https://www.tiktok.com",
+            "https://www.instagram.com",
+            "https://www.facebook.com",
+            "https://platform.twitter.com",
+        ),
 
-CSP_SCRIPT_SRC = (
-    "'self'",
-    "https://www.youtube.com",
-    "https://www.tiktok.com",
-    "https://www.instagram.com",
-    "https://platform.twitter.com",
-)
+        "script-src": (
+            "'self'",
+            "https://www.youtube.com",
+            "https://www.tiktok.com",
+            "https://www.instagram.com",
+            "https://platform.twitter.com",
+            "https://connect.facebook.net",
+        ),
 
-CSP_STYLE_SRC = (
-    "'self'",
-    "'unsafe-inline'",  # Instagram/TikTok embed対策
-)
+        "style-src": (
+            "'self'",
+            "'unsafe-inline'",  # Instagram / TikTok embed 必須
+        ),
 
-CSP_IMG_SRC = (
-    "'self'",
-    "data:",
-    "https:",
-)
+        "img-src": (
+            "'self'",
+            "data:",
+            "https:",
+        ),
+    }
+}
