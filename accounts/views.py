@@ -92,14 +92,19 @@ class SignUpView(generic.CreateView):
 # =========================
 
 def activate(request, token):
-    user = get_object_or_404(CustomUser, activation_token=token)
+    try:
+        user = CustomUser.objects.get(
+            activation_token=token,
+            is_active=False
+        )
+    except CustomUser.DoesNotExist:
+        # ❌ 無効・期限切れ・二重クリックなど
+        return render(request, "accounts/activate_failed.html")
 
+    # ✅ 正常な本登録
     user.is_active = True
     user.activation_token = None
     user.save(update_fields=["is_active", "activation_token"])
 
-    messages.success(request, "アカウントが有効化されました。ログインしてください。")
-    return redirect("accounts:login")
-
-def signup_done(request):
-    return render(request, "accounts/signup_done.html")
+    messages.success(request, "アカウントが有効化されました。")
+    return render(request, "accounts/activate_success.html")
