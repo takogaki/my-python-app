@@ -24,36 +24,30 @@
 
         {% if comment.video_url %}
         
-        {# YouTube #}
-        {% if "youtube.com" in comment.video_url or "youtube" in comment.video_url %}
+        {% if "youtube.com" in comment.video_url or "youtu.be" in comment.video_url %}
         <iframe width="100%" height="315"
-            src="https://www.youtube.com/embed/{{ comment.video_url|cut:'https://youtube/'|cut:'https://www.youtube.com/watch?v=' }}"
+            src="https://www.youtube.com/embed/{{ comment.video_url|cut:'https://www.youtube.com/watch?v='|cut:'https://youtu.be/' }}"
             frameborder="0" allowfullscreen>
         </iframe>
         
-        {# TikTok #}
         {% elif "tiktok.com" in comment.video_url %}
         <blockquote class="tiktok-embed" cite="{{ comment.video_url }}"></blockquote>
-        <script async src="https://www.tiktok.com/embed.js"></script>
         
-        {# Instagram #}
         {% elif "instagram.com" in comment.video_url %}
-        <blockquote class="instagram-media" data-instagram-permalink="{{ comment.video_url }}">
+        <blockquote class="instagram-media" data-instgrm-permalink="{{ comment.video_url }}">
         </blockquote>
-        <script async src="//www.instagram.com/embed.js"></script>
         
-        {# X (Twitter) #}
         {% elif "x.com" in comment.video_url or "twitter.com" in comment.video_url %}
         <blockquote class="twitter-tweet">
             <a href="{{ comment.video_url }}"></a>
         </blockquote>
-        <script async src="https://platform.twitter.com/widgets.js"></script>
         
-        {# Facebook #}
         {% elif "facebook.com" in comment.video_url %}
         <iframe src="https://www.facebook.com/plugins/video.php?href={{ comment.video_url }}" width="100%" height="315"
             style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen>
         </iframe>
+        
+        {% endif %}
         
         {% endif %}
 
@@ -80,36 +74,30 @@
 
             {% if reply.video_url %}
             
-            {# YouTube #}
-            {% if "youtube.com" in reply.video_url or "youtube" in reply.video_url %}
+            {% if "youtube.com" in reply.video_url or "youtu.be" in reply.video_url %}
             <iframe width="100%" height="315"
-                src="https://www.youtube.com/embed/{{ reply.video_url|cut:'https://youtube/'|cut:'https://www.youtube.com/watch?v=' }}"
+                src="https://www.youtube.com/embed/{{ reply.video_url|cut:'https://www.youtube.com/watch?v='|cut:'https://youtu.be/' }}"
                 frameborder="0" allowfullscreen>
             </iframe>
             
-            {# TikTok #}
             {% elif "tiktok.com" in reply.video_url %}
             <blockquote class="tiktok-embed" cite="{{ reply.video_url }}"></blockquote>
-            <script async src="https://www.tiktok.com/embed.js"></script>
             
-            {# Instagram #}
             {% elif "instagram.com" in reply.video_url %}
-            <blockquote class="instagram-media" data-instagram-permalink="{{ reply.video_url }}">
+            <blockquote class="instagram-media" data-instgrm-permalink="{{ reply.video_url }}">
             </blockquote>
-            <script async src="//www.instagram.com/embed.js"></script>
             
-            {# X (Twitter) #}
             {% elif "x.com" in reply.video_url or "twitter.com" in reply.video_url %}
             <blockquote class="twitter-tweet">
                 <a href="{{ reply.video_url }}"></a>
             </blockquote>
-            <script async src="https://platform.twitter.com/widgets.js"></script>
             
-            {# Facebook #}
             {% elif "facebook.com" in reply.video_url %}
             <iframe src="https://www.facebook.com/plugins/video.php?href={{ reply.video_url }}" width="100%" height="315"
                 style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen>
             </iframe>
+            
+            {% endif %}
             
             {% endif %}
 
@@ -153,3 +141,7 @@
 {% empty %}
 <p>コメントはまだありません。</p>
 {% endfor %}
+
+<script async src="https://www.tiktok.com/embed.js"></script>
+<script async src="//www.instagram.com/embed.js"></script>
+<script async src="https://platform.twitter.com/widgets.js"></script>
