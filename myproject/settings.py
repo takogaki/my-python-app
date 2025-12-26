@@ -12,6 +12,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
+DEBUG = True
+
 # ★ SECRET_KEY は Render の Environment Variables からのみ取得
 # ★ fallback / dotenv / 二重定義は一切しない
 SECRET_KEY = os.environ.get(
