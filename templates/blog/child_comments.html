@@ -22,7 +22,7 @@
             onclick="openMedia('{{ comment.image.url }}', 'image')">
         {% endif %}
 
-        {% include "blog/_video_embed.html" with video_url=comment.video_url %}
+        {% include "blog/video_embed.html" with video_url=comment.video_url %}
 
     </div>
 
@@ -45,7 +45,7 @@
             <img src="{{ reply.image.url }}" class="comment-media-thumb">
             {% endif %}
 
-            {% include "blog/_video_embed.html" with video_url=reply.video_url %}
+            {% include "blog/video_embed.html" with video_url=reply.video_url %}
 
             <!-- 返信への返信 -->
             <button type="button" onclick="toggleReply({{ reply.id }})">

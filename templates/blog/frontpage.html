@@ -42,7 +42,7 @@
 
     
     <!-- 🔽 動画サムネ -->
-    {% include "blog/_video_embed.html" with video_url=post.video_url %}
+    {% include "blog/video_embed.html" with video_url=post.video_url %}
 
     <br>
     <a href="{% url 'blog:post_detail' slug=post.slug %}">もっと読む</a>
