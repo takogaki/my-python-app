@@ -73,7 +73,7 @@ class SignUpView(generic.CreateView):
         activation_url = self.request.build_absolute_uri(
             reverse(
                 "accounts:activate",
-                args=[str(user.activation_token)]
+                kwargs={"token": user.activation_token}
             )
         )
 
@@ -83,6 +83,7 @@ class SignUpView(generic.CreateView):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
         )
+
         return super().form_valid(form)
     
 
