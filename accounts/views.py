@@ -100,3 +100,6 @@ def activate(request, token):
 
     messages.success(request, "アカウントが有効化されました。ログインしてください。")
     return redirect("accounts:login")
+
+def signup_done(request):
+    return render(request, "accounts/signup_done.html")
