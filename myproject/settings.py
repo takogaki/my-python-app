@@ -28,6 +28,24 @@ ALLOWED_HOSTS = [
     ".onrender.com",
 ]
 
+# blog/security.py（新規作成を推奨）
+
+ALLOWED_VIDEO_DOMAINS = {
+    "youtube.com",
+    "www.youtube.com",
+    "youtu.be",
+    "tiktok.com",
+    "www.tiktok.com",
+    "instagram.com",
+    "www.instagram.com",
+    "twitter.com",
+    "www.twitter.com",
+    "x.com",
+    "www.x.com",
+    "facebook.com",
+    "www.facebook.com",
+}
+
 # Render 固有ホスト
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
@@ -79,6 +97,7 @@ else:
 # アプリケーション定義
 # ----------------------------------
 INSTALLED_APPS = [
+    "csp",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -95,6 +114,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "csp.middleware.CSPMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -195,3 +215,39 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # その他
 # ----------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# =========================
+# Content Security Policy
+# =========================
+
+CSP_DEFAULT_SRC = ("'self'",)
+
+CSP_FRAME_SRC = (
+    "'self'",
+    "https://www.youtube.com",
+    "https://www.youtube-nocookie.com",
+    "https://www.tiktok.com",
+    "https://www.instagram.com",
+    "https://www.facebook.com",
+    "https://platform.twitter.com",
+)
+
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "https://www.youtube.com",
+    "https://www.tiktok.com",
+    "https://www.instagram.com",
+    "https://platform.twitter.com",
+)
+
+CSP_STYLE_SRC = (
+    "'self'",
+    "'unsafe-inline'",  # Instagram/TikTok embed対策
+)
+
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+    "https:",
+)
