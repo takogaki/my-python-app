@@ -31,23 +31,35 @@
             </iframe>
             
             {% elif "tiktok.com" in comment.video_url %}
-            <blockquote class="tiktok-embed" cite="{{ comment.video_url }}"></blockquote>
+            <blockquote class="tiktok-embed" cite="{{ comment.video_url }}" data-video-id="">
+                <a href="{{ comment.video_url }}"></a>
+            </blockquote>
+            <script async src="https://www.tiktok.com/embed.js"></script>
             
             {% elif "instagram.com" in comment.video_url %}
-            <blockquote class="instagram-media" data-instgrm-permalink="{{ comment.video_url }}">
+            <blockquote class="instagram-media" data-instgrm-permalink="{{ comment.video_url }}" data-instgrm-version="14">
+                <a href="{{ comment.video_url }}"></a>
             </blockquote>
+            <script async src="https://www.instagram.com/embed.js"></script>
             
             {% elif "x.com" in comment.video_url or "twitter.com" in comment.video_url %}
             <blockquote class="twitter-tweet">
                 <a href="{{ comment.video_url }}"></a>
             </blockquote>
+            <script async src="https://platform.twitter.com/widgets.js"></script>
             
             {% elif "facebook.com" in comment.video_url %}
-            <iframe src="https://www.facebook.com/plugins/video.php?href={{ comment.video_url }}" width="100%" height="315"
+            <iframe src="https://www.facebook.com/plugins/video.php?href={{ comment.video_url|urlencode }}" width="100%" height="315"
                 style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen>
             </iframe>
             
             {% endif %}
+
+            <p>
+                <a href="{{ comment.video_url }}" target="_blank" rel="noopener">
+                    ▶ 動画を開く
+                </a>
+            </p>
         
         {% endif %}
 
@@ -81,23 +93,35 @@
                 </iframe>
                 
                 {% elif "tiktok.com" in reply.video_url %}
-                <blockquote class="tiktok-embed" cite="{{ reply.video_url }}"></blockquote>
+                <blockquote class="tiktok-embed" cite="{{ reply.video_url }}" data-video-id="">
+                    <a href="{{ reply.video_url }}"></a>
+                </blockquote>
+                <script async src="https://www.tiktok.com/embed.js"></script>
                 
                 {% elif "instagram.com" in reply.video_url %}
-                <blockquote class="instagram-media" data-instgrm-permalink="{{ reply.video_url }}">
+                <blockquote class="instagram-media" data-instgrm-permalink="{{ reply.video_url }}" data-instgrm-version="14">
+                    <a href="{{ reply.video_url }}"></a>
                 </blockquote>
+                <script async src="https://www.instagram.com/embed.js"></script>
                 
                 {% elif "x.com" in reply.video_url or "twitter.com" in reply.video_url %}
                 <blockquote class="twitter-tweet">
                     <a href="{{ reply.video_url }}"></a>
                 </blockquote>
+                <script async src="https://platform.twitter.com/widgets.js"></script>
                 
                 {% elif "facebook.com" in reply.video_url %}
-                <iframe src="https://www.facebook.com/plugins/video.php?href={{ reply.video_url }}" width="100%" height="315"
+                <iframe src="https://www.facebook.com/plugins/video.php?href={{ reply.video_url|urlencode }}" width="100%" height="315"
                     style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen>
                 </iframe>
                 
                 {% endif %}
+
+                <p>
+                    <a href="{{ reply.video_url }}" target="_blank" rel="noopener">
+                        ▶ 動画を開く
+                    </a>
+                </p>
             
             {% endif %}
 
