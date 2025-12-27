@@ -1,5 +1,6 @@
 {% load comment_tags %}
 {% load youtube_extras %}
+{% load static %}
 
 {% for comment in comments %}
 <div class="comment parent">
@@ -10,23 +11,24 @@
     </p>
 
     {% if comment.replies.exists %}
-    <button type="button" class="show-replies-button" onclick="toggleReplies({{ comment.id }})">
+    <button type="button" class="replies-toggle" data-comment-id="{{ comment.id }}">
         返信を見る（{{ comment.replies.count }}件）
     </button>
     {% endif %}
 
     <div class="media-wrapper">
-
         {% if comment.image %}
-        <img src="{{ comment.image.url }}" class="comment-media-thumb"
-            onclick="openMedia('{{ comment.image.url }}', 'image')">
+        <img src="{{ comment.image.url }}" class="comment-media-thumb">
         {% endif %}
 
+        
         {% include "blog/video_embed.html" with video_url=comment.video_url %}
-
+            
     </div>
 
-    <!-- 子コメント（返信） -->
+    <!-- =====================
+         子コメント（返信）
+    ====================== -->
     <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
 
         {% for reply in comment.replies.all %}
@@ -45,14 +47,16 @@
             <img src="{{ reply.image.url }}" class="comment-media-thumb">
             {% endif %}
 
+        
             {% include "blog/video_embed.html" with video_url=reply.video_url %}
+                
 
-            <!-- 返信への返信 -->
-            <button type="button" onclick="toggleReply({{ reply.id }})">
+            <!-- 🔥 返信への返信（reply.id で統一） -->
+            <button type="button" class="reply-toggle" data-reply-id="{{ reply.id }}">
                 返信
             </button>
 
-            <div id="reply-form-{{ reply.id }}" style="display:none; margin-left:20px;">
+            <div id="reply-form-{{ reply.id }}" class="reply-form" style="display:none; margin-left:20px;">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
@@ -64,15 +68,16 @@
 
         </div>
         {% endfor %}
-
     </div>
 
-    <!-- 親コメントへの返信 -->
-    <button type="button" onclick="toggleReply({{ comment.id }})">
+    <!-- =====================
+         親コメントへの返信
+    ====================== -->
+    <button type="button" class="reply-toggle" data-reply-id="{{ comment.id }}">
         返信
     </button>
 
-    <div id="reply-form-{{ comment.id }}" style="display:none; margin-left:20px;">
+    <div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none; margin-left:20px;">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
@@ -87,6 +92,8 @@
 {% empty %}
 <p>コメントはまだありません。</p>
 {% endfor %}
+
+<script src="{% static 'blog/blog.js' %}"></script>
 
 <script async src="https://www.tiktok.com/embed.js"></script>
 <script async src="//www.instagram.com/embed.js"></script>

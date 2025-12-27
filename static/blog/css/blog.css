@@ -291,3 +291,39 @@ h2.subtitle {
 .youtube-link a:hover {
     text-decoration: underline;
 }
+
+
+
+.video-placeholder {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    height: 315px;
+    background: #111;
+    border-radius: 10px;
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-label {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    z-index: 1;
+    opacity: 0.85;
+}
+
+.video-overlay {
+    position: absolute;
+    inset: 0;
+    text-indent: -9999px;
+}
+
+/* サービス別色（任意） */
+.video-label.youtube { color: #ff4c4c; }
+.video-label.tiktok { color: #25f4ee; }
+.video-label.instagram { color: #e1306c; }
+.video-label.twitter { color: #1da1f2; }
+.video-label.facebook { color: #1877f2; }

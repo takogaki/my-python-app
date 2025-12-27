@@ -88,3 +88,53 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+function toggleReplyWithParent(replyId, parentId) {
+    const replies = document.getElementById(`replies-${parentId}`);
+    if (replies && replies.style.display !== "block") {
+        replies.style.display = "block";
+    }
+
+    toggleReply(replyId);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.addEventListener("click", (e) => {
+
+        const btn = e.target.closest(".reply-toggle");
+        if (!btn) return;
+
+        const id = btn.dataset.replyId;
+        if (!id) return;
+
+        const form = document.getElementById(`reply-form-${id}`);
+        if (!form) return;
+
+        form.style.display =
+            form.style.display === "block" ? "none" : "block";
+    });
+
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* =========================
+       返信一覧の表示切り替え
+    ========================= */
+    document.addEventListener("click", (e) => {
+
+        const btn = e.target.closest(".replies-toggle");
+        if (!btn) return;
+
+        const id = btn.dataset.commentId;
+        if (!id) return;
+
+        const replies = document.getElementById(`replies-${id}`);
+        if (!replies) return;
+
+        replies.style.display =
+            replies.style.display === "block" ? "none" : "block";
+    });
+
+});

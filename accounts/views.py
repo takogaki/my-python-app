@@ -10,6 +10,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
+from django.utils.http import urlencode
+from django.contrib.auth import login
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
@@ -65,6 +67,11 @@ class SignUpView(generic.CreateView):
     success_url = reverse_lazy("accounts:signup_done")
 
     def form_valid(self, form):
+        # ★ next を session に保存
+        next_url = self.request.GET.get("next")
+        if next_url:
+            self.request.session["signup_next"] = next_url
+
         user = form.save(commit=False)
         user.is_active = False
         user.activation_token = uuid.uuid4()
@@ -87,10 +94,12 @@ class SignUpView(generic.CreateView):
         return super().form_valid(form)
     
 
-
 # =========================
 # ★ 本登録（UUID方式・最終確定版）
 # =========================
+
+def signup_done(request):
+    return render(request, "accounts/signup_done.html")
 
 def activate(request, token):
     try:
@@ -99,16 +108,22 @@ def activate(request, token):
             is_active=False
         )
     except CustomUser.DoesNotExist:
-        # ❌ 無効・期限切れ・二重クリックなど
         return render(request, "accounts/activate_failed.html")
 
-    # ✅ 正常な本登録
+    # 本登録
     user.is_active = True
     user.activation_token = None
     user.save(update_fields=["is_active", "activation_token"])
 
+    # ★ 自動ログイン
+    login(request, user)
+
+    # ★ 元のページ取得
+    next_url = request.session.pop("signup_next", None)
+
+    if next_url:
+        return redirect(next_url)
+
+    # フォールバック（通常）
     messages.success(request, "アカウントが有効化されました。")
     return render(request, "accounts/activate_success.html")
-
-def signup_done(request):
-    return render(request, "accounts/signup_done.html")
