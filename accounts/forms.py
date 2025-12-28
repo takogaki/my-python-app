@@ -4,6 +4,7 @@ from .models import CustomUser
 from django.contrib.auth.forms import UserCreationForm
 from datetime import datetime
 
+
 class CustomUserCreationForm(UserCreationForm):
 
     birth_date_input = forms.CharField(
@@ -50,3 +51,8 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+class ProfileImageForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["profile_image"]

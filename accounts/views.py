@@ -17,6 +17,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 
 from .forms import CustomUserCreationForm
+from .forms import ProfileImageForm
+
 from .models import CustomUser
 from diary.models import Page
 
@@ -110,20 +112,42 @@ def activate(request, token):
     except CustomUser.DoesNotExist:
         return render(request, "accounts/activate_failed.html")
 
-    # 本登録
-    user.is_active = True
-    user.activation_token = None
-    user.save(update_fields=["is_active", "activation_token"])
+    # 🔹 GET：本登録＋画像入力画面表示
+    if request.method == "GET":
+        user.is_active = True
+        user.activation_token = None
+        user.save(update_fields=["is_active", "activation_token"])
 
-    # ★ 自動ログイン
-    login(request, user)
+        login(request, user)
 
-    # ★ 元のページ取得
-    next_url = request.session.pop("signup_next", None)
+        form = ProfileImageForm(instance=user)
+        return render(
+            request,
+            "accounts/activate_success.html",
+            {"form": form}
+        )
 
-    if next_url:
-        return redirect(next_url)
+    # 🔹 POST：プロフィール画像保存
+    form = ProfileImageForm(
+        request.POST,
+        request.FILES,
+        instance=user
+    )
 
-    # フォールバック（通常）
-    messages.success(request, "アカウントが有効化されました。")
-    return render(request, "accounts/activate_success.html")
+    if form.is_valid():
+        form.save()
+
+        # ★ 元のページ取得
+        next_url = request.session.pop("signup_next", None)
+        if next_url:
+            return redirect(next_url)
+
+        messages.success(request, "プロフィール画像を設定しました。")
+        return redirect("/")
+
+    # ❌ バリデーションエラー時
+    return render(
+        request,
+        "accounts/activate_success.html",
+        {"form": form}
+    )

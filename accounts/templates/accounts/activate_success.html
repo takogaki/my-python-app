@@ -3,11 +3,14 @@
 {% block body %}
 <h2>登録が完了しました 🎉</h2>
 
-<p>
-    メール認証が完了しました。ログインできます。
-</p>
+<p>プロフィール画像を設定できます（後から変更も可能です）</p>
 
-<a href="{% url 'login' %}{% if next %}?next={{ next }}{% endif %}">
-    ログインする
-</a>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <a href="{% url 'login' %}{% if next %}?next={{ next }}{% endif %}">
+        保存してログインする
+    </a>
+</form>
+
 {% endblock %}
