@@ -77,43 +77,31 @@ header h1 a {
 }
 
 /* =========================
-   ログアウトボタン（フッター上）
+   ログアウト（フッター上）
 ========================= */
 
-.logout-area {
+.logout-wrapper {
     display: flex;
     justify-content: center;
-    margin: 30px 0 10px;
+    margin: 40px 0 20px;
 }
 
-.logout-btn {
-    color: #666;
-    border-radius: 20px;
-    padding: 6px 18px;
-    font-size: 0.8rem;
+.logout-pill {
+    background: #ffffff;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 8px 26px;
+    border-radius: 999px;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    background: transparent;
-    border: none;
-    color: #888;
-    text-decoration: underline;
 }
 
-.logout-btn:hover {
-    background: #fee2e2;      /* 淡い赤 */
+.logout-pill:hover {
+    background: #fef2f2;
     border-color: #fca5a5;
     color: #b91c1c;
 }
-
-/* スマホでも押しやすく */
-@media (max-width: 600px) {
-    .logout-btn {
-        padding: 8px 22px;
-        font-size: 0.85rem;
-    }
-}
-
-
 
 /* ===== 登録ユーザー数 ===== */
 .user-count {

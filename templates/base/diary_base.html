@@ -15,7 +15,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>喋る場</title>
     
-    <link rel="stylesheet" href="{% static 'diary/css/base.css' %}">
     <script src="{% static 'diary/js/base.js' %}"></script>
     <!-- blog.js の読み込み -->
     <script src="{% static 'blog/js/blog.js' %}"></script>
@@ -52,12 +51,12 @@
         {% endblock %}
     </main>
 
-<form action="{% url 'accounts:logout' %}" method="post" class="logout-area">
-    {% csrf_token %}
-    <button type="submit" class="logout-btn">
-        🚪 ログアウト
-    </button>
-</form>
+<div class="logout-wrapper">
+    <form action="{% url 'accounts:logout' %}" method="post">
+        {% csrf_token %}
+        <button class="logout-pill">ログアウト</button>
+    </form>
+</div>
 
     <footer class="site-footer">
         <small>© 喋る場</small>
