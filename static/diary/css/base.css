@@ -76,12 +76,49 @@ header h1 a {
     background: #4338ca;
 }
 
-.btn-outline {
-    background: white;
-    border: 1px solid #4f46e5;
-    color: #4f46e5;
+/* =========================
+   ログアウトボタン（フッター上）
+========================= */
+
+.logout-area {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0 10px;
 }
 
-.btn-outline:hover {
-    background: #eef2ff;
+.logout-btn {
+    color: #666;
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    border: none;
+    color: #888;
+    text-decoration: underline;
+}
+
+.logout-btn:hover {
+    background: #fee2e2;      /* 淡い赤 */
+    border-color: #fca5a5;
+    color: #b91c1c;
+}
+
+/* スマホでも押しやすく */
+@media (max-width: 600px) {
+    .logout-btn {
+        padding: 8px 22px;
+        font-size: 0.85rem;
+    }
+}
+
+
+
+/* ===== 登録ユーザー数 ===== */
+.user-count {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 4px;
+    text-align: right;
 }

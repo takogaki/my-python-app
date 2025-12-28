@@ -32,14 +32,16 @@
                 {% if user.is_authenticated %}
                 <span class="welcome">
                     こんにちは、{{ request.user.username }} さん
+                    <p class="user-count">
+                        ログインユーザー数：{{ logged_in_users_count }}
+                    </p>
                 </span>
-                <form action="{% url 'accounts:logout' %}" method="post">
-                    {% csrf_token %}
-                    <button class="btn btn-outline">ログアウト</button>
-                </form>
                 {% else %}
                 <a class="btn btn-outline" href="{% url 'accounts:login' %}">ログイン</a>
                 <a class="btn" href="{% url 'accounts:signup' %}">新規登録</a>
+                <p class="user-count">
+                    ログインユーザー数：{{ logged_in_users_count }}
+                </p>
                 {% endif %}
             </div>
         </div>
@@ -49,6 +51,13 @@
         {% block body %}
         {% endblock %}
     </main>
+
+<form action="{% url 'accounts:logout' %}" method="post" class="logout-area">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn">
+        🚪 ログアウト
+    </button>
+</form>
 
     <footer class="site-footer">
         <small>© 喋る場</small>
