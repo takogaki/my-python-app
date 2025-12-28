@@ -6,56 +6,66 @@
 {% block body %}
 <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
-<small>Posted at {{ post.posted_date }}</small>
-<br>
-<small>投稿者： {{ post.name }}</small>
+<div class="content-container">
 
-<h1 class="title">{{ post.title }}</h1>
+    <!-- 投稿カード -->
+    <div class="post-detail-card">
 
-<p>{{ post.body }}</p>
+        <div class="post-meta">
+            <small>🕒 {{ post.posted_date }}</small><br>
+            <small>✍️ {{ post.name }}</small>
+        </div>
 
-<div class="media-wrapper">
+        <h1 class="post-title">{{ post.title }}</h1>
 
-    {% if post.image and post.image.name %}
-    <img src="{{ post.image.url }}" class="comment-media-thumb">
-    {% endif %}
+        <div class="post-body">
+            {{ post.body|linebreaks }}
+        </div>
 
-    
-    {% include "blog/video_embed.html" with video_url=post.video_url %}
-        
+        <div class="media-wrapper">
+            {% if post.image and post.image.name %}
+            <img src="{{ post.image.url }}" class="comment-media-thumb">
+            {% endif %}
+
+            {% include "blog/video_embed.html" with video_url=post.video_url %}
+        </div>
+    </div>
+
+    <!-- コメント投稿 -->
+    <div class="comment-form-card">
+        <h2 class="section-title">💬 コメントを書く</h2>
+
+        <form method="post" enctype="multipart/form-data" class="comment-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="submit-btn">
+                コメントを投稿
+            </button>
+        </form>
+    </div>
+
+    <!-- コメント一覧 -->
+    <div class="comment-list-card">
+        <h2 class="section-title">🗂 コメント一覧</h2>
+
+        {% include "blog/child_comments.html" with comments=parent_comments form=form %}
+    </div>
+
+    <!-- 戻る -->
+    <div class="back-area">
+        <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">
+            ← 戻る
+        </a>
+    </div>
 
 </div>
 
-
-<hr>
-
-<h2 class="subtitle">コメントを書く</h2>
-
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="button is-success">コメントを投稿</button>
-</form>
-
-
-<hr>
-
-<h2 class="subtitle">コメント一覧</h2>
-
-{% include "blog/child_comments.html" with comments=parent_comments form=form %}
-
-<hr>
-
+<!-- メディアモーダル -->
 <div id="media-modal" class="media-modal" onclick="closeMedia()">
     <div id="media-content"></div>
 </div>
 
-<a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="button">
-    戻る
-</a>
-
 <script src="{% static 'blog/js/blog.js' %}"></script>
-
 <script async src="https://www.tiktok.com/embed.js"></script>
 <script async src="//www.instagram.com/embed.js"></script>
 <script async src="https://platform.twitter.com/widgets.js"></script>

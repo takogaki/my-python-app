@@ -6,11 +6,14 @@
 <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
 
-<h2 class="page-title">口を開く</h2>
-<p class="page-description">
-    ここは、あなたの言葉や気持ちをそっと置いていく場所です。<br>
-    文章・画像・動画、どれでも大丈夫です。
-</p>
+<div class="intro-card">
+    <h2 class="page-title">口を開く</h2>
+    <p class="page-description">
+        ここは、あなたの言葉や気持ちをそっと置いていく場所です。<br>
+        文章・画像・動画、どれでも大丈夫です。
+    </p>
+</div>
+
 <div class="post-form-card">
     <form method="post" enctype="multipart/form-data" class="post-form">
         {% csrf_token %}
@@ -18,25 +21,33 @@
         <button type="submit" class="submit-btn">口をとじる</button>
     </form>
 </div>
-    <div class="notification is-light video-guide">
-        <strong>📹 動画の貼り方（すべて共通）</strong><br><br>
+    <div class="info-card video-guide">
+        <h3 class="info-title">📹 動画の貼り方（すべて共通）</h3>
     
-        次のサービスの動画URLを、そのまま貼り付けてください。<br><br>
+        <p class="info-text">
+            次のサービスの動画URLを、そのまま貼り付けてください。
+        </p>
     
-        <ul>
-            <li>▶ YouTube</li>
-            <li>▶ X（旧Twitter）</li>
-            <li>▶ Instagram</li>
-            <li>▶ TikTok</li>
-            <li>▶ Facebook</li>
+        <ul class="service-list">
+            <li>YouTube</li>
+            <li>X（旧Twitter）</li>
+            <li>Instagram</li>
+            <li>TikTok</li>
+            <li>Facebook</li>
         </ul>
     
-        <strong>やり方：</strong><br>
-        ① 見せたい動画を開く<br>
-        ② 「共有」の後「リンクをコピー」を押す<br>
-        ③ 表示されたURLをそのまま貼る<br><br>
+        <div class="steps">
+            <p><strong>やり方</strong></p>
+            <ol>
+                <li>見せたい動画を開く</li>
+                <li>「共有」→「リンクをコピー」</li>
+                <li>URLをそのまま貼り付ける</li>
+            </ol>
+        </div>
     
-        ※ 限定公開・非公開設定でもOKな場合があります。
+        <p class="note">
+            ※ 限定公開・非公開設定でもOKな場合があります。
+        </p>
     </div>
 </form>
 

@@ -1,7 +1,6 @@
-   /* =========================
-   レイアウト共通
+/* =========================
+   共通レイアウト
 ========================= */
-
 .content-container {
     max-width: 800px;
     margin: 0 auto;
@@ -10,88 +9,174 @@
 }
 
 /* =========================
-   投稿カード（一覧）
+   ページ導入（タイトル・説明）
 ========================= */
+.page-title {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
 
-.post {
-    background-color: #f9f9f9;
-    padding: 16px;
-    border-radius: 8px;
+.page-description {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.6;
     margin-bottom: 20px;
 }
 
-.post h2 {
-    font-size: 1.4rem;
+/* =========================
+   共通カード
+========================= */
+.intro-card,
+.post-form-card,
+.info-card,
+.post {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 680px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   投稿フォーム
+========================= */
+.post-form p {
+    margin-bottom: 1.2rem;
+}
+
+.post-form label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.post-form input,
+.post-form textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.submit-btn {
+    display: block;
+    margin: 0 auto;
+    background: #4a90e2;
+    color: white;
+    padding: 0.6rem 1.6rem;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.submit-btn:hover {
+    background: #357abd;
+}
+
+/* =========================
+   動画ガイド
+========================= */
+.video-guide {
+    max-width: 680px;
+    margin: 0 auto 30px;
+}
+
+.info-title {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.info-text {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 12px;
+}
+
+.service-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 0;
+    margin: 12px 0;
+    list-style: none;
+}
+
+.service-list li {
+    background: #f5f5f5;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.steps {
+    font-size: 0.9rem;
+}
+
+.steps ol {
+    padding-left: 18px;
+}
+
+.steps li {
+    margin-bottom: 4px;
+}
+
+.note {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* =========================
+   投稿一覧
+========================= */
+.post h2.subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
 }
 
 .post small {
-    font-size: 0.85rem;
-    color: gray;
+    font-size: 0.8rem;
+    color: #888;
 }
 
-.post a {
-    color: #007bff;
+.read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-weight: bold;
     text-decoration: none;
 }
 
-.post a:hover {
-    text-decoration: underline;
+.comment-count {
+    font-size: 0.8rem;
+    color: #666;
 }
 
 /* =========================
-   投稿詳細
+   コメント
 ========================= */
-
-h1.title.has-text-centered {
-    font-size: 2.2rem;
-    font-weight: bold;
-    margin-bottom: 16px;
-    word-break: break-word;
-}
-
-small.has-text-grey {
-    font-size: 0.85rem;
-    color: #7a7a7a;
-}
-
-p.content {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    margin-bottom: 20px;
-    word-break: break-word;
-}
-
-/* =========================
-   コメントエリア
-========================= */
-
-h2.subtitle {
-    font-size: 1.5rem;
-    margin-top: 36px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 8px;
-}
-
 .comment {
     padding: 12px 14px;
     margin-top: 10px;
     border-radius: 8px;
     border-left: 4px solid #cbd5e1;
     background-color: #f9fafb;
-    transition: background-color 0.2s;
 }
 
 .comment:nth-of-type(even) {
     background-color: #eef2ff;
 }
 
-.comment:hover {
-    background-color: #dde7ff;
-}
-
 .comment strong {
-    font-size: 0.95rem;
-    color: #1f2937;
+    font-size: 0.9rem;
 }
 
 .comment small {
@@ -99,100 +184,15 @@ h2.subtitle {
     color: #6b7280;
 }
 
-.comment button {
-    margin-top: 6px;
-    font-size: 0.8rem;
-    background: none;
-    border: none;
-    color: #2563eb;
-    cursor: pointer;
-}
-
-.comment button:hover {
-    text-decoration: underline;
-}
-
-/* =========================
-   返信（階層）
-========================= */
-
 .reply-indented {
-    margin-left: 20px;
+    margin-left: 18px;
     padding-left: 12px;
     border-left: 2px solid #ddd;
-    background-color: #f8f8f8;
-    border-radius: 6px;
-}
-
-/* 深さによる色（inline style 前提） */
-.comment[style*="60px"] {
-    border-left-color: #93c5fd;
-}
-
-.comment[style*="90px"] {
-    border-left-color: #60a5fa;
 }
 
 /* =========================
-   タグ・通知
+   メディア
 ========================= */
-
-.tag.is-primary {
-    background-color: #48c774;
-    color: #fff;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    margin-left: 6px;
-}
-
-.notification.is-info {
-    margin-top: 20px;
-    text-align: center;
-}
-
-/* =========================
-   返信フォーム
-========================= */
-
-.reply-form {
-    margin-top: 16px;
-    padding: 14px;
-    background-color: #f1f1f1;
-    border-radius: 8px;
-}
-
-.reply-form input,
-.reply-form textarea {
-    width: 100%;
-    margin-top: 8px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.show-reply-button,
-.show-replies-button {
-    margin-top: 6px;
-    font-size: 0.8rem;
-    color: #065fd4;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-/* =========================
-   画像サムネイル
-========================= */
-
-.media-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
-}
-
 .post-media-thumb,
 .comment-media-thumb {
     max-width: 160px;
@@ -202,10 +202,6 @@ h2.subtitle {
     border-radius: 6px;
     cursor: pointer;
 }
-
-/* =========================
-   画像モーダル
-========================= */
 
 .media-modal {
     position: fixed;
@@ -217,83 +213,16 @@ h2.subtitle {
     z-index: 9999;
 }
 
-.media-inner {
-    width: 100%;
-    max-width: 960px;
-    padding: 12px;
-    box-sizing: border-box;
-    position: relative;
-}
-
-.media-close {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    font-size: 28px;
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-}
-
-#media-content {
-    display: flex;
-    justify-content: center;
-}
-
 #media-content img {
     width: 100%;
     max-height: 90vh;
     object-fit: contain;
-    background: #000;
     border-radius: 6px;
 }
 
 /* =========================
-   スマホ最適化
+   動画プレースホルダー
 ========================= */
-
-@media (max-width: 767px) {
-
-    .content-container {
-        padding: 12px;
-    }
-
-    h1.title.has-text-centered {
-        font-size: 1.6rem;
-    }
-
-    p.content {
-        font-size: 1rem;
-    }
-
-    .reply-indented {
-        margin-left: 14px;
-    }
-
-    .media-inner {
-        max-width: 100%;
-        padding: 0;
-    }
-}
-
-.youtube-link {
-    text-align: left;
-    margin-top: 8px;
-}
-
-.youtube-link a {
-    color: #e53935;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.youtube-link a:hover {
-    text-decoration: underline;
-}
-
-
-
 .video-placeholder {
     position: relative;
     width: 100%;
@@ -308,103 +237,113 @@ h2.subtitle {
 }
 
 .video-label {
-    color: white;
     font-size: 1.1rem;
     font-weight: bold;
-    z-index: 1;
-    opacity: 0.85;
 }
 
-.video-overlay {
-    position: absolute;
-    inset: 0;
-    text-indent: -9999px;
-}
-
-/* サービス別色（任意） */
 .video-label.youtube { color: #ff4c4c; }
 .video-label.tiktok { color: #25f4ee; }
 .video-label.instagram { color: #e1306c; }
 .video-label.twitter { color: #1da1f2; }
 .video-label.facebook { color: #1877f2; }
 
+/* =========================
+   スマホ最適化
+========================= */
+@media (max-width: 600px) {
 
-.page-title {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
+    .page-title {
+        font-size: 1.2rem;
+    }
+
+    .intro-card,
+    .post-form-card,
+    .info-card,
+    .post {
+        padding: 16px;
+        margin: 16px;
+    }
+
+    .reply-indented {
+        margin-left: 12px;
+    }
 }
 
-.page-description {
-    color: #666;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-}
 
-.post-form-card {
+
+/* =========================
+   投稿詳細カード
+========================= */
+.post-detail-card,
+.comment-form-card,
+.comment-list-card {
     background: #fff;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    margin-bottom: 2rem;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
-.submit-button {
-    background: #444;
-    color: #fff;
-    border: none;
-    padding: 0.6rem 1.5rem;
-    border-radius: 20px;
-    cursor: pointer;
+.post-meta {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 10px;
 }
 
-.submit-button:hover {
-    background: #222;
+.post-title {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    word-break: break-word;
 }
 
-.video-guide ul {
-    margin-left: 1rem;
-}
-
-.video-guide li {
-    margin-bottom: 0.3rem;
-}
-
-.read-more {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-weight: bold;
-}
-
-.comment-count {
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.post-form p {
-    margin-bottom: 1.2rem;
-}
-
-.post-form label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 0.3rem;
-}
-
-.post-form input,
-.post-form textarea {
-    width: 95%;
-    padding: 0.6rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+.post-body {
     font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 20px;
 }
 
-.submit-btn {
-    background: #4a90e2;
-    color: white;
-    padding: 0.6rem 1.4rem;
-    border-radius: 20px;
-    border: none;
-    cursor: pointer;
+/* =========================
+   セクション見出し
+========================= */
+.section-title {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+}
+
+/* =========================
+   コメントフォーム
+========================= */
+.comment-form p {
+    margin-bottom: 1rem;
+}
+
+/* =========================
+   戻るボタン
+========================= */
+.back-area {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-button {
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: #4f46e5;
+}
+
+.back-button:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   スマホ最適化
+========================= */
+@media (max-width: 600px) {
+    .post-title {
+        font-size: 1.3rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
 }
