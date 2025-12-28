@@ -46,7 +46,9 @@
         
 
     <br>
-    <a href="{% url 'blog:post_detail' slug=post.slug %}">もっと読む</a>
+    <a href="{% url 'blog:post_detail' slug=post.slug %}">
+        もっと読む（コメント {{ post.comment_count }} 件）
+    </a>
 </div>
 
 {% endfor %}

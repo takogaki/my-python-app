@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from faker import Faker
 from .forms import CommentForm, PostForm
 from .models import Post, Comment
+from django.db.models import Count
 import uuid
 
 fake = Faker()
@@ -22,7 +23,12 @@ def get_anonymous_id(request):
 # トップページ
 # =======================
 def frontpage(request):
-    posts = Post.objects.all().order_by("-posted_date")
+    posts = (
+        Post.objects
+        .all()
+        .annotate(comment_count=Count("comments"))
+        .order_by("-posted_date")
+    )
 
     if request.method == "POST":
         form = PostForm(
