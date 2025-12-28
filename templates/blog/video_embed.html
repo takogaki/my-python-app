@@ -14,20 +14,20 @@
     <!-- ✅ ログイン済：動画っぽい四角 -->
         <div class="video-placeholder">
 
-            {% if "youtube.com" in post.video_url or "youtu.be" in video_url %}
-            <span class="video-label youtube">YouTube 動画</span>
-
-            {% elif "tiktok.com" in post.video_url %}
-            <span class="video-label tiktok">TikTok 動画</span>
+            {% if "facebook.com" in post.video_url %}
+            <span class="video-label facebook">Facebook リンク</span>
 
             {% elif "instagram.com" in post.video_url %}
             <span class="video-label instagram">Instagram リンク</span>
 
-            {% elif "x.com" in post.video_url or "twitter.com" in video_url %}
-            <span class="video-label twitter">X リンク</span>
+            {% elif "tiktok.com" in post.video_url %}
+            <span class="video-label tiktok">TikTok 動画</span>
+            
+            {% elif "youtube.com" in post.video_url or "youtu.be" in video_url %}
+            <span class="video-label youtube">YouTube 動画</span>
 
-            {% elif "facebook.com" in post.video_url %}
-            <span class="video-label facebook">Facebook リンク</span>
+            {% elif "x.com" in post.video_url or "twitter.com" in post.video_url %}
+            <span class="video-label twitter">X リンク</span>
 
             {% else %}
             <span class="video-label">動画</span>
