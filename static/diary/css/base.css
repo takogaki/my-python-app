@@ -123,3 +123,38 @@ form button {
     color: #999;
     text-align: center;
 }
+
+/* =========================
+   全体レイアウト（スマホ最適化）
+========================= */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+                 "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    background: #f7f7f9;
+    color: #333;
+}
+
+/* =========================
+   ヘッダー
+========================= */
+header {
+    position: relative;
+    padding: 12px 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    white-space: nowrap;   /* ← 喋る 場 を防ぐ */
+}
+
+header h1 a {
+    text-decoration: none;
+    color: #222;
+    font-weight: bold;
+}
