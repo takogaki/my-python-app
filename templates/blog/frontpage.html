@@ -6,20 +6,38 @@
 <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
 
-<h2>口を開く</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">口をとじる</button>
-    <br>
-    <div class="notification is-light">
-        <strong>📺 YouTube動画の貼り方</strong><br>
-        ① YouTubeで動画を開く<br>
-        ② 「共有」を押す<br>
-        ③ 表示されたURLをコピー<br>
-        ④ そのまま貼り付けてください（限定公開でもOK）
+<h2 class="page-title">口を開く</h2>
+<p class="page-description">
+    ここは、あなたの言葉や気持ちをそっと置いていく場所です。<br>
+    文章・画像・動画、どれでも大丈夫です。
+</p>
+<div class="post-form-card">
+    <form method="post" enctype="multipart/form-data" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">口をとじる</button>
+    </form>
+</div>
+    <div class="notification is-light video-guide">
+        <strong>📹 動画の貼り方（すべて共通）</strong><br><br>
+    
+        次のサービスの動画URLを、そのまま貼り付けてください。<br><br>
+    
+        <ul>
+            <li>▶ YouTube</li>
+            <li>▶ X（旧Twitter）</li>
+            <li>▶ Instagram</li>
+            <li>▶ TikTok</li>
+            <li>▶ Facebook</li>
+        </ul>
+    
+        <strong>やり方：</strong><br>
+        ① 見せたい動画を開く<br>
+        ② 「共有」または「リンクをコピー」を押す<br>
+        ③ 表示されたURLをそのまま貼る<br><br>
+    
+        ※ 限定公開・非公開設定でもOKな場合があります。
     </div>
-    <br>
 </form>
 
 {% for post in posts %}
@@ -40,14 +58,14 @@
     <img src="{{ post.image.url }}" class="comment-media-thumb">
     {% endif %}
 
-    
     <!-- 🔽 動画サムネ -->
     {% include "blog/video_embed.html" with video_url=post.video_url %}
         
-
-    <br>
-    <a href="{% url 'blog:post_detail' slug=post.slug %}">
-        もっと読む（コメント {{ post.comment_count }} 件）
+    <a class="read-more" href="{% url 'blog:post_detail' slug=post.slug %}">
+        もっと読む
+        <span class="comment-count">
+            💬 {{ post.comment_count }}
+        </span>
     </a>
 </div>
 
