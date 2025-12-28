@@ -1,0 +1,99 @@
+/* =========================
+   ブログ投稿フォーム専用CSS
+   ========================= */
+
+/* フォーム全体 */
+form {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* 各フィールド（form.as_p が <p> で囲む） */
+form p {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.4rem;
+}
+
+/* ラベル */
+form label {
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+/* 入力欄 共通 */
+form input[type="text"],
+form input[type="url"],
+form input[type="file"],
+form textarea,
+form select {
+    padding: 0.75rem 0.9rem;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+/* フォーカス時 */
+form input:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: #6b9cff;
+    box-shadow: 0 0 0 3px rgba(107,156,255,0.2);
+}
+
+/* テキストエリア */
+form textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+/* ファイル入力 */
+form input[type="file"] {
+    padding: 0.5rem;
+    background: #fafafa;
+}
+
+/* エラーメッセージ */
+form .errorlist {
+    margin: 0.4rem 0 0;
+    padding: 0;
+    list-style: none;
+    color: #e53935;
+    font-size: 0.85rem;
+}
+
+/* 送信ボタン */
+form button[type="submit"] {
+    margin-top: 1rem;
+    padding: 0.9rem;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #6b9cff, #4f7cff);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* ホバー */
+form button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79,124,255,0.35);
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+    form {
+        padding: 1.5rem 1.2rem;
+        border-radius: 12px;
+    }
+}

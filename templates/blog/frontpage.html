@@ -33,7 +33,7 @@
     
         <strong>やり方：</strong><br>
         ① 見せたい動画を開く<br>
-        ② 「共有」または「リンクをコピー」を押す<br>
+        ② 「共有」の後「リンクをコピー」を押す<br>
         ③ 表示されたURLをそのまま貼る<br><br>
     
         ※ 限定公開・非公開設定でもOKな場合があります。
@@ -42,7 +42,7 @@
 
 {% for post in posts %}
 
-<a href="{% url 'blog:post_detail' slug=post.slug %}">{{ post.title }}</a>
+<!-- <a href="{% url 'blog:post_detail' slug=post.slug %}">{{ post.title }}</a> -->
 
 <div class="post block">
     <!-- 投稿者名 -->

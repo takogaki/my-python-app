@@ -1,0 +1,125 @@
+/* ===== ベース ===== */
+body {
+    margin: 0;
+    font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+    background: #f5f7fa;
+    color: #333;
+}
+
+/* ===== ヘッダー ===== */
+.site-header {
+    background: #ffffff;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 20px;
+}
+
+.header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.site-title a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+/* ===== ユーザーエリア ===== */
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.welcome {
+    font-size: 0.9rem;
+}
+
+/* ===== ボタン ===== */
+.btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: none;
+    background: #4f46e5;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn:hover {
+    background: #4338ca;
+}
+
+.btn-outline {
+    background: white;
+    border: 1px solid #4f46e5;
+    color: #4f46e5;
+}
+
+.btn-outline:hover {
+    background: #eef2ff;
+}
+
+/* ===== メイン ===== */
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 15px;
+}
+
+/* ===== フッター ===== */
+.site-footer {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+    font-size: 0.8rem;
+}
+
+form p {
+    margin-bottom: 15px;
+}
+
+form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+form button {
+    margin-top: 15px;
+}
+
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.btn.block {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.notice {
+    font-size: 0.85rem;
+    color: #999;
+    text-align: center;
+}

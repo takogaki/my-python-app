@@ -50,6 +50,9 @@
     <div id="media-content"></div>
 </div>
 
+<a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="button">
+    戻る
+</a>
 
 <script src="{% static 'blog/js/blog.js' %}"></script>
 

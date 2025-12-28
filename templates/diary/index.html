@@ -1,26 +1,55 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
+
 {% block body %}
 
-<!-- メッセージボックス -->
-        <a href="{% url 'user_messages:message_box' %}" class="button">メッセージボックス</a>
-        <br>
-        <div id="clock"></div>
-        <br>
-        <a href="{% url 'diary:page_create' %}" class="button">日記を書く</a>
-        <br>
-        <a href="{% url 'diary:page_list' %}" class="button">日記一覧</a>
-        <br>
-        <hr>
-        <a href="{% url 'blog:frontpage' %}" class="button">喋る場入り口</a>
-        <br>
-        <hr>
-        🚧建設中※まだ使用できません。
-        <!-- <a href="{% url 'chat:start_stream' %}" class="button">先に1人で始める</a> -->
-        <br>
-        🚧建設中※まだ使用できません。
-        <!-- <a href="{% url 'chat:chat_home' %}" class="button">みんなと合流する</a> -->
-        <br>
-        <hr>
-        <a href="{% url 'accounts:user_list' %}" class="button">登録ユーザー一覧</a>
+<div class="dashboard">
 
-        {% endblock %}
+        <h2 class="dashboard-title">ホーム</h2>
+
+        <!-- 🕊 メッセージ -->
+        <div class="dashboard-section">
+                <a href="{% url 'user_messages:message_box' %}" class="dashboard-button primary">
+                        💌 メッセージボックス
+                </a>
+        </div>
+
+        <!-- ⏰ 時計 -->
+        <div class="dashboard-clock">
+                <div id="clock"></div>
+        </div>
+
+        <!-- 📖 日記 -->
+        <div class="dashboard-section">
+                <h3>📖 日記</h3>
+                <a href="{% url 'diary:page_create' %}" class="dashboard-button">
+                        日記を書く
+                </a>
+                <a href="{% url 'diary:page_list' %}" class="dashboard-button ghost">
+                        日記一覧
+                </a>
+        </div>
+
+        <!-- 💬 喋る場 -->
+        <div class="dashboard-section">
+                <h3>💬 喋る場</h3>
+                <a href="{% url 'blog:frontpage' %}" class="dashboard-button">
+                        喋る場入り口
+                </a>
+
+                <div class="disabled-box">
+                        🚧 建設中（まだ使用できません）
+                </div>
+        </div>
+
+        <!-- 👥 ユーザー -->
+        <div class="dashboard-section">
+                <h3>👥 ユーザー</h3>
+                <a href="{% url 'accounts:user_list' %}" class="dashboard-button ghost">
+                        登録ユーザー一覧
+                </a>
+        </div>
+
+</div>
+
+{% endblock %}
