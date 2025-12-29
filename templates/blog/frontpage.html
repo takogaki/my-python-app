@@ -68,7 +68,7 @@
 <p>{{ post.body|truncatechars:120 }}</p>
 
     <!-- 🔽 画像サムネ -->
-    {% if post.image and post.image.name %}
+    {% if post.image %}
     <img src="{{ post.image.url }}" class="comment-media-thumb">
     {% endif %}
 
