@@ -73,8 +73,7 @@ def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
 
     parent_comments = Comment.objects.filter(
-        post=post,
-        parent__isnull=True
+        post=post, parent__isnull=True
     ).order_by("-posted_date")
 
     if request.method == "POST":
@@ -92,33 +91,30 @@ def post_detail(request, slug):
             comment = form.save(commit=False)
             comment.post = post
 
-
-
             # =========================
-            # 表示名の決定
+            # ★ ここが修正の核心
             # =========================
+            device_id = None  # ← 必ず最初に定義する
+
             if request.user.is_authenticated:
                 comment.name = request.user.username
             else:
                 device_id = get_device_id(request)
-                comment.name = f"未ログイン#{device_id[:6].upper()}"
+                comment.name = f"未ログイン-{device_id[:6]}"
 
             if parent:
                 comment.parent = parent.root_parent
-                comment.reply_to = request.POST.get("reply_to")
+                comment.reply_to = parent.name
 
             comment.save()
 
             response = redirect("blog:post_detail", slug=slug)
 
-            # Cookie が無ければ保存
-            if not request.COOKIES.get("device_id"):
+            if device_id and not request.COOKIES.get("device_id"):
                 response.set_cookie(
                     "device_id",
                     device_id,
-                    max_age=60 * 60 * 24 * 365,  # 1年
-                    httponly=True,
-                    samesite="Lax",
+                    max_age=60 * 60 * 24 * 365,
                 )
 
             return response

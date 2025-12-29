@@ -1,43 +1,37 @@
 {% if video_url %}
 
-    {% if not user.is_authenticated %}
-    <!-- 🔒 未ログイン用 -->
-    <div class="video-placeholder">
-        <span class="video-label">
-            <a href="{% url 'login' %}?next={{ request.path }}">
-                ログインすると動画を視聴できます
-            </a>
-        </span>
-    </div>
+{% if not user.is_authenticated %}
+<!-- 🔒 未ログイン用 -->
+<div class="video-placeholder locked">
+    <a href="{% url 'login' %}?next={{ request.path }}" class="video-label">
+        ログインすると動画を視聴できます
+    </a>
+</div>
+
+{% else %}
+<!-- ✅ ログイン済 -->
+<a href="{{ video_url }}" target="_blank" rel="noopener" class="video-placeholder clickable">
+
+    {% if "facebook.com" in video_url %}
+    <span class="video-label facebook">Facebook 動画</span>
+
+    {% elif "instagram.com" in video_url %}
+    <span class="video-label instagram">Instagram 動画</span>
+
+    {% elif "tiktok.com" in video_url %}
+    <span class="video-label tiktok">TikTok 動画</span>
+
+    {% elif "youtube.com" in video_url or "youtu.be" in video_url %}
+    <span class="video-label youtube">YouTube 動画</span>
+
+    {% elif "x.com" in video_url or "twitter.com" in video_url %}
+    <span class="video-label twitter">X 動画</span>
 
     {% else %}
-    <!-- ✅ ログイン済：動画っぽい四角 -->
-        <div class="video-placeholder">
-
-            {% if "facebook.com" in post.video_url %}
-            <span class="video-label facebook">Facebook リンク</span>
-
-            {% elif "instagram.com" in post.video_url %}
-            <span class="video-label instagram">Instagram リンク</span>
-
-            {% elif "tiktok.com" in post.video_url %}
-            <span class="video-label tiktok">TikTok 動画</span>
-            
-            {% elif "youtube.com" in post.video_url or "youtu.be" in video_url %}
-            <span class="video-label youtube">YouTube 動画</span>
-
-            {% elif "x.com" in post.video_url or "twitter.com" in post.video_url %}
-            <span class="video-label twitter">X リンク</span>
-
-            {% else %}
-            <span class="video-label">動画</span>
-            {% endif %}
-
-            <a href="{{ post.video_url }}" target="_blank" rel="noopener" class="video-overlay">
-                play
-            </a>
-        </div>
-
+    <span class="video-label">動画リンク</span>
     {% endif %}
+
+</a>
+{% endif %}
 
 {% endif %}

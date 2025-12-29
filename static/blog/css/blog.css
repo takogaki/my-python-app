@@ -347,3 +347,29 @@
         font-size: 1.1rem;
     }
 }
+
+
+
+
+.video-link-box {
+    margin-top: 10px;
+}
+
+.video-link {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+
+.video-link.youtube { background: #ff0000; }
+.video-link.tiktok { background: #000000; }
+.video-link.instagram { background: #e1306c; }
+.video-link.twitter { background: #1da1f2; }
+.video-link.facebook { background: #1877f2; }
+
+.video-link:hover {
+    opacity: 0.85;
+}
