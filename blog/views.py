@@ -43,22 +43,19 @@ def frontpage(request):
     )
 
     if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
+        form = PostForm(
+            request.POST,
+            request.FILES,
+            user=request.user,  # ★ これが無いと本番で必ず壊れる
+        )
+
         if form.is_valid():
             post = form.save(commit=False)
-
-            if request.user.is_authenticated:
-                post.author = request.user
-                post.name = request.user.username
-            else:
-                device_id = get_device_id(request)
-                post.author = None
-                post.name = f"未ログイン-{device_id[:6].upper()}"
-
+            post.author = request.user if request.user.is_authenticated else None
             post.save()
             return redirect("blog:frontpage")
     else:
-        form = PostForm()
+        form = PostForm(user=request.user)  # ★ GET でも必須
 
     return render(
         request,
