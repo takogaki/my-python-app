@@ -57,7 +57,7 @@
             </button>
 
             <div id="reply-form-{{ reply.id }}" class="reply-form" style="display:none; margin-left:20px;">
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}">
                     {% csrf_token %}
                     {{ form.as_p }}
                     <input type="hidden" name="parent_id" value="{{ comment.id }}">
@@ -78,7 +78,7 @@
     </button>
 
     <div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none; margin-left:20px;">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="hidden" name="parent_id" value="{{ comment.id }}">

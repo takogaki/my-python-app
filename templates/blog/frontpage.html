@@ -15,7 +15,7 @@
 </div>
 
 <div class="post-form-card">
-    <form method="post" enctype="multipart/form-data" class="post-form">
+    <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}"></form>
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="submit-btn">口をとじる</button>
