@@ -44,33 +44,19 @@ def frontpage(request):
 
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
-
         if form.is_valid():
             post = form.save(commit=False)
 
             if request.user.is_authenticated:
-                # ログインユーザー
                 post.author = request.user
                 post.name = request.user.username
             else:
-                # 未ログインユーザー → 識別番号
                 device_id = get_device_id(request)
                 post.author = None
                 post.name = f"未ログイン-{device_id[:6].upper()}"
 
             post.save()
-
-            response = redirect("blog:frontpage")
-
-            # Cookie 未設定なら保存
-            if not request.COOKIES.get("device_id"):
-                response.set_cookie(
-                    "device_id",
-                    device_id,
-                    max_age=60 * 60 * 24 * 365,
-                )
-
-            return response
+            return redirect("blog:frontpage")
     else:
         form = PostForm()
 

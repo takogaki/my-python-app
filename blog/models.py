@@ -17,7 +17,6 @@ class Post(models.Model):
         blank=True,
     )
 
-    # 表示名（ユーザー名 or 識別ID）
     name = models.CharField(
         max_length=50,
         blank=True,
@@ -34,22 +33,14 @@ class Post(models.Model):
     video_url = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # =========================
-        # 表示名の最終確定
-        # =========================
-
-        if self.author:
-            # ログインユーザー → username
-            self.name = self.author.username
-
-        else:
-            # 未ログイン → すでに入っている name を尊重
-            if not self.name:
+        # ★ 最終保険：何も入っていなければだけ補完
+        if not self.name:
+            if self.author:
+                self.name = self.author.username
+            else:
                 self.name = "未ログインユーザー"
 
-        # =========================
         # slug 自動生成
-        # =========================
         if not self.slug:
             base_slug = slugify(self.title) or uuid4().hex[:10]
             slug = base_slug
@@ -63,7 +54,8 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-
+    
+    
 class Comment(models.Model):
     post = models.ForeignKey(
         "Post",
