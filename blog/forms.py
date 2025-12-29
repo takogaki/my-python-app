@@ -87,11 +87,6 @@ class PostForm(forms.ModelForm):
 # コメントフォーム
 # =======================
 class CommentForm(forms.ModelForm):
-    # name = forms.CharField(
-    #     required=False,
-    #     widget=forms.TextInput(attrs={"placeholder": "匿名可"}),
-    #     label="名前",
-    # )
 
     class Meta:
         model = Comment
@@ -105,18 +100,14 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.parent = kwargs.pop("parent", None)
-        self.user = kwargs.pop("user", None)  # ★ 追加
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
         if self.parent:
-            parent_name = self.parent.name or "匿名"
+            parent_name = self.parent.name or "未ログインユーザー"
             self.fields["body"].widget.attrs["placeholder"] = (
                 f"{parent_name} さんに返信する"
             )
-
-    def clean_name(self):
-        name = self.cleaned_data.get("name")
-        return name or None
 
     def clean_video_url(self):
         video_url = self.cleaned_data.get("video_url")
