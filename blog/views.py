@@ -95,6 +95,8 @@ def post_detail(request, slug):
             comment = form.save(commit=False)
             comment.post = post
 
+
+
             # =========================
             # 表示名の決定
             # =========================

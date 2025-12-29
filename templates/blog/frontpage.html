@@ -74,12 +74,14 @@
     <!-- 🔽 動画サムネ -->
     {% include "blog/video_embed.html" with video_url=post.video_url %}
         
-    <a class="read-more" href="{% url 'blog:post_detail' slug=post.slug %}">
-        もっと読む
-        <span class="comment-count">
-            💬 {{ post.comment_count }}
-        </span>
-    </a>
+    {% if post.slug %}
+        <a href="{% url 'blog:post_detail' slug=post.slug %}">
+            もっと読む
+            <span class="comment-count">
+                💬 {{ post.comment_count }}
+            </span>
+        </a>
+    {% endif %}
 </div>
 
 {% endfor %}
