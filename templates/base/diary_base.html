@@ -30,7 +30,7 @@
             <div class="user-area">
                 {% if user.is_authenticated %}
                 <span class="welcome">
-                    こんにちは、{{ request.user.username }} さん
+                    こんにちは、<a class="btn btn-outline" href="{% url 'accounts:mypage' %}">{{ request.user.username }}</a>さん
                     <p class="user-count">
                         ログインユーザー数：{{ logged_in_users_count }}
                     </p>
@@ -50,13 +50,6 @@
         {% block body %}
         {% endblock %}
     </main>
-
-<div class="logout-wrapper">
-    <form action="{% url 'accounts:logout' %}" method="post">
-        {% csrf_token %}
-        <button class="logout-pill">ログアウト</button>
-    </form>
-</div>
 
     <footer class="site-footer">
         <small>© 喋る場</small>

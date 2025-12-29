@@ -2,6 +2,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 from .views import SignUpView, UserDetailView
 from . import views
+from .views import mypage
+
 
 app_name = "accounts"
 
@@ -20,6 +22,7 @@ urlpatterns = [
     path("users/<str:username>/", views.UserDetailView.as_view(), name="user_detail"),
 
     # ユーザー公開ページ（username指定）
+    path("mypage/", views.mypage, name="mypage"),
     path("user/<str:username>/", UserDetailView.as_view(), name="user_detail_by_username"),
 
     # メール認証（★これが唯一の activate）

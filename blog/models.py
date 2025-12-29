@@ -3,69 +3,60 @@ from faker import Faker
 from django.utils.text import slugify
 import unicodedata
 from uuid import uuid4
+from django.conf import settings
 
 fake = Faker()
 
 
 class Post(models.Model):
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="blog_posts",
+        null=True,
+        blank=True,
+    )
+
+    # 表示名（ユーザー名 or 識別ID）
     name = models.CharField(
-        max_length=255,
+        max_length=50,
         blank=True,
         null=True,
-        verbose_name="投稿者名"
+        verbose_name="表示名"
     )
 
-    title = models.CharField(
-        max_length=255,
-        verbose_name="タイトル"
-    )
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, blank=True)
+    body = models.TextField()
+    posted_date = models.DateTimeField(auto_now_add=True)
 
-    slug = models.SlugField(
-        unique=True,
-        blank=True,
-        db_index=True,  # 🔒 本番での検索最適化
-    )
-
-    body = models.TextField(
-        verbose_name="本文"
-    )
-
-    posted_date = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    image = models.ImageField(
-        upload_to="post_images/",
-        null=True,
-        blank=True
-    )
-
-    # ★ すべての動画SNS用（安全なURLは forms.py 側で厳格に検証）
-    video_url = models.URLField(
-        blank=True,
-        null=True,
-        help_text="YouTube / TikTok / Instagram / X / Facebook の動画URL"
-    )
+    image = models.ImageField(upload_to="post_images/", null=True, blank=True)
+    video_url = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # 投稿者名が無ければ自動生成（既存挙動そのまま）
-        if not self.name:
-            self.name = fake.name()
+        # =========================
+        # 表示名の最終確定
+        # =========================
 
-        # slug 自動生成（日本語・空文字完全対応）
+        if self.author:
+            # ログインユーザー → username
+            self.name = self.author.username
+
+        else:
+            # 未ログイン → すでに入っている name を尊重
+            if not self.name:
+                self.name = "未ログインユーザー"
+
+        # =========================
+        # slug 自動生成
+        # =========================
         if not self.slug:
-            normalized_title = unicodedata.normalize("NFKD", self.title)
-            base_slug = slugify(normalized_title)
-
-            if not base_slug:
-                base_slug = uuid4().hex[:10]
-
+            base_slug = slugify(self.title) or uuid4().hex[:10]
             slug = base_slug
             counter = 1
             while Post.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
-
             self.slug = slug
 
         super().save(*args, **kwargs)
@@ -73,18 +64,19 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-
 class Comment(models.Model):
     post = models.ForeignKey(
-        Post,
+        "Post",
         on_delete=models.CASCADE,
         related_name="comments"
     )
 
+    # 表示名（自動で入る）
     name = models.CharField(
         max_length=50,
         blank=True,
-        null=True
+        null=True,
+        verbose_name="表示名"
     )
 
     body = models.TextField()
@@ -118,6 +110,13 @@ class Comment(models.Model):
         null=True,
         help_text="動画URL（YouTube / TikTok / Instagram / X / Facebook）"
     )
+
+    def save(self, *args, **kwargs):
+        # 表示名が未設定なら強制的に未ログインユーザー
+        if not self.name:
+            self.name = "未ログインユーザー"
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.body[:20]

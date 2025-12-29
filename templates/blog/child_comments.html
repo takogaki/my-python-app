@@ -6,7 +6,7 @@
 <div class="comment parent">
 
     <p>
-        <strong>{{ comment.name|default:"匿名" }}</strong><br>
+        <strong>コメント：{{ comment.name }}</strong><br>
         {{ comment.body }}
     </p>
 
@@ -35,7 +35,7 @@
         <div class="comment reply">
 
             <p>
-                ∟ <strong>{{ reply.name|default:"匿名" }}</strong>
+                ∟ <strong>コメント：{{ reply.name }}</strong>
                 {% if reply.reply_to %}
                 ＞＞＞ <strong>{{ reply.reply_to }}</strong>
                 {% endif %}

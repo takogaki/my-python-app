@@ -5,6 +5,7 @@ from .forms import CommentForm, PostForm
 from .models import Post, Comment
 from django.db.models import Count
 import uuid
+from .utils import get_device_id
 
 fake = Faker()
 
@@ -20,6 +21,17 @@ def get_anonymous_id(request):
 
 
 # =======================
+# 端末一意ID取得（cookie）
+# =======================
+def get_device_id(request):
+    device_id = request.COOKIES.get("device_id")
+    if not device_id:
+        device_id = uuid.uuid4().hex
+    return device_id
+
+
+
+# =======================
 # トップページ
 # =======================
 def frontpage(request):
@@ -31,19 +43,36 @@ def frontpage(request):
     )
 
     if request.method == "POST":
-        form = PostForm(
-            request.POST,
-            request.FILES,
-            user=request.user,  # ★ 重要
-        )
+        form = PostForm(request.POST, request.FILES)
 
         if form.is_valid():
             post = form.save(commit=False)
-            post.name = post.name or fake.name()
+
+            if request.user.is_authenticated:
+                # ログインユーザー
+                post.author = request.user
+                post.name = request.user.username
+            else:
+                # 未ログインユーザー → 識別番号
+                device_id = get_device_id(request)
+                post.author = None
+                post.name = f"未ログイン-{device_id[:6].upper()}"
+
             post.save()
-            return redirect("blog:frontpage")
+
+            response = redirect("blog:frontpage")
+
+            # Cookie 未設定なら保存
+            if not request.COOKIES.get("device_id"):
+                response.set_cookie(
+                    "device_id",
+                    device_id,
+                    max_age=60 * 60 * 24 * 365,
+                )
+
+            return response
     else:
-        form = PostForm(user=request.user)  # ★ 重要
+        form = PostForm()
 
     return render(
         request,
@@ -54,7 +83,6 @@ def frontpage(request):
         },
     )
 
-
 # =======================
 # 投稿詳細 + コメント
 # =======================
@@ -62,7 +90,8 @@ def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
 
     parent_comments = Comment.objects.filter(
-        post=post, parent__isnull=True
+        post=post,
+        parent__isnull=True
     ).order_by("-posted_date")
 
     if request.method == "POST":
@@ -73,17 +102,21 @@ def post_detail(request, slug):
             request.POST,
             request.FILES,
             parent=parent,
-            user=request.user,  # ★ 重要
+            user=request.user,
         )
 
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
 
-            anon_id = get_anonymous_id(request)
-
-            if not comment.name:
-                comment.name = f"匿名{anon_id[:4].upper()}"
+            # =========================
+            # 表示名の決定
+            # =========================
+            if request.user.is_authenticated:
+                comment.name = request.user.username
+            else:
+                device_id = get_device_id(request)
+                comment.name = f"未ログイン#{device_id[:6].upper()}"
 
             if parent:
                 comment.parent = parent.root_parent
@@ -93,16 +126,19 @@ def post_detail(request, slug):
 
             response = redirect("blog:post_detail", slug=slug)
 
-            if not request.COOKIES.get("anon_id"):
+            # Cookie が無ければ保存
+            if not request.COOKIES.get("device_id"):
                 response.set_cookie(
-                    "anon_id",
-                    anon_id,
-                    max_age=60 * 60 * 24 * 365,
+                    "device_id",
+                    device_id,
+                    max_age=60 * 60 * 24 * 365,  # 1年
+                    httponly=True,
+                    samesite="Lax",
                 )
 
             return response
     else:
-        form = CommentForm(user=request.user)  # ★ 重要
+        form = CommentForm(user=request.user)
 
     return render(
         request,

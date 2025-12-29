@@ -13,6 +13,10 @@ from django.conf import settings
 from django.utils.http import urlencode
 from django.contrib.auth import login
 
+from diary.models import Page              # 日記
+from blog.models import Post               # ブログ投稿
+from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
+
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 
@@ -151,3 +155,22 @@ def activate(request, token):
         "accounts/activate_success.html",
         {"form": form}
     )
+
+
+# =========================
+# ★ マイページ
+# =========================
+@login_required
+def mypage(request):
+    user = request.user
+
+    diaries = Page.objects.filter(author=user).order_by("-page_date")
+    blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
+    messages = Message.objects.filter(recipient=request.user)
+    
+    return render(request, "accounts/mypage.html", {
+        "diaries": diaries,
+        "blog_posts": blog_posts,
+        "messages": messages,
+        "profile": user,
+    })

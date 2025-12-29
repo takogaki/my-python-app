@@ -56,15 +56,9 @@ def validate_video_url(url: str | None):
 # Post の投稿フォーム
 # =======================
 class PostForm(forms.ModelForm):
-    name = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": "匿名可"}),
-        label="名前",
-    )
-
     class Meta:
         model = Post
-        fields = ["name", "title", "body", "image", "video_url"]
+        fields = ["title", "body", "image", "video_url"]
         widgets = {
             "title": forms.TextInput(attrs={"placeholder": "タイトル"}),
             "body": forms.Textarea(attrs={
@@ -74,41 +68,34 @@ class PostForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # ★ 追加（壊さない）
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
-
-    def clean_name(self):
-        name = self.cleaned_data.get("name")
-        return name or None
 
     def clean_video_url(self):
         video_url = self.cleaned_data.get("video_url")
 
-        # 動画が未入力ならOK（画像投稿だけの場合）
         if not video_url:
             return None
 
-        # ★ 未ログインは動画不可
         if not self.user or not self.user.is_authenticated:
             raise ValidationError("動画の投稿にはログインが必要です。")
 
-        # 既存の安全バリデーションはそのまま
         return validate_video_url(video_url)
+    
 
 # =======================
 # コメントフォーム
 # =======================
 class CommentForm(forms.ModelForm):
-    name = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": "匿名可"}),
-        label="名前",
-    )
+    # name = forms.CharField(
+    #     required=False,
+    #     widget=forms.TextInput(attrs={"placeholder": "匿名可"}),
+    #     label="名前",
+    # )
 
     class Meta:
         model = Comment
-        fields = ["name", "body", "image", "video_url"]
+        fields = ["body", "image", "video_url"]
         widgets = {
             "body": forms.Textarea(attrs={
                 "placeholder": "コメントを書く",
