@@ -33,12 +33,28 @@ class Post(models.Model):
     video_url = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # ★ 最終保険：何も入っていなければだけ補完
+        # 表示名の最終確定
         if not self.name:
             if self.author:
                 self.name = self.author.username
             else:
                 self.name = "未ログインユーザー"
+
+        # slug 自動生成（保険付き）
+        if not self.slug:
+            base_slug = slugify(self.title)
+            if not base_slug:
+                base_slug = uuid4().hex[:10]
+
+            slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)
 
         # slug 自動生成
         if not self.slug:
@@ -55,7 +71,7 @@ class Post(models.Model):
     def __str__(self):
         return self.title
     
-    
+
 class Comment(models.Model):
     post = models.ForeignKey(
         "Post",
@@ -104,10 +120,8 @@ class Comment(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        # 表示名が未設定なら強制的に未ログインユーザー
         if not self.name:
             self.name = "未ログインユーザー"
-
         super().save(*args, **kwargs)
 
     def __str__(self):
