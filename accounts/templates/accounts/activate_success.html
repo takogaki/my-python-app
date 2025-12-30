@@ -1,16 +1,23 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
 
 {% block body %}
-<h2>登録が完了しました 🎉</h2>
 
-<p>プロフィール画像を設定できます（後から変更も可能です）</p>
+<div class="intro-card">
+    <h2 class="page-title">登録が完了しました 🎉</h2>
+    <p class="page-description">
+        プロフィール画像は後からでも変更できます。
+    </p>
+</div>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <a href="{% url 'login' %}{% if next %}?next={{ next }}{% endif %}">
-        保存してログインする
-    </a>
-</form>
+<div class="post-form-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
 
+        <button type="submit" class="submit-btn">
+            保存してログインする
+        </button>
+    </form>
+</div>
 {% endblock %}

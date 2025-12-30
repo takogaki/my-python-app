@@ -1,15 +1,20 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
+
 {% block body %}
 
-<h2>仮登録が完了しました</h2>
+<div class="intro-card">
+    <h2 class="page-title">仮登録が完了しました</h2>
 
-<p>
-    ご入力いただいたメールアドレス宛に<br>
-    <strong>本登録用の確認メール</strong>を送信しました。
-</p>
+    <p class="page-description">
+        ご入力いただいたメールアドレス宛に<br>
+        <strong>本登録用の確認メール</strong>を送信しました。
+    </p>
 
-<p>
-    メール内のリンクをクリックすると、登録が完了します。
-</p>
+    <p class="page-description">
+        メール内のリンクをクリックすると、<br>
+        登録が完了します。
+    </p>
+</div>
 
 {% endblock %}

@@ -1,18 +1,36 @@
-<!-- login.html -->
 {% extends "base/diary_base.html" %}
+{% load static %}
+
 {% block body %}
-<h2>ログイン</h2>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+<div class="intro-card">
+    <h2 class="page-title">ログイン</h2>
+    <p class="page-description">
+        続きを見る・動画を投稿するにはログインが必要です。
+    </p>
+</div>
 
-    {% if request.GET.next %}
-    <input type="hidden" name="next" value="{{ request.GET.next }}">
-    {% endif %}
+<div class="post-form-card">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
 
-    <button type="submit">ログイン</button>
-</form>
+        {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
 
-<p>新規登録は<a href="{% url 'accounts:signup' %}?next={{ request.GET.next }}">こちら</a></p>
+        <button type="submit" class="submit-btn">
+            ログイン
+        </button>
+    </form>
+
+    <div class="form-footer">
+        <p>
+            アカウントをお持ちでない方は<br>
+            <a href="{% url 'accounts:signup' %}?next={{ request.GET.next }}">
+                新規登録はこちら
+            </a>
+        </p>
+    </div>
+</div>
 {% endblock %}

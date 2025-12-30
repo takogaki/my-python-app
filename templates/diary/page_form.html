@@ -1,12 +1,22 @@
 {% extends "base/diary_base.html" %}
-{% block body %}
+{% load static %}
 
-    <h2>日記を書く</h2>
+{% block body %}
+<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+
+<div class="intro-card">
+    <h2 class="page-title">日記を書く</h2>
+    <p class="page-description">
+        今日のこと、少しだけ書いてみませんか。
+    </p>
+</div>
+
+<div class="post-form-card">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">保存</button>
+        <button type="submit" class="submit-btn">保存する</button>
     </form>
-    <br>
+</div>
 
 {% endblock %}

@@ -1,33 +1,78 @@
 {% extends "base/diary_base.html" %}
 {% block body %}
 
-<h1>詳細情報</h1>
-<p><strong>名前:</strong> {{ user.username }}</p>
-<a href="{% url 'user_messages:send_message' user.username %}" class="btn btn-primary">メッセージを送る</a>
+<!-- =====================
+ ユーザー情報カード
+===================== -->
+<div class="card">
+    <h2 class="card-title">
+        {{ user.username }} さんのプロフィール
+    </h2>
 
-<p><strong>性別:</strong> {{ user.get_gender_display }}</p>
-<p><strong>年齢:</strong> {{ user.get_age }}歳</p>
+    <div class="card-content">
+        <p><strong>名前：</strong>{{ user.username }}</p>
+        <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
+        <p><strong>年齢：</strong>{{ user.get_age }}歳</p>
+    </div>
 
-<h1>{{ user.username }}さんの公開日記</h1>
+    <div class="card-actions">
+        <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
+            メッセージを送る
+        </a>
+    </div>
+</div>
 
-<ul>
+<!-- =====================
+ 公開日記一覧
+===================== -->
+<div class="card">
+    <h2 class="card-title">
+        {{ user.username }} さんの公開日記
+    </h2>
+
+    {% if public_pages %}
     {% for page in public_pages %}
-    <li>
-        <h2>{{ page.title }}</h2>
-        <p>作成日: {{ page.page_date }}</p>
-        <p>{{ page.content }}</p>
-        <p>
+    <div class="sub-card">
+        <h3 class="sub-card-title">
+            {{ page.title }}
+        </h3>
+
+        <p class="sub-card-date">
+            作成日：{{ page.page_date }}
+        </p>
+
+        <p class="sub-card-body">
+            {{ page.content }}
+        </p>
+
+        <p class="sub-card-like">
             <strong>
-                {{ page.unique_likes_count }}人のユーザーから、{{ page.likes }} 👍頂いている日記です。
+                {{ page.unique_likes_count }}人のユーザーから
+                {{ page.likes }} 👍 をもらっています
             </strong>
         </p>
-        <a href="{% url 'diary:page_detail' page.id %}">詳細を見る</a>
-    </li>
-    {% empty %}
-    <p>公開されている日記はありません。</p>
-    {% endfor %}
-</ul>
 
-<a href="{% url 'accounts:user_list' %}">ユーザー一覧に戻る</a>
+        <div class="card-actions">
+            <a href="{% url 'diary:page_detail' page.id %}" class="btn outline">
+                詳細を見る
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="empty-text">
+        公開されている日記はありません。
+    </p>
+    {% endif %}
+</div>
+
+<!-- =====================
+ 戻る
+===================== -->
+<div class="card-footer center">
+    <a href="{% url 'accounts:user_list' %}" class="btn outline">
+        ← ユーザー一覧に戻る
+    </a>
+</div>
 
 {% endblock %}

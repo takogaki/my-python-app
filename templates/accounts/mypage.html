@@ -4,45 +4,67 @@
 {% block body %}
 <div class="mypage">
 
+<section class="profile-card">
+    <h2>{{ user_obj.username }}</h2>
+</section>
+
     <!-- プロフィール -->
     <section class="profile-card">
-        <img src="{{ user_obj.profile_image.url }}" class="avatar">
-        <h2>{{ user_obj.username }}</h2>
+        {% if user.profile.profile_image %}
+            <img src="{{ user.profile.profile_image.url }}" class="avatar">
+        {% else %}
+            <img src="{% static 'images/default_avatar.png' %}" class="avatar">
+        {% endif %}
+            <!-- <h2>{{ user_obj.username }}</h2> -->
     </section>
 
     <!-- 日記 -->
-    <section>
-        <h3>📔 日記一覧</h3>
+    <section class="content-card">
+        <h3 class="section-title">📔 日記一覧</h3>
+
         {% for diary in diaries %}
-        <a href="{% url 'diary:page_detail' diary.pk %}">
-            {{ diary.title }}
-        </a>
+        <div class="list-item">
+            <a href="{% url 'diary:page_detail' diary.pk %}" class="item-title">
+                {{ diary.title }}
+            </a>
+            <div class="item-meta">
+                投稿日：{{ diary.page_date|date:"Y年m月d日" }}
+            </div>
+        </div>
         {% empty %}
-        <p>日記はまだありません</p>
+        <p class="empty-text">日記はまだありません</p>
         {% endfor %}
     </section>
+
     <!-- ブログ -->
-    <section>
-        <h3>📝 ブログ投稿</h3>
+    <section class="content-card">
+        <h3 class="section-title">📝 ブログ投稿</h3>
+
         {% for post in blog_posts %}
-        <a href="{% url 'blog:post_detail' post.slug %}">
-            {{ post.title }}
-        </a>
+        <div class="list-item">
+            <a href="{% url 'blog:post_detail' post.slug %}" class="item-title">
+                {{ post.title }}
+            </a>
+            <div class="item-meta">
+                投稿日：{{ post.posted_date|date:"Y年m月d日" }}
+            </div>
+        </div>
         {% empty %}
-        <p>ブログ投稿はまだありません</p>
+        <p class="empty-text">ブログ投稿はまだありません</p>
         {% endfor %}
     </section>
 
     <!-- メッセージ -->
-    <section>
-        <h3>💌 受信メッセージ</h3>
+    <section class="content-card">
+        <h3 class="section-title">💌 受信メッセージ</h3>
+
         {% for msg in messages %}
         <div class="message-card">
-            <strong>{{ msg.from_user }}</strong><br>
-            {{ msg.body|truncatechars:50 }}
+            <strong>{{ msg.from_user }}</strong>
+            <p>{{ msg.body|truncatechars:50 }}</p>
         </div>
         {% empty %}
-        <p>メッセージはありません</p>
+        <p class="empty-text">メッセージはありません</p>
         {% endfor %}
     </section>
 

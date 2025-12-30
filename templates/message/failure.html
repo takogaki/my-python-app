@@ -1,7 +1,18 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
 {% block body %}
 
-<h2>メッセージ送信に失敗しました</h2>
-<p>申し訳ございません。時間をおいて再度お試しください。</p>
-<button onclick="history.back()">戻る</button>
+<div class="card">
+    <h2 class="card-title">メッセージ送信に失敗しました</h2>
+
+    <p class="card-text">
+        申し訳ございません。<br>
+        時間をおいて再度お試しください。
+    </p>
+
+    <div class="card-actions">
+        <button class="btn" onclick="history.back()">戻る</button>
+    </div>
+</div>
+
 {% endblock %}

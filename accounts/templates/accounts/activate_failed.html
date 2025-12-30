@@ -1,20 +1,23 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
 
 {% block body %}
-<h2>認証に失敗しました</h2>
 
-<p>
-    以下の理由が考えられます。
-</p>
+<div class="intro-card">
+    <h2 class="page-title">認証に失敗しました</h2>
+    <p class="page-description">
+        以下の理由が考えられます。
+    </p>
+</div>
 
-<ul>
-    <li>リンクの有効期限切れ</li>
-    <li>すでに認証済み</li>
-</ul>
+<div class="post-form-card">
+    <ul class="error-list">
+        <li>リンクの有効期限が切れている</li>
+        <li>すでに認証が完了している</li>
+    </ul>
 
-<p>
-    もう一度ログインをお試しください。
-</p>
-
-<a href="{% url 'accounts:login' %}">ログイン画面へ</a>
+    <a href="{% url 'accounts:login' %}" class="submit-btn">
+        ログイン画面へ
+    </a>
+</div>
 {% endblock %}

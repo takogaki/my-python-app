@@ -4,17 +4,17 @@
 {% load static %}
 
 <head>
-    <script src="{% static 'blog/js/blog.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'diary/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/blog_form.css' %}">
-
+    <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>喋る場</title>
     
+    <script src="{% static 'blog/js/blog.js' %}"></script>
     <script src="{% static 'diary/js/base.js' %}"></script>
     <!-- blog.js の読み込み -->
     <script src="{% static 'blog/js/blog.js' %}"></script>

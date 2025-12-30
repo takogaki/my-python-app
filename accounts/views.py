@@ -167,10 +167,16 @@ def mypage(request):
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
     messages = Message.objects.filter(recipient=request.user)
-    
+
     return render(request, "accounts/mypage.html", {
         "diaries": diaries,
         "blog_posts": blog_posts,
         "messages": messages,
         "profile": user,
+    })
+
+def mypage(request):
+    user_obj = request.user
+    return render(request, "accounts/mypage.html", {
+        "user_obj": user_obj,
     })

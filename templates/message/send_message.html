@@ -1,15 +1,36 @@
 {% extends "base/diary_base.html" %}
-
+{% load static %}
 {% block body %}
 
-<h1>{{ recipient.username }}さんにメッセージを送る</h1>
-<form method="POST">
-    {% csrf_token %}
-    <label for="message">メッセージ:</label>
-    <textarea id="message" name="message" required></textarea>
-    <button type="submit">送信</button>
-</form>
+<div class="card">
+    <h2 class="card-title">
+        {{ recipient.username }}さんにメッセージを送る
+    </h2>
 
-<a href="{% url 'accounts:user_detail' recipient.username %}">戻る</a>
+    <form method="POST" class="message-form">
+        {% csrf_token %}
+    
+        <div class="form-group">
+            <label for="message" class="form-label">
+                メッセージ
+            </label>
+    
+            <textarea id="message" name="message" class="form-textarea" placeholder="ここにメッセージを入力してください（相手を傷つけない言葉を心がけましょう）" rows="6"
+                required></textarea>
+        </div>
+    
+        <div class="card-actions">
+            <button type="submit" class="btn primary">
+                送信
+            </button>
+        </div>
+    </form>
+
+    <div class="card-footer">
+        <a href="{% url 'accounts:user_detail' recipient.username %}">
+            ← 戻る
+        </a>
+    </div>
+</div>
 
 {% endblock %}

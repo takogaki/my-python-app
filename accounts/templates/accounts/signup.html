@@ -1,86 +1,32 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
+
 {% block body %}
 
-<style>
-    .form-box {
-        max-width: 420px;
-        margin: 40px auto;
-        padding: 24px;
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
-    }
+<!-- タイトル＋説明カード -->
+<div class="intro-card">
+    <h2 class="page-title">新規登録</h2>
+    <p class="page-description">
+        アカウントを作成すると、<br>
+        日記の作成・動画の共有ができるようになります。
+    </p>
+</div>
 
-    .form-box h2 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .form-field {
-        margin-bottom: 16px;
-    }
-
-    .form-field label {
-        font-weight: bold;
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    .form-field input,
-    .form-field select {
-        width: 100%;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-
-    .error {
-        color: #d00;
-        font-size: 0.9em;
-        margin-top: 4px;
-    }
-
-    .help {
-        font-size: 0.85em;
-        color: #666;
-    }
-
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 1em;
-        cursor: pointer;
-    }
-</style>
-
-<div class="form-box">
-    <h2>新規登録</h2>
-
+<!-- フォームカード -->
+<div class="post-form-card">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-    
-        {% for field in form %}
-        <div style="margin-bottom: 1em;">
-            {{ field.label_tag }}<br>
-            {{ field }}
-            {% if field.errors %}
-            <div style="color:red;">
-                {{ field.errors }}
-            </div>
-            {% endif %}
-        </div>
-        {% endfor %}
-    
-        <button type="submit">仮登録する</button>
+
+        {{ form.as_p }}
+
+        <button type="submit" class="submit-btn">
+            仮登録する
+        </button>
     </form>
-    
-    <p style="font-size:0.9em;">
+
+    <p class="form-note">
         登録後、確認メールが届きます。<br>
-        リンクをクリックすると本登録完了です。
+        メール内のリンクをクリックすると本登録が完了します。
     </p>
 </div>
 

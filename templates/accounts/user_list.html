@@ -1,13 +1,24 @@
 {% extends "base/diary_base.html" %}
 {% block body %}
 
-    <h1>ユーザー一覧</h1>
-    <ul>
+<div class="card">
+    <h2 class="card-title">登録ユーザー一覧</h2>
+
+    {% if users %}
+    <ul class="user-list">
         {% for user in users %}
-        <li>
-            <a href="{% url 'accounts:user_detail' user.username %}">{{ user.username }}</a>
+        <li class="user-list-item">
+            <a href="{% url 'accounts:user_detail' user.username %}">
+                {{ user.username }}
+            </a>
         </li>
         {% endfor %}
     </ul>
+    {% else %}
+    <p class="empty-text">
+        ユーザーが見つかりません。
+    </p>
+    {% endif %}
+</div>
 
 {% endblock %}

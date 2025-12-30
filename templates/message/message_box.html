@@ -1,24 +1,47 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
 {% block body %}
 
-<h2>メッセージボックス</h2>
+<div class="page-container">
 
-{% if messages %}
-<ul>
+    <!-- タイトルカード -->
+    <div class="intro-card">
+        <h2 class="page-title">メッセージボックス</h2>
+        <p class="page-description">
+            これまでに届いたメッセージ一覧です。
+        </p>
+    </div>
+
+    {% if messages %}
     {% for message in messages %}
-    <li>
-        <p><strong>From:</strong> {{ message.sender.username }}</p>
-        <p><strong>Message:</strong> {{ message.content }}</p>
-        <p><strong>Sent at:</strong> {{ message.sent_at }}</p>
+    <div class="post block">
 
-        <!-- 返信ボタン -->
-        <a href="{% url 'user_messages:send_message' username=message.sender.username %}">
-            <button type="button">返信</button>
-        </a>
-    </li>
+        <p class="post-author">
+            From：{{ message.sender.username }}
+        </p>
+
+        <p class="post-body">
+            {{ message.content }}
+        </p>
+
+        <small class="post-date">
+            {{ message.sent_at }}
+        </small>
+
+        <div style="margin-top: 12px;">
+            <a href="{% url 'user_messages:send_message' username=message.sender.username %}" class="submit-btn">
+                返信する
+            </a>
+        </div>
+
+    </div>
     {% endfor %}
-</ul>
-{% else %}
-<p>まだメッセージはありません。</p>
-{% endif %}
+    {% else %}
+    <div class="post block">
+        <p>まだメッセージはありません。</p>
+    </div>
+    {% endif %}
+
+</div>
+
 {% endblock %}
