@@ -17,13 +17,7 @@ class Post(models.Model):
         blank=True,
     )
 
-    name = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        verbose_name="表示名"
-    )
-
+    name = models.CharField(max_length=50, blank=True, null=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     body = models.TextField()
@@ -33,30 +27,6 @@ class Post(models.Model):
     video_url = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # 表示名の最終確定
-        if not self.name:
-            if self.author:
-                self.name = self.author.username
-            else:
-                self.name = "未ログインユーザー"
-
-        # slug 自動生成（保険付き）
-        if not self.slug:
-            base_slug = slugify(self.title)
-            if not base_slug:
-                base_slug = uuid4().hex[:10]
-
-            slug = base_slug
-            counter = 1
-            while Post.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
-
-            self.slug = slug
-
-        super().save(*args, **kwargs)
-
-        # slug 自動生成
         if not self.slug:
             base_slug = slugify(self.title) or uuid4().hex[:10]
             slug = base_slug
@@ -70,7 +40,6 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-    
 
 class Comment(models.Model):
     post = models.ForeignKey(
