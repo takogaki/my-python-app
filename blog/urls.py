@@ -2,6 +2,12 @@ from django.urls import path
 from . import views
 # blog/utils.py
 import uuid
+from django.urls import path
+from .views import frontpage
+
+urlpatterns = [
+    path("", frontpage, name="frontpage"),
+]
 
 
 def get_device_id(request):
