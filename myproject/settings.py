@@ -94,11 +94,21 @@ else:
         "http://localhost:8000",
     ]
 
+
+# ⚠️ これだけでOK。import cloudinary は不要
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+}
+
+
 # ----------------------------------
 # アプリケーション定義
 # ----------------------------------
 INSTALLED_APPS = [
     "cloudinary_storage",
+    "cloudinary",
     "csp",
     "django.contrib.admin",
     "django.contrib.auth",
