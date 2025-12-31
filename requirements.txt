@@ -11,3 +11,5 @@ sqlparse==0.5.1
 Faker==18.9.0
 Pillow
 django-csp>=4.0
+cloudinary
+django-cloudinary-storage
