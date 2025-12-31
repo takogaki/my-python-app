@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import dj_database_url
+import cloudinary
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -19,6 +20,13 @@ DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "dev-secret-key-unsafe"
+)
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+    secure=True,
 )
 
 ALLOWED_HOSTS = [
@@ -98,6 +106,8 @@ else:
 # アプリケーション定義
 # ----------------------------------
 INSTALLED_APPS = [
+    "cloudinary",
+    "cloudinary_storage",
     "csp",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -113,6 +123,8 @@ INSTALLED_APPS = [
     "user_messages",
     "django_extensions",
 ]
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
