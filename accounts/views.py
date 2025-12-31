@@ -119,7 +119,7 @@ def activate(request, token):
     except CustomUser.DoesNotExist:
         return render(request, "accounts/activate_failed.html")
 
-    # 🔹 GET：画像入力画面を表示するだけ
+    # 🔹 GET：画像選択画面
     if request.method == "GET":
         form = ProfileImageForm(instance=user.profile)
         return render(
@@ -138,20 +138,22 @@ def activate(request, token):
     if form.is_valid():
         form.save()
 
-        # 本登録確定
+        # ✅ ここで初めて本登録
         user.is_active = True
         user.activation_token = None
         user.save(update_fields=["is_active", "activation_token"])
 
         login(request, user)
 
+        # 元のページがあれば戻す
         next_url = request.session.pop("signup_next", None)
         if next_url:
             return redirect(next_url)
 
-        return redirect("accounts:signup_done")
+        # 🔴 signup_done に戻さない！！
+        return redirect("/")
 
-    # ❌ バリデーションエラー
+    # ❌ バリデーションエラー時のみ再表示
     return render(
         request,
         "accounts/activate_success.html",
