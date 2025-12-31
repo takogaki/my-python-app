@@ -115,6 +115,8 @@ INSTALLED_APPS = [
     "django_extensions",
 ]
 
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 MIDDLEWARE = [
