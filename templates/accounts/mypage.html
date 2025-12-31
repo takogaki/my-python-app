@@ -4,18 +4,28 @@
 {% block body %}
 <div class="mypage">
 
-<section class="profile-card">
+<!-- <section class="profile-card">
     <h2>{{ user_obj.username }}</h2>
-</section>
+</section> -->
 
     <!-- プロフィール -->
     <section class="profile-card">
-        {% if user_obj.profile.profile_image %}
-        <img src="{{ user_obj.profile.profile_image.url }}" class="avatar">
+        <h2>{{ user_obj.username }}</h2>
+        {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" class="avatar">
         {% else %}
         <img src="{% static 'images/default_avatar.png' %}" class="avatar">
         {% endif %}
-    
+        <div class="profile-actions">
+            <a href="{% url 'accounts:profile_edit' %}">編集</a>
+        
+            <!-- {% if user.profile.profile_image %}
+            <form method="post" action="{% url 'accounts:profile_image_delete' %}">
+                {% csrf_token %}
+                <button type="submit">画像を削除</button>
+            </form>
+            {% endif %} -->
+        </div>
         <!-- <h2>{{ user_obj.username }}</h2> -->
     </section>
 

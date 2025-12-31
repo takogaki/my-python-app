@@ -21,7 +21,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 
 from .forms import CustomUserCreationForm
-from .forms import ProfileImageForm
+from .forms import ProfileForm
 
 from .models import CustomUser
 from diary.models import Page
@@ -121,7 +121,7 @@ def activate(request, token):
 
     # 🔹 GET：画像選択画面
     if request.method == "GET":
-        form = ProfileImageForm(instance=user.profile)
+        form = ProfileForm(instance=user.profile)
         return render(
             request,
             "accounts/activate_success.html",
@@ -129,7 +129,7 @@ def activate(request, token):
         )
 
     # 🔹 POST：画像保存 → 本登録完了
-    form = ProfileImageForm(
+    form = ProfileForm(
         request.POST,
         request.FILES,
         instance=user.profile
@@ -183,3 +183,42 @@ def mypage(request):
     return render(request, "accounts/mypage.html", {
         "user_obj": user_obj,
     })
+
+# =========================
+# ★ マイページ　ユーザーネーム編集ビュー（編集）
+# =========================
+@login_required
+def profile_edit(request):
+    user = request.user
+
+    if request.method == "POST":
+        form = ProfileForm(
+            request.POST,
+            request.FILES,
+            instance=user
+        )
+        if form.is_valid():
+            form.save()
+            return redirect("accounts:mypage")
+    else:
+        form = ProfileForm(instance=user)
+
+    return render(
+        request,
+        "accounts/profile_edit.html",
+        {"form": form}
+    )
+
+# =========================
+# ★ プロフィール画像削除ビュー（削除）
+# =========================
+@login_required
+def profile_image_delete(request):
+    profile = request.user.profile
+
+    if profile.profile_image:
+        profile.profile_image.delete(save=False)
+        profile.profile_image = None
+        profile.save()
+
+    return redirect("accounts:mypage")

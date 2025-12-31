@@ -1,0 +1,55 @@
+.profile-edit {
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.profile-form p {
+    margin-bottom: 20px;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.back-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+
+
+
+
+
+.avatar-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+
+
+
+
+/* 画像クリア用チェックボックス横並び */
+.clear-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.clear-checkbox input[type="checkbox"] {
+    margin: 0;
+}

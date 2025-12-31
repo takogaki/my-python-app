@@ -126,8 +126,8 @@ header h1 a {
 }
 
 .avatar {
-    width: 120px;
-    height: 120px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     object-fit: cover;
 }

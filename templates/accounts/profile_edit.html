@@ -1,0 +1,29 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block body %}
+<div class="container profile-edit">
+
+    <h1 class="page-title">プロフィール編集</h1>
+
+    {% if user.profile_image %}
+    <div class="current-image">
+        <p>現在の画像</p>
+        <img src="{{ user.profile_image.url }}" class="avatar-large">
+    </div>
+{% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="profile-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">
+            保存
+        </button>
+    </form>
+
+    <div class="back-link">
+        <a href="{% url 'accounts:mypage' %}">← マイページに戻る</a>
+    </div>
+
+</div>
+{% endblock %}

@@ -29,4 +29,6 @@ urlpatterns = [
     path("activate/<uuid:token>/", views.activate, name="activate"),
 
     # プロフィール設定
+    path("profile/edit/", views.profile_edit, name="profile_edit"),
+    path("profile/image/delete/", views.profile_image_delete, name="profile_image_delete"),
 ]
