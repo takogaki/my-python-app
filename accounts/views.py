@@ -101,12 +101,15 @@ class SignUpView(generic.CreateView):
     
 
 # =========================
-# ★ 本登録（UUID方式・最終確定版）
+# 仮登録完了画面
 # =========================
-
 def signup_done(request):
     return render(request, "accounts/signup_done.html")
 
+
+# =========================
+# 本登録（画像設定）
+# =========================
 def activate(request, token):
     try:
         user = CustomUser.objects.get(
@@ -116,46 +119,44 @@ def activate(request, token):
     except CustomUser.DoesNotExist:
         return render(request, "accounts/activate_failed.html")
 
-    # 🔹 GET：本登録＋画像入力画面表示
+    # 🔹 GET：画像入力画面を表示するだけ
     if request.method == "GET":
-        user.is_active = True
-        user.activation_token = None
-        user.save(update_fields=["is_active", "activation_token"])
-
-        login(request, user)
-
-        form = ProfileImageForm(instance=user)
+        form = ProfileImageForm(instance=user.profile)
         return render(
             request,
             "accounts/activate_success.html",
             {"form": form}
         )
 
-    # 🔹 POST：プロフィール画像保存
+    # 🔹 POST：画像保存 → 本登録完了
     form = ProfileImageForm(
         request.POST,
         request.FILES,
-        instance=user
+        instance=user.profile
     )
 
     if form.is_valid():
         form.save()
 
-        # ★ 元のページ取得
+        # 本登録確定
+        user.is_active = True
+        user.activation_token = None
+        user.save(update_fields=["is_active", "activation_token"])
+
+        login(request, user)
+
         next_url = request.session.pop("signup_next", None)
         if next_url:
             return redirect(next_url)
 
-        messages.success(request, "プロフィール画像を設定しました。")
-        return redirect("/")
+        return redirect("accounts:signup_done")
 
-    # ❌ バリデーションエラー時
+    # ❌ バリデーションエラー
     return render(
         request,
         "accounts/activate_success.html",
         {"form": form}
     )
-
 
 # =========================
 # ★ マイページ

@@ -10,12 +10,13 @@
 
     <!-- プロフィール -->
     <section class="profile-card">
-        {% if user.profile.profile_image %}
-            <img src="{{ user.profile.profile_image.url }}" class="avatar">
+        {% if user_obj.profile.profile_image %}
+        <img src="{{ user_obj.profile.profile_image.url }}" class="avatar">
         {% else %}
-            <img src="{% static 'images/default_avatar.png' %}" class="avatar">
+        <img src="{% static 'images/default_avatar.png' %}" class="avatar">
         {% endif %}
-            <!-- <h2>{{ user_obj.username }}</h2> -->
+    
+        <!-- <h2>{{ user_obj.username }}</h2> -->
     </section>
 
     <!-- 日記 -->
