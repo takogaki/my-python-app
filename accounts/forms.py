@@ -47,6 +47,19 @@ class CustomUserCreationForm(UserCreationForm):
             "birth_date_input",
         ]
 
+
+# ★ ここが重要
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError(
+                "このユーザー名はすでに使用されています。"
+            )
+
+        return username
+
+
     def clean_birth_date_input(self):
         value = self.cleaned_data["birth_date_input"]
 
@@ -103,3 +116,10 @@ class ProfileForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
+
+    # accounts/forms.py
+class ActivateProfileImageForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["profile_image"]

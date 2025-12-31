@@ -5,6 +5,7 @@ from django.views.generic import DetailView
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
 from django.views import generic
+from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -20,6 +21,7 @@ from user_messages.models import Message   # メッセージ（※名前は実�
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 
+from .forms import ActivateProfileImageForm
 from .forms import CustomUserCreationForm
 from .forms import ProfileForm
 
@@ -66,7 +68,6 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 # =========================
 # ★ 新規登録（メール認証付き）
 # =========================
-
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm
     template_name = "accounts/signup.html"
@@ -121,7 +122,7 @@ def activate(request, token):
 
     # 🔹 GET：画像選択画面
     if request.method == "GET":
-        form = ProfileForm(instance=user.profile)
+        form = ProfileForm(instance=user)   # ← ★ここだけ
         return render(
             request,
             "accounts/activate_success.html",
@@ -132,28 +133,24 @@ def activate(request, token):
     form = ProfileForm(
         request.POST,
         request.FILES,
-        instance=user.profile
+        instance=user                     # ← ★ここだけ
     )
 
     if form.is_valid():
         form.save()
 
-        # ✅ ここで初めて本登録
         user.is_active = True
         user.activation_token = None
         user.save(update_fields=["is_active", "activation_token"])
 
         login(request, user)
 
-        # 元のページがあれば戻す
         next_url = request.session.pop("signup_next", None)
         if next_url:
             return redirect(next_url)
 
-        # 🔴 signup_done に戻さない！！
         return redirect("/")
 
-    # ❌ バリデーションエラー時のみ再表示
     return render(
         request,
         "accounts/activate_success.html",
