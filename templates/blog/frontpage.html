@@ -5,6 +5,9 @@
 {% block body %}
 <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
+<p class="post-content">
+    {{ post.content|linebreaksbr }}
+</p>
 
 <div class="intro-card">
     <h2 class="page-title">口を開く</h2>
@@ -50,11 +53,8 @@
             ※ 限定公開・非公開設定でもOKな場合があります。
         </p>
     </div>
-</form>
 
 {% for post in posts %}
-
-<!-- <a href="{% url 'blog:post_detail' slug=post.slug %}">{{ post.title }}</a> -->
 
 <div class="post block">
     <!-- 投稿者名 -->
@@ -65,7 +65,12 @@
     <h2 class="subtitle">{{ post.title }}</h2>
     <small>Posted at {{ post.posted_date }}</small>
 
-<p>{{ post.body|truncatechars:120 }}</p>
+    <!-- ✅ 改行を反映させる本文表示 -->
+    <p class="post-content">
+        {{ post.content|linebreaksbr }}
+    </p>
+
+    <p>{{ post.body|truncatechars:120 }}</p>
 
     <!-- 🔽 画像サムネ -->
     {% if post.image %}

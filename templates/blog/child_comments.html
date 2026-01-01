@@ -5,6 +5,11 @@
 {% for comment in comments %}
 <div class="comment parent">
 
+    <!-- ✅ 改行を反映させる本文表示 -->
+    <p class="post-content">
+        {{ comment.content|linebreaksbr }}
+    </p>
+
     <p>
         <strong>コメント：{{ comment.name }}</strong><br>
         {{ comment.body }}
@@ -33,6 +38,11 @@
 
         {% for reply in comment.replies.all %}
         <div class="comment reply">
+
+            <!-- ✅ 改行を反映させる本文表示 -->
+            <p class="post-content">
+                {{ reply.content|linebreaksbr }}
+            </p>
 
             <p>
                 ∟ <strong>コメント：{{ reply.name }}</strong>

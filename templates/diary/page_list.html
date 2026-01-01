@@ -1,38 +1,66 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
+
 {% block body %}
 
-<h1>{{ request.user.username }} の日記一覧</h1>
-<ul>
-    {% for diary in diaries %}
-    <li>
-        <strong>{{ diary.title }}</strong> ({{ diary.created_at|date:"Y-m-d" }})
-        <p>{{ diary.content }}</p>
-        <p>公開設定: {{ diary.is_public|yesno:"公開,非公開" }}</p>
-    </li>
-    {% endfor %}
-</ul>
+<div class="page-container">
 
-<ul>
+    <!-- タイトルカード -->
+    <div class="intro-card">
+        <h2 class="page-title">
+            {{ request.user.username }} の日記一覧
+        </h2>
+        <p class="page-description">
+            これまでに書いた日記です。
+        </p>
+    </div>
+
+    {% if page_list %}
     {% for page in page_list %}
-    <p>
-        {% if page.is_public %}
-        <span style="color: blue; font-weight: bold;">公開中</span>
-        {% else %}
-        <span style="color: red; font-weight: bold;">非公開</span>
-        {% endif %}
-    </p>
-        <li>{{ page.page_date }}: 
-            <a href="{% url 'diary:page_detail' page.id %}">{{ page.title }}</a>
-            <br>
-                <strong>
-                    {{ page.unique_likes_count }}人のユーザーから、{{ page.likes }} 👍頂いている日記です。
-                </strong>
-            <hr>
-        </li>
-    {% empty %}
-        <div>日記のページが１つもありません。</div>
+    <div class="post block">
+
+        <!-- 公開 / 非公開 -->
+        <p class="post-author">
+            {% if page.is_public %}
+            <span style="color: #4da6ff; font-weight: bold;">公開中</span>
+            {% else %}
+            <span style="color: #ff6b6b; font-weight: bold;">非公開</span>
+            {% endif %}
+        </p>
+
+        <!-- タイトル -->
+        <h3 class="subtitle">
+            <a href="{% url 'diary:page_detail' page.id %}">
+                {{ page.title }}
+            </a>
+        </h3>
+
+        <!-- 日付 -->
+        <small class="post-date">
+            {{ page.page_date|date:"Y-m-d" }}
+        </small>
+
+        <!-- 本文（抜粋） -->
+        <p class="post-body">
+            {{ page.content|truncatechars:120|linebreaksbr }}
+        </p>
+
+        <!-- いいね情報 -->
+        <p style="margin-top: 8px;">
+            <strong>
+                {{ page.unique_likes_count }}人のユーザーから
+                {{ page.likes }} 👍 をもらっています
+            </strong>
+        </p>
+
+    </div>
     {% endfor %}
-</ul>
-<br>
+    {% else %}
+    <div class="post block">
+        <p>日記はまだありません。</p>
+    </div>
+    {% endif %}
+
+</div>
 
 {% endblock %}

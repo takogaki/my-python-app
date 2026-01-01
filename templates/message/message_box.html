@@ -20,12 +20,14 @@
             From：{{ message.sender.username }}
         </p>
 
+        
+
         <p class="post-body">
-            {{ message.content }}
+            {{ message.content|linebreaksbr }}
         </p>
 
         <small class="post-date">
-            {{ message.sent_at }}
+            {{ message.sent_at|date:"Y/m/d H:i" }}
         </small>
 
         <div style="margin-top: 12px;">
