@@ -3,11 +3,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from blog.views import post_detail
-from pages.views import index
 
 
 urlpatterns = [
-    path("", index, name="index"),   # ← トップページ
     path('user_messages/', include('user_messages.urls')),  
     path("admin/", admin.site.urls),
     path("diary/", include("diary.urls")),
