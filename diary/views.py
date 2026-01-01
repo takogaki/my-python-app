@@ -16,8 +16,9 @@ User = get_user_model()
 timezone.now()  # タイムゾーン付きの現在日時を取得
 
 
+# diary/views.py
 def index(request):
-    return render(request, "index.html")
+    return render(request, "diary/index.html")
 
 class IndexView(View):
     def get(self, request):
