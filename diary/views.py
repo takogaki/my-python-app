@@ -81,18 +81,6 @@ class PageDeleteView(LoginRequiredMixin, DeleteView):
         return Page.objects.filter(author=self.request.user)
 
 
-# class UserDetailView(LoginRequiredMixin, DetailView):
-#     model = CustomUser
-#     template_name = "diary/user_detail.html"
-#     context_object_name = "user"
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         # ユーザーの公開日記のみ取得
-#         context["public_pages"] = Page.objects.filter(author=self.object, is_public=True)
-#         return context
-
-
 # 関数ベースビュー
 @login_required
 def user_diary_list(request, user_id):
