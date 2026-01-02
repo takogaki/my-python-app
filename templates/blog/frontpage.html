@@ -66,12 +66,10 @@
     <small>Posted at {{ post.posted_date }}</small>
 
     <!-- ✅ 改行を反映させる本文表示 -->
-    <p class="post-content">
-        {{ post.content|linebreaksbr }}
-    </p>
-
-    <p>{{ post.body|truncatechars:120 }}</p>
-
+        <p class="post-content">
+            {{ post.body|truncatechars:120|linebreaksbr }}</p>
+        </p>
+        
     <!-- 🔽 画像サムネ -->
     {% if post.image %}
     <img src="{{ post.image.url }}" class="comment-media-thumb">

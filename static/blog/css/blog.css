@@ -373,3 +373,11 @@
 .video-link:hover {
     opacity: 0.85;
 }
+
+
+
+.post-content {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.8;
+}

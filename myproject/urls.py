@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from blog.views import post_detail
 from diary.views import index
 
 
@@ -15,7 +14,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('', include('django.contrib.auth.urls')),
     path('chat/', include('chat.urls')),
-    path("posts/<slug:slug>/", post_detail, name="post_detail"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
