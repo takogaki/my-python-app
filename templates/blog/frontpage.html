@@ -67,9 +67,9 @@
 
     <!-- ✅ 改行を反映させる本文表示 -->
         <p class="post-content">
-            {{ post.body|truncatechars:120|linebreaksbr }}</p>
+            {{ post.body|truncatechars:120|linebreaksbr }}
         </p>
-        
+
     <!-- 🔽 画像サムネ -->
     {% if post.image %}
     <img src="{{ post.image.url }}" class="comment-media-thumb">

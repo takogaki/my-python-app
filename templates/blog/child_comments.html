@@ -7,12 +7,8 @@
 
     <!-- ✅ 改行を反映させる本文表示 -->
     <p class="post-content">
-        {{ comment.content|linebreaksbr }}
-    </p>
-
-    <p>
         <strong>コメント：{{ comment.name }}</strong><br>
-        {{ comment.body }}
+        {{ comment.body|linebreaksbr }}
     </p>
 
     {% if comment.replies.exists %}
@@ -41,16 +37,12 @@
 
             <!-- ✅ 改行を反映させる本文表示 -->
             <p class="post-content">
-                {{ reply.content|linebreaksbr }}
-            </p>
-
-            <p>
                 ∟ <strong>コメント：{{ reply.name }}</strong>
                 {% if reply.reply_to %}
                 ＞＞＞ <strong>{{ reply.reply_to }}</strong>
                 {% endif %}
                 <br>
-                {{ reply.body }}
+                {{ reply.body|linebreaksbr }} }}
             </p>
 
             {% if reply.image %}
