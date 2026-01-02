@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from faker import Faker
 from .forms import CommentForm, PostForm
@@ -97,8 +98,14 @@ def post_detail(request, slug):
     ).order_by("-posted_date")
 
     if request.method == "POST":
+        parent = None
         parent_id = request.POST.get("parent_id")
-        parent = Comment.objects.get(id=parent_id) if parent_id else None
+
+        if parent_id:
+            try:
+                parent = Comment.objects.get(id=parent_id)
+            except Comment.DoesNotExist:
+                parent = None
 
         form = CommentForm(
             request.POST,
@@ -111,10 +118,7 @@ def post_detail(request, slug):
             comment = form.save(commit=False)
             comment.post = post
 
-            # =========================
-            # ★ ここが修正の核心
-            # =========================
-            device_id = None  # ← 必ず最初に定義する
+            device_id = None
 
             if request.user.is_authenticated:
                 comment.name = request.user.username
@@ -123,7 +127,7 @@ def post_detail(request, slug):
                 comment.name = f"未ログイン-{device_id[:6]}"
 
             if parent:
-                comment.parent = parent.root_parent
+                comment.parent = parent.parent or parent
                 comment.reply_to = parent.name
 
             comment.save()
