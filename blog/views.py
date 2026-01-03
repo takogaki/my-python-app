@@ -160,6 +160,9 @@ def post_create(request):
     if request.method == "POST":
         form = PostForm(request.POST, user=request.user)
         if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user   # ★ これが必須
+            post.name = request.user.username  # 表示名も揃えるなら
             form.save()
             return redirect("blog:frontpage")
     else:

@@ -175,12 +175,6 @@ def mypage(request):
         "profile": user,
     })
 
-def mypage(request):
-    user_obj = request.user
-    return render(request, "accounts/mypage.html", {
-        "user_obj": user_obj,
-    })
-
 # =========================
 # ★ マイページ　ユーザーネーム編集ビュー（編集）
 # =========================
