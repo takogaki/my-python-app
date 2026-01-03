@@ -4,24 +4,29 @@
 <!-- =====================
  ユーザー情報カード
 ===================== -->
-<div class="card">
-    <h2 class="card-title">
-        {{ user.username }} さんのプロフィール
-    </h2>
+<section class="profile-card">
+    <div class="card">
+        <h2 class="card-title">
+            {{ user.username }} さんのプロフィール
+        </h2>
 
-    <div class="card-content">
-        <p><strong>名前：</strong>{{ user.username }}</p>
-        <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
-        <p><strong>年齢：</strong>{{ user.get_age }}歳</p>
+    <!-- プロフィール画像 -->
+            {% if user.profile_image %}
+            <img src="{{ user.profile_image.url }}" class="avatar">
+            {% endif %}
+
+            <p><strong>名前：</strong>{{ user.username }}</p>
+            <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
+            <p><strong>年齢：</strong>{{ user.get_age }}歳</p>
+        </div>
+
+        <div class="card-actions">
+            <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
+                メッセージを送る
+            </a>
+        </div>
     </div>
-
-    <div class="card-actions">
-        <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
-            メッセージを送る
-        </a>
-    </div>
-</div>
-
+</section>
 <!-- =====================
  公開日記一覧
 ===================== -->

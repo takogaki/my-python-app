@@ -1,19 +1,52 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
+
 {% block body %}
+<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
-<form method="POST">
-    {% csrf_token %}
-    <p>このページを削除しても良いですか？</p>
-    <button type="submit">削除</button>
-</form>
-<h2>{{ page.title }}</h2>
-<div>{{ page.page_date }}</div>
-<div>{{ page.body | linebreaksbr }}</div>
-{% if page.picture %}
-    <img src="{{ page.picture.url }}" />
-{% endif %}
-<br>
+<div class="content-container">
 
-<button onclick="history.back()">戻る</button>
+    <!-- 削除確認カード -->
+    <div class="post-detail-card">
 
+        <h1 class="post-title" style="color:#dc2626;">
+            ⚠️ 日記の削除確認
+        </h1>
+
+        <p style="margin-bottom: 20px; color:#555;">
+            この日記を削除すると、<strong>元に戻すことはできません</strong>。<br>
+            本当に削除してもよろしいですか？
+        </p>
+
+        <!-- 確認用 日記内容 -->
+        <div class="post-meta">
+            <small>🕒 {{ page.page_date }}</small><br>
+            <small>✍️ {{ page.author }}</small>
+        </div>
+
+        <h2 class="subtitle">{{ page.title }}</h2>
+
+        <div class="post-body">
+            {{ page.body|linebreaks }}
+        </div>
+
+        {% if page.picture %}
+        <img src="{{ page.picture.url }}" class="comment-media-thumb">
+        {% endif %}
+
+        <!-- 削除フォーム -->
+        <form method="POST" style="margin-top: 30px;">
+            {% csrf_token %}
+            <button type="submit" class="submit-btn" style="background:#dc2626;">
+                この日記を削除する
+            </button>
+        </form>
+
+        <!-- 戻る -->
+        <div class="back-area">
+            <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">← 戻る</a>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

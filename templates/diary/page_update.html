@@ -6,8 +6,10 @@
     {{ form.as_p }}
     <button type="submit">更新</button>
 </form>
-<br>
 
-<button onclick="history.back()">戻る</button>
+<div class="back-area">
+    <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">← 戻る</a>
+</div>
+
 
 {% endblock %}
