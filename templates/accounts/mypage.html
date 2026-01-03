@@ -64,11 +64,26 @@
     <!-- メッセージ -->
     <section class="content-card">
         <h3 class="section-title">💌 受信メッセージ</h3>
-
+    
         {% for msg in messages %}
         <div class="message-card">
-            <strong>{{ msg.from_user }}</strong>
-            <p>{{ msg.body|truncatechars:50 }}</p>
+            <strong>
+                {% if msg.is_important %}
+                <span class="important">★</span>
+                {% endif %}
+        
+                {{ msg.sender.username }}
+        
+                {% if not msg.is_read %}
+                <span class="badge unread">未読</span>
+                {% endif %}
+            </strong>
+        
+            <p>{{ msg.content|truncatechars:50 }}</p>
+        
+            <small class="text-muted">
+                {{ msg.sent_at|date:"Y/m/d H:i" }}
+            </small>
         </div>
         {% empty %}
         <p class="empty-text">メッセージはありません</p>
