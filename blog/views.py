@@ -98,14 +98,8 @@ def post_detail(request, slug):
     ).order_by("-posted_date")
 
     if request.method == "POST":
-        parent = None
         parent_id = request.POST.get("parent_id")
-
-        if parent_id:
-            try:
-                parent = Comment.objects.get(id=parent_id)
-            except Comment.DoesNotExist:
-                parent = None
+        parent = Comment.objects.get(id=parent_id) if parent_id else None
 
         form = CommentForm(
             request.POST,
@@ -118,7 +112,10 @@ def post_detail(request, slug):
             comment = form.save(commit=False)
             comment.post = post
 
-            device_id = None
+            # =========================
+            # ★ ここが修正の核心
+            # =========================
+            device_id = None  # ← 必ず最初に定義する
 
             if request.user.is_authenticated:
                 comment.name = request.user.username
@@ -127,7 +124,7 @@ def post_detail(request, slug):
                 comment.name = f"未ログイン-{device_id[:6]}"
 
             if parent:
-                comment.parent = parent.parent or parent
+                comment.parent = parent.root_parent
                 comment.reply_to = parent.name
 
             comment.save()

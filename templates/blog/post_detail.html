@@ -1,6 +1,6 @@
 {% extends "base/diary_base.html" %}
 {% load youtube_extras %}
-{% load comment_tags %}
+<!-- {% load comment_tags %} -->
 {% load static %}
 
 {% block body %}
@@ -27,7 +27,7 @@
             <img src="{{ post.image.url }}" class="comment-media-thumb">
             {% endif %}
 
-            {% include "blog/video_embed.html" with video_url=post.video_url %}
+            <!-- {% include "blog/video_embed.html" with video_url=post.video_url %} -->
         </div>
     </div>
 
