@@ -8,5 +8,7 @@ urlpatterns = [
     path("success/", views.success, name="success"),
     path("message_box/", views.message_box, name="message_box"),
     path("failure/", views.failure, name="failure"),
+    path("<int:pk>/", views.message_detail, name="message_detail"),
+    path("<int:pk>/reply/", views.message_reply, name="message_reply"),
 
 ]

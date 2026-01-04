@@ -13,7 +13,15 @@
 
         <div class="post-meta">
             <small>🕒 {{ post.posted_date }}</small><br>
-            <small>✍️ {{ post.name }}</small>
+                {% if post.author %}
+                <a href="{% url 'accounts:user_detail' post.author.username %}">
+                    {{ post.author.username }}
+                </a>
+                {% else %}
+                <span class="guest-name">
+                    {{ post.name }}
+                </span>
+                {% endif %}
         </div>
 
         <h1 class="post-title">{{ post.title }}</h1>

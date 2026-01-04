@@ -107,3 +107,49 @@ def success(request):
 @login_required
 def failure(request):
     return render(request, "message/failure.html")
+
+
+
+
+@login_required
+def message_detail(request, pk):
+    message = get_object_or_404(
+        Message,
+        pk=pk,
+        recipient=request.user   # ← 超重要（安全装置）
+    )
+
+    # 未読 → 既読
+    if not message.is_read:
+        message.is_read = True
+        message.save()
+
+    return render(request, "message/message_detail.html", {
+    "message": message,
+})
+
+
+
+@login_required
+def message_reply(request, pk):
+    original = get_object_or_404(
+        Message,
+        pk=pk,
+        recipient=request.user
+    )
+
+    if request.method == "POST":
+        form = ReplyMessageForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.sender = request.user
+            reply.recipient = original.sender
+            reply.save()
+            return redirect("user_messages:message_detail", pk=original.pk)
+    else:
+        form = ReplyMessageForm()
+
+    return render(request, "user_messages/message_reply.html", {
+        "form": form,
+        "original": original,
+    })

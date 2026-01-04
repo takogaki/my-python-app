@@ -20,8 +20,6 @@
             From：{{ message.sender.username }}
         </p>
 
-        
-
         <p class="post-body">
             {{ message.content|linebreaksbr }}
         </p>
@@ -30,10 +28,8 @@
             {{ message.sent_at|date:"Y/m/d H:i" }}
         </small>
 
-        <div style="margin-top: 12px;">
-            <a href="{% url 'user_messages:send_message' username=message.sender.username %}" class="submit-btn">
-                返信する
-            </a>
+        <div style="margin-top: 12px; text-align: center;">
+            <a href="{% url 'user_messages:message_detail' message.id %}" class="btn primary">詳細</a>
         </div>
 
     </div>

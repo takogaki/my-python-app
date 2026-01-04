@@ -72,15 +72,21 @@
                 <span class="important">★</span>
                 {% endif %}
         
-                {{ msg.sender.username }}
+                <a href="{% url 'accounts:user_detail' msg.sender.username %}">
+                    {{ msg.sender.username }}
+                </a>
         
                 {% if not msg.is_read %}
-                <span class="badge unread">未読</span>
+                    <span class="badge unread">未読</span>
                 {% endif %}
             </strong>
         
-            <p>{{ msg.content|truncatechars:50 }}</p>
-        
+                <p>{{ msg.content|truncatechars:50 }}</p>
+
+            <div style="margin-top: 12px; text-align: center;">
+                <a href="{% url 'user_messages:message_detail' msg.id %}" class="btn primary">詳細</a>
+            </div>
+
             <small class="text-muted">
                 {{ msg.sent_at|date:"Y/m/d H:i" }}
             </small>

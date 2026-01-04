@@ -1,0 +1,38 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<div class="card">
+    <h2 class="card-title">📩 メッセージ詳細</h2>
+
+    <div class="card-content">
+        <p>
+            <strong>送信者：</strong>
+            <a href="{% url 'accounts:user_detail' message.sender.username %}">
+                {{ message.sender.username }}
+            </a>
+        </p>
+
+        <p>
+            <strong>受信日時：</strong>
+            {{ message.sent_at|date:"Y/m/d H:i" }}
+        </p>
+
+        <hr>
+
+        <p class="message-body">
+            {{ message.content|linebreaksbr }}
+        </p>
+    </div>
+
+    <div class="card-actions">
+        <a href="{% url 'user_messages:send_message' username=message.sender.username %}" class="btn primary">
+            返信する
+        </a>
+
+        <a href="{% url 'accounts:mypage' %}" class="btn outline">
+            マイページに戻る
+        </a>
+    </div>
+</div>
+
+{% endblock %}

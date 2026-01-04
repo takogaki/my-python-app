@@ -7,7 +7,16 @@
 
     <!-- ✅ 改行を反映させる本文表示 -->
     <p class="post-content">
-        <strong>コメント：{{ comment.name }}</strong><br>
+        {% if comment.author %}
+        <a href="{% url 'accounts:user_detail' comment.author.username %}">
+            <strong>コメント：{{ comment.author.username }}</strong>
+        </a>
+        {% else %}
+        <span class="guest-name">
+            <strong>コメント：{{ comment.name }}</strong>
+        </span>
+        {% endif %}
+        <br>
         {{ comment.body|linebreaksbr }}
     </p>
 
@@ -37,7 +46,17 @@
 
             <!-- ✅ 改行を反映させる本文表示 -->
             <p class="post-content">
-                ∟ <strong>コメント：{{ reply.name }}</strong>
+
+                {% if reply.author %}
+                <a href="{% url 'accounts:user_detail' reply.author.username %}">
+                    ∟ <strong>コメント：{{ reply.author.username }}</strong>
+                </a>
+                {% else %}
+                <span class="guest-name">
+                    ∟ <strong>コメント：{{ reply.name }}</strong>
+                </span>
+                {% endif %}
+
                 {% if reply.reply_to %}
                 ＞＞＞ <strong>{{ reply.reply_to }}</strong>
                 {% endif %}
@@ -64,7 +83,7 @@
                     {{ form.as_p }}
                     <input type="hidden" name="parent_id" value="{{ comment.id }}">
                     <input type="hidden" name="reply_to" value="{{ reply.name }}">
-                    <button type="submit">送信</button>
+                    <button type="submit" class="submit-btn">送信</button>
                 </form>
             </div>
 
@@ -85,7 +104,7 @@
             {{ form.as_p }}
             <input type="hidden" name="parent_id" value="{{ comment.id }}">
             <input type="hidden" name="reply_to" value="{{ comment.name }}">
-            <button type="submit">送信</button>
+            <button type="submit" class="submit-btn">送信</button>
         </form>
     </div>
 
@@ -94,8 +113,6 @@
 {% empty %}
 <p>コメントはまだありません。</p>
 {% endfor %}
-
-<script src="{% static 'blog/js/blog.js' %}"></script>
 
 <script async src="https://www.tiktok.com/embed.js"></script>
 <script async src="//www.instagram.com/embed.js"></script>
