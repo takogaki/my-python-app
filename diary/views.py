@@ -58,6 +58,24 @@ class PageDetailView(LoginRequiredMixin, DetailView):
     template_name = "diary/page_detail.html"
     context_object_name = "page"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["previous_url"] = self.request.META.get("HTTP_REFERER")
+        return context
+
+# views.py
+
+    def page_detail(request, pk):
+        page = get_object_or_404(Page, pk=pk)
+
+        # 遷移元URL（なければ None）
+        previous_url = request.META.get("HTTP_REFERER")
+
+        return render(request, "page_detail.html", {
+            "page": page,
+            "previous_url": previous_url,
+        })
+
 
 class PageUpdateView(LoginRequiredMixin, UpdateView):
     model = Page

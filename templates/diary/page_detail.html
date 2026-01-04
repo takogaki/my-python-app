@@ -56,7 +56,11 @@
 
     <!-- 戻る -->
     <div class="back-area">
-        <a href="{% url 'accounts:mypage' %}" class="back-button">← 戻る</a>
+        {% if previous_url %}
+        <a href="{{ previous_url }}" class="back-button">← 戻る</a>
+        {% else %}
+        <a href="{% url 'diary:page_list' %}" class="back-button">← 戻る</a>
+        {% endif %}
     </div>
 
 </div>

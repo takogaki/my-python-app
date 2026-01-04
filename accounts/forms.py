@@ -6,6 +6,8 @@ from datetime import datetime
 from .models import Profile
 from django.contrib.auth import get_user_model
 import re
+# ユーザーネーム編集フォーム
+User = get_user_model()
 
 from django.core.exceptions import ValidationError
 
@@ -78,14 +80,12 @@ class CustomUserCreationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.birth_date = self.cleaned_data["birth_date_input"]
         user.is_active = False  # ← 本番対応ポイント
         if commit:
             user.save()
         return user
     
-
-# ユーザーネーム編集フォーム
-User = get_user_model()
 
 class ProfileForm(forms.ModelForm):
     username = forms.CharField(
