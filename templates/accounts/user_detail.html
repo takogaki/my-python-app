@@ -6,7 +6,7 @@
 ===================== -->
 <section class="profile-card">
     <div class="card">
-        <h2 class="card-title">
+        <h2 class="profile-name">
             {{ user.username }} さんのプロフィール
         </h2>
 
@@ -15,8 +15,9 @@
             <img src="{{ user.profile_image.url }}" class="avatar">
             {% endif %}
 
-            <p><strong>名前：</strong>{{ user.username }}</p>
+        <div class="profile-info">
             <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
+
             {% with age=user.get_age %}
             {% if age %}
             <p><strong>年齢：</strong>{{ age }}歳</p>
