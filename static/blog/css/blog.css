@@ -247,6 +247,48 @@
 .video-label.twitter { color: #1da1f2; }
 .video-label.facebook { color: #1877f2; }
 
+/* ===== 追加分 ===== */
+
+/* TikTok Lite */
+.video-label.tiktoklite {
+    color: #00f2ea;
+}
+
+/* Threads */
+.video-label.threads {
+    color: #000000;
+}
+
+/* LINE BOOM */
+.video-label.lineboom {
+    color: #06c755;
+}
+
+/* Pinterest */
+.video-label.pinterest {
+    color: #e60023;
+}
+
+/* Pococha */
+.video-label.pococha {
+    color: #ff6fae;
+}
+
+/* 17LIVE */
+.video-label.seventeen {
+    color: #ffb300;
+}
+
+/* ニコニコ生放送 */
+.video-label.nicovideo {
+    color: #555555;
+}
+
+/* whoo */
+.video-label.whoo {
+    color: #7b61ff;
+}
+
 /* =========================
    スマホ最適化
 ========================= */
