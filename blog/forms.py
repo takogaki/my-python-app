@@ -13,18 +13,22 @@ fake = Faker()
 # =======================
 ALLOWED_VIDEO_DOMAINS = {
     "youtube.com",
-    "www.youtube.com",
     "youtu.be",
     "tiktok.com",
-    "www.tiktok.com",
+    "lite.tiktok.com",
+    "threads.net",
+    "line.me",
+    "lineboom",
+    "pinterest.",
+    "pococha.com",
+    "17.live",
+    "nicovideo.jp",
+    "nico.ms",
+    "whoo",
     "instagram.com",
-    "www.instagram.com",
     "twitter.com",
-    "www.twitter.com",
     "x.com",
-    "www.x.com",
     "facebook.com",
-    "www.facebook.com",
 }
 
 # =======================

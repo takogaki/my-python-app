@@ -34,7 +34,7 @@ ALLOWED_VIDEO_DOMAINS = {
     "youtube.com",
     "youtu.be",
     "tiktok.com",
-    "tiktoklite.com",
+    "lite.tiktok.com",
     "threads.net",
     "line.me",
     "lineboom",
