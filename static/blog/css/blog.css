@@ -254,19 +254,9 @@
     color: #00f2ea;
 }
 
-/* Threads */
-.video-label.threads {
-    color: #000000;
-}
-
 /* LINE BOOM */
 .video-label.lineboom {
     color: #06c755;
-}
-
-/* Pinterest */
-.video-label.pinterest {
-    color: #e60023;
 }
 
 /* Pococha */
