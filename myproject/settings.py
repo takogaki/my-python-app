@@ -109,6 +109,7 @@ CLOUDINARY_STORAGE = {
 # アプリケーション定義
 # ----------------------------------
 INSTALLED_APPS = [
+    'django.contrib.sitemaps',
     "cloudinary_storage",
     "cloudinary",
     "csp",
