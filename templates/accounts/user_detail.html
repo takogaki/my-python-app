@@ -8,6 +8,11 @@
     <div class="card">
         <h2 class="profile-name">
             {{ user.username }} さんのプロフィール
+            <h2 class="user-name">
+                {% if user.is_supporter %}
+                <span class="supporter-badge" title="この場所を応援してくれた方です">🌸</span>
+                {% endif %}
+            </h2>
         </h2>
 
     <!-- プロフィール画像 -->

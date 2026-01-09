@@ -6,7 +6,11 @@
 
     <!-- プロフィール -->
     <section class="profile-card">
-        <h2 class="profile-name">{{ user.username }}</h2>
+        <h2 class="profile-name">{{ user.username }}
+            {% if user.is_supporter %}
+            <span class="supporter-badge" title="ここはあなたのおかげで続けられています">🌸</span>
+            {% endif %}
+        </h2>
         {% if user.profile_image %}
         <img src="{{ user.profile_image.url }}" class="avatar">
         {% else %}
@@ -108,22 +112,19 @@
 
 <section class="support-card">
     <p class="support-text">
-        ここは、
-        誰かが一人にならないための場所として
-        運営しています。
-        
-        気持ちに余裕のあるときだけで大丈夫なので、
+        ここは、誰かが一人にならないための場所として運営しています。<br>
+        気持ちに余裕のあるときだけで大丈夫なので、<br>
         この場所を続ける応援をしてもらえたら嬉しいです。
     </p>
 
+    <a href="https://www.buymeacoffee.com/takogaki" target="_blank" rel="noopener" class="btn support">
+        🌸 この場所を応援する
+    </a>
+
     <p class="support-note">
         ※ 支援は任意です。<br>
-        しなくても、今まで通りすべて利用できます。
+        しなくても、今まで通りすべての機能をご利用いただけます。
     </p>
-
-    <a href="https://www.buymeacoffee.com/takogaki" target="_blank" rel="noopener" class="btn support">
-        ☕ この場所を応援する
-    </a>
 </section>
 
 

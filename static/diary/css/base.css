@@ -340,48 +340,54 @@ section h3 {
 
 /* ===== 応援（Buy Me a Coffee） ===== */
 
+/* ===== 応援（支援）セクション ===== */
 .support-card {
-    max-width: 720px;
     margin: 32px auto 0;
     padding: 20px;
-    background: #fff;
+    max-width: 520px;
+    background: #fff7f9;            /* ほんのり桜背景 */
+    border: 1px solid #f3c1d1;      /* 桜色の枠線 */
     border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     text-align: center;
 }
 
 .support-text {
     font-size: 0.95rem;
     line-height: 1.7;
-    color: #444;
+    color: #555;
     margin-bottom: 16px;
-    white-space: pre-line;
 }
 
-/* 応援ボタン */
+/* 🌸 応援ボタン */
 .btn.support {
     display: inline-block;
     padding: 10px 20px;
-    border-radius: 999px;
-    background: #f7c873; /* Buy Me a Coffeeっぽい色 */
-    color: #4a2c00;
-    font-weight: 600;
+    background: #e86a8d;            /* 桜の花びら色 */
+    color: #fff;
+    border-radius: 999px;           /* やさしい丸み */
     text-decoration: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    font-weight: bold;
+    transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .btn.support:hover {
+    background: #d95c7d;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-
-
+/* ※ 任意注意書き */
 .support-note {
-    margin-top: 14px;
+    margin-top: 12px;
     font-size: 0.8rem;
-    color: #777;
-    background: #f9f9f9;
-    padding: 8px 12px;
-    border-radius: 8px;
+    color: #888;
+}
+
+/* 🌸 = */
+/* 「この場所を応援してくれた人」 */
+.supporter-badge {
+    margin-left: 6px;
+    font-size: 1.05rem;
+    color: #e86a8d;      /* さくら色 */
+    vertical-align: middle;
+    opacity: 0.9;
 }

@@ -3,6 +3,7 @@ from .models import CustomUser
 from django.db.models.deletion import Collector
 from django.db import router
 
+
 @admin.action(description="選択したユーザーと関連データを完全削除")
 def delete_users_and_all_related_data(modeladmin, request, queryset):
     for user in queryset:
@@ -12,7 +13,10 @@ def delete_users_and_all_related_data(modeladmin, request, queryset):
         collector.collect([user])  # 対象のユーザーと関連データを収集
         collector.delete()  # 収集したデータをすべて削除
 
+
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff']
+    list_display = ("username", "email", "is_supporter", 'first_name', 'last_name', "is_active", 'is_staff')
     search_fields = ['username', 'email']
+    list_filter = ("is_supporter", "is_active")
+    actions = [delete_users_and_all_related_data]

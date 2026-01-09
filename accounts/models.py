@@ -58,6 +58,8 @@ class CustomUser(AbstractUser):
         blank=True
     )
 
+    is_supporter = models.BooleanField(default=False)
+
 
 class Profile(models.Model):
     user = models.OneToOneField(
