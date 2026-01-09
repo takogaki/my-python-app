@@ -6,22 +6,34 @@
 
     <!-- プロフィール -->
     <section class="profile-card">
-        <h2 class="profile-name">{{ user.username }}
+        <h2 class="profile-name">
+            {{ user.username }}
             {% if user.is_supporter %}
-            <span class="supporter-badge" title="ここはあなたのおかげで続けられています">🌸</span>
+            <span class="supporter-badge" title="ここはあなたのおかげで続けられています">
+                🌸
+            </span>
             {% endif %}
         </h2>
+    
+        {% if user.is_supporter %}
+        <p class="supporter-message">
+            ここはあなたのおかげで続けられています
+        </p>
+        {% endif %}
+    
         {% if user.profile_image %}
         <img src="{{ user.profile_image.url }}" class="avatar">
         {% else %}
         <img src="{% static 'images/default_avatar.png' %}" class="avatar">
         {% endif %}
+    
         <div class="profile-actions">
             <a href="{% url 'accounts:profile_edit' %}">編集</a>
         </div>
+    
         <div class="profile-info">
             <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
-        
+    
             {% with age=user.get_age %}
             {% if age %}
             <p><strong>年齢：</strong>{{ age }}歳</p>

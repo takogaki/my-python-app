@@ -386,8 +386,15 @@ section h3 {
 /* 「この場所を応援してくれた人」 */
 .supporter-badge {
     margin-left: 6px;
-    font-size: 1.05rem;
+    font-size: 0.9em;
     color: #e86a8d;      /* さくら色 */
     vertical-align: middle;
     opacity: 0.9;
+}
+
+.supporter-message {
+    margin-top: 4px;
+    font-size: 0.85em;
+    color: #b85c7a; /* 桜色 */
+    text-align: center;
 }
