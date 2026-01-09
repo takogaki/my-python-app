@@ -3,53 +3,72 @@
 
 {% block body %}
 
-<div class="dashboard">
+<main class="top">
+        <div class="dashboard">
 
-        <h2 class="dashboard-title">ホーム</h2>
-
-        <!-- 🕊 メッセージ -->
-        <div class="dashboard-section">
-                <a href="{% url 'user_messages:message_box' %}" class="dashboard-button primary">
-                        💌 メッセージボックス
-                </a>
-        </div>
-
-        <!-- ⏰ 時計 -->
-        <div class="dashboard-clock">
-                <div id="clock"></div>
-        </div>
-
-        <!-- 📖 日記 -->
-        <div class="dashboard-section">
-                <h3>📖 日記</h3>
-                <a href="{% url 'diary:page_create' %}" class="dashboard-button">
-                        日記を書く
-                </a>
-                <a href="{% url 'diary:page_list' %}" class="dashboard-button ghost">
-                        日記一覧
-                </a>
-        </div>
-
-        <!-- 💬 喋る場 -->
-        <div class="dashboard-section">
-                <h3>💬 喋る場</h3>
-                <a href="{% url 'blog:frontpage' %}" class="dashboard-button">
-                        喋る場入り口
-                </a>
-
-                <div class="disabled-box">
-                        🚧 建設中（まだ使用できません）
+                <h1 class="site-catch">
+                        ひとりの気持ちを、そっと言葉にできる場所
+                </h1>
+                <div class="top-lead">
+                        <p>ひとりで抱えるには、<br>
+                                夜は少し長すぎることがあります。</p>
+                
+                        <p>この場所は、<br>
+                                気持ちを言葉にしてもいい場所です。</p>
+                
+                        <p>誰かに返事をもらわなくても、<br>
+                                読んでもらえるだけで救われることもある。</p>
+                
+                        <p>そんな交流があってもいいと、<br>
+                                私たちは思っています。</p>
                 </div>
-        </div>
 
-        <!-- 👥 ユーザー -->
-        <div class="dashboard-section">
-                <h3>👥 ユーザー</h3>
-                <a href="{% url 'accounts:user_list' %}" class="dashboard-button ghost">
-                        登録ユーザー一覧
-                </a>
-        </div>
+                <h2 class="dashboard-title">ホーム</h2>
 
-</div>
+                <!-- 🕊 メッセージ -->
+                <div class="dashboard-section">
+                        <a href="{% url 'user_messages:message_box' %}" class="dashboard-button primary">
+                                💌 メッセージボックス
+                        </a>
+                </div>
+
+                <!-- ⏰ 時計 -->
+                <div class="dashboard-clock">
+                        <div id="clock"></div>
+                </div>
+
+                <!-- 📖 日記 -->
+                <div class="dashboard-section">
+                        <h3>📖 日記</h3>
+                        <a href="{% url 'diary:page_create' %}" class="dashboard-button">
+                                日記を書く
+                        </a>
+                        <a href="{% url 'diary:page_list' %}" class="dashboard-button ghost">
+                                日記一覧
+                        </a>
+                </div>
+
+                <!-- 💬 喋る場 -->
+                <div class="dashboard-section">
+                        <h3>💬 喋る場</h3>
+                        <a href="{% url 'blog:frontpage' %}" class="dashboard-button">
+                                喋る場入り口
+                        </a>
+
+                        <div class="disabled-box">
+                                🚧 建設中（まだ使用できません）
+                        </div>
+                </div>
+
+                <!-- 👥 ユーザー -->
+                <div class="dashboard-section">
+                        <h3>👥 ユーザー</h3>
+                        <a href="{% url 'accounts:user_list' %}" class="dashboard-button ghost">
+                                登録ユーザー一覧
+                        </a>
+                </div>
+
+        </div>
+</main>
 
 {% endblock %}
