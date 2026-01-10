@@ -9,6 +9,21 @@ fake = Faker()
 
 
 class Post(models.Model):
+    VIDEO_TYPE_CHOICES = [
+            ("normal", "通常動画"),
+            ("live", "ライブ配信"),
+        ]
+
+    video_url = models.URLField(blank=True, null=True)
+    video_type = models.CharField(
+        max_length=10,
+        choices=VIDEO_TYPE_CHOICES,
+        default="normal",
+    )
+
+        # ライブ配信用（任意だが超おすすめ）
+    live_ended = models.BooleanField(default=False)
+
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -42,6 +57,22 @@ class Post(models.Model):
         return self.title
 
 class Comment(models.Model):
+    VIDEO_TYPE_CHOICES = [
+            ("normal", "通常動画"),
+            ("live", "ライブ配信"),
+        ]
+    
+    video_type = models.CharField(
+        max_length=10,
+        choices=VIDEO_TYPE_CHOICES,
+        default="normal",
+    )
+
+    live_ended = models.BooleanField(
+        default=False,
+        help_text="ライブ配信が終了している場合にチェック"
+    )
+
     post = models.ForeignKey(
         "Post",
         on_delete=models.CASCADE,

@@ -32,8 +32,9 @@
         {% endif %}
 
         
-        {% include "blog/video_embed.html" with video_url=comment.video_url %}
-            
+        <!-- {% include "blog/video_embed.html" with video_url=comment.video_url %} -->
+        {% include "blog/video_embed.html" with obj=comment %}
+
     </div>
 
     <!-- =====================
@@ -69,8 +70,8 @@
             {% endif %}
 
         
-            {% include "blog/video_embed.html" with video_url=reply.video_url %}
-                
+            <!-- {% include "blog/video_embed.html" with video_url=reply.video_url %} -->
+            {% include "blog/video_embed.html" with obj=reply %}
 
             <!-- 🔥 返信への返信（reply.id で統一） -->
             <button type="button" class="reply-toggle" data-reply-id="{{ reply.id }}">

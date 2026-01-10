@@ -413,3 +413,22 @@
     word-break: break-word;
     line-height: 1.8;
 }
+
+
+
+.video-label.live {
+    color: #e53935;
+    font-weight: bold;
+}
+
+.video-label.ended {
+    color: #777;
+    background: #f2f2f2;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+.video-placeholder.ended {
+    pointer-events: none;
+    cursor: default;
+}

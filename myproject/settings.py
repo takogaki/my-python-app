@@ -32,20 +32,32 @@ ALLOWED_HOSTS = [
 
 ALLOWED_VIDEO_DOMAINS = {
     "youtube.com",
+    "www.youtube.com",
     "youtu.be",
     "tiktok.com",
+    "www.tiktok.com",
     "lite.tiktok.com",
+    "www.lite.tiktok.com",
     "line.me",
     "linevoom.line.me",
+    "www.linevoom.line.me",
+    "pococha.com",
     "www.pococha.com",
     "17.live",
+    "www.17.live",
     "live.nicovideo.jp",
+    "www.live.nicovideo.jp",
     "nico.ms",
     "whOO.ooo",
+    "www.whOO.ooo",
     "instagram.com",
+    "www.instagram.com",
     "twitter.com",
+    "www.twitter.com",
     "x.com",
+    "www.x.com",
     "facebook.com",
+    "www.facebook.com",
 }
 
 # Render 固有ホスト

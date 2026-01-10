@@ -1,55 +1,70 @@
-{% if video_url %}
+{% if obj.video_url %}
 
-{% if not user.is_authenticated %}
-<!-- 🔒 未ログイン用 -->
-<div class="video-placeholder locked">
-    <a href="{% url 'login' %}?next={{ request.path }}" class="video-label">
-        ログインすると動画を視聴できます
-    </a>
-</div>
-
-{% else %}
-<!-- ✅ ログイン済 -->
-<a href="{{ video_url }}" target="_blank" rel="noopener" class="video-placeholder clickable">
-
-    {% if "facebook.com" in video_url %}
-    <span class="video-label facebook">Facebook 動画</span>
-
-    {% elif "instagram.com" in video_url %}
-    <span class="video-label instagram">Instagram 動画</span>
-
-    {% elif "tiktok.com" in video_url %}
-    <span class="video-label tiktok">TikTok 動画</span>
-
-    {% elif "lite.tiktok.com" in video_url %}
-    <span class="video-label tiktoklite">TikTok Lite 動画</span>
-    
-    {% elif "linevoom.line.me" in video_url or "linevoom" in video_url %}
-    <span class="video-label lineboom">LINE BOOM 動画</span>
-    
-    {% elif "www.pococha.com" in video_url %}
-    <span class="video-label pococha">Pococha 配信❤️</span>
-    
-    {% elif "17.live" in video_url %}
-    <span class="video-label seventeen">17LIVE 配信❤️</span>
-    
-    {% elif "live.nicovideo.jp" in video_url or "nico.ms" in video_url %}
-    <span class="video-label nicovideo">ニコ生 配信❤️</span>
-    
-    {% elif "whOO.ooo" in video_url %}
-    <span class="video-label whoo">whoo 動画</span>
-
-    {% elif "youtube.com" in video_url or "youtu.be" in video_url %}
-    <span class="video-label youtube">YouTube 動画</span>
-
-    {% elif "x.com" in video_url or "twitter.com" in video_url %}
-    <span class="video-label twitter">X 動画</span>
+    {% if not user.is_authenticated %}
+    <!-- 🔒 未ログイン用 -->
+    <div class="video-placeholder locked">
+        <a href="{% url 'login' %}?next={{ request.path }}" class="video-label">
+            ログインすると動画を視聴できます
+        </a>
+    </div>
 
     {% else %}
-    <span class="video-label">動画リンク</span>
+    <!-- ✅ ログイン済 -->
+
+        {% if obj.video_type == "live" and obj.live_ended %}
+        <!-- 🔴 配信終了 -->
+        <div class="video-placeholder ended">
+            <span class="video-label ended">
+                🔴 この動画は配信終了しています
+            </span>
+        </div>
+
+        {% else %}
+        <!-- ▶ 再生可能 -->
+        <a href="{{ obj.video_url }}" target="_blank" rel="noopener" class="video-placeholder clickable">
+
+            {% if obj.video_type == "live" %}
+            <span class="video-label live">🔴 Live配信</span>
+
+            {% elif "facebook.com" in obj.video_url or "www.facebook.com" in obj.video_url %}
+            <span class="video-label facebook">Facebook 動画</span>
+
+            {% elif "instagram.com" in obj.video_url or "www.instagram.com" in obj.video_url %}
+            <span class="video-label instagram">Instagram 動画</span>
+
+            {% elif "tiktok.com" in obj.video_url or "www.tiktok.com" in obj.video_url %}
+            <span class="video-label tiktok">TikTok 動画</span>
+
+            {% elif "lite.tiktok.com" in obj.video_url or "www.lite.tiktok.com" in obj.video_url %}
+            <span class="video-label tiktoklite">TikTok Lite 動画</span>
+
+            {% elif "linevoom.line.me" in obj.video_url or "linevoom" in obj.video_url %}
+            <span class="video-label lineboom">LINE BOOM 動画</span>
+
+            {% elif "pococha.com" in obj.video_url or "www.pococha.com" in obj.video_url %}
+            <span class="video-label pococha">Pococha 配信❤️</span>
+
+            {% elif "17.live" in obj.video_url or "www.17.live" in obj.video_url %}
+            <span class="video-label seventeen">17LIVE 配信❤️</span>
+
+            {% elif "live.nicovideo.jp" in obj.video_url or "nico.ms" in obj.video_url %}
+            <span class="video-label nicovideo">ニコ生 配信❤️</span>
+
+            {% elif "whoo.ooo" in obj.video_url or "www.whoo.ooo" in obj.video_url %}
+            <span class="video-label whoo">whoo 動画</span>
+
+            {% elif "youtube.com" in obj.video_url or "www.youtube.com" in obj.video_url or "youtu.be" in obj.video_url %}
+            <span class="video-label youtube">YouTube 動画</span>
+
+            {% elif "x.com" in obj.video_url or "twitter.com" in obj.video_url %}
+            <span class="video-label twitter">X 動画</span>
+
+            {% else %}
+            <span class="video-label">動画リンク</span>
+            {% endif %}
+
+        </a>
+        {% endif %}
+
     {% endif %}
-
-</a>
-{% endif %}
-
 {% endif %}
