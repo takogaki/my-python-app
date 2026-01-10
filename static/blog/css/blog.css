@@ -432,3 +432,73 @@
     pointer-events: none;
     cursor: default;
 }
+
+
+
+
+/* ===============================
+   🔴 LIVE 点滅アニメーション
+   =============================== */
+
+@keyframes live-blink {
+    0% {
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(255, 0, 0, 0.0);
+    }
+    50% {
+        opacity: 0.35;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    }
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 0 rgba(255, 0, 0, 0.0);
+    }
+}
+
+/* LIVE共通 */
+.video-label.live {
+    color: #fff;
+    background: linear-gradient(135deg, #ff0000, #b30000);
+    font-weight: bold;
+    border-radius: 999px;
+    padding: 6px 12px;
+    display: inline-block;
+    animation: live-blink 2s infinite;
+}
+
+/* ===============================
+   プラットフォーム別微調整（任意）
+   =============================== */
+
+.video-label.live.youtube {
+    background: linear-gradient(135deg, #ff0000, #cc0000);
+}
+
+.video-label.live.tiktok {
+    background: linear-gradient(135deg, #25f4ee, #fe2c55);
+}
+
+.video-label.live.instagram {
+    background: linear-gradient(135deg, #f58529, #dd2a7b);
+}
+
+.video-label.live.facebook {
+    background: linear-gradient(135deg, #1877f2, #0f5dc2);
+}
+
+.video-label.live.twitter {
+    background: linear-gradient(135deg, #1da1f2, #0d8ddb);
+}
+
+.video-label.live.pococha,
+.video-label.live.seventeen,
+.video-label.live.nicovideo {
+    background: linear-gradient(135deg, #ff5f5f, #cc0000);
+}
+
+
+
+.video-placeholder.ended .video-label {
+    animation: none;
+    opacity: 0.6;
+}
