@@ -22,5 +22,9 @@ urlpatterns = [
     path("", frontpage, name="frontpage"),
     path("posts/create/", views.post_create, name="post_create"),
     path('posts/<slug:slug>/', views.post_detail, name="post_detail"),
-    # path("posts/<slug:slug>/", post_detail, name="post_detail"),
+    path(
+        "posts/<slug:slug>/end-live/",
+        views.end_live,
+        name="end_live"
+    ),
 ]

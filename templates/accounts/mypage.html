@@ -72,6 +72,17 @@
             <div class="item-meta">
                 投稿日：{{ post.posted_date|date:"Y年m月d日" }}
             </div>
+
+            <!-- 🔴 ライブ配信 & 未終了 のときだけ表示 -->
+            {% if post.video_type == "live" and not post.live_ended %}
+            <form action="{% url 'blog:end_live' post.slug %}" method="post" style="margin-top: 8px;">
+                {% csrf_token %}
+                <button class="btn danger small">
+                    🔴 配信終了にする
+                </button>
+            </form>
+            {% endif %}
+
         </div>
         {% empty %}
         <p class="empty-text">ブログ投稿はまだありません</p>

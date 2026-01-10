@@ -169,3 +169,20 @@ def post_create(request):
         form = PostForm(user=request.user)
 
     return render(request, "blog/post_form.html", {"form": form})
+
+
+
+@login_required
+def end_live(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+
+    # 🔒 投稿者本人のみ
+    if post.author != request.user:
+        return redirect("blog:post_detail", slug=slug)
+
+    # 🔴 ライブ配信のみ
+    if post.video_type == "live":
+        post.live_ended = True
+        post.save()
+
+    return redirect("accounts:mypage")  # mypage に戻す
