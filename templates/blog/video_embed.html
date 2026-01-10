@@ -28,7 +28,7 @@
             =============================== -->
             {% if "facebook.com" in obj.video_url or "www.facebook.com" in obj.video_url %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label live facebook">🔴 Facebook LIVE配信（終了している可能性があります）</span>
+                <span class="video-label live facebook">🔴 Facebook LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label facebook">▶ Facebook 動画</span>
                 {% endif %}
@@ -38,7 +38,7 @@
                 =============================== -->
                 {% elif "instagram.com" in obj.video_url or "www.instagram.com" in obj.video_url %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label live instagram">🔴 Instagram LIVE配信（終了している可能性があります）</span>
+                <span class="video-label live instagram">🔴 Instagram LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label instagram">▶ Instagram 動画</span>
                 {% endif %}
@@ -48,14 +48,14 @@
                 =============================== -->
                 {% elif "tiktok.com" in obj.video_url or "www.tiktok.com" in obj.video_url %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label live tiktok">🔴 TikTok LIVE配信（終了している可能性があります）</span>
+                <span class="video-label live tiktok">🔴 TikTok LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label tiktok">▶ TikTok 動画</span>
                 {% endif %}
 
                 {% elif "lite.tiktok.com" in obj.video_url or "www.lite.tiktok.com" in obj.video_url %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label live tiktoklite">🔴 TikTok Lite LIVE配信（終了している可能性があります）</span>
+                <span class="video-label live tiktoklite">🔴 TikTok Lite LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label tiktoklite">▶ TikTok Lite 動画</span>
                 {% endif %}
@@ -65,7 +65,7 @@
                 =============================== -->
                 {% elif "linevoom.line.me" in obj.video_url or "linevoom" in obj.video_url %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label lineboom">🔴 LINE VOOM LIVE配信（終了している可能性があります）</span>
+                <span class="video-label lineboom">🔴 LINE VOOM LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label lineboom">▶ LINE VOOM 動画</span>
                 {% endif %}
@@ -74,19 +74,19 @@
                 Pococha
                 =============================== -->
                 {% elif "pococha.com" in obj.video_url or "www.pococha.com" in obj.video_url %}
-                <span class="video-label live pococha">🔴 Pococha 配信❤️（終了している可能性があります）</span>
+                <span class="video-label live pococha">🔴 Pococha 配信❤️<br>（終了している可能性があります）</span>
 
                 <!-- ===============================
                 17LIVE
                 =============================== -->
                 {% elif "17.live" in obj.video_url or "www.17.live" in obj.video_url %}
-                <span class="video-label live seventeen">🔴 17LIVE 配信❤️（終了している可能性があります）</span>
+                <span class="video-label live seventeen">🔴 17LIVE 配信❤️<br>（終了している可能性があります）</span>
 
                 <!-- ===============================
                 ニコ生
                 =============================== -->
                 {% elif "live.nicovideo.jp" in obj.video_url or "nico.ms" in obj.video_url %}
-                <span class="video-label live nicovideo">🔴 ニコ生 配信❤️（終了している可能性があります）</span>
+                <span class="video-label live nicovideo">🔴 ニコ生 配信❤️<br>（終了している可能性があります）</span>
 
                 <!-- ===============================
                 whoo
@@ -100,7 +100,7 @@
                 =============================== -->
                 {% elif "youtube.com" in obj.video_url or "www.youtube.com" in obj.video_url or "youtu.be" in obj.video_url %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label live youtube">🔴 YouTube LIVE配信（終了している可能性があります）</span>
+                <span class="video-label live youtube">🔴 YouTube LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label youtube">▶ YouTube 動画</span>
                 {% endif %}
@@ -110,14 +110,14 @@
                 =============================== -->
                 {% elif "x.com" in obj.video_url or "twitter.com" in obj.video_url %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label live twitter">🔴 X LIVE配信（終了している可能性があります）</span>
+                <span class="video-label live twitter">🔴 X LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label twitter">▶ X 動画</span>
                 {% endif %}
 
                 {% else %}
                 {% if obj.video_type == "live" %}
-                <span class="video-label live">🔴 LIVE配信（終了している可能性があります）</span>
+                <span class="video-label live">🔴 LIVE配信<br>（終了している可能性があります）</span>
                 {% else %}
                 <span class="video-label">▶ 動画リンク</span>
                 {% endif %}
