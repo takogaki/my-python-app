@@ -9,6 +9,15 @@ class PostAdmin(admin.ModelAdmin):
         "live_ended",
     )
     list_filter = ("video_type", "live_ended")
+
+    fields = (
+        "author",
+        "body",
+        "video_url",
+        "video_type",
+        "live_ended",
+        "image",
+    )
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
@@ -21,3 +30,12 @@ class CommentAdmin(admin.ModelAdmin):
     )
     list_filter = ("video_type", "live_ended")
     search_fields = ("body", "name")
+
+    fields = (
+        "author",
+        "body",
+        "video_url",
+        "video_type",
+        "live_ended",
+        "image",
+    )
