@@ -174,15 +174,36 @@ def post_create(request):
 
 @login_required
 def end_live(request, slug):
-    post = get_object_or_404(Post, slug=slug)
+    post = get_object_or_404(Post, slug=slug, author=request.user)
 
-    # 🔒 投稿者本人のみ
-    if post.author != request.user:
-        return redirect("blog:post_detail", slug=slug)
-
-    # 🔴 ライブ配信のみ
-    if post.video_type == "live":
+    if request.method == "POST":
         post.live_ended = True
         post.save()
 
-    return redirect("accounts:mypage")  # mypage に戻す
+    return redirect("blog:post_detail", slug=post.slug)
+
+
+
+@login_required
+def delete_post(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+
+    if request.method == "POST":
+        post.delete()
+
+    return redirect("accounts:mypage")
+
+
+
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    # 本人チェック（超重要）
+    if comment.post.author != request.user:
+        return redirect("accounts:mypage")
+
+    if request.method == "POST":
+        comment.delete()
+
+    return redirect("accounts:mypage")

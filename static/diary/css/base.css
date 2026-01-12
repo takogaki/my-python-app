@@ -420,3 +420,50 @@ section h3 {
     color: #b85c7a; /* 桜色 */
     text-align: center;
 }
+
+
+
+
+
+/* 投稿日 + 管理操作 横並び */
+.meta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px; /* 投稿日と同じ */
+    color: #777;
+}
+
+/* 投稿日 */
+.meta-date {
+    white-space: nowrap;
+}
+
+/* 管理用リンク */
+.meta-link {
+    all: unset;               /* ← これが決定打 */
+    cursor: pointer;
+    font-size: inherit;
+    color: #b00020;
+    text-decoration: underline;
+}
+
+.meta-link:hover {
+    color: #ff0033;
+}
+
+/* 危険操作 */
+.meta-link.danger {
+    color: #b00020;
+}
+
+.meta-link.danger:hover {
+    color: #ff0033;
+}
+
+/* formをインライン化 */
+.inline-form {
+    display: inline;
+    margin: 0;
+    all: unset; 
+}

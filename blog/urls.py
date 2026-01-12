@@ -27,4 +27,6 @@ urlpatterns = [
         views.end_live,
         name="end_live"
     ),
+    path("post/<slug:slug>/delete/", views.delete_post, name="delete_post"),
+    path("comment/<int:pk>/delete/", views.delete_comment, name="delete_comment"),
 ]

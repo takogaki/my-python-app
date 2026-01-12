@@ -69,25 +69,42 @@
             <a href="{% url 'blog:post_detail' post.slug %}" class="item-title">
                 {{ post.title }}
             </a>
-            <div class="item-meta">
-                投稿日：{{ post.posted_date|date:"Y年m月d日" }}
+        
+            <div class="meta-row">
+                <span class="meta-date">
+                    投稿日：{{ post.posted_date|date:"Y年m月d日" }}
+                </span>
+        
+                {% if not post.live_ended %}
+                    {% if post.video_type == "live" or post.is_live_only_service %}
+                    <form action="{% url 'blog:end_live' post.slug %}" method="post" class="inline-form"
+                        onsubmit="return confirm('本当にライブ配信を終了しますか？');">
+                        {% csrf_token %}
+                        <button class="meta-link danger">配信終了</button>
+                    </form>
+                    {% endif %}
+                {% endif %}
+        
+                <form action="{% url 'blog:delete_post' post.slug %}" method="post" class="inline-form"
+                    onsubmit="return confirm('本当にこの投稿を削除しますか？');">
+                    {% csrf_token %}
+                    <button class="meta-link danger">削除</button>
+                </form>
             </div>
-
-            <!-- 🔴 ライブ配信 & 未終了 のときだけ表示 -->
-            {% if post.video_type == "live" and not post.live_ended %}
-            <form action="{% url 'blog:end_live' post.slug %}" method="post" style="margin-top: 8px;">
-                {% csrf_token %}
-                <button class="btn danger small">
-                    🔴 配信終了にする
-                </button>
-            </form>
-            {% endif %}
-
         </div>
+
         {% empty %}
         <p class="empty-text">ブログ投稿はまだありません</p>
         {% endfor %}
     </section>
+
+
+    {% for comment in comments %}
+    <div class="list-item">
+        <p>{{ comment.body|truncatechars:50 }}</p>
+    </div>
+    {% endfor %}
+
 
     <!-- メッセージ -->
     <section class="content-card">

@@ -11,14 +11,12 @@
     {% else %}
     <!-- ✅ ログイン済 -->
 
-        {% if obj.video_type == "live" and obj.live_ended %}
-        <!-- 🔴 配信終了 -->
+        {% if obj.is_effective_live %}
         <div class="video-placeholder ended">
             <span class="video-label ended">
                 🔴 この動画は配信終了しています
             </span>
         </div>
-
         {% else %}
         <!-- ▶ 再生可能 -->
         <a href="{{ obj.video_url }}" target="_blank" rel="noopener" class="video-placeholder clickable">

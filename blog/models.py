@@ -13,6 +13,16 @@ class Post(models.Model):
             ("normal", "通常動画"),
             ("live", "ライブ配信"),
         ]
+    
+    @property
+    def is_effective_live(self):
+        return (
+            self.live_ended and
+            (
+                self.video_type == "live"
+                or self.is_live_only_service()
+            )
+        )
 
     video_url = models.URLField(blank=True, null=True)
     video_type = models.CharField(
@@ -39,7 +49,22 @@ class Post(models.Model):
     posted_date = models.DateTimeField(auto_now_add=True)
 
     image = models.ImageField(upload_to="post_images/", null=True, blank=True)
-    video_url = models.URLField(blank=True, null=True)
+
+    def is_live_only_service(self):
+        if not self.video_url:
+            return False
+
+        live_services = [
+            "pococha.com",
+            "www.pococha.com",
+            "17.live",
+            "www.17.live",
+            "live.nicovideo.jp",
+            "www.live.nicovideo.jp",
+            "nico.ms",
+        ]
+
+        return any(service in self.video_url for service in live_services)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -72,6 +97,22 @@ class Comment(models.Model):
         default=False,
         help_text="ライブ配信が終了している場合にチェック"
     )
+
+    def is_live_only_service(self):
+        if not self.video_url:
+            return False
+
+        live_services = [
+            "pococha.com",
+            "www.pococha.com",
+            "17.live",
+            "www.17.live",
+            "live.nicovideo.jp",
+            "www.live.nicovideo.jp",
+            "nico.ms",
+        ]
+
+        return any(service in self.video_url for service in live_services)
 
     post = models.ForeignKey(
         "Post",
