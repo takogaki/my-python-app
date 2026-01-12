@@ -11,7 +11,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Lino｜あなたは、ひとりじゃない。">
     <meta property="og:description" content="話したくなったとき、書きたくなったとき。Linoは、あなたがひとりにならないための場所です。">
-    <meta property="og:image" content="{% static 'images/og/ogp.png' %}">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og/ogp.png' %}">
     <meta property="og:url" content="https://my-python-app-0t2k.onrender.com/">
     <meta property="og:site_name" content="Lino">
 
@@ -19,7 +19,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Lino｜あなたは、ひとりじゃない。">
     <meta name="twitter:description" content="あなたの気持ちを、ひとりで抱えなくていい場所。">
-    <meta name="twitter:image" content="{% static 'images/og/ogp.png' %}">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og/ogp.png' %}">
 
     <meta name="google-site-verification" content="GUHdMs02t79910_YzaHxrFxZIThm4GNQdTJ0NKlbR98" />
 
