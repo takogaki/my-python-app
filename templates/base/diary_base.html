@@ -5,6 +5,22 @@
 
 <head>
 
+    <meta charset="UTF-8">
+
+    <!-- OGP -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Lino｜あなたは、ひとりじゃない。">
+    <meta property="og:description" content="話したくなったとき、書きたくなったとき。Linoは、あなたがひとりにならないための場所です。">
+    <meta property="og:image" content="https://my-python-app-0t2k.onrender.com/static/images/og/ogp.png">
+    <meta property="og:url" content="https://my-python-app-0t2k.onrender.com/">
+    <meta property="og:site_name" content="Lino">
+
+    <!-- Twitter(X) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lino｜あなたは、ひとりじゃない。">
+    <meta name="twitter:description" content="あなたの気持ちを、ひとりで抱えなくていい場所。">
+    <meta name="twitter:image" content="https://my-python-app-0t2k.onrender.com/static/images/og/ogp.png">
+
     <meta name="google-site-verification" content="GUHdMs02t79910_YzaHxrFxZIThm4GNQdTJ0NKlbR98" />
 
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -13,17 +29,14 @@
     <link rel="stylesheet" href="{% static 'blog/css/blog_form.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
-    <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <script src="{% static 'blog/js/blog.js' %}"></script>
     <script src="{% static 'diary/js/base.js' %}"></script>
     <!-- blog.js の読み込み -->
     <script src="{% static 'blog/js/blog.js' %}"></script>
 
-    <meta charset="utf-8">
-    <title>あなたの気持ちを、ひとりで抱えなくていい場所｜いつでも言葉にできるサイト</title>
+    <title>Lino｜あなたの気持ちを、いつでも言葉にできるサイト</title>
 
     <meta name="description"
         content="あなたの気持ちを、いつでも言葉にして残せる場所です。日記や投稿を通して、笑ったり共感したり、無理のない交流ができます。誰かと話したいときも、静かに気持ちを書きたいときも利用できます。">
@@ -34,9 +47,11 @@
     <header class="site-header">
         <div class="header-inner">
             <h1 class="site-title">
-                <a href="{% url 'diary:index' %}">喋る場</a>
+                <a href="{% url 'diary:index' %}" class="logo-text">
+                    Lino
+                    <span class="logo-sub">あなたは、ひとりじゃない。</span>
+                </a>
             </h1>
-
             <div class="user-area">
                 {% if user.is_authenticated %}
                 <span class="welcome">
@@ -62,10 +77,8 @@
     </main>
 
     <footer class="site-footer">
-        <small>© 喋る場</small>
+        <small>© Lino</small>
     </footer>
 </body>
-
-</html>
 
 </html>

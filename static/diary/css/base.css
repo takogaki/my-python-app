@@ -1,3 +1,15 @@
+.logo-text {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.logo-sub {
+    font-size: 11px;
+    opacity: 0.75;
+    display: block;
+}
+
+
 .site-catch {
     font-size: 1.2rem;
     font-weight: 600;
