@@ -138,3 +138,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.addEventListener("click", (e) => {
+
+        const btn = e.target.closest(".reply-toggle");
+        if (!btn) return;
+
+        const type = btn.dataset.type;   // comment / reply
+        const id = btn.dataset.id;
+        if (!type || !id) return;
+
+        const form = document.getElementById(`reply-form-${type}-${id}`);
+        if (!form) return;
+
+        form.style.display =
+            form.style.display === "block" ? "none" : "block";
+    });
+
+});
