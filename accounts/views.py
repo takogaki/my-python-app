@@ -262,6 +262,24 @@ def contact_eden(request):
             is_important=True,
         )
 
-        return redirect("accounts:mypage")
+        # ② 管理人にメールを送る
+        send_mail(
+            subject="【Lino】管理人宛てメッセージが届きました",
+            message=(
+                f"送信者：{request.user.username}\n\n"
+                f"{content}"
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[admin_user.email],
+        )
+
+        messages.success(request, "管理人にメッセージを送信しました")
+
+        # ③ 送信完了ページへ
+        return redirect("accounts:contact_eden_done")
 
     return render(request, "accounts/contact_eden.html")
+
+@login_required
+def contact_eden_done(request):
+    return render(request, "accounts/contact_eden_done.html")

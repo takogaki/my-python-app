@@ -38,4 +38,5 @@ urlpatterns = [
 
     # 管理人へ連絡
     path("contact-eden/", views.contact_eden, name="contact_eden"),
+    path("contact-eden/done/", views.contact_eden_done, name="contact_eden_done"),
 ]

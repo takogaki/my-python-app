@@ -1,0 +1,22 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<div class="content-card">
+    <h2>送信が完了しました</h2>
+
+    <p>
+        管理人へメッセージを送信しました。<br>
+        内容はきちんと届いています。
+    </p>
+
+    <p>
+        返信がある場合は、<br>
+        マイページのメッセージ欄に届きます。
+    </p>
+
+    <a href="{% url 'accounts:mypage' %}" class="btn">
+        マイページへ戻る
+    </a>
+</div>
+
+{% endblock %}
