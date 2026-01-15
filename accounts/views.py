@@ -235,9 +235,9 @@ def withdraw_execute(request):
 # エラー時、管理人宛てにメッセージ送信
 @login_required
 def contact_eden(request):
-    admin_user = User.objects.filter(is_superuser=True).first()
-
-    if not admin_user:
+    try:
+        admin_user = User.objects.get(username="eden")
+    except User.DoesNotExist:
         return render(request, "accounts/contact_error.html")
 
     if request.method == "POST":
@@ -245,9 +245,9 @@ def contact_eden(request):
 
         Message.objects.create(
             sender=request.user,
-            recipient=admin_user,  # ← ここが重要
+            recipient=admin_user,
             content=content,
-            is_important=True
+            is_important=True,
         )
 
         return redirect("accounts:mypage")
