@@ -39,15 +39,22 @@ User = get_user_model()
 
 @login_required
 def user_list(request):
-    users = CustomUser.objects.exclude(pk=request.user.pk)
-    return render(request, "accounts/user_list.html", {"users": users})
+    users = CustomUser.objects.filter(
+        is_active=True,
+        is_superuser=False
+    ).exclude(pk=request.user.pk)
 
+    return render(request, "accounts/user_list.html", {"users": users})
 
 @login_required
 def user_detail(request, pk):
-    user = get_object_or_404(CustomUser, pk=pk)
+    user = get_object_or_404(
+        CustomUser,
+        pk=pk,
+        is_superuser=False,
+        is_active=True
+    )
     return render(request, "accounts/user_detail.html", {"user": user})
-
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
@@ -55,7 +62,12 @@ class UserDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "user"
 
     def get_object(self):
-        return get_object_or_404(User, username=self.kwargs["username"])
+        return get_object_or_404(
+            User,
+            username=self.kwargs["username"],
+            is_superuser=False,
+            is_active=True
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
