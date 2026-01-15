@@ -31,4 +31,11 @@ urlpatterns = [
     # プロフィール設定
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("profile/image/delete/", views.profile_image_delete, name="profile_image_delete"),
+
+    # アカウント削除（退会）
+    path("withdraw/", views.withdraw_confirm, name="withdraw_confirm"),
+    path("withdraw/execute/", views.withdraw_execute, name="withdraw_execute"),
+
+    # 管理人へ連絡
+    path("contact-eden/", views.contact_eden, name="contact_eden"),
 ]

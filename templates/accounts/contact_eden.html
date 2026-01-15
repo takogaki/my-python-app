@@ -1,0 +1,26 @@
+{% extends "base/diary_base.html" %}
+{% block body %}
+
+<section class="content-card">
+    <h2>管理人に知らせる</h2>
+
+    <p>
+        不具合・エラー・気になることがあれば、<br>
+        そのまま書いて送ってください。
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="content" class="form-textarea" rows="6" placeholder="例：〇〇を押したら画面が真っ白になりました" required></textarea>
+
+        <div class="logout-wrapper">
+            <button class="btn primary">送信する</button>
+        </div>
+    </form>
+
+    <a href="{% url 'accounts:mypage' %}" class="btn ghost">
+        戻る
+    </a>
+</section>
+
+{% endblock %}

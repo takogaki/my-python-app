@@ -144,14 +144,23 @@
         <p class="empty-text">メッセージはありません</p>
         {% endfor %}
     </section>
-
 </div>
+
+<a href="{% url 'accounts:contact_eden' %}" class="dashboard-button ghost">
+    🛠 エラーを管理人に知らせる
+</a>
 
 <div class="logout-wrapper">
     <form action="{% url 'accounts:logout' %}" method="post">
         {% csrf_token %}
         <button class="logout-pill">ログアウト</button>
     </form>
+</div>
+
+<div class="logout-wrapper">
+    <a href="{% url 'accounts:withdraw_confirm' %}" class="text-danger">
+        退会する
+    </a>
 </div>
 
 <section class="support-card">

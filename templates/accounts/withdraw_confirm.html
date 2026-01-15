@@ -1,0 +1,39 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+データのリセット｜Lino
+{% endblock %}
+
+{% block body %}
+
+<section class="card">
+    <h3 class="section-title">退会の確認</h3>
+
+    <p class="empty-text">
+        Lino を退会すると、<br>
+        あなたのアカウント・投稿・日記・コメントはすべて削除されます。
+    </p>
+
+    <p class="empty-text">
+        この操作は取り消せません。
+    </p>
+
+    <div class="logout-wrapper">
+        <form method="post" action="{% url 'accounts:withdraw_execute' %}"
+            onsubmit="return confirm('本当に退会しますか？\nすべてのデータは削除されます。');">
+            {% csrf_token %}
+            <button type="submit" class="logout-pill">
+                退会する
+            </button>
+        </form>
+    </div>
+
+    <div class="logout-wrapper">
+        <a href="{% url 'accounts:mypage' %}" class="logout-pill">
+            やっぱりやめる
+        </a>
+    </div>
+</section>
+
+{% endblock %}

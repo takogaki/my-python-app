@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.utils.http import urlencode
 from django.contrib.auth import login
+from django.contrib.auth import logout
 
 from diary.models import Page              # 日記
 from blog.models import Post               # ブログ投稿
@@ -213,3 +214,42 @@ def profile_image_delete(request):
         profile.save()
 
     return redirect("accounts:mypage")
+
+
+# ログアウト＆アカウント削除（退会）
+@login_required
+def withdraw_confirm(request):
+    return render(request, "accounts/withdraw_confirm.html")
+
+@login_required
+def withdraw_execute(request):
+    if request.method == "POST":
+        user = request.user
+        logout(request)
+        user.delete()
+        return redirect("diary:index")
+
+    return redirect("accounts:withdraw_confirm")
+
+
+# エラー時、管理人宛てにメッセージ送信
+@login_required
+def contact_eden(request):
+    admin_user = User.objects.filter(is_superuser=True).first()
+
+    if not admin_user:
+        return render(request, "accounts/contact_error.html")
+
+    if request.method == "POST":
+        content = request.POST.get("content")
+
+        Message.objects.create(
+            sender=request.user,
+            recipient=admin_user,  # ← ここが重要
+            content=content,
+            is_important=True
+        )
+
+        return redirect("accounts:mypage")
+
+    return render(request, "accounts/contact_eden.html")
