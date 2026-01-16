@@ -1,22 +1,29 @@
 {% extends "base/diary_base.html" %}
+
+{% block title %}
+報告完了｜Lino
+{% endblock %}
+
 {% block body %}
 
-<div class="content-card">
-    <h2>送信が完了しました</h2>
+<section class="card">
+    <h2 class="card-title">送信が完了しました</h2>
 
-    <p>
-        管理人へメッセージを送信しました。<br>
-        内容はきちんと届いています。
+    <p class="page-description">
+        管理人へメッセージを送りました。<br>
+        きちんと届いています。
     </p>
 
-    <p>
+    <p class="page-description">
         返信がある場合は、<br>
         マイページのメッセージ欄に届きます。
     </p>
 
-    <a href="{% url 'accounts:mypage' %}" class="btn">
-        マイページへ戻る
-    </a>
-</div>
+    <div class="card-actions">
+        <a href="{% url 'accounts:mypage' %}" class="btn primary">
+            マイページへ戻る
+        </a>
+    </div>
+</section>
 
 {% endblock %}

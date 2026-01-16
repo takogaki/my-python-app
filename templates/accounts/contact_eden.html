@@ -1,10 +1,15 @@
 {% extends "base/diary_base.html" %}
+
+{% block title %}
+管理人へ報告｜Lino
+{% endblock %}
+
 {% block body %}
 
-<section class="content-card">
-    <h2>管理人に知らせる</h2>
+<section class="card">
+    <h2 class="card-title">管理人に知らせる</h2>
 
-    <p>
+    <p class="page-description">
         不具合・エラー・気になることがあれば、<br>
         そのまま書いて送ってください。
     </p>
@@ -17,10 +22,12 @@
             <button class="btn primary">送信する</button>
         </div>
     </form>
-
-    <a href="{% url 'accounts:mypage' %}" class="btn ghost">
-        戻る
-    </a>
+        
+            <div class="action-row">
+                <a href="{% url 'accounts:mypage' %}" class="btn ghost">
+                    戻る
+                </a>
+            </div>
 </section>
 
 {% endblock %}

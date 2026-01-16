@@ -283,3 +283,34 @@ def contact_eden(request):
 @login_required
 def contact_eden_done(request):
     return render(request, "accounts/contact_eden_done.html")
+
+
+
+
+# 404エラーページから管理人宛てにメッセージ送信（匿名）
+def contact_eden_public(request):
+    try:
+        admin_user = User.objects.get(username="eden")
+    except User.DoesNotExist:
+        return render(request, "accounts/contact_error.html")
+
+    if request.method == "POST":
+        content = request.POST.get("content", "")
+
+        Message.objects.create(
+            sender=None,  # ← 匿名
+            recipient=admin_user,
+            content=f"[404ページから]\n\n{content}",
+            is_important=True,
+        )
+
+        send_mail(
+            subject="【Lino】404ページから連絡がありました",
+            message=content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[admin_user.email],
+        )
+
+        return render(request, "accounts/contact_eden_done.html")
+
+    return redirect("/")

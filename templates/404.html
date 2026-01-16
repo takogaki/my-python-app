@@ -1,0 +1,19 @@
+<h1>ページが見つかりませんでした</h1>
+
+<p>
+    お探しのページは存在しないか、移動した可能性があります。
+</p>
+
+<hr>
+
+<h3>管理人に知らせる</h3>
+
+<form method="post" action="{% url 'accounts:contact_eden' %}">
+    {% csrf_token %}
+
+    <textarea name="content" rows="4" required placeholder="どんな操作をしてこの画面になりましたか？"></textarea>
+
+    <button type="submit" class="btn primary">
+        管理人に送信する
+    </button>
+</form>
