@@ -111,31 +111,49 @@
 
 
     <!-- メッセージ -->
+    <!-- メッセージ -->
     <section class="content-card">
-        <h3 class="section-title">💌 受信メッセージ</h3>
+        {% comment %} ===== 未読数カウント（表示用・副作用なし） ===== {% endcomment %}
+        {% with unread_count=0 %}
+        {% for m in messages %}
+        {% if not m.is_read %}
+        {% with unread_count|add:1 as unread_count %}
+        {% endwith %}
+        {% endif %}
+        {% endfor %}
+    
+        <h3 class="section-title">
+            💌 受信メッセージ
+            {% if unread_count > 0 %}
+            <span class="badge unread">{{ unread_count }}</span>
+            {% endif %}
+        </h3>
+        {% endwith %}
     
         {% for msg in messages %}
-        <div class="message-card">
+        <div class="message-card {% if not msg.is_read %}unread{% endif %}">
             <strong>
                 {% if msg.is_important %}
                 <span class="important">★</span>
                 {% endif %}
-        
+    
                 <a href="{% url 'accounts:user_detail' msg.sender.username %}">
                     {{ msg.sender.username }}
                 </a>
-        
+    
                 {% if not msg.is_read %}
-                    <span class="badge unread">未読</span>
+                <span class="badge unread">未読</span>
                 {% endif %}
             </strong>
-        
-                <p>{{ msg.content|truncatechars:50 }}</p>
-
+    
+            <p>{{ msg.content|truncatechars:50 }}</p>
+    
             <div style="margin-top: 12px; text-align: center;">
-                <a href="{% url 'user_messages:message_detail' msg.id %}" class="btn primary">詳細</a>
+                <a href="{% url 'user_messages:message_detail' msg.id %}" class="btn primary">
+                    詳細
+                </a>
             </div>
-
+    
             <small class="text-muted">
                 {{ msg.sent_at|date:"Y/m/d H:i" }}
             </small>

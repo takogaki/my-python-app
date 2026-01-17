@@ -188,6 +188,46 @@ def mypage(request):
         "profile": user,
     })
 
+
+# =========================
+# ★ 管理人向けメッセージ
+# =========================
+@login_required
+def admin_message_list(request):
+    messages = Message.objects.filter(
+        recipient=request.user
+    ).order_by("-sent_at")
+
+    return render(
+        request,
+        "accounts/admin_message_list.html",
+        {"messages": messages}
+    )
+
+# =========================
+# ★ 管理人向けメッセージ詳細ビュー未読 → 既読
+# =========================
+@login_required
+def admin_message_detail(request, pk):
+    message = get_object_or_404(
+        Message,
+        pk=pk,
+        recipient=request.user
+    )
+
+    # ★ ここが未読 → 既読
+    if not message.is_read:
+        message.is_read = True
+        message.save(update_fields=["is_read"])
+
+    return render(
+        request,
+        "accounts/admin_message_detail.html",
+        {"message": message}
+    )
+
+
+
 # =========================
 # ★ マイページ　ユーザーネーム編集ビュー（編集）
 # =========================

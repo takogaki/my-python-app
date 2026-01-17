@@ -485,3 +485,9 @@ section h3 {
     display: flex;
     justify-content: center;
 }
+
+
+.important {
+    color: #e53935;
+    font-weight: bold;
+}
