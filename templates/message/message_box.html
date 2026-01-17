@@ -19,24 +19,30 @@
 
     {% if messages %}
     {% for message in messages %}
-    <div class="post block">
-
+    <div class="post block {% if not message.is_read %}unread{% endif %}">
+    
         <p class="post-author">
             From：{{ message.sender.username }}
+    
+            {% if not message.is_read %}
+            <span class="badge unread">未読</span>
+            {% endif %}
         </p>
-
+    
         <p class="post-body">
             {{ message.content|linebreaksbr }}
         </p>
-
+    
         <small class="post-date">
             {{ message.sent_at|date:"Y/m/d H:i" }}
         </small>
-
+    
         <div style="margin-top: 12px; text-align: center;">
-            <a href="{% url 'user_messages:message_detail' message.id %}" class="btn primary">詳細</a>
+            <a href="{% url 'user_messages:message_detail' message.id %}" class="btn primary">
+                詳細
+            </a>
         </div>
-
+    
     </div>
     {% endfor %}
     {% else %}

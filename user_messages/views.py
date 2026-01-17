@@ -9,13 +9,15 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def message_box(request):
-    user = request.user
-    # メッセージを受信日時が新しい順に取得
-    messages = Message.objects.filter(recipient=user).order_by('-sent_at')
+    messages = Message.objects.filter(
+        recipient=request.user
+    ).order_by("-sent_at")
 
-    return render(request, 'message/message_box.html', {
-        'messages': messages  # メッセージをテンプレートに渡す
-    })
+    return render(
+        request,
+        "message/message_box.html",
+        {"messages": messages}
+    )
 
 @login_required
 def send_message(request, username):
@@ -122,7 +124,7 @@ def message_detail(request, pk):
     # 未読 → 既読
     if not message.is_read:
         message.is_read = True
-        message.save()
+        message.save(update_fields=["is_read"])
 
     return render(request, "message/message_detail.html", {
     "message": message,
