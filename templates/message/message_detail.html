@@ -12,9 +12,15 @@
     <div class="card-content">
         <p>
             <strong>送信者：</strong>
+            {% if message.sender.is_staff %}
+            <span class="author-name">
+                {{ message.sender.username }}
+            </span>
+            {% else %}
             <a href="{% url 'accounts:user_detail' message.sender.username %}">
                 {{ message.sender.username }}
             </a>
+            {% endif %}
         </p>
 
         <p>
