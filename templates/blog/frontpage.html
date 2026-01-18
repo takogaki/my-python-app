@@ -70,16 +70,22 @@
     <!-- 投稿者名 -->
     <p class="post-author">
         {% if post.author %}
+        {% if post.author.is_staff %}
+        <span class="author-name">
+            {{ post.author.username }}
+        </span>
+        {% else %}
         <a href="{% url 'accounts:user_detail' post.author.username %}">
             {{ post.author.username }}
         </a>
+        {% endif %}
         {% else %}
         <span class="guest-name">
             {{ post.name }}
         </span>
         {% endif %}
     </p>
-
+    
     <h2 class="subtitle">{{ post.title }}</h2>
     <small>Posted at {{ post.posted_date }}</small>
 
