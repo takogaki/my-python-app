@@ -5,6 +5,8 @@ from faker import Faker
 from .forms import CommentForm, PostForm
 from .models import Post, Comment
 from django.db.models import Count
+from notifications.models import Notification
+from django.urls import reverse
 import uuid
 from .utils import get_device_id
 
@@ -128,6 +130,16 @@ def post_detail(request, slug):
                 comment.reply_to = parent.name
 
             comment.save()
+
+            # =======================
+            # 通知作成（投稿者宛）
+            # =======================
+            if request.user.is_authenticated:
+                Notification.objects.create(
+                    actor=request.user,
+                    recipient=post.author,
+                    verb="コメントしました",
+                )
 
             response = redirect("blog:post_detail", slug=slug)
 

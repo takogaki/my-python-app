@@ -138,6 +138,7 @@ INSTALLED_APPS = [
     "chat",
     "user_messages",
     "django_extensions",
+    "notifications",
 ]
 
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True
