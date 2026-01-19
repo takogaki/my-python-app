@@ -132,13 +132,21 @@ def post_detail(request, slug):
             comment.save()
 
             # =======================
-            # 通知作成（投稿者宛）
+            # 通知作成（ログイン時のみ）
             # =======================
-            if request.user.is_authenticated:
+            if (
+                request.user.is_authenticated
+                and post.author
+                and post.author != request.user
+            ):
                 Notification.objects.create(
-                    actor=request.user,
                     recipient=post.author,
-                    verb="コメントしました",
+                    actor=request.user,
+                    verb="あなたの投稿にコメントしました",
+                    target_url=reverse(
+                        "blog:post_detail",
+                        kwargs={"slug": post.slug}
+                    )
                 )
 
             response = redirect("blog:post_detail", slug=slug)
