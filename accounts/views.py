@@ -25,6 +25,7 @@ from django.utils.encoding import force_str, force_bytes
 from .forms import ActivateProfileImageForm
 from .forms import CustomUserCreationForm
 from .forms import ProfileForm
+from notifications.models import Notification
 
 from .models import CustomUser
 from diary.models import Page
@@ -181,11 +182,16 @@ def mypage(request):
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
     messages = Message.objects.filter(recipient=request.user)
 
+    notifications = Notification.objects.filter(
+        recipient=request.user
+    ).order_by("-created_at")
+
     return render(request, "accounts/mypage.html", {
         "diaries": diaries,
         "blog_posts": blog_posts,
         "messages": messages,
         "profile": user,
+        "notifications": notifications,  # ← ★これだけ
     })
 
 
