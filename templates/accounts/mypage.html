@@ -96,7 +96,7 @@
                 </form>
 
                 {% for n in notifications %}
-                    {% if n.target_url == post.get_absolute_url and not n.is_read %}
+                    {% if post.slug in n.target_url and not n.is_read %}
                     <span class="badge unread">🔔 新しいコメント</span>
                     {% endif %}
                 {% endfor %}
