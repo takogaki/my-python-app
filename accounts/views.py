@@ -180,19 +180,33 @@ def mypage(request):
 
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
-    messages = Message.objects.filter(recipient=request.user)
+    messages = Message.objects.filter(recipient=user)
 
+    # 未読通知だけ取得
     notifications = Notification.objects.filter(
-        recipient=request.user
+        recipient=user,
+        is_read=False
     ).order_by("-created_at")
 
-    return render(request, "accounts/mypage.html", {
-        "diaries": diaries,
-        "blog_posts": blog_posts,
-        "messages": messages,
-        "profile": user,
-        "notifications": notifications,  # ← ★これだけ
-    })
+    # ★ 投稿ごとの「未読コメントがあるか」をまとめる
+    unread_comment_map = {}
+
+    for n in notifications:
+        if n.target_post_id:
+            unread_comment_map[n.target_post_id] = True
+
+    return render(
+        request,
+        "accounts/mypage.html",
+        {
+            "diaries": diaries,
+            "blog_posts": blog_posts,
+            "messages": messages,
+            "profile": user,
+            "notifications": notifications,
+            "unread_comment_map": unread_comment_map,  # ← ★追加
+        }
+    )
 
 
 # =========================
