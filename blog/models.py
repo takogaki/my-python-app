@@ -4,6 +4,7 @@ from django.utils.text import slugify
 import unicodedata
 from uuid import uuid4
 from django.conf import settings
+from django.urls import reverse
 
 fake = Faker()
 
@@ -80,6 +81,9 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def get_absolute_url(self):
+        return reverse("blog:post_detail", kwargs={"slug": self.slug})
 
 class Comment(models.Model):
     VIDEO_TYPE_CHOICES = [
