@@ -3,7 +3,7 @@
 {% load static %}
 
 {% for comment in comments %}
-<div class="comment parent">
+<div id="comment-{{ comment.id }}" class="comment parent">
 
     <!-- ✅ 改行を反映させる本文表示 -->
     <p class="post-content">
@@ -43,7 +43,7 @@
     <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
 
         {% for reply in comment.replies.all %}
-        <div class="comment reply">
+        <div id="comment-{{ reply.id }}" class="comment reply">
 
             <!-- ✅ 改行を反映させる本文表示 -->
             <p class="post-content">

@@ -95,19 +95,23 @@
                     <button class="meta-link danger">削除</button>
                 </form>
 
-                {% with has_unread=False %}
+                {% with has_unread_comment=False %}
                     {% for n in notifications %}
-                        {% if post.slug in n.target_url %}
-                        <span class="badge unread">🔔 新しいコメント</span>
-                        {% break %}
+                        {% if not n.is_read and n.target_post_id == post.id %}
+                            {% with True as has_unread_comment %}
+                            {% endwith %}
                         {% endif %}
                     {% endfor %}
+                    
+                    {% if has_unread_comment %}
+                    <span class="badge unread">🔔 新しいコメント</span>
+                    {% endif %}
                 {% endwith %}
 
                 <div class="notification-list">
                     {% for n in notifications %}
-                        {% if post.slug in n.target_url %}
-                        <div class="notification-text">
+                        {% if not n.is_read and n.target_post_id == post.id %}
+                        <div class="notification-inline">
                             <a href="{{ n.target_url }}">
                                 {{ n.actor.username }} さんがあなたの投稿にコメントしました
                             </a>
