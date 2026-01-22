@@ -11,9 +11,19 @@ fake = Faker()
 
 class Post(models.Model):
     VIDEO_TYPE_CHOICES = [
-        ("normal", "通常動画"),
-        ("live", "ライブ配信"),
-    ]
+            ("normal", "通常動画"),
+            ("live", "ライブ配信"),
+        ]
+    
+    @property
+    def is_effective_live(self):
+        return (
+            self.live_ended and
+            (
+                self.video_type == "live"
+                or self.is_live_only_service()
+            )
+        )
 
     video_url = models.URLField(blank=True, null=True)
     video_type = models.CharField(
@@ -22,6 +32,7 @@ class Post(models.Model):
         default="normal",
     )
 
+        # ライブ配信用（任意だが超おすすめ）
     live_ended = models.BooleanField(default=False)
 
     author = models.ForeignKey(
@@ -37,17 +48,8 @@ class Post(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     body = models.TextField()
     posted_date = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to="post_images/", null=True, blank=True)
 
-    @property
-    def is_effective_live(self):
-        return (
-            self.live_ended
-            and (
-                self.video_type == "live"
-                or self.is_live_only_service()
-            )
-        )
+    image = models.ImageField(upload_to="post_images/", null=True, blank=True)
 
     def is_live_only_service(self):
         if not self.video_url:
@@ -55,8 +57,11 @@ class Post(models.Model):
 
         live_services = [
             "pococha.com",
+            "www.pococha.com",
             "17.live",
+            "www.17.live",
             "live.nicovideo.jp",
+            "www.live.nicovideo.jp",
             "nico.ms",
         ]
 
@@ -74,13 +79,12 @@ class Post(models.Model):
 
         super().save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse("blog:post_detail", kwargs={"slug": self.slug})
-
     def __str__(self):
         return self.title
     
-    
+    def get_absolute_url(self):
+        return reverse("blog:post_detail", kwargs={"slug": self.slug})
+
 class Comment(models.Model):
     VIDEO_TYPE_CHOICES = [
             ("normal", "通常動画"),
