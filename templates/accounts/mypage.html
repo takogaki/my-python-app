@@ -95,16 +95,25 @@
                     <button class="meta-link danger">削除</button>
                 </form>
 
-                {# 🔔 新しいコメント（1つだけ） #}
-                {% if unread_comment_map.post.id %}
+                {# 🔔 新しいコメント（1回だけ） #}
+                {% with has_unread_comment=False %}
+                {% for n in notifications %}
+                {% if not n.is_read and n.target_post and n.target_post.id == post.id %}
+                {% with True as has_unread_comment %}
+                {% endwith %}
+                {% endif %}
+                {% endfor %}
+
+                {% if has_unread_comment %}
                 <span class="badge unread">🔔 新しいコメント</span>
                 {% endif %}
+                {% endwith %}
             </div>
 
-            {# 📝 コメント通知（件数分） #}
+            {# 📝 コメント通知（未読・件数分） #}
             <div class="notification-list">
                 {% for n in notifications %}
-                {% if n.target_post_id == post.id %}
+                {% if not n.is_read and n.target_post and n.target_post.id == post.id %}
                 <div class="notification-inline">
                     <a href="{{ n.target_url }}">
                         {{ n.actor.username }} さんがあなたの投稿にコメントしました
@@ -119,6 +128,7 @@
         <p class="empty-text">ブログ投稿はまだありません</p>
         {% endfor %}
     </section>
+
 
     <!-- メッセージ -->
     <!-- メッセージ -->
