@@ -120,6 +120,21 @@
                     {% endfor %}
                 </div>
 
+                <section class="content-card">
+                    <h3 class="section-title">🔔 通知</h3>
+                
+                    {% for n in notifications %}
+                    <div class="notification-item {% if not n.is_read %}unread{% endif %}">
+                        <a href="{{ n.target_url }}">
+                            {{ n.actor.username }} さんが
+                            {{ n.verb }}
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="empty-text">通知はありません</p>
+                    {% endfor %}
+                </section>
+
             </div>
         </div>
 
@@ -155,21 +170,6 @@
             {% endif %}
         </h3>
         {% endwith %}
-
-        <section class="content-card">
-            <h3 class="section-title">🔔 通知</h3>
-        
-            {% for n in notifications %}
-            <div class="notification-item {% if not n.is_read %}unread{% endif %}">
-                <a href="{{ n.target_url }}">
-                    {{ n.actor.username }} さんが
-                    {{ n.verb }}
-                </a>
-            </div>
-            {% empty %}
-            <p class="empty-text">通知はありません</p>
-            {% endfor %}
-        </section>
     
         {% for msg in messages %}
         <div class="message-card {% if not msg.is_read %}unread{% endif %}">

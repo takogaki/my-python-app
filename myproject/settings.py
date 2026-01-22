@@ -298,3 +298,5 @@ CONTENT_SECURITY_POLICY = {
         ),
     }
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
