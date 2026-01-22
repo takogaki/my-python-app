@@ -192,7 +192,7 @@ def mypage(request):
     unread_comment_map = {}
 
     for n in notifications:
-        if n.target_post_id:
+        if n.target_post and n.target_post.id:
             unread_comment_map[n.target_post_id] = True
 
     return render(
