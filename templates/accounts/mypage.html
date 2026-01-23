@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-わたし｜Lino
+わたし｜Spiria
 {% endblock %}
 
 {% block body %}
@@ -94,10 +94,6 @@
                     {% csrf_token %}
                     <button class="meta-link danger">削除</button>
                 </form>
-    
-                {% if post.id in unread_comment_map %}
-                <span class="badge unread">🔔 新しいコメント</span>
-                {% endif %}
             </div>
     
             {# 🔔 コメント通知一覧 #}
