@@ -182,18 +182,10 @@ def mypage(request):
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
     messages = Message.objects.filter(recipient=user)
 
-    # 未読通知だけ取得
     notifications = Notification.objects.filter(
         recipient=user,
         is_read=False
     ).order_by("-created_at")
-
-    # ★ 投稿ごとの「未読コメントがあるか」をまとめる
-    unread_comment_map = {}
-
-    for n in notifications:
-        if n.target_post and n.target_post.id:
-            unread_comment_map[n.target_post_id] = True
 
     return render(
         request,
@@ -204,7 +196,6 @@ def mypage(request):
             "messages": messages,
             "profile": user,
             "notifications": notifications,
-            "unread_comment_map": unread_comment_map,  # ← ★追加
         }
     )
 
