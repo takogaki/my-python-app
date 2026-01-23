@@ -142,7 +142,7 @@ def post_detail(request, slug):
                 Notification.objects.create(
                     recipient=post.author,
                     actor=request.user,
-                    verb = f"{request.user.username} さんがコメントしました"
+                    verb = f"{request.user.username} さんがコメントしました",
                     target_url=post.get_absolute_url() + f"#comment-{comment.id}",
                 )
 
