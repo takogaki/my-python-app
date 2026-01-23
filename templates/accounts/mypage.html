@@ -97,10 +97,9 @@
     
                 {# 🔔 未読コメントがあるか #}
                 {% for n in notifications %}
-                {% if not n.is_read and post.slug in n.target_url %}
-                <span class="badge unread">🔔 新しいコメント</span>
-                {% break %}
-                {% endif %}
+                    {% if not n.is_read and post.slug in n.target_url %}
+                    <span class="badge unread">🔔 新しいコメント</span>
+                    {% endif %}
                 {% endfor %}
             </div>
     
