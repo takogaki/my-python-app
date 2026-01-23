@@ -95,12 +95,9 @@
                     <button class="meta-link danger">削除</button>
                 </form>
     
-                {# 🔔 未読コメントがあるか #}
-                {% for n in notifications %}
-                    {% if not n.is_read and post.slug in n.target_url %}
-                    <span class="badge unread">🔔 新しいコメント</span>
-                    {% endif %}
-                {% endfor %}
+                {% if unread_comment_map.post.id %}
+                <span class="badge unread">🔔 新しいコメント</span>
+                {% endif %}
             </div>
     
             {# 🔔 コメント通知一覧 #}
