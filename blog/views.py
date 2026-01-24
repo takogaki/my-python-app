@@ -152,6 +152,18 @@ def post_detail(request, slug):
                 )
 
             return response
+        
+        form = CommentForm(user=request.user)
+
+    return render(
+        request,
+        "blog/post_detail.html",
+        {
+            "post": post,
+            "parent_comments": parent_comments,
+            "form": form,
+        }
+    )
 
 # =======================
 # 投稿作成（URLに残す場合）
