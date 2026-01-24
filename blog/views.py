@@ -9,6 +9,9 @@ from notifications.models import Notification
 from django.urls import reverse
 import uuid
 from .utils import get_device_id
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 fake = Faker()
 
@@ -99,7 +102,6 @@ def post_detail(request, slug):
         post=post, parent__isnull=True
     ).order_by("-posted_date")
 
-    # 🔑 まず空の form を用意する（GET用）
     form = CommentForm(user=request.user)
 
     if request.method == "POST":
@@ -120,17 +122,24 @@ def post_detail(request, slug):
             device_id = None
 
             if request.user.is_authenticated:
+                comment.author = request.user
                 comment.name = request.user.username
             else:
                 device_id = get_device_id(request)
                 comment.name = f"未ログイン-{device_id[:6]}"
 
+            # 🔑 reply_to（User）をセット
+            reply_to_id = request.POST.get("reply_to")
+            if reply_to_id:
+                comment.reply_to = User.objects.filter(id=reply_to_id).first()
+
+            # 🔑 親コメント
             if parent:
                 comment.parent = parent.root_parent
-                comment.reply_to = parent.name
 
             comment.save()
 
+            # 🔔 通知
             if request.user.is_authenticated and post.author != request.user:
                 Notification.objects.create(
                     recipient=post.author,
@@ -150,7 +159,6 @@ def post_detail(request, slug):
 
             return response
 
-    # 🔚 GET でも POST失敗でも必ずここに来る
     return render(
         request,
         "blog/post_detail.html",

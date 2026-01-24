@@ -59,7 +59,10 @@
                 {% endif %}
 
                 {% if reply.reply_to %}
-                ＞＞＞ <strong>{{ reply.reply_to }}</strong>
+                ＞＞＞
+                <a href="{% url 'accounts:user_detail' reply.reply_to.username %}">
+                    <strong>{{ reply.reply_to.username }}</strong>
+                </a>
                 {% endif %}
                 <br>
                 {{ reply.body|linebreaksbr }}
@@ -78,15 +81,15 @@
                 返信
             </button>
 
-            <div id="reply-form-{{ reply.id }}" class="reply-form" style="display:none; margin-left:20px;">
-                <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                    <input type="hidden" name="reply_to" value="{{ reply.name }}">
-                    <button type="submit" class="submit-btn">送信</button>
-                </form>
-            </div>
+            <form method="post">
+                {% csrf_token %}
+            
+                <input type="hidden" name="parent" value="{{ comment.id }}">
+                <input type="hidden" name="reply_to" value="{{ reply.author.id }}">
+            
+                {{ form.body }}
+                <button type="submit">返信</button>
+            </form>
 
         </div>
         {% endfor %}

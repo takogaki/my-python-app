@@ -146,10 +146,13 @@ class Comment(models.Model):
         related_name="replies"
     )
 
-    reply_to = models.CharField(
-        max_length=50,
+    # Commentモデル
+    reply_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         null=True,
-        blank=True
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="replied_comments"
     )
 
     image = models.ImageField(
