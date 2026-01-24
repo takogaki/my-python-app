@@ -99,9 +99,8 @@
             {# 🔔 コメント通知一覧 #}
             <div class="notification-list">
                 {% for n in notifications %}
-                {% if not n.is_read %}
                 <div class="notification-inline">
-                    <a href="{% url 'notifications:read' n.id %}">
+                    <a href="{% url 'open_notification' n.id %}">
                         {% if n.actor %}
                         {{ n.actor.username }} さんがあなたの投稿にコメントしました
                         {% else %}
@@ -109,9 +108,8 @@
                         {% endif %}
                     </a>
                 </div>
-                {% endif %}
                 {% empty %}
-                <p class="empty-text">通知はありません</p>
+                <p>通知はありません</p>
                 {% endfor %}
             </div>
     
