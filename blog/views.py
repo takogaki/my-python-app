@@ -99,6 +99,9 @@ def post_detail(request, slug):
         post=post, parent__isnull=True
     ).order_by("-posted_date")
 
+    # 🔑 まず空の form を用意する（GET用）
+    form = CommentForm(user=request.user)
+
     if request.method == "POST":
         parent_id = request.POST.get("parent_id")
         parent = Comment.objects.get(id=parent_id) if parent_id else None
@@ -114,10 +117,7 @@ def post_detail(request, slug):
             comment = form.save(commit=False)
             comment.post = post
 
-            # =========================
-            # ★ ここが修正の核心
-            # =========================
-            device_id = None  # ← 必ず最初に定義する
+            device_id = None
 
             if request.user.is_authenticated:
                 comment.name = request.user.username
@@ -131,9 +131,6 @@ def post_detail(request, slug):
 
             comment.save()
 
-            # =======================
-            # 通知作成（ログイン時のみ）
-            # =======================
             if request.user.is_authenticated and post.author != request.user:
                 Notification.objects.create(
                     recipient=post.author,
@@ -146,15 +143,11 @@ def post_detail(request, slug):
             response = redirect("blog:post_detail", slug=slug)
 
             if device_id and not request.COOKIES.get("device_id"):
-                response.set_cookie(
-                    "device_id",
-                    max_age=60 * 60 * 24 * 365,
-                )
+                response.set_cookie("device_id", max_age=60 * 60 * 24 * 365)
 
             return response
-        
-        form = CommentForm(user=request.user)
 
+    # 🔚 GET でも POST失敗でも必ずここに来る
     return render(
         request,
         "blog/post_detail.html",
