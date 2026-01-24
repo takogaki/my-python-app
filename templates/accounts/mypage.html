@@ -99,26 +99,16 @@
             {# 🔔 コメント通知一覧 #}
             <div class="notification-list">
                 {% for n in notifications %}
-                <div class="notification-inline">
+                <div class="notification-item">
                     <a href="{% url 'notifications:open_notification' n.id %}">
-                        {% if n.actor %}
-                        {{ n.actor.username }} さんがあなたの投稿にコメントしました
-                        {% else %}
-                        誰かがあなたの投稿にコメントしました
-                        {% endif %}
+                        {{ n.verb }}
                     </a>
                 </div>
                 {% empty %}
                 <p>通知はありません</p>
                 {% endfor %}
             </div>
-    
-        {% empty %}
-        <p class="empty-text">ブログ投稿はまだありません</p>
-        {% endfor %}
-    </section>
 
-    <!-- メッセージ -->
     <!-- メッセージ -->
     <section class="content-card">
         {% comment %} ===== 未読数カウント（表示用・副作用なし） ===== {% endcomment %}

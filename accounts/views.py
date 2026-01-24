@@ -187,6 +187,8 @@ def mypage(request):
         is_read=False
     ).order_by("-created_at")
 
+    posts = Post.objects.filter(author=request.user)
+
     return render(
         request,
         "accounts/mypage.html",
