@@ -100,7 +100,7 @@
             <div class="notification-list">
                 {% for n in notifications %}
                 <div class="notification-inline">
-                    <a href="{% url 'open_notification' n.id %}">
+                    <a href="{% url 'notifications:open_notification' n.id %}">
                         {% if n.actor %}
                         {{ n.actor.username }} さんがあなたの投稿にコメントしました
                         {% else %}
