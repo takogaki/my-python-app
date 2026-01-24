@@ -19,6 +19,15 @@ class Notification(models.Model):
 
     verb = models.CharField(max_length=255)
 
+    # ⭐ 追加：どの投稿の通知か
+    post = models.ForeignKey(
+        "blog.Post",              # ← あなたのPostモデルに合わせる
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications"
+    )
+
     target_url = models.CharField(
         max_length=500,
         blank=True

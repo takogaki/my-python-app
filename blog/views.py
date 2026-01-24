@@ -134,15 +134,12 @@ def post_detail(request, slug):
             # =======================
             # 通知作成（ログイン時のみ）
             # =======================
-            if (
-                request.user.is_authenticated
-                and post.author
-                and post.author != request.user
-            ):
+            if request.user.is_authenticated and post.author != request.user:
                 Notification.objects.create(
                     recipient=post.author,
                     actor=request.user,
-                    verb = f"{request.user.username} さんがコメントしました",
+                    post=post,
+                    verb=f"{request.user.username} さんがコメントしました",
                     target_url=reverse("blog:post_detail", args=[post.slug]),
                 )
 
@@ -151,24 +148,10 @@ def post_detail(request, slug):
             if device_id and not request.COOKIES.get("device_id"):
                 response.set_cookie(
                     "device_id",
-                    device_id,
                     max_age=60 * 60 * 24 * 365,
                 )
 
             return response
-    else:
-        form = CommentForm(user=request.user)
-
-    return render(
-        request,
-        "blog/post_detail.html",
-        {
-            "post": post,
-            "parent_comments": parent_comments,
-            "form": form,
-        },
-    )
-
 
 # =======================
 # 投稿作成（URLに残す場合）
