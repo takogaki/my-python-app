@@ -143,7 +143,7 @@ def post_detail(request, slug):
                     recipient=post.author,
                     actor=request.user,
                     verb = f"{request.user.username} さんがコメントしました",
-                    target_url=post.get_absolute_url() + f"#comment-{comment.id}",
+                    target_url=reverse("blog:post_detail", args=[post.slug]),
                 )
 
             response = redirect("blog:post_detail", slug=slug)
