@@ -139,6 +139,21 @@ def post_detail(request, slug):
 
             comment.save()
 
+            recipient = None
+
+            if comment.reply_to and comment.reply_to.author:
+                recipient = comment.reply_to.author
+            elif post.author:
+                recipient = post.author
+
+            if recipient:
+                Notification.objects.create(
+                    sender=request.user,
+                    recipient=recipient,
+                    message=f"{request.user.username} さんがコメントしました",
+                    url=f"/blog/posts/{post.slug}/#comment-{comment.id}",
+                )
+
             # 🔔 通知
             if request.user.is_authenticated and post.author != request.user:
                 Notification.objects.create(
