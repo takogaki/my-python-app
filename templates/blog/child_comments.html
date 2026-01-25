@@ -5,7 +5,7 @@
 {% for comment in comments %}
 <div id="comment-{{ comment.id }}" class="comment parent">
 
-    <!-- ✅ 改行を反映させる本文表示 -->
+    <!-- 親コメント本文 -->
     <p class="post-content">
         {% if comment.author %}
         <a href="{% url 'accounts:user_detail' comment.author.username %}">
@@ -20,7 +20,7 @@
         {{ comment.body|linebreaksbr }}
     </p>
 
-    {% if comment.replies.exists %}
+    {% if comment.replies.count %}
     <button type="button" class="replies-toggle" data-comment-id="{{ comment.id }}">
         返信を見る（{{ comment.replies.count }}件）
     </button>
@@ -30,11 +30,7 @@
         {% if comment.image %}
         <img src="{{ comment.image.url }}" class="comment-media-thumb">
         {% endif %}
-
-        
-        <!-- {% include "blog/video_embed.html" with video_url=comment.video_url %} -->
         {% include "blog/video_embed.html" with obj=comment %}
-
     </div>
 
     <!-- =====================
@@ -45,9 +41,7 @@
         {% for reply in comment.replies.all %}
         <div id="comment-{{ reply.id }}" class="comment reply">
 
-            <!-- ✅ 改行を反映させる本文表示 -->
             <p class="post-content">
-
                 {% if reply.author %}
                 <a href="{% url 'accounts:user_detail' reply.author.username %}">
                     ∟ <strong>コメント：{{ reply.author.username }}</strong>
@@ -72,21 +66,19 @@
             <img src="{{ reply.image.url }}" class="comment-media-thumb">
             {% endif %}
 
-        
-            <!-- {% include "blog/video_embed.html" with video_url=reply.video_url %} -->
             {% include "blog/video_embed.html" with obj=reply %}
 
-            <!-- 🔥 返信への返信（reply.id で統一） -->
+            <!-- 返信への返信 -->
             <button type="button" class="reply-toggle" data-reply-id="{{ reply.id }}">
                 返信
             </button>
 
-            <form method="post">
+            <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}">
                 {% csrf_token %}
-            
-                <input type="hidden" name="parent" value="{{ comment.id }}">
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                {% if reply.author %}
                 <input type="hidden" name="reply_to" value="{{ reply.author.id }}">
-            
+                {% endif %}
                 {{ form.body }}
                 <button type="submit">返信</button>
             </form>
@@ -107,7 +99,9 @@
             {% csrf_token %}
             {{ form.as_p }}
             <input type="hidden" name="parent_id" value="{{ comment.id }}">
-            <input type="hidden" name="reply_to" value="{{ comment.name }}">
+            {% if comment.author %}
+            <input type="hidden" name="reply_to" value="{{ comment.author.id }}">
+            {% endif %}
             <button type="submit" class="submit-btn">送信</button>
         </form>
     </div>

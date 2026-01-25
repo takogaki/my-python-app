@@ -23,19 +23,25 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "post",
+        "author",
         "name",
-        "video_type",
-        "live_ended",
+        "parent",
+        "reply_to",
         "posted_date",
     )
-    list_filter = ("video_type", "live_ended")
-    search_fields = ("body", "name")
+
+    list_filter = ("posted_date",)
+    search_fields = ("body", "name", "author__username")
 
     fields = (
+        "post",
         "author",
+        "name",
+        "parent",
+        "reply_to",
         "body",
         "video_url",
-        "video_type",
-        "live_ended",
         "image",
     )
+
+    readonly_fields = ("posted_date",)
