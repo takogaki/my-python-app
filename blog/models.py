@@ -132,6 +132,13 @@ class Comment(models.Model):
         verbose_name="表示名"
     )
 
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+
     body = models.TextField()
 
     posted_date = models.DateTimeField(
@@ -168,7 +175,9 @@ class Comment(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if not self.name:
+        if self.author:
+            self.name = self.author.username
+        elif not self.name:
             self.name = "未ログインユーザー"
         super().save(*args, **kwargs)
 

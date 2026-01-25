@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Post, Comment
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = (
@@ -18,15 +20,17 @@ class PostAdmin(admin.ModelAdmin):
         "live_ended",
         "image",
     )
+
+
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "post",
-        "author",
+        "display_author",   # ← ★ authorの代替
         "name",
         "parent",
-        "reply_to",
+        "display_reply_to", # ← ★ reply_toの代替
         "posted_date",
     )
 
@@ -45,3 +49,15 @@ class CommentAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ("posted_date",)
+
+    # ===== 表示用メソッド =====
+
+    def display_author(self, obj):
+        return obj.author.username if obj.author else obj.name
+
+    display_author.short_description = "投稿者"
+
+    def display_reply_to(self, obj):
+        return obj.reply_to.username if obj.reply_to else "-"
+
+    display_reply_to.short_description = "返信先"
