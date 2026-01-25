@@ -8,12 +8,14 @@
     <!-- 親コメント本文 -->
     <p class="post-content">
         {% if comment.author %}
-        <a href="{% url 'accounts:user_detail' comment.author.username %}">
-            <strong>コメント：{{ comment.author.username }}</strong>
+        <!-- 登録ユーザ：クリック可能 -->
+        <a href="{% url 'user_detail' comment.author.id %}" class="comment-author">
+            {{ comment.author.username }}
         </a>
         {% else %}
-        <span class="guest-name">
-            <strong>コメント：{{ comment.name }}</strong>
+        <!-- 未ログインユーザ：識別ID表示・クリック不可 -->
+        <span class="comment-author guest">
+            未ログイン-{{ comment.device_id }}
         </span>
         {% endif %}
         <br>
@@ -43,18 +45,20 @@
 
             <p class="post-content">
                 {% if reply.author %}
-                <a href="{% url 'accounts:user_detail' reply.author.username %}">
-                    ∟ <strong>コメント：{{ reply.author.username }}</strong>
+                <!-- 登録ユーザ：クリック可能 -->
+                <a href="{% url 'user_detail' reply.author.id %}" class="comment-author">
+                    {{ reply.author.username }}
                 </a>
                 {% else %}
-                <span class="guest-name">
-                    ∟ <strong>コメント：{{ reply.name }}</strong>
+                <!-- 未ログインユーザ：識別ID表示・クリック不可 -->
+                <span class="comment-author guest">
+                    未ログイン-{{ reply.device_id }}
                 </span>
                 {% endif %}
 
                 {% if reply.reply_to %}
                 ＞＞＞
-                <a href="{% url 'accounts:user_detail' reply.reply_to.username %}">
+                <a href="{% url 'user_detail' reply.reply_to.id %}">
                     <strong>{{ reply.reply_to.username }}</strong>
                 </a>
                 {% endif %}

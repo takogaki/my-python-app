@@ -136,7 +136,8 @@ class Comment(models.Model):
         settings.AUTH_USER_MODEL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        related_name="comments",
     )
 
     body = models.TextField()
