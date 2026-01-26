@@ -107,13 +107,17 @@ def post_detail(request, slug):
     # =======================
     for comment in parent_comments:
         comment.can_link = bool(
-            comment.author and comment.author.is_active
+            comment.author
+            and comment.author.is_active
+            and not comment.author.is_superuser
         )
 
-        for reply in comment.replies.all():
-            reply.can_link = bool(
-                reply.reply_to and reply.reply_to.is_active
-            )
+    for reply in comment.replies.all():
+        reply.can_link = bool(
+            reply.reply_to
+            and reply.reply_to.is_active
+            and not reply.reply_to.is_superuser
+        )
 
     form = CommentForm(user=request.user)
 

@@ -11,9 +11,17 @@
         <a href="{% url 'accounts:user_detail' comment.author.id %}">
             {{ comment.author.username }}
         </a>
-        {% elif comment.name %}
+    
+        {% elif not comment.author %}
+        {# 未登録ユーザー #}
         <span class="comment-author guest">
             {{ comment.name }}
+        </span>
+    
+        {% else %}
+        {# 退会・管理人など #}
+        <span class="comment-author guest">
+            退会ユーザ
         </span>
         {% endif %}
         <br>
@@ -46,19 +54,14 @@
                 <a href="{% url 'accounts:user_detail' reply.reply_to.id %}">
                     <strong>{{ reply.reply_to.username }}</strong>
                 </a>
-                {% elif reply.name %}
-                <strong>{{ reply.name }}</strong>
-                {% endif %}
             
-                {% if reply.reply_to %}
-                ＞＞＞
-                {% if reply.can_link %}
-                <a href="{% url 'accounts:user_detail' reply.reply_to.id %}">
-                    <strong>{{ reply.reply_to.username }}</strong>
-                </a>
+                {% elif not reply.reply_to %}
+                {# 未登録ユーザー #}
+                <strong>{{ reply.name }}</strong>
+            
                 {% else %}
-                <strong>{{ reply.reply_to.username|default:"退会ユーザ" }}</strong>
-                {% endif %}
+                {# 退会・管理人など #}
+                <strong>退会ユーザ</strong>
                 {% endif %}
                 <br>
                 {{ reply.body|linebreaksbr }}
