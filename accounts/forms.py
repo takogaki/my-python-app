@@ -6,10 +6,33 @@ from datetime import datetime
 from .models import Profile
 from django.contrib.auth import get_user_model
 import re
+from django.core.exceptions import ValidationError
+
 # ユーザーネーム編集フォーム
 User = get_user_model()
 
-from django.core.exceptions import ValidationError
+
+def validate_profile_image(image):
+    if not image:
+        return image
+
+    allowed_types = [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+    ]
+
+    if image.content_type not in allowed_types:
+        raise ValidationError(
+            "画像形式は PNG / JPG / WEBP のみ対応しています。"
+        )
+
+    max_size = 2 * 1024 * 1024  # 2MB
+    if image.size > max_size:
+        raise ValidationError("画像サイズは2MB以内にしてください。")
+
+    return image
+
 
 def validate_username_ascii(value):
     """
@@ -94,12 +117,24 @@ class ProfileForm(forms.ModelForm):
         validators=[validate_username_ascii],
     )
 
+    profile_image = forms.ImageField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={
+            "accept": "image/png,image/jpeg,image/webp"
+        })
+    )
     class Meta:
         model = User
         fields = ["username", "profile_image"]
 
+    def clean_profile_image(self):
+        image = self.cleaned_data.get("profile_image")
+        return validate_profile_image(image)
+
     def clean_username(self):
         username = self.cleaned_data.get("username")
+
+        
 
         # 空なら変更しない
         if not username:
@@ -120,6 +155,16 @@ class ProfileForm(forms.ModelForm):
 
     # accounts/forms.py
 class ActivateProfileImageForm(forms.ModelForm):
+    profile_image = forms.ImageField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={
+            "accept": "image/png,image/jpeg,image/webp"
+        })
+    )
     class Meta:
         model = User
         fields = ["profile_image"]
+
+    def clean_profile_image(self):
+        image = self.cleaned_data.get("profile_image")
+        return validate_profile_image(image)
