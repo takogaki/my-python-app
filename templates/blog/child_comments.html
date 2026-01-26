@@ -7,15 +7,13 @@
 
     <!-- 親コメント本文 -->
     <p class="post-content">
-        {% if comment.author %}
-        <!-- 登録ユーザ：クリック可能 -->
-        <a href="{% url 'accounts:user_detail' comment.author.id %}" class="comment-author">
+        {% if comment.can_link %}
+        <a href="{% url 'accounts:user_detail' comment.author.id %}">
             {{ comment.author.username }}
         </a>
-        {% else %}
-        <!-- 未ログインユーザ：識別ID表示・クリック不可 -->
+        {% elif comment.name %}
         <span class="comment-author guest">
-            未ログイン-{{ comment.device_id }}
+            {{ comment.name }}
         </span>
         {% endif %}
         <br>
@@ -36,7 +34,7 @@
     </div>
 
     <!-- =====================
-         子コメント（返信）
+        子コメント（返信）
     ====================== -->
     <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
 
@@ -44,23 +42,23 @@
         <div id="comment-{{ reply.id }}" class="comment reply">
 
             <p class="post-content">
-                {% if reply.author %}
-                <!-- 登録ユーザ：クリック可能 -->
-                <a href="{% url 'accounts:user_detail' reply.author.id %}" class="comment-author">
-                    {{ reply.author.username }}
-                </a>
-                {% else %}
-                <!-- 未ログインユーザ：識別ID表示・クリック不可 -->
-                <span class="comment-author guest">
-                    未ログイン-{{ reply.device_id }}
-                </span>
-                {% endif %}
-
-                {% if reply.reply_to %}
-                ＞＞＞
+                {% if reply.can_link %}
                 <a href="{% url 'accounts:user_detail' reply.reply_to.id %}">
                     <strong>{{ reply.reply_to.username }}</strong>
                 </a>
+                {% elif reply.name %}
+                <strong>{{ reply.name }}</strong>
+                {% endif %}
+            
+                {% if reply.reply_to %}
+                ＞＞＞
+                {% if reply.can_link %}
+                <a href="{% url 'accounts:user_detail' reply.reply_to.id %}">
+                    <strong>{{ reply.reply_to.username }}</strong>
+                </a>
+                {% else %}
+                <strong>{{ reply.reply_to.username|default:"退会ユーザ" }}</strong>
+                {% endif %}
                 {% endif %}
                 <br>
                 {{ reply.body|linebreaksbr }}

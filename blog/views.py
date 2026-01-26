@@ -102,6 +102,19 @@ def post_detail(request, slug):
         post=post, parent__isnull=True
     ).order_by("-posted_date")
 
+    # =======================
+    # コメント・返信のリンク可否フラグ
+    # =======================
+    for comment in parent_comments:
+        comment.can_link = bool(
+            comment.author and comment.author.is_active
+        )
+
+        for reply in comment.replies.all():
+            reply.can_link = bool(
+                reply.reply_to and reply.reply_to.is_active
+            )
+
     form = CommentForm(user=request.user)
 
     if request.method == "POST":
