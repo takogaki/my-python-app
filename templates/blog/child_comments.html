@@ -9,7 +9,7 @@
     <p class="post-content">
         {% if comment.author %}
         <!-- 登録ユーザ：クリック可能 -->
-        <a href="{% url 'user_detail' comment.author.id %}" class="comment-author">
+        <a href="{% url 'accounts:user_detail' comment.author.id %}" class="comment-author">
             {{ comment.author.username }}
         </a>
         {% else %}
@@ -46,7 +46,7 @@
             <p class="post-content">
                 {% if reply.author %}
                 <!-- 登録ユーザ：クリック可能 -->
-                <a href="{% url 'user_detail' reply.author.id %}" class="comment-author">
+                <a href="{% url 'accounts:user_detail' reply.author.id %}" class="comment-author">
                     {{ reply.author.username }}
                 </a>
                 {% else %}
@@ -58,7 +58,7 @@
 
                 {% if reply.reply_to %}
                 ＞＞＞
-                <a href="{% url 'user_detail' reply.reply_to.id %}">
+                <a href="{% url 'accounts:user_detail' reply.reply_to.id %}">
                     <strong>{{ reply.reply_to.username }}</strong>
                 </a>
                 {% endif %}
