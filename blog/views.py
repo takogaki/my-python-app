@@ -106,18 +106,43 @@ def post_detail(request, slug):
     # コメント・返信のリンク可否フラグ
     # =======================
     for comment in parent_comments:
-        comment.can_link = bool(
-            comment.author
-            and comment.author.is_active
-            and not comment.author.is_superuser
-        )
+        if comment.author is None:
+            # 未登録ユーザー
+            comment.display_name = comment.name  # 未登録-xxxx
+            comment.can_link = False
 
+        elif comment.author.is_superuser:
+            # 管理人（表示は username、リンク不可）
+            comment.display_name = comment.author.username
+            comment.can_link = False
+
+        elif not comment.author.is_active:
+            # 退会ユーザー
+            comment.display_name = "退会ユーザー"
+            comment.can_link = False
+
+        else:
+            # 通常ユーザー
+            comment.display_name = comment.author.username
+            comment.can_link = True
+
+    # ===== 返信 =====
     for reply in comment.replies.all():
-        reply.can_link = bool(
-            reply.reply_to
-            and reply.reply_to.is_active
-            and not reply.reply_to.is_superuser
-        )
+        if reply.reply_to is None:
+            reply.display_name = reply.name
+            reply.can_link = False
+
+        elif reply.reply_to.is_superuser:
+            reply.display_name = reply.reply_to.username
+            reply.can_link = False
+
+        elif not reply.reply_to.is_active:
+            reply.display_name = "退会ユーザー"
+            reply.can_link = False
+
+        else:
+            reply.display_name = reply.reply_to.username
+            reply.can_link = True
 
     form = CommentForm(user=request.user)
 

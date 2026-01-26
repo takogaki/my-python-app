@@ -8,20 +8,12 @@
     <!-- 親コメント本文 -->
     <p class="post-content">
         {% if comment.can_link %}
-        <a href="{% url 'accounts:user_detail' comment.author.id %}">
-            {{ comment.author.username }}
+        <a href="{% url 'accounts:user_detail' comment.author.username %}">
+            {{ comment.display_name }}
         </a>
-    
-        {% elif not comment.author %}
-        {# 未登録ユーザー #}
-        <span class="comment-author guest">
-            {{ comment.name }}
-        </span>
-    
         {% else %}
-        {# 退会・管理人など #}
         <span class="comment-author guest">
-            退会ユーザ
+            {{ comment.display_name }}
         </span>
         {% endif %}
         <br>
@@ -51,17 +43,13 @@
 
             <p class="post-content">
                 {% if reply.can_link %}
-                <a href="{% url 'accounts:user_detail' reply.reply_to.id %}">
-                    <strong>{{ reply.reply_to.username }}</strong>
+                <a href="{% url 'accounts:user_detail' reply.author.username %}">
+                    {{ reply.display_name }}
                 </a>
-            
-                {% elif not reply.reply_to %}
-                {# 未登録ユーザー #}
-                <strong>{{ reply.name }}</strong>
-            
                 {% else %}
-                {# 退会・管理人など #}
-                <strong>退会ユーザ</strong>
+                <span class="reply-author guest">
+                    {{ reply.display_name }}
+                </span>
                 {% endif %}
                 <br>
                 {{ reply.body|linebreaksbr }}
