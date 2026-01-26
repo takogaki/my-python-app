@@ -16,3 +16,26 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTime();
     setInterval(updateTime, 1000);
 });
+
+// プロフィール画像のモーダル表示
+document.addEventListener("DOMContentLoaded", () => {
+    const avatar = document.querySelector(".avatar-clickable");
+    const modal = document.getElementById("image-modal");
+    const modalImg = document.getElementById("modal-image");
+    const closeBtn = document.querySelector(".image-modal .close");
+
+    avatar.addEventListener("click", () => {
+        modal.style.display = "block";
+        modalImg.src = avatar.src;
+    });
+
+    closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});

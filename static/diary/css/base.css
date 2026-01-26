@@ -491,3 +491,35 @@ section h3 {
     color: #e53935;
     font-weight: bold;
 }
+
+
+
+/* プロフィール画像クリックで拡大表示 */
+.avatar-clickable {
+    cursor: pointer;
+}
+
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+}
+
+.image-modal-content {
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    margin: auto;
+    margin-top: 5%;
+}
+
+.image-modal .close {
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 32px;
+    cursor: pointer;
+}

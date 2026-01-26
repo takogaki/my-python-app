@@ -26,10 +26,16 @@
         {% endif %}
     
         {% if user.profile_image %}
-        <img src="{{ user.profile_image.url }}" class="avatar">
+        <img src="{{ user.profile_image.url }}" class="avatar avatar-clickable" alt="プロフィール画像">
         {% else %}
-        <img src="{% static 'images/default_avatar.png' %}" class="avatar">
+        <img src="{% static 'accounts/img/default_avatar.png' %}" class="avatar avatar-clickable" alt="プロフィール画像">
         {% endif %}
+        
+        <!-- モーダル -->
+        <div id="image-modal" class="image-modal">
+            <span class="close">&times;</span>
+            <img class="image-modal-content" id="modal-image">
+        </div>
     
         <div class="profile-actions">
             <a href="{% url 'accounts:profile_edit' %}">編集</a>
