@@ -139,33 +139,32 @@ def post_detail(request, slug):
 
             comment.save()
 
-            recipient = None
+            # =======================
+            # 🔔 通知（recipient が存在する場合のみ）
+            # =======================
+            if request.user.is_authenticated:
+                recipient = None
 
-            if comment.reply_to and comment.reply_to.author:
-                recipient = comment.reply_to.author
-            elif post.author:
-                recipient = post.author
+                # 返信なら「返信先ユーザ」
+                if comment.reply_to:
+                    recipient = comment.reply_to
 
-            if recipient:
-                Notification.objects.create(
-                    sender=request.user,
-                    recipient=recipient,
-                    message=f"{request.user.username} さんがコメントしました",
-                    url=f"/blog/posts/{post.slug}/#comment-{comment.id}",
-                )
+                # 通常コメントなら「投稿者」
+                elif post.author:
+                    recipient = post.author
 
-            # 🔔 通知
-            if request.user.is_authenticated and post.author != request.user:
-                Notification.objects.create(
-                    recipient=post.author,
-                    actor=request.user,
-                    post=post,
-                    verb=f"{request.user.username} さんがコメントしました",
-                    target_url=(
-                        reverse("blog:post_detail", args=[post.slug])
-                        + f"#comment-{comment.id}"
-                    ),
-                )
+                # 自分自身への通知は送らない
+                if recipient and recipient != request.user:
+                    Notification.objects.create(
+                        recipient=recipient,
+                        actor=request.user,
+                        post=post,
+                        verb=f"{request.user.username} さんがコメントしました",
+                        target_url=(
+                            reverse("blog:post_detail", args=[post.slug])
+                            + f"#comment-{comment.id}"
+                        ),
+                    )
 
             response = redirect("blog:post_detail", slug=slug)
 
