@@ -63,30 +63,32 @@
 ===================== -->
 <hr>
 
-<h2>{{ user.username }} さんの投稿</h2>
+<h2 class="section-title">{{ user.username }} さんの投稿</h2>
 
 {% if blog_posts %}
-<ul class="user-post-list">
+<div class="post-list">
     {% for post in blog_posts %}
-    <li>
-        <a href="{{ post.get_absolute_url }}">
-            {{ post.title }}
-        </a>
+    <div class="post-card">
 
-        <small>
-            （{{ post.posted_date|date:"Y/m/d" }}）
+        <h3 class="post-title">
+            <a href="{{ post.get_absolute_url }}">
+                {{ post.title }}
+            </a>
+        </h3>
 
+        <p class="post-meta">
+            {{ post.posted_date|date:"Y/m/d" }}
             {% if post.video_type == "live" %}
-            🔴ライブ
+            <span class="post-live">🔴 ライブ</span>
             {% endif %}
-        </small>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>まだ投稿はありません。</p>
-{% endif %}
+        </p>
 
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="no-posts">まだ投稿はありません。</p>
+{% endif %}
 
 <!-- =====================
 公開日記一覧
