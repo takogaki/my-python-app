@@ -61,22 +61,22 @@
 <!-- =====================
 ブログ投稿一覧
 ===================== -->
-<hr>
+<div class="card">
+    <h2 class="card-title">
+        {{ user.username }} さんの投稿
+    </h2>
 
-<h2 class="section-title">{{ user.username }} さんの投稿</h2>
-
-{% if blog_posts %}
-<div class="post-list">
+    {% if blog_posts %}
     {% for post in blog_posts %}
-    <div class="post-card">
+    <div class="sub-card">
 
-        <h3 class="post-title">
+        <h3 class="sub-card-title">
             <a href="{{ post.get_absolute_url }}">
                 {{ post.title }}
             </a>
         </h3>
 
-        <p class="post-meta">
+        <p class="sub-card-date">
             {{ post.posted_date|date:"Y/m/d" }}
             {% if post.video_type == "live" %}
             <span class="post-live">🔴 ライブ</span>
@@ -85,10 +85,10 @@
 
     </div>
     {% endfor %}
+    {% else %}
+    <p class="empty-text">まだ投稿はありません。</p>
+    {% endif %}
 </div>
-{% else %}
-<p class="no-posts">まだ投稿はありません。</p>
-{% endif %}
 
 <!-- =====================
 公開日記一覧
