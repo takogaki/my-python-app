@@ -76,6 +76,11 @@ class UserDetailView(LoginRequiredMixin, DetailView):
             author=self.object,
             is_public=True
         ).order_by("-page_date")
+
+        context["blog_posts"] = Post.objects.filter(
+                author=self.object
+            ).order_by("-posted_date")
+
         return context
 
 

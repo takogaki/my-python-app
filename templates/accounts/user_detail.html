@@ -57,8 +57,39 @@
         </div>
     </div>
 </section>
+
 <!-- =====================
- 公開日記一覧
+ブログ投稿一覧
+===================== -->
+<hr>
+
+<h2>{{ user.username }} さんの投稿</h2>
+
+{% if blog_posts %}
+<ul class="user-post-list">
+    {% for post in blog_posts %}
+    <li>
+        <a href="{{ post.get_absolute_url }}">
+            {{ post.title }}
+        </a>
+
+        <small>
+            （{{ post.posted_date|date:"Y/m/d" }}）
+
+            {% if post.video_type == "live" %}
+            🔴ライブ
+            {% endif %}
+        </small>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>まだ投稿はありません。</p>
+{% endif %}
+
+
+<!-- =====================
+公開日記一覧
 ===================== -->
 <div class="card">
     <h2 class="card-title">
