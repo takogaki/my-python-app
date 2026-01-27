@@ -49,13 +49,13 @@
             <h1 class="site-title">
                 <a href="{% url 'diary:index' %}" class="logo-text">
                     SPIRYTUS
-                    <span class="logo-sub">出会いやすさ、語りやすさ、ここがその上限。</span>
+                    <span class="logo-sub">出会いやすさ、<br>&ensp;語りやすさ、<br>&emsp;ここがその上限。</span>
                 </a>
             </h1>
             <div class="user-area">
                 {% if user.is_authenticated %}
                 <span class="welcome">
-                    こんにちは、<a class="btn btn-outline" href="{% url 'accounts:mypage' %}">{{ request.user.username }}</a>さん
+                        <a class="btn btn-outline" href="{% url 'accounts:mypage' %}">{{ request.user.username }}</a>
                     <p class="user-count">
                         ログインユーザー数：{{ logged_in_users_count }}
                     </p>
