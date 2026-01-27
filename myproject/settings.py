@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
-# DEBUG = True
+DEBUG = True
 
 # ★ SECRET_KEY は Render の Environment Variables からのみ取得
 # ★ fallback / dotenv / 二重定義は一切しない
@@ -135,7 +135,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "diary.apps.DiaryConfig",
     "blog.apps.BlogConfig",
-    "chat",
+    "videochat",
     "user_messages",
     "django_extensions",
     "notifications",

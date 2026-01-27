@@ -1,0 +1,15 @@
+<h2>ビデオチャットルーム</h2>
+
+<p>ホスト：{{ room.host.username }}</p>
+
+<button onclick="openJitsi()">
+    ビデオチャットを開く
+</button>
+
+<script>
+    function openJitsi() {
+        const roomName = "{{ room.room_id }}";
+        const url = "https://meet.jit.si/" + roomName;
+        window.open(url, "_blank");
+    }
+</script>

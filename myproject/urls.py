@@ -19,7 +19,7 @@ urlpatterns = [
     path('blog/', include('blog.urls')),  
     path('accounts/', include('accounts.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('chat/', include('chat.urls')),
+    path("videochat/", include("videochat.urls")),
     path("notifications/", include("notifications.urls")),
 ] 
 
