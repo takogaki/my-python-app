@@ -49,7 +49,7 @@
             <h1 class="site-title">
                 <a href="{% url 'diary:index' %}" class="logo-text">
                     the.SPIRYTUS
-                    <span class="logo-sub">出会いやすい,語りやすい,その上限°</span>
+                    <span class="logo-sub">出会いやすさの限界到達°</span>
                 </a>
             </h1>
             <div class="user-area">
@@ -62,10 +62,8 @@
                 </span>
                 {% else %}
                 <a class="btn btn-outline" href="{% url 'accounts:login' %}">ログイン</a>
-                <a class="btn" href="{% url 'accounts:signup' %}">新規登録</a>
-                <p class="user-count">
-                    ログインユーザー数：{{ logged_in_users_count }}
-                </p>
+                <!-- <a class="btn" href="{% url 'accounts:signup' %}">新規登録</a> -->
+                
                 {% endif %}
             </div>
         </div>
@@ -76,7 +74,10 @@
         {% endblock %}
     </main>
 
-    <footer class="site-footer">
+    <footer class="site-footer" style="text-align: center;">
+        <p class="user-count" style="text-align: center;">
+            ログインユーザー数：{{ logged_in_users_count }}
+        </p>
         <small>© MAX96°</small>
     </footer>
 </body>
