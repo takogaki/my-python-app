@@ -20,10 +20,15 @@
                 </div>
 
                 <div class="dashboard-section">
-                        <h3>💬 話す</h3>
-                                <div class="disabled-box">
-                                        🚧 建設中（まだ使用できません）
-                                </div>
+                        <h3>💬 話す</h3>    
+
+                        <a href="{% url 'videochat:start' %}" class="dashboard-button">
+                                自分が話す（ライブ開始）まだ未完成
+                        </a>
+
+                        <a href="{% url 'videochat:room_list' %}" class="dashboard-button ghost">
+                                ライブ中の話し場を見るまだ未完成
+                        </a>
                 </div>
 
                 <!-- 📖 日記 -->

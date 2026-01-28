@@ -1,0 +1,32 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+参加申請中｜SPIRYTUS
+{% endblock %}
+
+{% block body %}
+<main class="top">
+    <div class="dashboard">
+
+        <h1 class="site-catch">{{ room.title }}</h1>
+
+        <div class="dashboard-section">
+            {% if already_requested %}
+            <div class="disabled-box">
+                すでに参加申請を送信しています。
+            </div>
+            {% else %}
+            <div class="disabled-box">
+                参加申請を送信しました。
+            </div>
+            {% endif %}
+
+            <p style="margin-top: 1rem; opacity: 0.8;">
+                配信者の承認をお待ちください。
+            </p>
+        </div>
+
+    </div>
+</main>
+{% endblock %}

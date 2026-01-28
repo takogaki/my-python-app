@@ -1,0 +1,34 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+ライブ中の話し場｜SPIRYTUS
+{% endblock %}
+
+{% block body %}
+<main class="top">
+    <div class="dashboard">
+
+        <h1 class="site-catch">現在ライブ中</h1>
+
+        {% if rooms %}
+        {% for room in rooms %}
+        <div class="dashboard-section">
+            <h3>{{ room.title }}</h3>
+
+            <a href="{% url 'videochat:room_join' room.room_slug %}" class="dashboard-button">
+                参加する
+            </a>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="dashboard-section">
+            <div class="disabled-box">
+                現在ライブ中の配信はありません
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}

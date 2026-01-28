@@ -1,5 +1,5 @@
 from django.http import HttpResponseForbidden
-from .models import VideoRoom, RoomParticipant
+from .models import VideoRoom, RoomParticipant, JoinRequest
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.text import slugify
@@ -16,7 +16,9 @@ def jitsi_test(request):
 @login_required
 def room_list(request):
     rooms = VideoRoom.objects.filter(is_live=True, is_closed=False)
-    return render(request, "videochat/room_list.html", {"rooms": rooms})
+    return render(request, "videochat/room_list.html", {
+        "rooms": rooms
+    })
 
 
 @login_required
@@ -56,26 +58,29 @@ def room_start(request, room_slug):
 
 @login_required
 def room_join(request, room_slug):
-    room = get_object_or_404(
-        VideoRoom,
-        room_slug=room_slug,
-        is_live=True,
-        is_closed=False,
-    )
+    room = get_object_or_404(VideoRoom, room_slug=room_slug, is_live=True)
 
+    # パスワードチェック
     if room.password:
-        if request.method != "POST":
+        if request.method == "POST":
+            if request.POST.get("password") != room.password:
+                return render(request, "videochat/password.html", {
+                    "room": room,
+                    "error": "パスワードが違います"
+                })
+        else:
             return render(request, "videochat/password.html", {"room": room})
 
-        if request.POST.get("password") != room.password:
-            return render(
-                request,
-                "videochat/password.html",
-                {"room": room, "error": "パスワードが違います"},
-            )
+    # 申請作成（重複防止）
+    join_request, created = JoinRequest.objects.get_or_create(
+        room=room,
+        user=request.user
+    )
 
-    return redirect(f"https://meet.jit.si/{room.room_slug}")
-
+    return render(request, "videochat/join_requested.html", {
+        "room": room,
+        "already_requested": not created,
+    })
 
 @login_required
 def approve_participant(request, room_slug, user_id):
@@ -101,14 +106,42 @@ def room_manage(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
     if room.host != request.user:
-        return HttpResponseForbidden()
+        return HttpResponseForbidden("配信者のみ管理できます")
 
-    participants = RoomParticipant.objects.filter(room=room)
+    requests = JoinRequest.objects.filter(
+        room=room,
+        approved=False
+    ).select_related("user")
 
     return render(request, "videochat/room_manage.html", {
         "room": room,
-        "participants": participants,
+        "requests": requests,
     })
+
+@login_required
+def approve_participant(request, room_slug, user_id):
+    room = get_object_or_404(VideoRoom, room_slug=room_slug)
+
+    if room.host != request.user:
+        return HttpResponseForbidden()
+
+    join_request = get_object_or_404(
+        JoinRequest,
+        room=room,
+        user_id=user_id
+    )
+
+    join_request.approved = True
+    join_request.save()
+
+    # 参加者として登録（後工程用）
+    RoomParticipant.objects.get_or_create(
+        room=room,
+        user=join_request.user,
+        defaults={"is_approved": True}
+    )
+
+    return redirect("videochat:room_manage", room_slug=room_slug)
 
 
 @login_required

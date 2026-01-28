@@ -1,0 +1,16 @@
+<h2>{{ room.title }} - 参加申請</h2>
+
+{% if requests %}
+<ul>
+    {% for req in requests %}
+    <li>
+        {{ req.user }}
+        <a href="{% url 'videochat:approve_participant' room.room_slug req.user.id %}">
+            承認
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>申請はありません。</p>
+{% endif %}

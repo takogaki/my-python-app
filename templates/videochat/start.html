@@ -1,29 +1,34 @@
-<!DOCTYPE html>
-<html>
+{% extends "base/diary_base.html" %}
+{% load static %}
 
-<head>
-    <meta charset="utf-8">
-    <title>配信開始</title>
-</head>
+{% block title %}
+配信を開始する｜SPIRYTUS
+{% endblock %}
 
-<body>
-    <h1>配信を開始する</h1>
+{% block body %}
+<main class="top">
+    <div class="dashboard">
 
-    <form method="post">
-        {% csrf_token %}
+        <h1 class="site-catch">配信を開始する</h1>
 
-        <div>
-            <label>タイトル</label><br>
-            <input type="text" name="title" required>
-        </div>
+        <form method="post" class="dashboard-section">
+            {% csrf_token %}
 
-        <div>
-            <label>パスワード（任意）</label><br>
-            <input type="text" name="password">
-        </div>
+            <div class="form-group">
+                <label>タイトル</label>
+                <input type="text" name="title" required>
+            </div>
 
-        <button type="submit">配信開始</button>
-    </form>
-</body>
+            <div class="form-group">
+                <label>パスワード（任意）</label>
+                <input type="text" name="password">
+            </div>
 
-</html>
+            <button type="submit" class="dashboard-button primary">
+                配信開始
+            </button>
+        </form>
+
+    </div>
+</main>
+{% endblock %}
