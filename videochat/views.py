@@ -15,9 +15,9 @@ def jitsi_test(request):
 
 @login_required
 def room_list(request):
-    rooms = VideoRoom.objects.filter(is_live=True, is_closed=False)
+    live_rooms = VideoRoom.objects.filter(is_live=True, is_closed=False)
     return render(request, "videochat/room_list.html", {
-        "rooms": rooms
+        "live_rooms": live_rooms
     })
 
 
@@ -53,8 +53,9 @@ def room_start(request, room_slug):
     room.is_live = True
     room.save()
 
-    return redirect(f"https://meet.jit.si/{room.room_slug}")
-
+    return render(request, "videochat/room_start.html", {
+        "room": room
+    })
 
 @login_required
 def room_join(request, room_slug):
@@ -149,7 +150,7 @@ def room_end(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
     if room.host != request.user:
-        return HttpResponseForbidden()
+        return HttpResponseForbidden("配信者のみ終了できます")
 
     room.is_live = False
     room.is_closed = True

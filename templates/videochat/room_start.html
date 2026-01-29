@@ -14,6 +14,15 @@
         allow="camera; microphone; fullscreen; display-capture">
     </iframe>
 
+    {% if request.user == room.host %}
+    <form method="post" action="{% url 'videochat:room_end' room.room_slug %}">
+        {% csrf_token %}
+        <button class="dashboard-button danger">
+            ⏹ 配信を終了する
+        </button>
+    </form>
+    {% endif %}
+
 </body>
 
 </html>

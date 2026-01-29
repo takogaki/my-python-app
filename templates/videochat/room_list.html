@@ -6,29 +6,23 @@
 {% endblock %}
 
 {% block body %}
-<main class="top">
-    <div class="dashboard">
+<h2>🔴 配信中</h2>
 
-        <h1 class="site-catch">現在ライブ中</h1>
+{% if live_rooms %}
+<ul class="live-room-list">
+    {% for room in live_rooms %}
+    <li class="live-room-item">
+        <p class="live-title">
+            🎥 {{ room.title }}
+        </p>
 
-        {% if rooms %}
-        {% for room in rooms %}
-        <div class="dashboard-section">
-            <h3>{{ room.title }}</h3>
-
-            <a href="{% url 'videochat:room_join' room.room_slug %}" class="dashboard-button">
-                参加する
-            </a>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div class="dashboard-section">
-            <div class="disabled-box">
-                現在ライブ中の配信はありません
-            </div>
-        </div>
-        {% endif %}
-
-    </div>
-</main>
+        <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" class="join-link">
+            ▶ 参加する
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>現在配信中のチャットはありません。</p>
+{% endif %}
 {% endblock %}
