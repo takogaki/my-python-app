@@ -3,23 +3,25 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Video Chat</title>
+    <title>{{ room.title }}｜配信管理</title>
 </head>
 
 <body>
 
-    <h2>ビデオチャット開始</h2>
+    <h2>🎥 配信管理画面</h2>
+    <p>タイトル：{{ room.title }}</p>
 
-    <iframe src="https://meet.jit.si/{{ room_slug }}" style="width: 100%; height: 90vh; border: 0;"
-        allow="camera; microphone; fullscreen; display-capture">
-    </iframe>
+    <!-- Jitsi は新しいタブで開く -->
+    <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" rel="noopener noreferrer">
+        ▶ 配信開始（Jitsiを開く）
+    </a>
+
+    <hr>
 
     {% if request.user == room.host %}
     <form method="post" action="{% url 'videochat:room_end' room.room_slug %}">
         {% csrf_token %}
-        <button class="dashboard-button danger">
-            ⏹ 配信を終了する
-        </button>
+        <button type="submit">🛑 配信終了</button>
     </form>
     {% endif %}
 
