@@ -53,9 +53,7 @@ def room_start(request, room_slug):
     room.is_live = True
     room.save()
 
-    return render(request, "videochat/room_start.html", {
-        "room": room
-    })
+    return redirect(f"https://meet.jit.si/{room.room_slug}")
 
 @login_required
 def room_join(request, room_slug):
