@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from uuid import uuid4
 
@@ -15,6 +16,12 @@ class VideoRoom(models.Model):
 
     is_live = models.BooleanField(default=False)
     is_closed = models.BooleanField(default=False)
+
+    thumbnail = models.ImageField(
+        upload_to="room_thumbnails/",
+        blank=True,
+        null=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

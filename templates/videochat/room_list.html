@@ -6,23 +6,29 @@
 {% endblock %}
 
 {% block body %}
-<h2>🔴 配信中</h2>
+<section class="intro-card">
+    <h2 class="page-title">🔴 配信中</h2>
 
-{% if live_rooms %}
-<ul class="live-room-list">
-    {% for room in live_rooms %}
-    <li class="live-room-item">
-        <p class="live-title">
-            🎥 {{ room.title }}
-        </p>
+    {% if rooms %}
+    <ul class="room-list">
+        {% for room in rooms %}
+        <li class="room-card">
+            <div class="room-card-body">
+                <p class="room-title">
+                    {{ room.title }}
+                </p>
 
-        <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" class="join-link">
-            ▶ 参加する
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>現在配信中のチャットはありません。</p>
-{% endif %}
+                <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" class="room-join-button">
+                    ▶ 参加する
+                </a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty-message">
+        現在配信中のチャットはありません。
+    </p>
+    {% endif %}
+</section>
 {% endblock %}

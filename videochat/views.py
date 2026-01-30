@@ -21,15 +21,15 @@ def room_list(request):
     ).order_by("-created_at")
 
     return render(request, "videochat/room_list.html", {
-        "live_rooms": rooms
+        "rooms": rooms
     })
-
 
 @login_required
 def start_room(request):
     if request.method == "POST":
         title = request.POST.get("title", "配信ルーム")
         password = request.POST.get("password", "")
+        thumbnail = request.FILES.get("thumbnail")
 
         base = slugify(title) or "room"
         room_slug = f"{base}-{uuid4().hex[:6]}"
@@ -40,6 +40,7 @@ def start_room(request):
             room_slug=room_slug,
             password=password,
             is_live=True,
+            thumbnail=thumbnail,
         )
 
         return redirect("videochat:room_start", room_slug=room.room_slug)
@@ -58,7 +59,11 @@ def room_start(request, room_slug):
     room.is_closed = False
     room.save()
 
-    return redirect(f"https://meet.jit.si/{room.room_slug}")
+    return render(request, "videochat/room_start.html", {
+        "room": room
+    })
+
+
 
 @login_required
 def room_join(request, room_slug):
@@ -155,8 +160,10 @@ def room_end(request, room_slug):
     if room.host != request.user:
         return HttpResponseForbidden("配信者のみ終了できます")
 
-    room.is_live = False
-    room.is_closed = True
-    room.save()
+    if request.method == "POST":
+        room.is_live = False
+        room.is_closed = True
+        room.save()
+        return redirect("videochat:room_list")
 
     return redirect("videochat:room_list")

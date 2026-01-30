@@ -11,7 +11,7 @@
 
         <h1 class="site-catch">配信を開始する</h1>
 
-        <form method="post" class="dashboard-section">
+        <form method="post" enctype="multipart/form-data" class="dashboard-section">
             {% csrf_token %}
 
             <div class="form-group">
@@ -24,8 +24,17 @@
                 <input type="text" name="password">
             </div>
 
+            <!-- ★ サムネイル追加 -->
+            <div class="form-group">
+                <label>サムネイル画像（任意）</label>
+                <input type="file" name="thumbnail" accept="image/*">
+                <p class="form-help">
+                    配信一覧に表示される画像です（未設定でも配信できます）
+                </p>
+            </div>
+
             <button type="submit" class="dashboard-button primary">
-                配信開始
+                次へ
             </button>
         </form>
 

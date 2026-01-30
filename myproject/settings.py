@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
-# DEBUG = True
+DEBUG = True
 
 # ★ SECRET_KEY は Render の Environment Variables からのみ取得
 # ★ fallback / dotenv / 二重定義は一切しない
@@ -269,12 +269,18 @@ CONTENT_SECURITY_POLICY = {
 
         "frame-src": (
             "'self'",
+            "https://meet.jit.si",
             "https://www.youtube.com",
             "https://www.youtube-nocookie.com",
             "https://www.tiktok.com",
             "https://www.instagram.com",
             "https://www.facebook.com",
             "https://platform.twitter.com",
+        ),
+
+        "connect-src": (
+            "'self'",
+            "https://meet.jit.si",
         ),
 
         "script-src": (

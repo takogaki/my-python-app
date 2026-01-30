@@ -1,30 +1,80 @@
-<!DOCTYPE html>
-<html lang="ja">
+{% extends "base/diary_base.html" %}
+{% load static %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>{{ room.title }}｜配信管理</title>
-</head>
+{% block title %}
+配信管理｜SPIRYTUS
+{% endblock %}
 
-<body>
+{% block body %}
+<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
-    <h2>🎥 配信管理画面</h2>
-    <p>タイトル：{{ room.title }}</p>
+<div class="intro-card">
+    <h2 class="page-title">配信管理</h2>
+    <p class="page-description">
+        ビデオチャットを管理します。
+    </p>
+</div>
 
-    <!-- Jitsi は新しいタブで開く -->
-    <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" rel="noopener noreferrer">
-        ▶ 配信開始（Jitsiを開く）
-    </a>
+<div class="post-form-card">
+
+    <p class="page-description">
+        これから配信するルーム情報です。
+    </p>
+    
+    <p style="text-align: center;">
+        <strong>配信タイトル</strong><br>
+        {{ room.title }}
+    </p>
+
+    {% if room.thumbnail %}
+    <img src="{{ room.thumbnail.url }}" class="room-thumbnail" alt="サムネイル">
+    {% else %}
+    <img src="{% static 'img/default_thumbnail.jpg' %}" class="room-thumbnail" alt="デフォルトサムネイル">
+    {% endif %}
+    
+    <hr>
+    
+    <p class="page-description">
+        下のボタンから Jitsi を開いて配信を開始してください。
+    </p>
+    
+    <p style="text-align: center;">
+        <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" rel="noopener noreferrer" class="submit-btn"
+            style="display: inline-block; text-decoration: none;">
+            ▶ Jitsi を開く
+        </a>
+    </p>
 
     <hr>
-
-    {% if request.user == room.host %}
+    
     <form method="post" action="{% url 'videochat:room_end' room.room_slug %}">
         {% csrf_token %}
-        <button type="submit">🛑 配信終了</button>
+    <div style="margin-top: -2em; font-size: 0.9em; color: #555;">
+        <h3 style="text-align: center;">⚠ ご注意ください</h3>
+        <button type="submit" class="submit-btn">
+            🛑 配信終了
+        </button>
+        <ul>
+            <li>
+                <strong>先に Jitsi 側で配信を終了</strong>してください。
+                （赤い電話ボタン）
+            </li>
+            <li>
+                この「配信終了」ボタンは、
+                <strong>Jitsi上の配信を止めるものではありません</strong>。
+            </li>
+            <li>
+                この操作は、
+                <strong>配信ルームを一覧（配信中リスト）から削除するためのもの</strong>です。
+            </li>
+            <li>
+                配信を完全に終了する場合は、
+                <strong>Jitsi終了 → このボタン</strong>の順で操作してください。
+            </li>
+        </ul>
+    </div>
     </form>
-    {% endif %}
 
-</body>
+</div>
 
-</html>
+{% endblock %}

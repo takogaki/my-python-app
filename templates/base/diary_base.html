@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{% static 'diary/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/blog_form.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+    <link rel="stylesheet" href="{% static 'chat/css/video_chat.css' %}">
 
     <!-- Meta -->
     <meta name="csrf-token" content="{{ csrf_token }}">
@@ -56,9 +57,9 @@
                 {% if user.is_authenticated %}
                 <span class="welcome">
                         <a class="btn btn-outline" href="{% url 'accounts:mypage' %}">{{ request.user.username }}</a>
-                    <p class="user-count">
+                    <!-- <p class="user-count">
                         ログインユーザー数：{{ logged_in_users_count }}
-                    </p>
+                    </p> -->
                 </span>
                 {% else %}
                 <a class="btn btn-outline" href="{% url 'accounts:login' %}">ログイン</a>
