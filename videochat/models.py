@@ -25,6 +25,16 @@ class VideoRoom(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    ast_heartbeat = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    last_heartbeat = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return self.title
 

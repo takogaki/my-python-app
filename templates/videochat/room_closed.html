@@ -1,0 +1,28 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+配信終了｜SPIRYTUS
+{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+
+<div class="intro-card">
+    <h2 class="page-title">配信は終了しました</h2>
+    <p class="page-description">
+        この配信はすでに終了しています。
+    </p>
+</div>
+
+<div class="post-form-card" style="text-align: center;">
+    <p style="margin-bottom: 1.5em;">
+        配信者が配信を終了したか、<br>
+        ルームがクローズされました。
+    </p>
+
+    <a href="{% url 'videochat:room_list' %}" class="submit-btn" style="text-decoration: none; display: inline-block;">
+        🔙 配信一覧へ戻る
+    </a>
+</div>
+{% endblock %}

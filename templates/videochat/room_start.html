@@ -77,4 +77,15 @@
 
 </div>
 
+<script>
+    setInterval(() => {
+        fetch("{% url 'videochat:room_heartbeat' room.room_slug %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        });
+    }, 15000); // 15秒ごと
+</script>
+
 {% endblock %}

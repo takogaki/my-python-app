@@ -13,14 +13,63 @@
     <ul class="room-list">
         {% for room in rooms %}
         <li class="room-card">
-            <div class="room-card-body">
-                <p class="room-title">
-                    {{ room.title }}
-                </p>
-
-                <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" class="room-join-button">
-                    ▶ 参加する
-                </a>
+            <div class="room-card-body" style="display: flex; gap: 16px; align-items: center;">
+        
+                <!-- 左側：テキスト群（順序そのまま） -->
+                <div style="flex: 1;">
+        
+                    <p class="room-title">
+                        {{ room.title }}
+                    </p>
+        
+                    <p class="room-host-name" style="display: flex; align-items: center; gap: 8px;">
+        
+                        {% if room.host.profile_image %}
+                        <img src="{{ room.host.profile_image.url }}" class="host-icon avatar-clickable" alt="配信者アイコン"
+                            style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        {% endif %}
+        
+                        <span>
+                            配信者：
+                            <a href="{% url 'accounts:user_detail' room.host.username %}" class="host-name-link">
+                            {{ room.host.username }}<br>
+                            </a>
+                            <small style="color: #666;">
+                                {% if room.host.gender %}
+                                {{ room.host.get_gender_display }}
+                                {% endif %}
+                                {% if room.host.get_age %}
+                                ・{{ room.host.get_age }}歳
+                                {% endif %}
+                            </small>
+                        </span>
+        
+                    </p>
+                    <a href="{% url 'videochat:room_join' room.room_slug %}" target="_blank">
+                        ▶ 参加する
+                    </a>
+                    <hr class="room-divider">
+                </div>
+        
+                <!-- 右側：サムネイル（横長） -->
+                <div>
+                    {% if room.thumbnail %}
+                    <img src="{{ room.thumbnail.url }}" class="host-icon avatar-clickable" alt="サムネイル" style="
+                                width: 240px;
+                                height: 135px;
+                                object-fit: cover;
+                                border-radius: 8px;
+                            ">
+                    {% else %}
+                    <img src="{% static 'img/default_thumbnail.jpg' %}" class="host-icon avatar-clickable" alt="デフォルトサムネイル" style="
+                                width: 240px;
+                                height: 135px;
+                                object-fit: cover;
+                                border-radius: 8px;
+                            ">
+                    {% endif %}
+                </div>
+        
             </div>
         </li>
         {% endfor %}
@@ -31,4 +80,10 @@
     </p>
     {% endif %}
 </section>
+
+<div id="image-modal" class="image-modal">
+    <span class="close">&times;</span>
+    <img id="modal-image">
+</div>
+
 {% endblock %}

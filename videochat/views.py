@@ -1,9 +1,12 @@
-from django.http import HttpResponseForbidden
-from .models import VideoRoom, RoomParticipant, JoinRequest
+from django.http import HttpResponseForbidden, JsonResponse
+from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.text import slugify
-from .models import VideoRoom
+from django.contrib import messages
+from django.utils import timezone
+from .models import VideoRoom, RoomParticipant, JoinRequest
+from .utils import is_host_alive
 from uuid import uuid4
 
 
@@ -11,6 +14,21 @@ from uuid import uuid4
 def jitsi_test(request):
     room_name = f"lino-{uuid4().hex[:10]}"
     return redirect(f"https://meet.jit.si/{room_name}")
+
+
+@login_required
+@require_POST
+def room_heartbeat(request, room_slug):
+    room = get_object_or_404(VideoRoom, room_slug=room_slug)
+
+    # ホストのみ
+    if request.user != room.host:
+        return JsonResponse({"status": "forbidden"}, status=403)
+
+    room.last_heartbeat = timezone.now()
+    room.save(update_fields=["last_heartbeat"])
+
+    return JsonResponse({"status": "ok"})
 
 
 @login_required
@@ -67,29 +85,16 @@ def room_start(request, room_slug):
 
 @login_required
 def room_join(request, room_slug):
-    room = get_object_or_404(VideoRoom, room_slug=room_slug, is_live=True)
+    room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
-    # パスワードチェック
-    if room.password:
-        if request.method == "POST":
-            if request.POST.get("password") != room.password:
-                return render(request, "videochat/password.html", {
-                    "room": room,
-                    "error": "パスワードが違います"
-                })
-        else:
-            return render(request, "videochat/password.html", {"room": room})
+    if not is_host_alive(room):
+        room.is_live = False
+        room.is_closed = True
+        room.save(update_fields=["is_live", "is_closed"])
 
-    # 申請作成（重複防止）
-    join_request, created = JoinRequest.objects.get_or_create(
-        room=room,
-        user=request.user
-    )
+        return render(request, "videochat/room_closed.html")
 
-    return render(request, "videochat/join_requested.html", {
-        "room": room,
-        "already_requested": not created,
-    })
+    return redirect(f"https://meet.jit.si/{room.room_slug}")
 
 @login_required
 def approve_participant(request, room_slug, user_id):
