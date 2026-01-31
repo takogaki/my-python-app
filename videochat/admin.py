@@ -9,6 +9,7 @@ class VideoRoomAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "room_slug",
+        "title",
         "host",
         "is_active",
         "host_alive",
@@ -22,6 +23,7 @@ class VideoRoomAdmin(admin.ModelAdmin):
 
     readonly_fields = (
         "room_slug",
+        "title",
         "host",
         "created_at",
         "last_heartbeat",
