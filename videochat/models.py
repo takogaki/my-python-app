@@ -8,6 +8,7 @@ User = settings.AUTH_USER_MODEL
 
 
 class VideoRoom(models.Model):
+    is_active = models.BooleanField(default=True)
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     room_slug = models.SlugField(unique=True)
@@ -24,11 +25,6 @@ class VideoRoom(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
-    ast_heartbeat = models.DateTimeField(
-        null=True,
-        blank=True
-    )
 
     last_heartbeat = models.DateTimeField(
         null=True,

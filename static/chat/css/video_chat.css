@@ -2,7 +2,7 @@
     width: 100%;
     max-width: 420px;
     aspect-ratio: 16 / 9;   /* 正方形 */
-    object-fit: cover;    /* はみ出しを綺麗にトリミング */
+    object-fit: contain;
     border-radius: 12px;  /* カードと揃えた角丸 */
     display: block;
     margin: 1.5em auto;   /* 中央寄せ */
