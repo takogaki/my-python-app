@@ -39,7 +39,7 @@
     </p>
     
     <p style="text-align: center;">
-        <a href="https://meet.jit.si/{{ room.room_slug }}" target="_blank" rel="noopener noreferrer" class="submit-btn"
+        <a href="{% url 'videochat:room_join' room.room_slug %}" target="_blank" rel="noopener noreferrer" class="submit-btn"
             style="display: inline-block; text-decoration: none;">
             ▶ Jitsi を開く
         </a>

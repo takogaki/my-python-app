@@ -5,6 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.text import slugify
 from django.contrib import messages
 from django.utils import timezone
+from .utils import is_room_active
 from .models import VideoRoom, RoomParticipant, JoinRequest
 from .utils import is_host_alive
 from uuid import uuid4
@@ -37,6 +38,9 @@ def room_list(request):
         is_live=True,
         is_closed=False
     ).order_by("-created_at")
+
+    for room in rooms:
+        room.is_active_now = is_room_active(room)
 
     return render(request, "videochat/room_list.html", {
         "rooms": rooms
@@ -87,12 +91,24 @@ def room_start(request, room_slug):
 def room_join(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
-    if not is_host_alive(room):
-        room.is_live = False
-        room.is_closed = True
-        room.save(update_fields=["is_live", "is_closed"])
+    unclosed_room = VideoRoom.objects.filter(
+        host=request.user,
+        is_live=True,
+        is_closed=False
+    ).exclude(id=room.id).first()
 
-        return render(request, "videochat/room_closed.html")
+    # Jitsi を開こうとした事実は必ず記録する
+    request.session["has_opened_jitsi"] = True
+
+    if unclosed_room:
+        return render(
+            request,
+            "videochat/join_redirect.html",
+            {
+                "room": room,
+                "unclosed_room": unclosed_room,
+            }
+        )
 
     return redirect(f"https://meet.jit.si/{room.room_slug}")
 
@@ -165,10 +181,24 @@ def room_end(request, room_slug):
     if room.host != request.user:
         return HttpResponseForbidden("配信者のみ終了できます")
 
-    if request.method == "POST":
-        room.is_live = False
-        room.is_closed = True
-        room.save()
-        return redirect("videochat:room_list")
+    room.is_live = False
+    room.is_closed = True
+    room.save()
+
+    # 終了したら必ずフラグを消す
+    request.session.pop("has_opened_jitsi", None)
+
+    return redirect("videochat:room_list")
+
+@login_required
+def force_close(request, room_id):
+    room = get_object_or_404(VideoRoom, id=room_id, host=request.user)
+
+    room.is_live = False
+    room.is_closed = True
+    room.save()
+
+    # 強制終了でも必ずフラグを消す
+    request.session.pop("has_opened_jitsi", None)
 
     return redirect("videochat:room_list")

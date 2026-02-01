@@ -257,6 +257,11 @@ ADMINS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
+TEMPLATES[0]["OPTIONS"]["context_processors"] += [
+    'videochat.context_processors.unclosed_room_warning',
+]
+
+
 # =========================
 # Content Security Policy (django-csp 4.x+)
 # =========================

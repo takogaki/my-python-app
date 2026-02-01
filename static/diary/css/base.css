@@ -49,6 +49,13 @@ body {
                  "Noto Sans JP", sans-serif;
     background: #f7f7f9;
     color: #333;
+    /* 通常は何もズラさない */
+    padding-top: 0;
+}
+
+/* warning-bar がある時だけ */
+body.has-warning {
+    padding-top: 56px; /* warning-bar の高さ */
 }
 
 /* =========================

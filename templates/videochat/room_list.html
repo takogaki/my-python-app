@@ -43,8 +43,12 @@
                                 {% endif %}
                             </small>
                         </span>
-        
                     </p>
+
+                    {% if room.is_active %}
+                    <span class="room-status">接続中</span>
+                    {% endif %}
+                    
                     <a href="{% url 'videochat:room_join' room.room_slug %}" target="_blank">
                         ▶ 参加する
                     </a>
@@ -52,23 +56,11 @@
                 </div>
         
                 <!-- 右側：サムネイル（横長） -->
-                <div>
+                <div class="room-list-thumbnail">
                     {% if room.thumbnail %}
-                    <img src="{{ room.thumbnail.url }}" class="host-icon avatar-clickable" alt="サムネイル" style="
-                        width: 100%;
-                        max-width: 240px;
-                        aspect-ratio: 16/9;
-                        object-fit: cover;
-                        border-radius: 8px;
-                        background-color: #f5f5f5;
-                    ">
+                    <img src="{{ room.thumbnail.url }}" class="avatar-clickable" alt="サムネイル">
                     {% else %}
-                    <img src="{% static 'img/default_thumbnail.jpg' %}" class="host-icon avatar-clickable" alt="デフォルトサムネイル" style="
-                                width: 240px;
-                                height: 135px;
-                                object-fit: cover;
-                                border-radius: 8px;
-                            ">
+                    <img src="{% static 'img/default_thumbnail.jpg' %}" class="host-icon avatar-clickable" alt="デフォルトサムネイル">
                     {% endif %}
                 </div>
         

@@ -9,6 +9,27 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* 右カラム（固定） */
+.room-list-thumbnail {
+    max-width: 240px;
+    aspect-ratio: 16 / 9;   /* ← ここで高さが確定 */
+    flex-shrink: 0;
+    display: flex;
+}
+
+/* 画像そのもの */
+.room-card .room-list-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #f5f5f5;
+}
+
+/* 左だけ伸ばす */
+.room-card-body > div:first-child {
+    flex: 1;
+}
+
 
 
 .room-host {
@@ -111,4 +132,48 @@
 
 .room-host-name small {
     display: block; /* 小さい文字を下に配置 */
+}
+
+
+
+/* 配信未終了 警告バー */
+/* 外側：画面上部に固定 */
+.warning-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10000;
+
+    background-color: #fff3cd;
+    border-bottom: 1px solid #ffeeba;
+}
+
+/* 内側：card 幅 */
+.warning-bar-inner {
+    max-width: 540px;          /* ← card と同じ値にする */
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 16px;
+
+    color: #856404;
+    font-size: 14px;
+}
+
+/* ボタン */
+.warning-action {
+    background-color: #d39e00;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.warning-action:hover {
+    background-color: #b38a00;
 }

@@ -44,7 +44,7 @@
     <meta name="description" content="送ってもいい。書いてもいい。話してもいい。見ているだけでもいい。何もしなくてもいい。SPIRYTUSは、いつでもここにあります。">
 </head>
 
-<body>
+<body class="{% if unclosed_room %}has-warning{% endif %}">
     <header class="site-header">
         <div class="header-inner">
             <h1 class="site-title">
@@ -66,6 +66,17 @@
             </div>
         </div>
     </header>
+
+    {% if unclosed_room %}
+    <div class="warning-bar">
+        <div class="warning-bar-inner">
+            <span>⚠️ 前回の配信が終了していません</span>
+            <a href="{% url 'videochat:force_close' unclosed_room.id %}" class="warning-action">
+                配信を終了する
+            </a>
+        </div>
+    </div>
+    {% endif %}
 
     <main class="container">
         {% block body %}
