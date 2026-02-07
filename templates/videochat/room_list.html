@@ -49,9 +49,16 @@
                     <span class="room-status">接続中</span>
                     {% endif %}
                     
+                    {% if room.password %}
+                    <a href="{% url 'videochat:room_password' room.room_slug %}" target="_blank">
+                        🔒 参加する
+                    </a>
+                    {% else %}
                     <a href="{% url 'videochat:room_join' room.room_slug %}" target="_blank">
                         ▶ 参加する
                     </a>
+                    {% endif %}
+                    
                     <hr class="room-divider">
                 </div>
         

@@ -177,3 +177,42 @@
 .warning-action:hover {
     background-color: #b38a00;
 }
+
+
+
+/* パスワード画面 */
+.password-card {
+    max-width: 420px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.password-room-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.password-form input {
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.form-error {
+    color: #c0392b;
+    font-size: 14px;
+}
+
+.password-note {
+    margin-top: 16px;
+    font-size: 12px;
+    color: #777;
+}

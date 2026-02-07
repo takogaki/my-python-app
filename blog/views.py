@@ -1,15 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from django.db import models
+from django.db.models import Count
+from django.urls import reverse
+from django.contrib.auth import get_user_model
 from faker import Faker
 from .forms import CommentForm, PostForm
 from .models import Post, Comment
-from django.db.models import Count
 from notifications.models import Notification
-from django.urls import reverse
 import uuid
 from .utils import get_device_id
-from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
@@ -97,58 +99,94 @@ def frontpage(request):
 # =======================
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
+    comment = None
 
-    parent_comments = Comment.objects.filter(
-        post=post, parent__isnull=True
-    ).order_by("-posted_date")
+    # 親コメント
+    parent_comments = (
+        Comment.objects
+        .filter(post=post, parent__isnull=True)
+        .order_by("-posted_date")
+        .prefetch_related(
+            models.Prefetch(
+                "replies",
+                queryset=Comment.objects.order_by("-posted_date")
+            )
+        )
+    )
+    
 
     # =======================
-    # コメント・返信のリンク可否フラグ
+    # 表示名・リンク可否設定
     # =======================
-    for comment in parent_comments:
-        if comment.author is None:
-            # 未登録ユーザー
-            comment.display_name = comment.name  # 未登録-xxxx
-            comment.can_link = False
+    # =======================
+    # 表示名・リンク可否設定
+    # =======================
+    for parent_comment in parent_comments:
 
-        elif comment.author.is_superuser:
-            # 管理人（表示は username、リンク不可）
-            comment.display_name = comment.author.username
-            comment.can_link = False
+        # ===== 親コメント =====
+        if parent_comment.author is None:
+            parent_comment.display_name = parent_comment.name
+            parent_comment.can_link = False
 
-        elif not comment.author.is_active:
-            # 退会ユーザー
-            comment.display_name = "退会ユーザー"
-            comment.can_link = False
+        elif parent_comment.author.is_superuser:
+            parent_comment.display_name = parent_comment.author.username
+            parent_comment.can_link = False
 
-        else:
-            # 通常ユーザー
-            comment.display_name = comment.author.username
-            comment.can_link = True
-
-    # ===== 返信 =====
-    for reply in comment.replies.all():
-        if reply.reply_to is None:
-            reply.display_name = reply.name
-            reply.can_link = False
-
-        elif reply.reply_to.is_superuser:
-            reply.display_name = reply.reply_to.username
-            reply.can_link = False
-
-        elif not reply.reply_to.is_active:
-            reply.display_name = "退会ユーザー"
-            reply.can_link = False
+        elif not parent_comment.author.is_active:
+            parent_comment.display_name = "退会ユーザー"
+            parent_comment.can_link = False
 
         else:
-            reply.display_name = reply.reply_to.username
-            reply.can_link = True
+            parent_comment.display_name = parent_comment.author.username
+            parent_comment.can_link = True
 
+        # ===== 返信 =====
+        for reply in parent_comment.replies.all():
+
+            # ---- 書いた人（左：A）----
+            if reply.author is None:
+                reply.author_display = reply.name
+                reply.author_can_link = False
+
+            elif reply.author.is_superuser:
+                reply.author_display = reply.author.username
+                reply.author_can_link = False
+
+            elif not reply.author.is_active:
+                reply.author_display = "退会ユーザー"
+                reply.author_can_link = False
+
+            else:
+                reply.author_display = reply.author.username
+                reply.author_can_link = True
+
+            # ---- 返信先（右：B）----
+            if reply.reply_to:
+                if reply.reply_to.is_superuser:
+                    reply.reply_to_display = reply.reply_to.username
+                    reply.reply_to_can_link = False
+
+                elif not reply.reply_to.is_active:
+                    reply.reply_to_display = "退会ユーザー"
+                    reply.reply_to_can_link = False
+
+                else:
+                    reply.reply_to_display = reply.reply_to.username
+                    reply.reply_to_can_link = True
+
+            else:
+                # reply_to が無い場合は「親コメントの投稿者」
+                reply.reply_to_display = parent_comment.display_name
+                reply.reply_to_can_link = parent_comment.can_link
+
+    # =======================
+    # フォーム
+    # =======================
     form = CommentForm(user=request.user)
 
     if request.method == "POST":
         parent_id = request.POST.get("parent_id")
-        parent = Comment.objects.get(id=parent_id) if parent_id else None
+        parent = Comment.objects.filter(id=parent_id).first()
 
         form = CommentForm(
             request.POST,
@@ -170,32 +208,28 @@ def post_detail(request, slug):
                 device_id = get_device_id(request)
                 comment.name = f"未ログイン-{device_id[:6]}"
 
-            # 🔑 reply_to（User）をセット
+            # 返信先ユーザー
             reply_to_id = request.POST.get("reply_to")
             if reply_to_id:
                 comment.reply_to = User.objects.filter(id=reply_to_id).first()
 
-            # 🔑 親コメント
+            # 親コメント
             if parent:
                 comment.parent = parent.root_parent
 
             comment.save()
 
             # =======================
-            # 🔔 通知（recipient が存在する場合のみ）
+            # 🔔 通知
             # =======================
             if request.user.is_authenticated:
                 recipient = None
 
-                # 返信なら「返信先ユーザ」
                 if comment.reply_to:
                     recipient = comment.reply_to
-
-                # 通常コメントなら「投稿者」
                 elif post.author:
                     recipient = post.author
 
-                # 自分自身への通知は送らない
                 if recipient and recipient != request.user:
                     Notification.objects.create(
                         recipient=recipient,

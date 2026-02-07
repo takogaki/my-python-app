@@ -46,6 +46,7 @@ def room_list(request):
         "rooms": rooms
     })
 
+# ルーム作成
 @login_required
 def start_room(request):
     if request.method == "POST":
@@ -67,23 +68,43 @@ def start_room(request):
 
         return redirect("videochat:room_start", room_slug=room.room_slug)
 
-    return render(request, "videochat/start.html")
+    return render(request, "videochat/room_create.html")
 
 
+
+# 配信管理（Jitsi）
 @login_required
 def room_start(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
-    if room.host != request.user:
-        return HttpResponseForbidden("配信者のみ開始できます")
-
-    room.is_live = True
-    room.is_closed = False
-    room.save()
+    # 配信者以外は入れない
+    if request.user != room.host:
+        return HttpResponseForbidden("配信者のみ")
 
     return render(request, "videochat/room_start.html", {
-        "room": room
+        "room": room,
     })
+
+
+@login_required
+def room_password(request, room_slug):
+    room = get_object_or_404(VideoRoom, room_slug=room_slug)
+
+    # 念のため：配信者はスキップ
+    if request.user == room.host:
+        return redirect("videochat:room_start", room_slug=room.room_slug)
+
+    if request.method == "POST":
+        if request.POST.get("password") == room.password:
+            request.session[f"room_auth_{room.id}"] = True
+            return redirect("videochat:room_start", room_slug=room.room_slug)
+        else:
+            return render(request, "videochat/room_password.html", {
+                "room": room,
+                "error": "パスワードが違います"
+            })
+
+    return render(request, "videochat/room_password.html", {"room": room})
 
 
 
@@ -91,26 +112,21 @@ def room_start(request, room_slug):
 def room_join(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
-    unclosed_room = VideoRoom.objects.filter(
-        host=request.user,
-        is_live=True,
-        is_closed=False
-    ).exclude(id=room.id).first()
+    # 配信者は管理画面へ
+    if request.user == room.host:
+        return redirect("videochat:room_start", room_slug=room.room_slug)
 
-    # Jitsi を開こうとした事実は必ず記録する
-    request.session["has_opened_jitsi"] = True
+    # 🔐 パスワード付きルーム
+    if room.password:
+        if not request.session.get(f"room_auth_{room.id}", False):
+            return redirect("videochat:room_password", room_slug=room.room_slug)
 
-    if unclosed_room:
-        return render(
-            request,
-            "videochat/join_redirect.html",
-            {
-                "room": room,
-                "unclosed_room": unclosed_room,
-            }
-        )
-
-    return redirect(f"https://meet.jit.si/{room.room_slug}")
+    # ✅ ここで初めて Jitsi を render
+    return render(request, "videochat/room_join.html", {
+        "room": room,
+        "jitsi_room_name": f"videochat-{room.room_slug}",
+        "user_name": request.user.username,
+    })
 
 @login_required
 def approve_participant(request, room_slug, user_id):
@@ -128,7 +144,10 @@ def approve_participant(request, room_slug, user_id):
     participant.is_approved = True
     participant.save()
 
-    return redirect("videochat:room_manage", room_slug=room_slug)
+    return render(request, "videochat/room_join.html", {
+        "room": room,
+        "jitsi_room_name": f"videochat-{room.room_slug}",
+    })
 
 
 @login_required

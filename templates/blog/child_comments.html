@@ -1,11 +1,12 @@
-{% load comment_tags %}
-{% load youtube_extras %}
 {% load static %}
+{% load youtube_extras %}
 
-{% for comment in comments %}
+{% for comment in parent_comments %}
 <div id="comment-{{ comment.id }}" class="comment parent">
 
-    <!-- 親コメント本文 -->
+    <!-- =====================
+        親コメント
+    ===================== -->
     <p class="post-content">
         {% if comment.can_link %}
         <a href="{% url 'accounts:user_detail' comment.author.username %}">
@@ -20,38 +21,68 @@
         {{ comment.body|linebreaksbr }}
     </p>
 
+    {% if comment.image %}
+    <img src="{{ comment.image.url }}" class="comment-media-thumb">
+    {% endif %}
+
+    {% include "blog/video_embed.html" with obj=comment %}
+
     {% if comment.replies.count %}
     <button type="button" class="replies-toggle" data-comment-id="{{ comment.id }}">
         返信を見る（{{ comment.replies.count }}件）
     </button>
     {% endif %}
 
-    <div class="media-wrapper">
-        {% if comment.image %}
-        <img src="{{ comment.image.url }}" class="comment-media-thumb">
-        {% endif %}
-        {% include "blog/video_embed.html" with obj=comment %}
-    </div>
-
     <!-- =====================
         子コメント（返信）
-    ====================== -->
+    ===================== -->
     <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
 
         {% for reply in comment.replies.all %}
         <div id="comment-{{ reply.id }}" class="comment reply">
 
-            <p class="post-content">
-                {% if reply.can_link %}
-                <a href="{% url 'accounts:user_detail' reply.author.username %}">
-                    {{ reply.display_name }}
-                </a>
-                {% else %}
-                <span class="reply-author guest">
-                    {{ reply.display_name }}
+            <!-- 返信ヘッダー -->
+            <p class="reply-header">
+            
+                <!-- ===== 書いた人（左）===== -->
+                <span class="reply-from">
+                    {% if reply.author %}
+                    {% if reply.author.is_superuser %}
+                    {{ reply.author.username }}
+                    {% elif reply.author.is_active %}
+                    <a href="{% url 'accounts:user_detail' reply.author.username %}">
+                        {{ reply.author.username }}
+                    </a>
+                    {% else %}
+                    退会ユーザー
+                    {% endif %}
+                    {% else %}
+                    {{ reply.name }}
+                    {% endif %}
                 </span>
-                {% endif %}
-                <br>
+            
+                <span class="reply-arrow"> >>>> </span>
+            
+                <!-- ===== 返信先（右）===== -->
+                <span class="reply-to">
+                    {% if reply.reply_to %}
+                    {% if reply.reply_to.is_superuser %}
+                    {{ reply.reply_to.username }}
+                    {% elif reply.reply_to.is_active %}
+                    <a href="{% url 'accounts:user_detail' reply.reply_to.username %}">
+                        {{ reply.reply_to.username }}
+                    </a>
+                    {% else %}
+                    退会ユーザー
+                    {% endif %}
+                    {% else %}
+                    {{ comment.display_name }}
+                    {% endif %}
+                </span>
+            
+            </p>
+
+            <p class="post-content">
                 {{ reply.body|linebreaksbr }}
             </p>
 
@@ -61,19 +92,29 @@
 
             {% include "blog/video_embed.html" with obj=reply %}
 
-            <!-- 返信への返信 -->
-            <button type="button" class="reply-toggle" data-reply-id="{{ reply.id }}">
-                返信
-            </button>
-
-            <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}">
+            <!-- 返信への返信フォーム -->
+            <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" class="reply-form-ui">
                 {% csrf_token %}
                 <input type="hidden" name="parent_id" value="{{ comment.id }}">
                 {% if reply.author %}
                 <input type="hidden" name="reply_to" value="{{ reply.author.id }}">
                 {% endif %}
+
+                <label class="form-label">body:</label>
                 {{ form.body }}
-                <button type="submit">返信</button>
+
+                <label class="form-label">image:</label>
+                {{ form.image }}
+
+                <label class="form-label">video url:</label>
+                {{ form.video_url }}
+
+                <label class="form-label">video type:</label>
+                {{ form.video_type }}
+
+                <button type="submit" class="reply-submit-btn">
+                    返信を投稿
+                </button>
             </form>
 
         </div>
@@ -81,24 +122,39 @@
     </div>
 
     <!-- =====================
-         親コメントへの返信
-    ====================== -->
-    <button type="button" class="reply-toggle" data-reply-id="{{ comment.id }}">
+        親コメントへの返信フォーム
+    ===================== -->
+    <button type="button" class="reply-toggle" data-id="{{ comment.id }}">
         返信
     </button>
 
-    <div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none; margin-left:20px;">
-        <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" enctype="multipart/form-data">
+    <div id="reply-form-comment-{{ comment.id }}" class="reply-form" style="display:none;">
+
+        <p class="reply-header">
+            >>> {{ comment.display_name }} に返信
+        </p>
+
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
             <input type="hidden" name="parent_id" value="{{ comment.id }}">
-            {% if comment.author %}
-            <input type="hidden" name="reply_to" value="{{ comment.author.id }}">
-            {% endif %}
-            <button type="submit" class="submit-btn">送信</button>
+
+            <label class="form-label">body:</label>
+            {{ form.body }}
+
+            <label class="form-label">image:</label>
+            {{ form.image }}
+
+            <label class="form-label">video url:</label>
+            {{ form.video_url }}
+
+            <label class="form-label">video type:</label>
+            <div class="form-group video-type-group">
+                {{ form.video_type }}
+            </div>
+
+            <button type="submit">送信</button>
         </form>
     </div>
-
 </div>
 <hr>
 {% empty %}
