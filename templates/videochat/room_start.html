@@ -20,7 +20,7 @@
     <p class="page-description">
         これから配信するルーム情報です。
     </p>
-    
+
     <p style="text-align: center;">
         <strong>配信タイトル</strong><br>
         {{ room.title }}
@@ -31,61 +31,94 @@
     {% else %}
     <img src="{% static 'img/default_thumbnail.jpg' %}" class="room-thumbnail" alt="デフォルトサムネイル">
     {% endif %}
-    
+
     <hr>
-    
+
     <p class="page-description">
         下のボタンから Jitsi を開いて配信を開始してください。
     </p>
-    
+
     <p style="text-align: center;">
-        <a href="{% url 'videochat:room_join' room.room_slug %}" target="_blank" rel="noopener noreferrer" class="submit-btn"
+        <a href="{% url 'videochat:room_start' room.room_slug %}" rel="noopener noreferrer" class="submit-btn"
             style="display: inline-block; text-decoration: none;">
             ▶ Jitsi を開く
         </a>
     </p>
 
     <hr>
-    
+
     <form method="post" action="{% url 'videochat:room_end' room.room_slug %}">
         {% csrf_token %}
-    <div style="margin-top: -2em; font-size: 0.9em; color: #555;">
-        <h3 style="text-align: center;">⚠ ご注意ください</h3>
-        <button type="submit" class="submit-btn">
-            🛑 配信終了
-        </button>
-        <ul>
-            <li>
-                <strong>先に Jitsi 側で配信を終了</strong>してください。
-                （赤い電話ボタン）
-            </li>
-            <li>
-                この「配信終了」ボタンは、
-                <strong>Jitsi上の配信を止めるものではありません</strong>。
-            </li>
-            <li>
-                この操作は、
-                <strong>配信ルームを一覧（配信中リスト）から削除するためのもの</strong>です。
-            </li>
-            <li>
-                配信を完全に終了する場合は、
-                <strong>Jitsi終了 → このボタン</strong>の順で操作してください。
-            </li>
-        </ul>
-    </div>
+        <div style="margin-top: -2em; font-size: 0.9em; color: #555;">
+            <h3 style="text-align: center;">⚠ ご注意ください</h3>
+
+            <button type="submit" class="submit-btn">
+                🛑 配信終了
+            </button>
+
+            <ul>
+                <li><strong>先に Jitsi 側で配信を終了</strong>してください。（赤い電話ボタン）</li>
+                <li>この「配信終了」ボタンは <strong>Jitsi上の配信を止めるものではありません</strong>。</li>
+                <li>この操作は <strong>配信ルームを一覧（配信中リスト）から削除するため</strong>のものです。</li>
+                <li><strong>Jitsi終了 → このボタン</strong>の順で操作してください。</li>
+            </ul>
+        </div>
     </form>
 
 </div>
 
+<!-- Jitsi 表示エリア -->
+<div id="jitsi-container" style="width:100%; height:90vh;"></div>
+
+<!-- CSRF token -->
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+<!-- Django → JS 変数受け渡し -->
 <script>
+    const ROOM_SLUG = "{{ room.room_slug|escapejs }}";
+    const USERNAME = "{{ request.user.username|escapejs }}";
+    const ROOM_PASSWORD = "{{ room.password|default:''|escapejs }}";
+</script>
+
+<!-- Jitsi API -->
+<script src="https://meet.jit.si/external_api.js"></script>
+
+<script>
+    /* global JitsiMeetExternalAPI */
+
+    const api = new JitsiMeetExternalAPI("meet.jit.si", {
+        roomName: "videochat-" + ROOM_SLUG,
+        parentNode: document.getElementById("jitsi-container"),
+        userInfo: {
+            displayName: USERNAME
+        },
+        configOverwrite: {
+            prejoinPageEnabled: false
+        }
+    });
+
+    // 配信者が必ずパスワードを設定
+    api.addEventListener('videoConferenceJoined', () => {
+        if (ROOM_PASSWORD) {
+            api.executeCommand('password', ROOM_PASSWORD);
+        }
+    });
+</script>
+
+<script>
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute('content');
+
+    // ハートビート（15秒ごと）
     setInterval(() => {
         fetch("{% url 'videochat:room_heartbeat' room.room_slug %}", {
             method: "POST",
             headers: {
-                "X-CSRFToken": "{{ csrf_token }}"
+                "X-CSRFToken": csrfToken
             }
         });
-    }, 15000); // 15秒ごと
+    }, 15000);
 </script>
 
 {% endblock %}
