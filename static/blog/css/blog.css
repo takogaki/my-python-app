@@ -648,3 +648,9 @@
     position: relative;
     top: 0;
 }
+
+.radio-text {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
