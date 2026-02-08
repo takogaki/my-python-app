@@ -349,6 +349,7 @@
     margin-bottom: 1rem;
 }
 
+
 /* =========================
    戻るボタン
 ========================= */
@@ -659,4 +660,35 @@
 .radio-text {
     position: relative;
     top: -1px;
+}
+
+
+/* =========================
+   Android専用 file input はみ出し完全防止
+========================= */
+
+/* file input 本体 */
+.reply-form-ui input[type="file"] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Android Chrome / WebView 対策 */
+@media (max-width: 600px) {
+    .reply-form-ui input[type="file"] {
+        font-size: 13px;
+        padding-right: 6px;
+    }
+}
+
+@media (max-width: 600px) {
+    .reply-form-ui input[type="file"]::-webkit-file-upload-button {
+        max-width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 }

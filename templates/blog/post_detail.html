@@ -17,15 +17,22 @@
 
         <div class="post-meta">
             <small>🕒 {{ post.posted_date }}</small><br>
-                {% if post.author %}
-                <a href="{% url 'accounts:user_detail' post.author.username %}">
-                    {{ post.author.username }}
-                </a>
-                {% else %}
-                <span class="guest-name">
-                    {{ post.name }}
-                </span>
-                {% endif %}
+        
+            {% if post.author %}
+            {% if post.author.is_superuser %}
+            <span class="admin-name">
+                {{ post.author.username }}
+            </span>
+            {% else %}
+            <a href="{% url 'accounts:user_detail' post.author.username %}">
+                {{ post.author.username }}
+            </a>
+            {% endif %}
+            {% else %}
+            <span class="guest-name">
+                {{ post.name }}
+            </span>
+            {% endif %}
         </div>
 
         <h1 class="post-title">{{ post.title }}</h1>
