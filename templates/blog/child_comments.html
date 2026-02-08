@@ -148,16 +148,9 @@
             {{ form.video_url }}
 
             <label class="form-label">video type:</label>
-            <ul class="video-type-group">
-                {% for radio in form.video_type %}
-                <li>
-                    <label>
-                        {{ radio.tag }}
-                        <span class="radio-text">{{ radio.choice_label }}</span>
-                    </label>
-                </li>
-                {% endfor %}
-            </ul>
+            <div class="form-group video-type-group">
+                {{ form.video_type }}
+            </div>
 
             <button type="submit">送信</button>
         </form>
