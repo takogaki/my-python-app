@@ -90,14 +90,17 @@ def room_start(request, room_slug):
 def room_password(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
-    # 念のため：配信者はスキップ
+    # 配信者は管理画面へ
     if request.user == room.host:
         return redirect("videochat:room_start", room_slug=room.room_slug)
 
     if request.method == "POST":
         if request.POST.get("password") == room.password:
             request.session[f"room_auth_{room.id}"] = True
-            return redirect("videochat:room_start", room_slug=room.room_slug)
+
+            # 🔥 ここが最重要：視聴者は room_join
+            return redirect("videochat:room_join", room_slug=room.room_slug)
+
         else:
             return render(request, "videochat/room_password.html", {
                 "room": room,
@@ -105,7 +108,6 @@ def room_password(request, room_slug):
             })
 
     return render(request, "videochat/room_password.html", {"room": room})
-
 
 
 @login_required
