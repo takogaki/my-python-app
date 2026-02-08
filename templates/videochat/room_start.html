@@ -38,9 +38,9 @@
         下のボタンから Jitsi を開いて配信を開始してください。
     </p>
 
-    <p style="text-align: center;">
-        <a href="{% url 'videochat:room_start' room.room_slug %}" rel="noopener noreferrer" class="submit-btn"
-            style="display: inline-block; text-decoration: none;">
+    <p class="jitsi-btn-wrapper">
+        <a href="https://meet.jit.si/videochat-{{ room.room_slug }}#userInfo.displayName={{ request.user.username }}"
+            target="_blank" rel="noopener noreferrer" class="submit-btn start-jitsi-btn">
             ▶ Jitsi を開く
         </a>
     </p>
@@ -66,59 +66,5 @@
     </form>
 
 </div>
-
-<!-- Jitsi 表示エリア -->
-<div id="jitsi-container" style="width:100%; height:90vh;"></div>
-
-<!-- CSRF token -->
-<meta name="csrf-token" content="{{ csrf_token }}">
-
-<!-- Django → JS 変数受け渡し -->
-<script>
-    const ROOM_SLUG = "{{ room.room_slug|escapejs }}";
-    const USERNAME = "{{ request.user.username|escapejs }}";
-    const ROOM_PASSWORD = "{{ room.password|default:''|escapejs }}";
-</script>
-
-<!-- Jitsi API -->
-<script src="https://meet.jit.si/external_api.js"></script>
-
-<script>
-    /* global JitsiMeetExternalAPI */
-
-    const api = new JitsiMeetExternalAPI("meet.jit.si", {
-        roomName: "videochat-" + ROOM_SLUG,
-        parentNode: document.getElementById("jitsi-container"),
-        userInfo: {
-            displayName: USERNAME
-        },
-        configOverwrite: {
-            prejoinPageEnabled: false
-        }
-    });
-
-    // 配信者が必ずパスワードを設定
-    api.addEventListener('videoConferenceJoined', () => {
-        if (ROOM_PASSWORD) {
-            api.executeCommand('password', ROOM_PASSWORD);
-        }
-    });
-</script>
-
-<script>
-    const csrfToken = document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute('content');
-
-    // ハートビート（15秒ごと）
-    setInterval(() => {
-        fetch("{% url 'videochat:room_heartbeat' room.room_slug %}", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken
-            }
-        });
-    }, 15000);
-</script>
 
 {% endblock %}

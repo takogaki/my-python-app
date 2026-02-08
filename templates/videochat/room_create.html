@@ -14,17 +14,25 @@
 </div>
 
 <div class="post-form-card">
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="room-create-form">
         {% csrf_token %}
 
-        <label class="form-label">配信タイトル</label>
-        <input type="text" name="title" required>
+        <div class="form-group">
+            <label class="form-label">配信タイトル</label>
+            <input type="text" name="title" required placeholder="例：雑談しながら作業します">
+        </div>
 
-        <label class="form-label">パスワード（任意）</label>
-        <input type="text" name="password">
+        <div class="form-group">
+            <label class="form-label">パスワード（任意）</label>
+            <input type="text" name="password" placeholder="設定すると視聴者は入力必須">
+            <p class="form-help">※ 未設定の場合は誰でも参加できます</p>
+        </div>
 
-        <label class="form-label">サムネイル</label>
-        <input type="file" name="thumbnail">
+        <div class="form-group">
+            <label class="form-label">サムネイル</label>
+            <input type="file" name="thumbnail" accept="image/*">
+            <p class="form-help">配信一覧に表示される画像です</p>
+        </div>
 
         <button type="submit" class="submit-btn">
             配信ルームを作成

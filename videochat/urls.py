@@ -13,6 +13,7 @@ urlpatterns = [
     path("<slug:room_slug>/start/", views.room_start, name="room_start"),
     path("room/<slug:room_slug>/password/", views.room_password, name="room_password"),
     path("join/<slug:room_slug>/", views.room_join, name="room_join"),
+    path("password/<slug:room_slug>/", views.room_password, name="room_password"),
     path("videochat/<slug:room_slug>/heartbeat/", views.room_heartbeat, name="room_heartbeat"),
     path("<slug:room_slug>/manage/", views.room_manage, name="room_manage"),
     path("<slug:room_slug>/approve/<int:user_id>/", views.approve_participant, name="approve_participant"),

@@ -110,24 +110,40 @@ def room_password(request, room_slug):
     return render(request, "videochat/room_password.html", {"room": room})
 
 
-@login_required
 def room_join(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
-    # 配信者は管理画面へ
-    if request.user == room.host:
-        return redirect("videochat:room_start", room_slug=room.room_slug)
+    # パスワード付きなのに未認証なら弾く
+    if room.password and not request.session.get(f"room_auth_{room_slug}"):
+        return redirect("videochat:room_password", room_slug=room_slug)
 
-    # 🔐 パスワード付きルーム
-    if room.password:
-        if not request.session.get(f"room_auth_{room.id}", False):
-            return redirect("videochat:room_password", room_slug=room.room_slug)
+    jitsi_url = (
+        f"https://meet.jit.si/videochat-{room.room_slug}"
+        f"#userInfo.displayName={request.user.username}"
+    )
+    return redirect(jitsi_url)
 
-    # ✅ ここで初めて Jitsi を render
-    return render(request, "videochat/room_join.html", {
+
+def room_password(request, room_slug):
+    room = get_object_or_404(VideoRoom, room_slug=room_slug)
+
+    if not room.password:
+        return redirect("videochat:room_join", room_slug=room_slug)
+
+    error = None
+
+    if request.method == "POST":
+        input_password = request.POST.get("password")
+
+        if input_password == room.password:
+            request.session[f"room_auth_{room_slug}"] = True
+            return redirect("videochat:room_join", room_slug=room_slug)
+        else:
+            error = "パスワードが違います"
+
+    return render(request, "videochat/room_password.html", {
         "room": room,
-        "jitsi_room_name": f"videochat-{room.room_slug}",
-        "user_name": request.user.username,
+        "error": error,
     })
 
 @login_required
