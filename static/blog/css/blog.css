@@ -656,7 +656,7 @@
 }
 
 /* OS差（特に iOS Safari）で出る場合のみ👇 */
-.radio-text {
+/* .radio-text {
     position: relative;
     top: -1px;
-}
+} */
