@@ -38,3 +38,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+// blog 画像のモーダル表示
+document.addEventListener("DOMContentLoaded", () => {
+
+    const modal = document.getElementById("media-modal");
+    const content = document.getElementById("media-content");
+
+    // 画像クリック
+    document.querySelectorAll(".post-media-thumb, .comment-media-thumb").forEach(img => {
+        img.addEventListener("click", () => {
+            content.innerHTML = `<img src="${img.src}">`;
+            modal.style.display = "flex";
+        });
+    });
+
+    // モーダル閉じる
+    modal.addEventListener("click", () => {
+        modal.style.display = "none";
+        content.innerHTML = "";
+    });
+
+});
