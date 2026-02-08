@@ -11,4 +11,9 @@ def unclosed_room_warning(request):
         is_closed=False
     ).order_by("-created_at").first()
 
+    if not room:
+        # 🔥 フラグも掃除する
+        request.session.pop("has_opened_jitsi", None)
+        return {}
+
     return {"unclosed_room": room}
