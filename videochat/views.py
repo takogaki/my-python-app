@@ -85,6 +85,7 @@ def room_start(request, room_slug):
         "room": room,
     })
 
+@login_required
 def room_join(request, room_slug):
     room = get_object_or_404(VideoRoom, room_slug=room_slug)
 
@@ -119,27 +120,6 @@ def room_password(request, room_slug):
     return render(request, "videochat/room_password.html", {
         "room": room,
         "error": error,
-    })
-
-@login_required
-def approve_participant(request, room_slug, user_id):
-    room = get_object_or_404(VideoRoom, room_slug=room_slug)
-
-    if room.host != request.user:
-        return HttpResponseForbidden()
-
-    participant = get_object_or_404(
-        RoomParticipant,
-        room=room,
-        user_id=user_id,
-    )
-
-    participant.is_approved = True
-    participant.save()
-
-    return render(request, "videochat/room_join.html", {
-        "room": room,
-        "jitsi_room_name": f"videochat-{room.room_slug}",
     })
 
 

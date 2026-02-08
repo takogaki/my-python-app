@@ -14,8 +14,8 @@ DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
 # DEBUG = True
 
-DEBUG = False
-ALLOWED_HOSTS = ["*"]  # 一時的
+# DEBUG = False
+# ALLOWED_HOSTS = ["*"]  # 一時的
 
 # ★ SECRET_KEY は Render の Environment Variables からのみ取得
 # ★ fallback / dotenv / 二重定義は一切しない
