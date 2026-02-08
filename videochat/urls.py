@@ -19,4 +19,5 @@ urlpatterns = [
     path("<slug:room_slug>/approve/<int:user_id>/", views.approve_participant, name="approve_participant"),
     path("<slug:room_slug>/end/", views.room_end, name="room_end"),
     path("force-close/<int:room_id>/", views.force_close, name="force_close"),
+    path("open-jitsi/<slug:room_slug>/", views.mark_jitsi_opened, name="mark_jitsi_opened"),
 ]

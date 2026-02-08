@@ -39,8 +39,8 @@
     </p>
 
     <p class="jitsi-btn-wrapper">
-        <a href="https://meet.jit.si/videochat-{{ room.room_slug }}#userInfo.displayName={{ request.user.username }}"
-            target="_blank" rel="noopener noreferrer" class="submit-btn start-jitsi-btn">
+        <a href="{% url 'videochat:mark_jitsi_opened' room.room_slug %}" target="_blank" rel="noopener noreferrer"
+            class="submit-btn start-jitsi-btn">
             ▶ Jitsi を開く
         </a>
     </p>
