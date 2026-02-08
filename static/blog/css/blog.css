@@ -615,7 +615,7 @@
    video type 専用（最終確定版）
 ========================= */
 
-.video-type-group {
+.video-type-group ul {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -646,17 +646,11 @@
     margin: 0;
     padding: 0;
     position: relative;
-    top: 0; /* ← 基本は0でOK */
+    top: 0;
 }
 
 .radio-text {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     line-height: 1;
 }
-
-/* OS差（特に iOS Safari）で出る場合のみ👇 */
-/* .radio-text {
-    position: relative;
-    top: -1px;
-} */
