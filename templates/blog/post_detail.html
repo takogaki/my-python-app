@@ -35,6 +35,19 @@
             {% endif %}
         </div>
 
+        {% if user.is_authenticated and post.author != user %}
+        <div class="save-post-float">
+            <form method="post" action="{% url 'blog:toggle_save_post' post.id %}">
+                {% csrf_token %}
+                {% if is_saved %}
+                <button class="save-btn saved">保存済み👍</button>
+                {% else %}
+                <button class="save-btn">マイページに保存</button>
+                {% endif %}
+            </form>
+        </div>
+        {% endif %}
+
         <h1 class="post-title">{{ post.title }}</h1>
 
         <div class="post-body">

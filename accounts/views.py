@@ -17,6 +17,7 @@ from django.contrib.auth import logout
 
 from diary.models import Page              # 日記
 from blog.models import Post               # ブログ投稿
+from accounts.models import SavedPost
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -186,6 +187,11 @@ def mypage(request):
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
     messages = Message.objects.filter(recipient=user)
+    saved_posts = (
+        SavedPost.objects
+        .filter(user=request.user)
+        .select_related("post")
+    )
 
     notifications = Notification.objects.filter(
         recipient=user,
@@ -203,6 +209,7 @@ def mypage(request):
             "messages": messages,
             "profile": user,
             "notifications": notifications,
+            "saved_posts": saved_posts, 
         }
     )
 

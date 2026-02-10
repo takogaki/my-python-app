@@ -8,6 +8,10 @@ from django.contrib.auth import get_user_model
 from faker import Faker
 from .forms import CommentForm, PostForm
 from .models import Post, Comment
+from django.contrib import messages
+from blog.models import Post
+from accounts.models import SavedPost
+
 from notifications.models import Notification
 import uuid
 from .utils import get_device_id
@@ -101,6 +105,13 @@ def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
     comment = None
 
+    is_saved = False
+    if request.user.is_authenticated:
+        is_saved = SavedPost.objects.filter(
+            user=request.user,
+            post=post
+        ).exists()
+
     # 親コメント
     parent_comments = (
         Comment.objects
@@ -114,10 +125,6 @@ def post_detail(request, slug):
         )
     )
     
-
-    # =======================
-    # 表示名・リンク可否設定
-    # =======================
     # =======================
     # 表示名・リンク可否設定
     # =======================
@@ -256,6 +263,7 @@ def post_detail(request, slug):
             "post": post,
             "parent_comments": parent_comments,
             "form": form,
+            "is_saved": is_saved,
         }
     )
 
@@ -313,3 +321,40 @@ def delete_comment(request, pk):
         comment.delete()
 
     return redirect("accounts:mypage")
+
+
+# =======================
+# 投稿保存ビュー
+# =======================
+@login_required
+def save_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # 自分の投稿は保存させない（保険）
+    if post.author == request.user:
+        messages.warning(request, "自分の投稿は保存できません")
+        return redirect("blog:post_detail", slug=post.slug)
+
+    SavedPost.objects.get_or_create(
+        user=request.user,
+        post=post
+    )
+
+    messages.success(request, "マイページに保存しました")
+    return redirect("blog:post_detail", slug=post.slug)
+
+
+@login_required
+def toggle_save_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    saved, created = SavedPost.objects.get_or_create(
+        user=request.user,
+        post=post
+    )
+
+    if not created:
+        # すでに保存されていた → 解除
+        saved.delete()
+
+    return redirect("blog:post_detail", slug=post.slug)

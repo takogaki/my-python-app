@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
+from blog.models import Post
 
 class CustomUser(AbstractUser):
     GENDER_CHOICES = [
@@ -75,3 +76,18 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+
+class SavedPost(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE
+    )
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "post")
