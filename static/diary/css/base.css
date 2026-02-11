@@ -531,3 +531,33 @@ section h3 {
     font-size: 32px;
     cursor: pointer;
 }
+
+
+
+
+
+
+
+/* 保存セクション専用 */
+.saved-section-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 25px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #eee;
+}
+
+/* 保存専用カード */
+.saved-list-item {
+    background: #ffffff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: 0.2s ease;
+}
+
+.saved-list-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}

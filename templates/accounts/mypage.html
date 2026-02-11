@@ -118,26 +118,29 @@
     </section>
 
     <!-- 保存した他ユーザーのブログ -->
-    <h3 class="section-title">📌 保存したブログ投稿</h3>
-    
-    {% for saved in saved_posts %}
-    <div class="list-item">
-        <a href="{% url 'blog:post_detail' saved.post.slug %}" class="item-title">
-            {{ saved.post.title }}
-        </a>
-    
-        <div class="meta-row">
-            <span class="meta-date">
-                投稿者：{{ saved.post.author.username }}
-            </span>
-            <span class="meta-date">
-                保存日：{{ saved.saved_at|date:"Y年m月d日" }}
-            </span>
+    <section class="content-card">
+        <h3 class="section-title">📌 保存したブログ投稿</h3>
+        
+        {% for saved in saved_posts %}
+        <div class="list-item">
+                <a href="{% url 'blog:post_detail' saved.post.slug %}" class="item-title">
+                    {{ saved.post.title }}
+                </a>
+            
+                <div class="meta-row">
+                    <span class="meta-date">
+                        投稿者：{{ saved.post.author.username }}
+                    </span>
+                    <span class="meta-date">
+                        保存日：{{ saved.saved_at|date:"Y年m月d日" }}
+                    </span>
+                </div>
+            {% empty %}
+            <p>保存した投稿はまだありません。</p>
+            {% endfor %}
         </div>
-    </div>
-    {% empty %}
-    <p>保存した投稿はまだありません。</p>
-    {% endfor %}
+    </section>
+
 
     <!-- メッセージ -->
     <section class="content-card">
