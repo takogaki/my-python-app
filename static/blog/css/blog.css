@@ -724,3 +724,17 @@
     color: #2e7d32;
     font-weight: 600;
 }
+
+/* =========================
+   スマホ時は重ならない配置
+========================= */
+@media screen and (max-width: 768px) {
+
+    .save-post-float {
+        position: static;      /* ← absoluteやfixedを解除 */
+        display: block;
+        margin: 15px 0;
+        text-align: right;     /* 右寄せしたい場合 */
+    }
+
+}
