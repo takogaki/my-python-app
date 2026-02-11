@@ -62,6 +62,23 @@
             <!-- {% include "blog/video_embed.html" with video_url=post.video_url %} -->
             {% include "blog/video_embed.html" with obj=post %}
         </div>
+
+        {% if user.is_authenticated and post.author != user %}
+            <div class="report-area subtle-report">
+                <form method="post" action="{% url 'blog:report_post' post.id %}">
+                    {% csrf_token %}
+                    <select name="reason">
+                        <option value="sexual">卑猥な内容</option>
+                        <option value="violent">暴力・グロ</option>
+                        <option value="harassment">嫌がらせ</option>
+                        <option value="spam">スパム</option>
+                        <option value="other">その他</option>
+                    </select>
+                    <button type="submit" class="report-btn">通報する</button>
+                </form>
+            </div>
+        {% endif %}
+
     </div>
 
     <!-- コメント投稿 -->

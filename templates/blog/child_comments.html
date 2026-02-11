@@ -27,6 +27,21 @@
 
     {% include "blog/video_embed.html" with obj=comment %}
 
+    <!-- 通報フォーム -->
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'blog:report_comment' comment.id %}" class="report-form subtle-report">
+        {% csrf_token %}
+        <select name="reason">
+            <option value="sexual">卑猥</option>
+            <option value="violent">暴力</option>
+            <option value="harassment">嫌がらせ</option>
+            <option value="spam">スパム</option>
+            <option value="other">その他</option>
+        </select>
+        <button type="submit" class="report-btn">通報</button>
+    </form>
+    {% endif %}
+
     {% if comment.replies.count %}
     <button type="button" class="replies-toggle" data-comment-id="{{ comment.id }}">
         返信を見る（{{ comment.replies.count }}件）
@@ -91,6 +106,21 @@
             {% endif %}
 
             {% include "blog/video_embed.html" with obj=reply %}
+
+            <!-- 通報フォーム -->
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'blog:report_comment' reply.id %}" class="report-form subtle-report">
+                {% csrf_token %}
+                <select name="reason">
+                    <option value="sexual">卑猥</option>
+                    <option value="violent">暴力</option>
+                    <option value="harassment">嫌がらせ</option>
+                    <option value="spam">スパム</option>
+                    <option value="other">その他</option>
+                </select>
+                <button type="submit" class="report-btn">通報</button>
+            </form>
+            {% endif %}
 
             <!-- 返信への返信フォーム -->
             <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" class="reply-form-ui">

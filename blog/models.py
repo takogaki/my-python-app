@@ -5,6 +5,7 @@ import unicodedata
 from uuid import uuid4
 from django.conf import settings
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 fake = Faker()
 
@@ -50,6 +51,8 @@ class Post(models.Model):
     posted_date = models.DateTimeField(auto_now_add=True)
 
     image = models.ImageField(upload_to="post_images/", null=True, blank=True)
+
+    is_hidden = models.BooleanField(default=False)
 
     def is_live_only_service(self):
         if not self.video_url:
@@ -175,6 +178,8 @@ class Comment(models.Model):
         help_text="動画URL（YouTube / TikTok / Instagram / X / Facebook）"
     )
 
+    is_hidden = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         if self.author:
             self.name = self.author.username
@@ -197,3 +202,43 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ["posted_date"]
+
+
+class Report(models.Model):
+    
+    REPORT_REASON_CHOICES = [
+        ("sexual", "卑猥な内容"),
+        ("violent", "暴力・グロ"),
+        ("harassment", "嫌がらせ"),
+        ("spam", "スパム"),
+        ("other", "その他"),
+    ]
+
+    post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="reports")
+    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=20, choices=REPORT_REASON_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.post} - {self.reason}"
+    
+    class Meta:
+        unique_together = ("post", "reporter")  # 同じ人が何度も通報できない
+    
+
+class CommentReport(models.Model):
+    REPORT_REASON_CHOICES = [
+        ("sexual", "卑猥な内容"),
+        ("violent", "暴力・グロ"),
+        ("harassment", "嫌がらせ"),
+        ("spam", "スパム"),
+        ("other", "その他"),
+    ]
+
+    comment = models.ForeignKey("Comment", on_delete=models.CASCADE, related_name="reports")
+    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=20, choices=REPORT_REASON_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("comment", "reporter")  # 同じ人が何度も通報できない

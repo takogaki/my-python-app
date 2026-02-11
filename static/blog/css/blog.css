@@ -738,3 +738,72 @@
     }
 
 }
+
+
+
+
+
+
+.report-area {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.report-btn {
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.report-form {
+    margin-top: 5px;
+    text-align: right;
+}
+
+.report-btn {
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+
+/* 通報を目立たなくする */
+.subtle-report {
+    margin-top: 8px;
+}
+
+.subtle-report select {
+    font-size: 12px;
+    padding: 2px 4px;
+    border: none;
+    background: transparent;
+    color: #777;
+}
+
+.subtle-report select:focus {
+    outline: none;
+}
+
+.subtle-report .report-btn {
+    font-size: 12px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #999;
+    cursor: pointer;
+}
+
+.subtle-report .report-btn:hover {
+    color: #e74c3c;
+}
+
+.subtle-report {
+    background: transparent !important;
+}

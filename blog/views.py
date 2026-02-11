@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from faker import Faker
 from .forms import CommentForm, PostForm
-from .models import Post, Comment
+from .models import Post, Comment, Report, CommentReport
 from django.contrib import messages
 from blog.models import Post
 from accounts.models import SavedPost
@@ -48,11 +48,11 @@ def get_device_id(request):
 # =======================
 def frontpage(request):
     posts = (
-        Post.objects
-        .all()
-        .annotate(comment_count=Count("comments"))
-        .order_by("-posted_date")
-    )
+    Post.objects
+    .filter(is_hidden=False)
+    .annotate(comment_count=Count("comments"))
+    .order_by("-posted_date")
+)
 
     if request.method == "POST":
         form = PostForm(
@@ -102,7 +102,7 @@ def frontpage(request):
 # 投稿詳細 + コメント
 # =======================
 def post_detail(request, slug):
-    post = get_object_or_404(Post, slug=slug)
+    post = get_object_or_404(Post, slug=slug, is_hidden=False)
     comment = None
 
     is_saved = False
@@ -115,12 +115,16 @@ def post_detail(request, slug):
     # 親コメント
     parent_comments = (
         Comment.objects
-        .filter(post=post, parent__isnull=True)
+        .filter(
+            post=post,
+            parent__isnull=True,
+            is_hidden=False
+        )
         .order_by("-posted_date")
         .prefetch_related(
             models.Prefetch(
                 "replies",
-                queryset=Comment.objects.order_by("-posted_date")
+                queryset=Comment.objects.filter(is_hidden=False).order_by("-posted_date")
             )
         )
     )
@@ -358,3 +362,43 @@ def toggle_save_post(request, post_id):
         saved.delete()
 
     return redirect("blog:post_detail", slug=post.slug)
+
+
+@login_required
+def report_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == "POST" and request.user.is_authenticated:
+        reason = request.POST.get("reason")
+
+        report, created = Report.objects.get_or_create(
+            post=post,
+            reporter=request.user,
+            defaults={"reason": reason}
+        )
+
+        if created and post.reports.count() >= 3 and not post.is_hidden:
+                post.is_hidden = True
+                post.save()
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+@login_required
+def report_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.method == "POST" and request.user.is_authenticated:
+        reason = request.POST.get("reason")
+
+        report, created = CommentReport.objects.get_or_create(
+            comment=comment,
+            reporter=request.user,
+            defaults={"reason": reason}
+        )
+
+        if created and comment.reports.count() >= 3 and not comment.is_hidden:
+                comment.is_hidden = True
+                comment.save()
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
