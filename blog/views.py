@@ -22,6 +22,18 @@ User = get_user_model()
 fake = Faker()
 
 
+def notify_admins(request, obj, message, admin_url_name, obj_id):
+    admins = User.objects.filter(is_superuser=True)
+
+    for admin in admins:
+        Notification.objects.create(
+            recipient=admin,
+            actor=request.user,
+            post=obj.post if hasattr(obj, "post") else obj,
+            verb=message,
+            target_url=reverse(admin_url_name, args=[obj_id])
+        )
+
 # =======================
 # 匿名ID
 # =======================
@@ -368,7 +380,7 @@ def toggle_save_post(request, post_id):
 def report_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
-    if request.method == "POST" and request.user.is_authenticated:
+    if request.method == "POST":
         reason = request.POST.get("reason")
 
         report, created = Report.objects.get_or_create(
@@ -377,8 +389,31 @@ def report_post(request, post_id):
             defaults={"reason": reason}
         )
 
-        if created and post.reports.count() >= 3 and not post.is_hidden:
-                post.is_hidden = True
+        if created:
+            count = post.reports.count()
+
+            # ===== 3件通知 =====
+            if count >= 3 and post.report_notice_level < 1:
+                notify_admins(
+                    request,
+                    post,
+                    f"投稿が3件通報されました（現在{count}件）",
+                    "admin:blog_post_change",
+                    post.id
+                )
+                post.report_notice_level = 1
+                post.save()
+
+            # ===== 5件通知 =====
+            elif count >= 5 and post.report_notice_level < 2:
+                notify_admins(
+                    request,
+                    post,
+                    f"投稿が5件通報されました（現在{count}件）",
+                    "admin:blog_post_change",
+                    post.id
+                )
+                post.report_notice_level = 2
                 post.save()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
@@ -388,7 +423,7 @@ def report_post(request, post_id):
 def report_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    if request.method == "POST" and request.user.is_authenticated:
+    if request.method == "POST":
         reason = request.POST.get("reason")
 
         report, created = CommentReport.objects.get_or_create(
@@ -397,8 +432,31 @@ def report_comment(request, comment_id):
             defaults={"reason": reason}
         )
 
-        if created and comment.reports.count() >= 3 and not comment.is_hidden:
-                comment.is_hidden = True
+        if created:
+            count = comment.reports.count()
+
+            # ===== 3件通知 =====
+            if count >= 3 and comment.report_notice_level < 1:
+                notify_admins(
+                    request,
+                    comment,
+                    f"コメントが3件通報されました（現在{count}件）",
+                    "admin:blog_comment_change",
+                    comment.id
+                )
+                comment.report_notice_level = 1
+                comment.save()
+
+            # ===== 5件通知 =====
+            elif count >= 5 and comment.report_notice_level < 2:
+                notify_admins(
+                    request,
+                    comment,
+                    f"コメントが5件通報されました（現在{count}件）",
+                    "admin:blog_comment_change",
+                    comment.id
+                )
+                comment.report_notice_level = 2
                 comment.save()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))

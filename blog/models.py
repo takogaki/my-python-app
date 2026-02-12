@@ -53,6 +53,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to="post_images/", null=True, blank=True)
 
     is_hidden = models.BooleanField(default=False)
+    report_notice_level = models.IntegerField(default=0)
 
     def is_live_only_service(self):
         if not self.video_url:
@@ -179,6 +180,7 @@ class Comment(models.Model):
     )
 
     is_hidden = models.BooleanField(default=False)
+    report_notice_level = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if self.author:
