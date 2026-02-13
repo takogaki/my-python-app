@@ -142,47 +142,39 @@
     </section>
 
     {% if user.is_superuser %}
-    <section class="content-card admin-report-box">
+    <section class="content-card">
         <h3 class="section-title">🚨 通報管理（管理者専用）</h3>
     
-        {# 投稿通報 #}
         {% for post in reported_posts %}
-        <div class="report-item">
-            <strong>【投稿】</strong>
-            <a href="/admin/blog/post/{{ post.id }}/change/">
-                {{ post.title }}
+        <div class="list-item">
+            <a href="/admin/blog/post/{{ post.id }}/change/" class="item-title">
+                【投稿】{{ post.title }}
             </a>
-            <span class="report-count">
-                （{{ post.report_count }}件）
-            </span>
+            <div class="item-meta">
+                通報件数：{{ post.report_count }}件
+            </div>
         </div>
         {% empty %}
-        <p>通報された投稿はありません</p>
+        <p class="empty-text">通報された投稿はありません</p>
         {% endfor %}
     
-        {# コメント通報 #}
         {% for comment in reported_comments %}
-        <div class="report-item">
-            <strong>
+        <div class="list-item">
+            <a href="/admin/blog/comment/{{ comment.id }}/change/" class="item-title">
                 {% if comment.parent %}
                 【リプライ】
                 {% else %}
                 【コメント】
                 {% endif %}
-            </strong>
-    
-            <a href="/admin/blog/comment/{{ comment.id }}/change/">
                 {{ comment.body|truncatechars:30 }}
             </a>
-    
-            <span class="report-count">
-                （{{ comment.report_count }}件）
-            </span>
+            <div class="item-meta">
+                通報件数：{{ comment.report_count }}件
+            </div>
         </div>
         {% empty %}
-        <p>通報されたコメントはありません</p>
+        <p class="empty-text">通報されたコメントはありません</p>
         {% endfor %}
-    
     </section>
     {% endif %}
 
@@ -206,32 +198,19 @@
         {% endwith %}
     
         {% for msg in messages %}
-        <div class="message-card {% if not msg.is_read %}unread{% endif %}">
-            <strong>
-                {% if msg.is_important %}
-                <span class="important">★</span>
-                {% endif %}
-    
-                <a href="{% url 'accounts:user_detail' msg.sender.username %}">
-                    {{ msg.sender.username }}
-                </a>
-    
+        <div class="list-item {% if not msg.is_read %}unread{% endif %}">
+            <a href="{% url 'user_messages:message_detail' msg.id %}" class="item-title">
+                {% if msg.is_important %}★ {% endif %}
+                {{ msg.sender.username }}
                 {% if not msg.is_read %}
                 <span class="badge unread">未読</span>
                 {% endif %}
-            </strong>
-    
-            <p>{{ msg.content|truncatechars:50 }}</p>
-    
-            <div style="margin-top: 12px; text-align: center;">
-                <a href="{% url 'user_messages:message_detail' msg.id %}" class="btn primary">
-                    詳細
-                </a>
-            </div>
-    
-            <small class="text-muted">
+            </a>
+        
+            <div class="item-meta">
+                {{ msg.content|truncatechars:50 }}<br>
                 {{ msg.sent_at|date:"Y/m/d H:i" }}
-            </small>
+            </div>
         </div>
         {% empty %}
         <p class="empty-text">メッセージはありません</p>
