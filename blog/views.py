@@ -380,83 +380,62 @@ def toggle_save_post(request, post_id):
 def report_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
-    if request.method == "POST":
-        reason = request.POST.get("reason")
+    # 既に通報済みなら防止（任意）
+    if Report.objects.filter(post=post, reporter=request.user).exists():
+        return redirect("blog:post_detail", slug=post.slug)
 
-        report, created = Report.objects.get_or_create(
-            post=post,
-            reporter=request.user,
-            defaults={"reason": reason}
-        )
+    # 通報作成
+    Report.objects.create(
+        post=post,
+        reporter=request.user,
+        reason=request.POST.get("reason", "")
+    )
 
-        if created:
-            count = post.reports.count()
+    # =========================
+    # ★ ここに書く
+    # =========================
+    count = post.reports.count()
 
-            # ===== 3件通知 =====
-            if count >= 3 and post.report_notice_level < 1:
-                notify_admins(
-                    request,
-                    post,
-                    f"投稿が3件通報されました（現在{count}件）",
-                    "admin:blog_post_change",
-                    post.id
-                )
-                post.report_notice_level = 1
-                post.save()
+    if count >= 5 and post.report_notice_level < 2:
+        notify_admins(post, 5)
+        post.report_notice_level = 2
+        post.save()
 
-            # ===== 5件通知 =====
-            elif count >= 5 and post.report_notice_level < 2:
-                notify_admins(
-                    request,
-                    post,
-                    f"投稿が5件通報されました（現在{count}件）",
-                    "admin:blog_post_change",
-                    post.id
-                )
-                post.report_notice_level = 2
-                post.save()
+    elif count >= 3 and post.report_notice_level < 1:
+        notify_admins(post, 3)
+        post.report_notice_level = 1
+        post.save()
 
-    return redirect(request.META.get("HTTP_REFERER", "/"))
-
+    return redirect("blog:post_detail", slug=post.slug)
 
 @login_required
 def report_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    if request.method == "POST":
-        reason = request.POST.get("reason")
+    # 既に通報済みなら防止
+    if CommentReport.objects.filter(comment=comment, reporter=request.user).exists():
+        return redirect("blog:post_detail", slug=comment.post.slug)
 
-        report, created = CommentReport.objects.get_or_create(
-            comment=comment,
-            reporter=request.user,
-            defaults={"reason": reason}
-        )
+    # 通報作成
+    CommentReport.objects.create(
+        comment=comment,
+        reporter=request.user,
+        reason=request.POST.get("reason", "")
+    )
 
-        if created:
-            count = comment.reports.count()
+    # =========================
+    # ★ 通知制御
+    # =========================
+    count = comment.reports.count()
 
-            # ===== 3件通知 =====
-            if count >= 3 and comment.report_notice_level < 1:
-                notify_admins(
-                    request,
-                    comment,
-                    f"コメントが3件通報されました（現在{count}件）",
-                    "admin:blog_comment_change",
-                    comment.id
-                )
-                comment.report_notice_level = 1
-                comment.save()
+    if count >= 5 and comment.report_notice_level < 2:
+        notify_admins(comment, 5)
+        comment.report_notice_level = 2
+        comment.save()
 
-            # ===== 5件通知 =====
-            elif count >= 5 and comment.report_notice_level < 2:
-                notify_admins(
-                    request,
-                    comment,
-                    f"コメントが5件通報されました（現在{count}件）",
-                    "admin:blog_comment_change",
-                    comment.id
-                )
-                comment.report_notice_level = 2
-                comment.save()
+    elif count >= 3 and comment.report_notice_level < 1:
+        notify_admins(comment, 3)
+        comment.report_notice_level = 1
+        comment.save()
 
-    return redirect(request.META.get("HTTP_REFERER", "/"))
+    return redirect("blog:post_detail", slug=comment.post.slug)

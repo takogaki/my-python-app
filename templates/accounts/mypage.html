@@ -141,6 +141,50 @@
         </div>
     </section>
 
+    {% if user.is_superuser %}
+    <section class="content-card admin-report-box">
+        <h3 class="section-title">🚨 通報管理（管理者専用）</h3>
+    
+        {# 投稿通報 #}
+        {% for post in reported_posts %}
+        <div class="report-item">
+            <strong>【投稿】</strong>
+            <a href="/admin/blog/post/{{ post.id }}/change/">
+                {{ post.title }}
+            </a>
+            <span class="report-count">
+                （{{ post.report_count }}件）
+            </span>
+        </div>
+        {% empty %}
+        <p>通報された投稿はありません</p>
+        {% endfor %}
+    
+        {# コメント通報 #}
+        {% for comment in reported_comments %}
+        <div class="report-item">
+            <strong>
+                {% if comment.parent %}
+                【リプライ】
+                {% else %}
+                【コメント】
+                {% endif %}
+            </strong>
+    
+            <a href="/admin/blog/comment/{{ comment.id }}/change/">
+                {{ comment.body|truncatechars:30 }}
+            </a>
+    
+            <span class="report-count">
+                （{{ comment.report_count }}件）
+            </span>
+        </div>
+        {% empty %}
+        <p>通報されたコメントはありません</p>
+        {% endfor %}
+    
+    </section>
+    {% endif %}
 
     <!-- メッセージ -->
     <section class="content-card">

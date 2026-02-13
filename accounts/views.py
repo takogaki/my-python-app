@@ -16,9 +16,10 @@ from django.contrib.auth import login
 from django.contrib.auth import logout
 
 from diary.models import Page              # 日記
-from blog.models import Post               # ブログ投稿
+from blog.models import Post, Comment      # ブログ投稿
 from accounts.models import SavedPost
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
+from django.db.models import Count
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
@@ -187,6 +188,7 @@ def mypage(request):
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
     messages = Message.objects.filter(recipient=user)
+
     saved_posts = (
         SavedPost.objects
         .filter(user=request.user)
@@ -198,7 +200,26 @@ def mypage(request):
         is_read=False
     ).order_by("-created_at")
 
-    posts = Post.objects.filter(author=request.user)
+    # =========================
+    # ★ 管理者用 通報一覧
+    # =========================
+    reported_posts = Post.objects.none()
+    reported_comments = Comment.objects.none()
+
+    if user.is_superuser:
+        reported_posts = (
+            Post.objects
+            .annotate(report_count=Count("reports"))
+            .filter(report_count__gte=3)
+            .order_by("-report_count")
+        )
+
+        reported_comments = (
+            Comment.objects
+            .annotate(report_count=Count("reports"))
+            .filter(report_count__gte=3)
+            .order_by("-report_count")
+        )
 
     return render(
         request,
@@ -209,7 +230,9 @@ def mypage(request):
             "messages": messages,
             "profile": user,
             "notifications": notifications,
-            "saved_posts": saved_posts, 
+            "saved_posts": saved_posts,
+            "reported_posts": reported_posts,
+            "reported_comments": reported_comments,
         }
     )
 
