@@ -145,36 +145,36 @@
     <section class="content-card">
         <h3 class="section-title">🚨 通報管理（管理者専用）</h3>
     
-        {% for post in reported_posts %}
-        <div class="list-item">
-            <a href="/admin/blog/post/{{ post.id }}/change/" class="item-title">
-                【投稿】{{ post.title }}
-            </a>
-            <div class="item-meta">
-                通報件数：{{ post.report_count }}件
+            {% for post in reported_posts %}
+            <div class="list-item">
+                <a href="/admin/blog/post/{{ post.id }}/change/" class="item-title">
+                    【投稿】{{ post.title }}
+                </a>
+                <div class="item-meta">
+                    通報件数：{{ post.report_count }}件
+                </div>
             </div>
-        </div>
-        {% empty %}
-        <p class="empty-text">通報された投稿はありません</p>
-        {% endfor %}
-    
-        {% for comment in reported_comments %}
-        <div class="list-item">
-            <a href="/admin/blog/comment/{{ comment.id }}/change/" class="item-title">
-                {% if comment.parent %}
-                【リプライ】
-                {% else %}
-                【コメント】
-                {% endif %}
-                {{ comment.body|truncatechars:30 }}
-            </a>
-            <div class="item-meta">
-                通報件数：{{ comment.report_count }}件
+            {% empty %}
+                <p class="empty-text">通報された投稿はありません</p>
+            {% endfor %}
+        
+            {% for comment in reported_comments %}
+            <div class="list-item">
+                <a href="/admin/blog/comment/{{ comment.id }}/change/" class="item-title">
+                    {% if comment.parent %}
+                    【リプライ】
+                    {% else %}
+                    【コメント】
+                    {% endif %}
+                    {{ comment.body|truncatechars:30 }}
+                </a>
+                <div class="item-meta">
+                    通報件数：{{ comment.report_count }}件
+                </div>
             </div>
-        </div>
-        {% empty %}
-        <p class="empty-text">通報されたコメントはありません</p>
-        {% endfor %}
+            {% empty %}
+                <p class="empty-text">通報されたコメントはありません</p>
+            {% endfor %}
     </section>
     {% endif %}
 
@@ -192,7 +192,7 @@
         <h3 class="section-title">
             💌 受信メッセージ
             {% if unread_count > 0 %}
-            <span class="badge unread">{{ unread_count }}</span>
+                <span class="badge unread">{{ unread_count }}</span>
             {% endif %}
         </h3>
         {% endwith %}
@@ -203,7 +203,7 @@
                 {% if msg.is_important %}★ {% endif %}
                 {{ msg.sender.username }}
                 {% if not msg.is_read %}
-                <span class="badge unread">未読</span>
+                    <span class="badge unread">未読</span>
                 {% endif %}
             </a>
         
@@ -213,7 +213,7 @@
             </div>
         </div>
         {% empty %}
-        <p class="empty-text">メッセージはありません</p>
+            <p class="empty-text">メッセージはありません</p>
         {% endfor %}
     </section>
 </div>
