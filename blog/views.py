@@ -11,6 +11,7 @@ from .models import Post, Comment, Report, CommentReport
 from django.contrib import messages
 from blog.models import Post
 from accounts.models import SavedPost
+from django.contrib.admin.views.decorators import staff_member_required
 
 from notifications.models import Notification
 import uuid
@@ -22,16 +23,33 @@ User = get_user_model()
 fake = Faker()
 
 
-def notify_admins(request, obj, message, admin_url_name, obj_id):
+def notify_admins(request, obj, level):
     admins = User.objects.filter(is_superuser=True)
+
+    if level == 3:
+        message = "通報が3件に達しました"
+    elif level == 5:
+        message = "通報が5件に達しました"
+    else:
+        return
+
+    # 管理画面URL自動判定
+    if isinstance(obj, Post):
+        url = reverse("admin:blog_post_change", args=[obj.id])
+        target_post = obj
+    elif isinstance(obj, Comment):
+        url = reverse("admin:blog_comment_change", args=[obj.id])
+        target_post = obj.post
+    else:
+        return
 
     for admin in admins:
         Notification.objects.create(
             recipient=admin,
             actor=request.user,
-            post=obj.post if hasattr(obj, "post") else obj,
+            post=target_post,
             verb=message,
-            target_url=reverse(admin_url_name, args=[obj_id])
+            target_url=url
         )
 
 # =======================
@@ -380,7 +398,7 @@ def toggle_save_post(request, post_id):
 def report_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
-    # 既に通報済みなら防止（任意）
+    # 既に通報済みなら防止
     if Report.objects.filter(post=post, reporter=request.user).exists():
         return redirect("blog:post_detail", slug=post.slug)
 
@@ -391,51 +409,52 @@ def report_post(request, post_id):
         reason=request.POST.get("reason", "")
     )
 
-    # =========================
-    # ★ ここに書く
-    # =========================
+    # 通報数チェック
     count = post.reports.count()
 
     if count >= 5 and post.report_notice_level < 2:
-        notify_admins(post, 5)
+        notify_admins(request, post, 5)
         post.report_notice_level = 2
-        post.save()
+        post.save(update_fields=["report_notice_level"])
 
     elif count >= 3 and post.report_notice_level < 1:
-        notify_admins(post, 3)
+        notify_admins(request, post, 3)
         post.report_notice_level = 1
-        post.save()
+        post.save(update_fields=["report_notice_level"])
 
     return redirect("blog:post_detail", slug=post.slug)
+
+
 
 @login_required
 def report_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    # 既に通報済みなら防止
-    if CommentReport.objects.filter(comment=comment, reporter=request.user).exists():
+    # 二重通報防止（unique_together あるが保険）
+    if CommentReport.objects.filter(
+        comment=comment,
+        reporter=request.user
+    ).exists():
         return redirect("blog:post_detail", slug=comment.post.slug)
 
     # 通報作成
     CommentReport.objects.create(
         comment=comment,
         reporter=request.user,
-        reason=request.POST.get("reason", "")
+        reason=request.POST.get("reason")
     )
 
-    # =========================
-    # ★ 通知制御
-    # =========================
+    # 通報数カウント
     count = comment.reports.count()
 
     if count >= 5 and comment.report_notice_level < 2:
-        notify_admins(comment, 5)
+        notify_admins(request, comment, 5)
         comment.report_notice_level = 2
-        comment.save()
+        comment.save(update_fields=["report_notice_level"])
 
     elif count >= 3 and comment.report_notice_level < 1:
-        notify_admins(comment, 3)
+        notify_admins(request, comment, 3)
         comment.report_notice_level = 1
-        comment.save()
+        comment.save(update_fields=["report_notice_level"])
 
     return redirect("blog:post_detail", slug=comment.post.slug)
