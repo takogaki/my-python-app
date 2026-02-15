@@ -71,20 +71,47 @@
 
 {% if page.author != request.user %}
 <script>
-    document.getElementById('like-button').addEventListener('click', function () {
-        fetch("{% url 'diary:like_diary' page.pk %}", {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('likes-count').textContent = data.likes;
-                document.getElementById('unique-users-count').textContent = data.unique_users;
-                document.getElementById('user-likes-count').textContent = data.user_like_count;
-            })
-            .catch(error => console.error(error));
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie) {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const likeButton = document.getElementById('like-button');
+
+        if (likeButton) {
+            likeButton.addEventListener('click', function () {
+                fetch("{% url 'diary:like_diary' page.pk %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                })
+                    .then(response => {
+                        console.log("Status:", response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Response:", data);
+                        document.getElementById('likes-count').textContent = data.likes;
+                        document.getElementById('unique-users-count').textContent = data.unique_users;
+                        document.getElementById('user-likes-count').textContent = data.user_like_count;
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+        }
+
     });
 </script>
 {% endif %}
