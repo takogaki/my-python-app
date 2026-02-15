@@ -54,7 +54,11 @@
         <p>👍したユニークユーザー数：<strong id="unique-users-count">{{ page.unique_likes_count }}</strong></p>
         <p>あなたの👍回数：<strong id="user-likes-count">0</strong></p>
 
-        <button id="like-button" class="submit-btn">👍 いいねする</button>
+            {% if page.author != request.user %}
+                <button id="like-button" class="submit-btn" data-url="{% url 'diary:like_diary' page.pk %}">
+                    👍 いいねする
+                </button>
+            {% endif %}
         {% endif %}
     </div>
 
@@ -68,52 +72,5 @@
     </div>
 
 </div>
-
-{% if page.author != request.user %}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie) {
-                const cookies = document.cookie.split(';');
-                for (let cookie of cookies) {
-                    cookie = cookie.trim();
-                    if (cookie.startsWith(name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        const likeButton = document.getElementById('like-button');
-
-        if (likeButton) {
-            likeButton.addEventListener('click', function () {
-                fetch("{% url 'diary:like_diary' page.pk %}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                    },
-                })
-                    .then(response => {
-                        console.log("Status:", response.status);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("Response:", data);
-                        document.getElementById('likes-count').textContent = data.likes;
-                        document.getElementById('unique-users-count').textContent = data.unique_users;
-                        document.getElementById('user-likes-count').textContent = data.user_like_count;
-                    })
-                    .catch(error => console.error("Error:", error));
-            });
-        }
-
-    });
-</script>
-{% endif %}
 
 {% endblock %}
