@@ -30,22 +30,37 @@
 {% endfor %}
 
 <script>
-    // いいねボタンをクリックしたときの処理
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
     document.querySelectorAll('.like-button').forEach(button => {
         button.addEventListener('click', function () {
-            const diaryId = this.dataset.diaryId;  // 日記IDを取得
-            const likesSpan = document.getElementById(`likes-${diaryId}`);  // いいね数の表示部分
+            const diaryId = this.dataset.diaryId;
+            const likesSpan = document.getElementById(`likes-${diaryId}`);
 
-            // Ajaxでいいね数を更新
             fetch(`/diary/like/${diaryId}/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',  // CSRFトークンを送信
+                    'X-CSRFToken': csrftoken,
                 },
             })
                 .then(response => response.json())
                 .then(data => {
-                    likesSpan.textContent = data.likes;  // 更新されたいいね数を表示
+                    likesSpan.textContent = data.likes;
                 })
                 .catch(error => console.error('Error:', error));
         });
