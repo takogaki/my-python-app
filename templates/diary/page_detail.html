@@ -72,7 +72,7 @@
 {% if page.author != request.user %}
 <script>
     document.getElementById('like-button').addEventListener('click', function () {
-        fetch(`/diary/like/{{ page.id }}/`, {
+        fetch("{% url 'diary:like_diary' page.pk %}", {
             method: 'POST',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
