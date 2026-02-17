@@ -8,7 +8,7 @@
 
     <!-- OGP -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="SPIRYTUS">
+    <meta property="og:site_name" content="the.SPIRYTUS">
     <meta property="og:title" content="SPIRYTUS｜好きなときに、好きなだけ">
     <meta property="og:description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og/ogp_spirytus.png' %}">
@@ -46,8 +46,19 @@
     <script src="{% static 'blog/js/blog.js' %}"></script>
 
     <!-- Title & Description -->
-    <title>{% block title %}the.SPIRYTUS 公式サイト | 新世代SNSアプリ{% endblock %}</title>
+    <title>{% block title %}the.SPIRYTUS | 出会い・趣味共有・学び合いができる新世代SNS{% endblock %}</title>
     <meta name="description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
+
+    <!-- Site Name Structured Data -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "the.SPIRYTUS",
+            "alternateName": "SPIRYTUS",
+            "url": "https://my-python-app-0t2k.onrender.com/"
+        }
+    </script>
 </head>
 
 <body class="{% if unclosed_room %}has-warning{% endif %}">
