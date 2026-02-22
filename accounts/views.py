@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
+from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
 from django.views import generic
@@ -23,6 +24,7 @@ from django.db.models import Count
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
+from django.utils.decorators import method_decorator
 
 from .forms import ActivateProfileImageForm
 from .forms import CustomUserCreationForm
@@ -30,7 +32,7 @@ from .forms import ProfileForm
 from notifications.models import Notification
 
 from .models import CustomUser
-from diary.models import Page
+from .models import UserLike
 
 import uuid
 
@@ -402,3 +404,31 @@ def contact_eden_public(request):
         return render(request, "accounts/contact_eden_done.html")
 
     return redirect("/")
+
+
+
+@method_decorator(login_required, name="dispatch")
+class UserListView(ListView):
+    model = User
+    template_name = "accounts/user_list.html"
+    context_object_name = "users"
+
+    def get_queryset(self):
+        # 自分以外のユーザーを表示
+        return User.objects.exclude(id=self.request.user.id)
+
+
+@login_required
+def like_user(request, user_id):
+    if request.method == "POST":
+        target_user = get_object_or_404(User, id=user_id)
+
+        if target_user != request.user:
+            UserLike.objects.get_or_create(
+                from_user=request.user,
+                to_user=target_user
+            )
+
+        return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"status": "error"})

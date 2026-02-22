@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
-from .views import SignUpView, UserDetailView
+from .views import SignUpView, UserDetailView, UserListView, like_user
 from . import views
 from .views import mypage
 
@@ -19,6 +19,7 @@ urlpatterns = [
 
     # ユーザー一覧・詳細
     path("users/", views.user_list, name="user_list"),
+    path("like/<int:user_id>/", like_user, name="like_user"),
     path("users/<str:username>/", views.UserDetailView.as_view(), name="user_detail"),
 
     # ユーザー公開ページ（username指定）

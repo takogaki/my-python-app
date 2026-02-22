@@ -16,5 +16,8 @@
     <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">← 戻る</a>
 </div>
 
+{% block extra_js %}
+<script src="{% static 'diary/js/diary.js' %}"></script>
+{% endblock %}
 
 {% endblock %}
