@@ -10,96 +10,107 @@ document.addEventListener("DOMContentLoaded", function () {
         return container.querySelectorAll(".card");
     }
 
+    function updateTopCardState() {
+        const cards = getCards();
+
+        cards.forEach(card => {
+            card.style.pointerEvents = "none";
+            card.style.zIndex = "0";
+        });
+
+        if (cards.length > 0) {
+            cards[0].style.pointerEvents = "auto";
+            cards[0].style.zIndex = "10";
+        }
+    }
+
     function swipe(direction) {
         const cards = getCards();
         const topCard = cards[0];
         if (!topCard) return;
 
-        const className =
-            direction === "right" ? "swipe-right" : "swipe-left";
+        const className = direction === "right"
+            ? "swipe-right"
+            : "swipe-left";
 
         topCard.classList.add(className);
 
         setTimeout(() => {
             topCard.classList.remove(className);
             container.appendChild(topCard);
+            updateTopCardState();
         }, 400);
     }
 
     nextBtn?.addEventListener("click", () => swipe("right"));
     prevBtn?.addEventListener("click", () => swipe("left"));
 
+    // 初期化
+    updateTopCardState();
+
     /* =========================
-    📱 モバイルスワイプ（安定版）
-    ========================= */
+   📱 モバイルスワイプ追加（PCを壊さない版）
+========================= */
 
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
+let startX = 0;
+let currentX = 0;
+let isDragging = false;
 
-    container.addEventListener("touchstart", (e) => {
-        const cards = getCards();
-        if (!cards.length) return;
+container.addEventListener("touchstart", (e) => {
+    const cards = getCards();
+    if (!cards.length) return;
 
-        const topCard = cards[0];
+    const topCard = cards[0];
 
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        currentX = startX;
+    isDragging = true;
+    startX = e.touches[0].clientX;
+    currentX = startX;
 
-        // ドラッグ開始時にtransition解除
-        topCard.style.transition = "none";
-        });
-    
-    });
+    // ドラッグ中はクラスアニメーション無効
+    topCard.style.transition = "none";
+});
 
-    container.addEventListener("touchmove", (e) => {
-        if (!isDragging) return;
+container.addEventListener("touchmove", (e) => {
+    if (!isDragging) return;
 
-        const cards = getCards();
-        const topCard = cards[0];
-        if (!topCard) return;
+    const cards = getCards();
+    const topCard = cards[0];
+    if (!topCard) return;
 
-        currentX = e.touches[0].clientX;
-        const diffX = currentX - startX;
+    currentX = e.touches[0].clientX;
+    const diffX = currentX - startX;
 
-        topCard.style.transform =
-            `translateX(${diffX}px) rotate(${diffX * 0.05}deg)`;
-    });
+    topCard.style.transform =
+        `translateX(${diffX}px) rotate(${diffX * 0.05}deg)`;
+});
 
-    container.addEventListener("touchend", () => {
-        if (!isDragging) return;
+container.addEventListener("touchend", () => {
+    if (!isDragging) return;
 
-        const cards = getCards();
-        const topCard = cards[0];
-        if (!topCard) return;
+    const cards = getCards();
+    const topCard = cards[0];
+    if (!topCard) return;
 
-        const diffX = currentX - startX;
-        const threshold = 120;
+    const diffX = currentX - startX;
+    const threshold = 120;
 
-        topCard.style.transition = "transform 0.35s ease, opacity 0.35s ease";
+    // transition復活
+    topCard.style.transition = "";
 
-        if (Math.abs(diffX) > threshold) {
+    if (Math.abs(diffX) > threshold) {
 
-            // 画面外へアニメーション
-            const direction = diffX > 0 ? 1 : -1;
-            topCard.style.transform =
-                `translateX(${direction * 600}px) rotate(${direction * 25}deg)`;
-            topCard.style.opacity = "0";
+        // ★ transformを一旦リセットしてからPCのswipeへ
+        topCard.style.transform = "";
 
-            setTimeout(() => {
-                // ★ 完全リセット（超重要）
-                topCard.style.transition = "";
-                topCard.style.transform = "";
-                topCard.style.opacity = "";
+        swipe(diffX > 0 ? "right" : "left");
 
-                container.appendChild(topCard);
-            }, 350);
+    } else {
+        // 元の位置へ戻す
+        topCard.style.transition = "transform 0.3s ease";
+        topCard.style.transform = "translateX(0) rotate(0)";
+    }
 
-        } else {
-            // 元の位置へ戻す
-            topCard.style.transform = "translateX(0) rotate(0)";
-        }
+    isDragging = false;
+});
 
-        isDragging = false;
-    });
+});
