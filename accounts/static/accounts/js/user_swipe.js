@@ -1,37 +1,51 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("JS START");
-
-    const cards = document.querySelectorAll(".card");
+    const container = document.querySelector(".swipe-container");
     const nextBtn = document.getElementById("nextBtn");
     const prevBtn = document.getElementById("prevBtn");
 
-    console.log("cards:", cards.length);
-    console.log("nextBtn:", nextBtn);
+    if (!container) return;
 
-    if (!cards.length) return;
+    function getCards() {
+        return container.querySelectorAll(".card");
+    }
 
-    let currentIndex = 0;
+    function updateTopCardState() {
+        const cards = getCards();
 
-    function showTopCard() {
-        cards.forEach((card, i) => {
-            card.style.display = i === currentIndex ? "block" : "none";
+        cards.forEach(card => {
+            card.style.pointerEvents = "none";
+            card.style.zIndex = "0";
         });
+
+        if (cards.length > 0) {
+            cards[0].style.pointerEvents = "auto";
+            cards[0].style.zIndex = "10";
+        }
     }
 
-    function nextCard() {
-        console.log("next clicked");
-        currentIndex = (currentIndex + 1) % cards.length;
-        showTopCard();
+    function swipe(direction) {
+        const cards = getCards();
+        const topCard = cards[0];
+        if (!topCard) return;
+
+        const className = direction === "right"
+            ? "swipe-right"
+            : "swipe-left";
+
+        topCard.classList.add(className);
+
+        setTimeout(() => {
+            topCard.classList.remove(className);
+            container.appendChild(topCard);
+            updateTopCardState();
+        }, 400);
     }
 
-    function prevCard() {
-        currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-        showTopCard();
-    }
+    nextBtn?.addEventListener("click", () => swipe("right"));
+    prevBtn?.addEventListener("click", () => swipe("left"));
 
-    if (nextBtn) nextBtn.addEventListener("click", nextCard);
-    if (prevBtn) prevBtn.addEventListener("click", prevCard);
+    // 初期化
+    updateTopCardState();
 
-    showTopCard();
 });

@@ -1,0 +1,118 @@
+/* =========================
+   Swipe Layout
+========================= */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+}
+
+.swipe-wrapper {
+    position: fixed;
+    top: 67px;
+    left: 0;
+    width: 100vw;
+    height: calc(100dvh - 67px);
+    background: #000;
+}
+
+.swipe-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================
+   Card
+========================= */
+
+.card {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 20px;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    pointer-events: none; /* JSで制御する */
+}
+
+/* 画像 */
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* グラデーション */
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.6) 0%,
+        rgba(0,0,0,0.2) 40%,
+        transparent 70%
+    );
+    pointer-events: none;
+}
+
+/* =========================
+   Profile Card
+========================= */
+
+.profile-card {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    padding: 20px 25px;
+    border-radius: 60px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+    color: white;
+    z-index: 5;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* =========================
+   Animation
+========================= */
+
+.card.swipe-right {
+    transform: translateX(500px) rotate(20deg);
+    opacity: 0;
+}
+
+.card.swipe-left {
+    transform: translateX(-500px) rotate(-20deg);
+    opacity: 0;
+}
+
+/* =========================
+   Arrows
+========================= */
+
+.nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    z-index: 999;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.nav-arrow.left { left: 30px; }
+.nav-arrow.right { right: 30px; }
+
+@media (max-width: 768px) {
+    .nav-arrow { display: none; }
+}
