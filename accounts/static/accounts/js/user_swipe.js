@@ -10,42 +10,77 @@ document.addEventListener("DOMContentLoaded", function () {
         return container.querySelectorAll(".card");
     }
 
-    function updateTopCardState() {
-        const cards = getCards();
-
-        cards.forEach(card => {
-            card.style.pointerEvents = "none";
-            card.style.zIndex = "0";
-        });
-
-        if (cards.length > 0) {
-            cards[0].style.pointerEvents = "auto";
-            cards[0].style.zIndex = "10";
-        }
-    }
-
     function swipe(direction) {
         const cards = getCards();
         const topCard = cards[0];
         if (!topCard) return;
 
-        const className = direction === "right"
-            ? "swipe-right"
-            : "swipe-left";
+        const className =
+            direction === "right" ? "swipe-right" : "swipe-left";
 
         topCard.classList.add(className);
 
         setTimeout(() => {
             topCard.classList.remove(className);
             container.appendChild(topCard);
-            updateTopCardState();
         }, 400);
     }
 
     nextBtn?.addEventListener("click", () => swipe("right"));
     prevBtn?.addEventListener("click", () => swipe("left"));
 
-    // 初期化
-    updateTopCardState();
+    /* =========================
+       📱 モバイルスワイプ
+    ========================= */
+
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+
+    container.addEventListener("touchstart", (e) => {
+        const cards = getCards();
+        if (!cards.length) return;
+
+        isDragging = true;
+        startX = e.touches[0].clientX;
+    });
+
+    container.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+
+        const cards = getCards();
+        const topCard = cards[0];
+        if (!topCard) return;
+
+        currentX = e.touches[0].clientX;
+        const diffX = currentX - startX;
+
+        topCard.style.transition = "none";
+        topCard.style.transform =
+            `translateX(${diffX}px) rotate(${diffX * 0.05}deg)`;
+    });
+
+    container.addEventListener("touchend", () => {
+        if (!isDragging) return;
+
+        const cards = getCards();
+        const topCard = cards[0];
+        if (!topCard) return;
+
+        const diffX = currentX - startX;
+        const threshold = 100;
+
+        topCard.style.transition = "transform 0.4s ease";
+
+        if (diffX > threshold) {
+            swipe("right");
+        } else if (diffX < -threshold) {
+            swipe("left");
+        } else {
+            topCard.style.transform = "translateX(0) rotate(0)";
+        }
+
+        isDragging = false;
+    });
 
 });
