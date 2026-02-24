@@ -42,6 +42,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 20px;
 }
 
 /* グラデーション */
@@ -59,22 +60,54 @@ body {
 }
 
 /* =========================
-   Profile Card
+   Profile Card（王道マッチング系）
 ========================= */
 
 .profile-card {
     position: absolute;
     bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50%;
-    padding: 20px 25px;
-    border-radius: 60px;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(10px);
+    left: 0;
+    width: 100%;
+    padding: 18px 20px 22px;
+    border-radius: 0 0 20px 20px;
+
+    /* グラデーションで自然に溶け込ませる */
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.75) 0%,
+        rgba(0,0,0,0.4) 40%,
+        rgba(0,0,0,0) 100%
+    );
+
     color: white;
     z-index: 5;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* 名前 */
+.profile-card h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* 年齢 */
+.profile-card h2 span {
+    font-weight: 400;
+}
+
+/* 性別 */
+.profile-card p {
+    font-size: 14px;
+    margin: 4px 0 0;
+    opacity: 0.9;
+}
+
+/* ボタンエリア */
+.pc-buttons {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
 }
 
 /* =========================
@@ -116,4 +149,34 @@ body {
 
 @media (max-width: 768px) {
     .nav-arrow { display: none; }
+}
+
+
+/* ライクボタン */
+.likeBtn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 26px;
+    cursor: pointer;
+
+    background: white;
+    color: #ff4d6d;
+
+    box-shadow: 0 8px 25px rgba(255,77,109,0.35);
+    transition: all 0.2s ease;
+}
+
+.likeBtn:hover {
+    transform: scale(1.1);
+}
+
+.likeBtn:active {
+    transform: scale(0.95);
+}
+
+.likeBtn.liked {
+    background: #ff4d6d;
+    color: white;
 }

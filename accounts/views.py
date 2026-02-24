@@ -20,7 +20,7 @@ from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
 from accounts.models import SavedPost
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
@@ -31,8 +31,7 @@ from .forms import CustomUserCreationForm
 from .forms import ProfileForm
 from notifications.models import Notification
 
-from .models import CustomUser
-from .models import UserLike
+from .models import CustomUser, UserLike, Match
 
 import uuid
 
@@ -49,7 +48,28 @@ def user_list(request):
         is_superuser=False
     ).exclude(pk=request.user.pk)
 
-    return render(request, "accounts/user_list.html", {"users": users})
+    # ✅ マッチ済み
+    matches = Match.objects.filter(
+        Q(user1=request.user) | Q(user2=request.user)
+    )
+
+    matched_user_ids = []
+    for match in matches:
+        if match.user1 == request.user:
+            matched_user_ids.append(match.user2.id)
+        else:
+            matched_user_ids.append(match.user1.id)
+
+    # ✅ LIKE済み（修正版）
+    liked_user_ids = UserLike.objects.filter(
+        from_user=request.user
+    ).values_list("to_user_id", flat=True)
+
+    return render(request, "accounts/user_list.html", {
+        "users": users,
+        "matched_user_ids": matched_user_ids,
+        "liked_user_ids": list(liked_user_ids),
+    })
 
 @login_required
 def user_detail(request, pk):
@@ -421,14 +441,84 @@ class UserListView(ListView):
 @login_required
 def like_user(request, user_id):
     if request.method == "POST":
-        target_user = get_object_or_404(User, id=user_id)
+        to_user = get_object_or_404(User, id=user_id)
 
-        if target_user != request.user:
-            UserLike.objects.get_or_create(
-                from_user=request.user,
-                to_user=target_user
+        # 🚫 自分にLIKE禁止
+        if request.user == to_user:
+            return JsonResponse({"status": "error", "message": "自分にはLIKEできません"})
+
+        like, created = UserLike.objects.get_or_create(
+            from_user=request.user,
+            to_user=to_user
+        )
+
+        # すでに押してた場合
+        if not created:
+            return JsonResponse({"status": "already_liked"})
+
+        # 🔥 相手が自分をLIKEしているか確認
+        is_match = UserLike.objects.filter(
+            from_user=to_user,
+            to_user=request.user
+        ).exists()
+
+        if is_match:
+            return JsonResponse({"status": "matched"})
+
+        return JsonResponse({"status": "liked"})
+    
+
+@login_required
+def like_user(request, user_id):
+    if request.method == "POST":
+        to_user = get_object_or_404(User, id=user_id)
+
+        if request.user == to_user:
+            return JsonResponse({"status": "error"})
+
+        like, created = UserLike.objects.get_or_create(
+            from_user=request.user,
+            to_user=to_user
+        )
+
+        # 🔥 相互LIKE確認
+        is_match = UserLike.objects.filter(
+            from_user=to_user,
+            to_user=request.user
+        ).exists()
+
+        if is_match:
+            # 🔥 重複防止のためID順に固定
+            user1 = min(request.user, to_user, key=lambda u: u.id)
+            user2 = max(request.user, to_user, key=lambda u: u.id)
+
+            Match.objects.get_or_create(
+                user1=user1,
+                user2=user2
             )
 
-        return JsonResponse({"status": "ok"})
+            return JsonResponse({"status": "matched"})
 
-    return JsonResponse({"status": "error"})
+        if not created:
+            return JsonResponse({"status": "already_liked"})
+
+        return JsonResponse({"status": "liked"})
+    
+
+@login_required
+def match_list(request):
+    matches = Match.objects.filter(
+        Q(user1=request.user) | Q(user2=request.user)
+    )
+
+    match_users = []
+    for match in matches:
+        if match.user1 == request.user:
+            match_users.append(match.user2)
+        else:
+            match_users.append(match.user1)
+
+    return render(request, "accounts/user_list.html", {
+        "users": match_users,   # ← user_listと同じ変数名にする
+        "is_match_page": True   # ← オプション（後で使える）
+    })

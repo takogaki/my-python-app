@@ -109,8 +109,62 @@ container.addEventListener("touchend", () => {
         topCard.style.transition = "transform 0.3s ease";
         topCard.style.transform = "translateX(0) rotate(0)";
     }
-
-    isDragging = false;
+    isDragging = false; 
 });
 
+/* =========================
+   ❤ Likeボタン（保存対応版）
+========================= */
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = cookie.substring(name.length + 1);
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+container.addEventListener("click", function (e) {
+
+    const btn = e.target.closest(".likeBtn");
+    if (!btn) return;
+
+    e.stopPropagation();
+
+    const userId = btn.dataset.userId;
+
+    fetch(`/accounts/like/${userId}/`, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+        "Content-Type": "application/json",
+    },
+})
+.then(res => res.json())
+.then(data => {
+    console.log("Success:", data);
+
+    if (data.status === "matched") {
+        btn.classList.add("liked");
+        alert("🎉 マッチ成立！");
+    }
+
+    if (data.status === "liked") {
+        btn.classList.add("liked");
+    }
+
+    if (data.status === "already_liked") {
+        btn.classList.add("liked");
+    }
+})
+.catch(error => console.error("Error:", error));
+    });
 });

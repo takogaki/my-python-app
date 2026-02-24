@@ -19,7 +19,6 @@ urlpatterns = [
 
     # ユーザー一覧・詳細
     path("users/", views.user_list, name="user_list"),
-    path("like/<int:user_id>/", like_user, name="like_user"),
     path("users/<str:username>/", views.UserDetailView.as_view(), name="user_detail"),
 
     # ユーザー公開ページ（username指定）
@@ -42,4 +41,8 @@ urlpatterns = [
     path("contact-eden/done/", views.contact_eden_done, name="contact_eden_done"),
     # 404エラー未ログイン時
     path("contact-eden-public/", views.contact_eden_public, name="contact_eden_public"),
+
+    #likeユーザー
+    path("like/<int:user_id>/", views.like_user, name="like_user"),
+    path("matches/", views.match_list, name="match_list"),
 ]

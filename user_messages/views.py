@@ -6,6 +6,9 @@ from .forms import ReplyMessageForm
 from .models import Message
 from accounts.models import CustomUser
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.db.models import Q
+from accounts.models import Match
 
 @login_required
 def message_box(request):
@@ -24,6 +27,15 @@ def send_message(request, username):
     """ユーザーBにメールを送信"""
     recipient = get_object_or_404(CustomUser, username=username)  # ユーザーB
     sender = request.user  # メールを送るユーザーA（ログイン中のユーザー）
+
+    # 🔐 マッチしているか確認
+    is_matched = Match.objects.filter(
+        Q(user1=sender, user2=recipient) |
+        Q(user1=recipient, user2=sender)
+    ).exists()
+
+    if not is_matched:
+        return HttpResponseForbidden("マッチしていない相手には送信できません。")
 
     if request.method == "POST":
         message_body = request.POST.get("message")

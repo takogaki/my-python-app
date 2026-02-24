@@ -123,8 +123,46 @@ class UserLike(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # 🔥 追加：通知管理用
+    is_read = models.BooleanField(default=False)
+
     class Meta:
         unique_together = ("from_user", "to_user")
 
     def __str__(self):
         return f"{self.from_user.username} → {self.to_user.username}"
+
+    def is_match(self):
+        """
+        相互LIKEならTrue
+        """
+        return UserLike.objects.filter(
+            from_user=self.to_user,
+            to_user=self.from_user
+        ).exists()
+
+    def save(self, *args, **kwargs):
+        # 🚫 自分にLIKE禁止
+        if self.from_user == self.to_user:
+            return
+        super().save(*args, **kwargs)
+
+
+class Match(models.Model):
+    user1 = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="matches_as_user1"
+    )
+    user2 = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="matches_as_user2"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user1", "user2")
+
+    def __str__(self):
+        return f"{self.user1} ❤️ {self.user2}"
