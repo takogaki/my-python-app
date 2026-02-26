@@ -1,0 +1,28 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+not matching｜SPIRYTUS
+{% endblock %}
+
+{% block content %}
+<div class="notmatch-wrapper">
+    <div class="notmatch-card">
+
+        <div class="emoji">💔</div>
+
+        <h2>まだマッチしていません</h2>
+
+        <p>
+            {{ target_user.username }} さんとは
+            まだマッチしていないため
+            メッセージを送ることができません。
+        </p>
+
+        <a href="{% url 'accounts:user_list' %}" class="back-btn">
+            ユーザー一覧へ戻る
+        </a>
+
+    </div>
+</div>
+{% endblock %}

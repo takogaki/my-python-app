@@ -30,11 +30,16 @@ body {
 .card {
     position: absolute;
     inset: 0;
+    width: 100%;
     overflow: hidden;
     border-radius: 20px;
     transition: transform 0.4s ease, opacity 0.4s ease;
     pointer-events: none; /* JSで制御する */
     transform: translateX(0) rotate(0);
+}
+
+.card:first-child {
+    z-index: 10;
 }
 
 /* 画像 */

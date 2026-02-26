@@ -35,7 +35,14 @@ def send_message(request, username):
     ).exists()
 
     if not is_matched:
-        return HttpResponseForbidden("マッチしていない相手には送信できません。")
+        return render(
+            request,
+            "message/not_matched.html",
+            {
+                "target_user": recipient
+            },
+            status=403
+        )
 
     if request.method == "POST":
         message_body = request.POST.get("message")

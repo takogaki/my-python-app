@@ -13,10 +13,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateTopCardState() {
         const cards = getCards();
 
-        cards.forEach(card => {
-            card.style.pointerEvents = "none";
-            card.style.zIndex = "0";
-        });
+        cards.forEach((card, index) => {
+        card.style.pointerEvents = index === 0 ? "auto" : "none";
+        card.style.zIndex = cards.length - index;
+    });
 
         if (cards.length > 0) {
             cards[0].style.pointerEvents = "auto";
@@ -36,8 +36,8 @@ document.addEventListener("DOMContentLoaded", function () {
         topCard.classList.add(className);
 
         setTimeout(() => {
-            topCard.classList.remove(className);
             container.appendChild(topCard);
+            topCard.classList.remove(className);
             updateTopCardState();
         }, 400);
     }
