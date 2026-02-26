@@ -45,9 +45,15 @@ def send_message(request, username):
         )
 
     if request.method == "POST":
-        message_body = request.POST.get("message")
-        message_body = f"{message_body}\n\n※このメールには返信できません。返信はサイト上でお願いいたします。"
+        raw_message = request.POST.get("message")
+        message_body = f"{raw_message}\n\n※このメールには返信できません。返信はサイト上でお願いいたします。"
         subject = f"{sender.username}さんからのメッセージ"
+
+        if not raw_message or raw_message.strip() == "":
+            return render(request, "message/send_message.html", {
+                "recipient": recipient,
+                "error": "メッセージを入力してください"
+            })
 
         # メールの作成
         email = EmailMessage(
