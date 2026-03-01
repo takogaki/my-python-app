@@ -11,6 +11,21 @@
         <div class="dashboard">
                 <h1 class="site-catch">好きなときに、好きなだけ</h1>
 
+                <!-- 👥 ユーザー -->
+                <div class="dashboard-section">
+                        <h3>👥 探す</h3>
+                        <a href="{% url 'accounts:user_list' %}" class="dashboard-button ghost">
+                                登録ユーザー一覧
+                        </a>
+                </div>
+                
+                <!-- 🕊 メッセージ -->
+                <div class="dashboard-section">
+                        <a href="{% url 'user_messages:message_box' %}" class="dashboard-button primary">
+                                💌 メッセージボックス
+                        </a>
+                </div>
+
                 <!-- 💬 話す -->
                 <div class="dashboard-section">
                         <h3>💬 書く</h3>
@@ -39,21 +54,6 @@
                         </a>
                         <a href="{% url 'diary:page_list' %}" class="dashboard-button ghost">
                                 日記一覧
-                        </a>
-                </div>
-
-                <!-- 👥 ユーザー -->
-                <div class="dashboard-section">
-                        <h3>👥 探す</h3>
-                        <a href="{% url 'accounts:user_list' %}" class="dashboard-button ghost">
-                                登録ユーザー一覧
-                        </a>
-                </div>
-
-                <!-- 🕊 メッセージ -->
-                <div class="dashboard-section">
-                        <a href="{% url 'user_messages:message_box' %}" class="dashboard-button primary">
-                                💌 メッセージボックス
                         </a>
                 </div>
 

@@ -7,6 +7,11 @@ load_dotenv()
 # ==============================
 # 基本設定
 # ==============================
+# ==============================
+#ローカルサーバー起動
+#daphne myproject.asgi:application
+# ==============================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
@@ -142,6 +147,7 @@ INSTALLED_APPS = [
     "user_messages",
     "django_extensions",
     "notifications",
+    "channels",
 ]
 
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True
@@ -181,6 +187,24 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "myproject.wsgi.application"
+ASGI_APPLICATION = "myproject.asgi.application"
+
+#本番用
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+#開発用
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",
+#     },
+# }
 
 # ----------------------------------
 # データベース
@@ -289,6 +313,9 @@ CONTENT_SECURITY_POLICY = {
         "connect-src": (
             "'self'",
             "https://meet.jit.si",
+            "ws://127.0.0.1:8000",
+            "ws://localhost:8000",
+            "wss://my-python-app-0t2k.onrender.com",
         ),
 
         "script-src": (

@@ -9,50 +9,58 @@
 
 <div class="page-container">
 
-    <!-- タイトルカード -->
     <div class="intro-card">
         <h2 class="page-title">メッセージボックス</h2>
         <p class="page-description">
-            これまでに届いたメッセージ一覧です。
+            やり取り中のユーザー一覧です。
         </p>
     </div>
 
     {% if messages %}
     {% for message in messages %}
-    <div class="post block {% if not message.is_read %}unread{% endif %}">
-    
+
+    <div class="post block {% if message.recipient == request.user and not message.is_read %}unread{% endif %}">
+
         <p class="post-author">
-            From：
-            {% if message.sender.is_staff %}
-            <span class="author-name">
-                {{ message.sender.username }}
-            </span>
+
+            {% if message.sender == request.user %}
+            <a href="{% url 'user_messages:send_message' message.recipient.username %}">
+                {{ message.recipient.username }}
+            </a>
             {% else %}
-            <a href="{% url 'accounts:user_detail' message.sender.username %}">
+            <a href="{% url 'user_messages:send_message' message.sender.username %}">
                 {{ message.sender.username }}
             </a>
             {% endif %}
-    
-            {% if not message.is_read %}
+
+            {% if message.recipient == request.user and not message.is_read %}
             <span class="badge unread">未読</span>
             {% endif %}
+
         </p>
-    
+
         <p class="post-body">
-            {{ message.content|linebreaksbr }}
+            {{ message.content|truncatechars:40 }}
         </p>
-    
+
         <small class="post-date">
             {{ message.sent_at|date:"Y/m/d H:i" }}
         </small>
-    
+
         <div style="margin-top: 12px; text-align: center;">
-            <a href="{% url 'user_messages:message_detail' message.id %}" class="btn primary">
-                詳細
+            {% if message.sender == request.user %}
+            <a href="{% url 'user_messages:send_message' message.recipient.username %}" class="btn primary">
+                トークを見る
             </a>
+            {% else %}
+            <a href="{% url 'user_messages:send_message' message.sender.username %}" class="btn primary">
+                トークを見る
+            </a>
+            {% endif %}
         </div>
-    
+
     </div>
+
     {% endfor %}
     {% else %}
     <div class="post block">

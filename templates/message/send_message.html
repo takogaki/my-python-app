@@ -1,27 +1,55 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
 
-メッセージを送る｜SPIRYTUS
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'user_messages/css/message.css' %}">
+{% endblock %}
 
 {% block body %}
 
 <div class="card">
     <h2 class="card-title">
-        {{ recipient.username }}さんにメッセージを送る
+        {{ recipient.username }}さんとのチャット
     </h2>
 
-    <form method="POST" class="message-form">
-        {% csrf_token %}
+    <!-- チャット表示エリア -->
+    <div id="chat-box" data-username="{{ recipient.username }}" data-current-user="{{ request.user.username }}">
     
-        <div class="form-group">
-            <label for="message" class="form-label">
-                メッセージ
-            </label>
-    
-            <textarea id="message" name="message" class="form-textarea" placeholder="ここにメッセージを入力してください（相手を傷つけない言葉を心がけましょう）" rows="6"
-                required></textarea>
+        {% for message in messages %}
+        <div class="chat-row {% if message.sender == request.user %}my-row{% else %}other-row{% endif %}">
+        
+            <!-- プロフィール画像 -->
+            {% if message.sender.profile_image %}
+            <img src="{{ message.sender.profile_image.url }}" class="chat-avatar">
+            {% else %}
+            <img src="{% static 'accounts/img/default_avatar.png' %}" class="chat-avatar">
+            {% endif %}
+        
+            <div class="chat-bubble-wrapper">
+        
+                <!-- 名前 -->
+                <a class="chat-username"
+                    href="{% if message.sender == request.user %}{% url 'accounts:mypage' %}{% else %}{% url 'accounts:user_detail' message.sender.username %}{% endif %}">
+                    {{ message.sender.username }}
+                </a>
+        
+                <!-- 吹き出し -->
+                <div class="chat-bubble {% if message.sender == request.user %}my-bubble{% else %}other-bubble{% endif %}">
+                    {{ message.content }}
+                </div>
+        
+            </div>
         </div>
+        {% endfor %}
     
+    </div>
+
+    <!-- フォーム（POSTは使わない） -->
+    <form id="chat-form" class="message-form">
+        <div class="form-group">
+            <textarea id="message-input" class="form-textarea" placeholder="メッセージを入力" rows="3" required></textarea>
+        </div>
+
         <div class="card-actions">
             <button type="submit" class="btn primary">
                 送信
@@ -36,4 +64,8 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'user_messages/js/message.js' %}"></script>
 {% endblock %}

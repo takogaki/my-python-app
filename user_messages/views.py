@@ -7,14 +7,33 @@ from .models import Message
 from accounts.models import CustomUser
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.db.models import Q
+from django.db.models import Max, Q
 from accounts.models import Match
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @login_required
 def message_box(request):
-    messages = Message.objects.filter(
-        recipient=request.user
+    user = request.user
+
+    # 自分が関わっているメッセージを新しい順に取得
+    all_messages = Message.objects.filter(
+        Q(sender=user) | Q(recipient=user)
     ).order_by("-sent_at")
+
+    conversation_dict = {}
+
+    for msg in all_messages:
+        # 相手を特定
+        partner = msg.recipient if msg.sender == user else msg.sender
+
+        # まだその相手が登録されていなければ登録（＝最新メッセージ）
+        if partner.id not in conversation_dict:
+            conversation_dict[partner.id] = msg
+
+    # 最新メッセージだけのリスト
+    messages = list(conversation_dict.values())
 
     return render(
         request,
@@ -24,67 +43,49 @@ def message_box(request):
 
 @login_required
 def send_message(request, username):
-    """ユーザーBにメールを送信"""
-    recipient = get_object_or_404(CustomUser, username=username)  # ユーザーB
-    sender = request.user  # メールを送るユーザーA（ログイン中のユーザー）
+    recipient = get_object_or_404(User, username=username)
+    sender = request.user
 
-    # 🔐 マッチしているか確認
+    # 🔐 マッチ確認
     is_matched = Match.objects.filter(
         Q(user1=sender, user2=recipient) |
         Q(user1=recipient, user2=sender)
     ).exists()
 
     if not is_matched:
-        return render(
-            request,
-            "message/not_matched.html",
-            {
-                "target_user": recipient
-            },
-            status=403
-        )
+        return render(request, "message/not_matched.html", {
+            "target_user": recipient
+        }, status=403)
 
+    # ✅ ここに追加（未読 → 既読）
+    Message.objects.filter(
+        sender=recipient,
+        recipient=sender,
+        is_read=False
+    ).update(is_read=True)
+
+    # POSTならメッセージ保存
     if request.method == "POST":
-        raw_message = request.POST.get("message")
-        message_body = f"{raw_message}\n\n※このメールには返信できません。返信はサイト上でお願いいたします。"
-        subject = f"{sender.username}さんからのメッセージ"
+        content = request.POST.get("message")
 
-        if not raw_message or raw_message.strip() == "":
-            return render(request, "message/send_message.html", {
-                "recipient": recipient,
-                "error": "メッセージを入力してください"
-            })
+        if content and content.strip():
+            Message.objects.create(
+                sender=sender,
+                recipient=recipient,
+                content=content.strip()
+            )
 
-        # メールの作成
-        email = EmailMessage(
-            subject=subject,  # 件名
-            body=message_body,  # メッセージ本文
-            from_email=None,  # `DEFAULT_FROM_EMAIL`を使用
-            to=[recipient.email],  # ユーザーBのメールアドレス
-            reply_to=[settings.EMAIL_HOST_USER],  # 返信先を固定のメールアドレスに設定
-        )
+    # 🔥 履歴取得
+    messages = Message.objects.filter(
+        Q(sender=sender, recipient=recipient) |
+        Q(sender=recipient, recipient=sender)
+    ).order_by("sent_at")
 
-        # トランザクションを使用してメッセージ送信とデータ保存を一緒に処理
-        try:
-            with transaction.atomic():
-                # メール送信
-                email.send()
+    return render(request, "message/send_message.html", {
+        "recipient": recipient,
+        "messages": messages
+    })
 
-                # メッセージをデータベースに保存
-                if sender and recipient:
-                    Message.objects.create(
-                        sender=sender,
-                        recipient=recipient,
-                        content=message_body,
-                    )
-
-            return redirect("user_messages:success")  # メール送信後に成功ページへ
-
-        except Exception as e:
-            print(f"Error occurred: {e}")
-            return redirect("user_messages:failure")  # エラーハンドリング（必要に応じて）
-
-    return render(request, "message/send_message.html", {"recipient": recipient})
 
 @login_required
 def index(request):

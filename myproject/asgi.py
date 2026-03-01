@@ -7,20 +7,26 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 """
 
-# video_chat/asgi.py
+# myproject/asgi.py
+
 import os
-from django.core.asgi import get_asgi_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
+
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-import chat.routing
+from django.core.asgi import get_asgi_application
+import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+django.setup()  # ← ★これが超重要★
+
+import user_messages.routing  # setup後に読み込む
 
 application = ProtocolTypeRouter({
-    'http': get_asgi_application(),
-    'websocket': AuthMiddlewareStack(
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
         URLRouter(
-            chat.routing.websocket_urlpatterns
+            user_messages.routing.websocket_urlpatterns
         )
     ),
 })
