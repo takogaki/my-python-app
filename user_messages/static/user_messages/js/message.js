@@ -15,37 +15,48 @@ document.addEventListener("DOMContentLoaded", function () {
         protocol + window.location.host + "/ws/chat/" + username + "/"
     );
 
+    // 受信メッセージ処理
     socket.onmessage = function (e) {
         const data = JSON.parse(e.data);
 
+        // チャット行の作成
         const row = document.createElement("div");
         row.classList.add("chat-row");
+        row.classList.add(data.sender === currentUser ? "my-row" : "other-row");
 
-        if (data.sender === currentUser) {
-            row.classList.add("my-row");
-        } else {
-            row.classList.add("other-row");
-        }
-
-        const imageUrl = data.image_url && data.image_url !== ""
+        // アバター
+        const avatar = document.createElement("img");
+        avatar.src = data.image_url && data.image_url !== ""
             ? data.image_url
             : "/static/accounts/img/default_avatar.png";
+        avatar.classList.add("chat-avatar");
 
-        row.innerHTML = `
-            <img src="${imageUrl}" class="chat-avatar">
+        // バブルラッパー
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("chat-bubble-wrapper");
 
-            <div class="chat-bubble-wrapper">
-                <a class="chat-username">${data.sender}</a>
-                <div class="chat-bubble">
-                    ${data.message}
-                </div>
-            </div>
-        `;
+        // ユーザー名
+        const usernameEl = document.createElement("a");
+        usernameEl.classList.add("chat-username");
+        usernameEl.textContent = data.sender;
 
+        // メッセージバブル
+        const bubble = document.createElement("div");
+        bubble.classList.add("chat-bubble");
+        bubble.textContent = data.message;
+
+        // DOM構造を組み立てる
+        wrapper.appendChild(usernameEl);
+        wrapper.appendChild(bubble);
+        row.appendChild(avatar);
+        row.appendChild(wrapper);
         chatBox.appendChild(row);
+
+        // 最新スクロール
         chatBox.scrollTop = chatBox.scrollHeight;
     };
 
+    // メッセージ送信
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -53,9 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!message) return;
 
         if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({
-                message: message
-            }));
+            socket.send(JSON.stringify({ message }));
         }
 
         input.value = "";

@@ -295,9 +295,12 @@ TEMPLATES[0]["OPTIONS"]["context_processors"] += [
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": (
+        "default-src": ("'self'",),
+        "style-src": (
             "'self'",
+            "'unsafe-inline'",  # ←ここを追加
         ),
+        
 
         "frame-src": (
             "'self'",
