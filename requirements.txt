@@ -5,6 +5,7 @@ Django==5.1.2
 dj-database-url==1.2.0
 psycopg2-binary==2.9.7
 whitenoise==6.5.0
+django-csp==3.8
 
 # ==========================
 # Channels / WebSocket
@@ -24,16 +25,3 @@ cloudinary==1.44.1
 # ==========================
 python-dotenv==1.0.0
 Faker==33.1.0
-
-# ==========================
-# aext 系パッケージ（GitHub URL からインストール）
-# ==========================
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-assistant
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-assistant-server
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-core
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-core-server
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-panels
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-panels-server
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-share-notebook
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-share-notebook-server
-# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-shared
