@@ -340,4 +340,28 @@ CONTENT_SECURITY_POLICY = {
     }
 }
 
+# ==========================
+# キャッシュ・セッション設定（Redis / 開発用切り替え）
+# ==========================
+if "REDIS_URL" in os.environ:
+    # 本番 Redis 用
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": os.environ["REDIS_URL"],
+            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+else:
+    # 開発用 LocMemCache
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
