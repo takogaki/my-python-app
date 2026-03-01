@@ -28,12 +28,12 @@ Faker==33.1.0
 # ==========================
 # aext 系パッケージ（GitHub URL からインストール）
 # ==========================
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-assistant
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-assistant-server
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-core
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-core-server
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-panels
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-panels-server
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-share-notebook
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-share-notebook-server
-git+https://github.com/takogaki/my-python-app.git@main#egg=aext-shared
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-assistant
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-assistant-server
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-core
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-core-server
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-panels
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-panels-server
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-share-notebook
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-share-notebook-server
+# git+https://github.com/takogaki/my-python-app.git@main#egg=aext-shared
