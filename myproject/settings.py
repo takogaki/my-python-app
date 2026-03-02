@@ -132,13 +132,12 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     "cloudinary_storage",
     "cloudinary",
-    "csp",
+    # "csp",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "accounts.apps.AccountsConfig",
     "diary.apps.DiaryConfig",
@@ -368,3 +367,5 @@ else:
     SESSION_CACHE_ALIAS = "default"
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+print(BASE_DIR)
