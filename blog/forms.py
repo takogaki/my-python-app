@@ -1,12 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from urllib.parse import urlparse
-from faker import Faker
 from .validators import validate_video_url
 
 from .models import Post, Comment
-
-fake = Faker()
 
 # =======================
 # 許可する動画ドメイン（本番用）
