@@ -1,38 +1,26 @@
-appdirs==1.4.4
+Django==5.1.2
 asgiref==3.8.1
-atomicwrites==1.4.0
-autobahn==25.12.2
-cbor2==5.8.0
-cffi==2.0.0
+
+# ASGI / WebSocket
 channels==4.0.0
 channels-redis==4.0.0
-cloudinary==1.44.1
 daphne==4.2.1
-dj-database-url==1.2.0
-Django==5.1.2
-django-cloudinary-storage==0.3.0
-django-extensions==4.1
-django-redis==6.0.0
-django-sitemaps==2.0.2
-django-sslserver==0.22
-django_csp==3.8
-Faker==33.1.0
-gunicorn==20.1.0
-jsonpointer==2.1
-mysqlclient==2.2.6
-Pillow==10.4.0
-protobuf==3.20.3
-psycopg2-binary==2.9.7
-py-ubjson==0.16.1
-pyasn1-modules==0.2.8
-pyls-spyder==0.4.0
-PyQt5==5.15.10
-PyQtWebEngine==5.15.6
-python-dotenv==1.0.0
 redis==5.2.0
-setuptools==80.9.0
-sqlparse==0.5.1
-txaio==25.12.2
-unicodedata2==15.0.0
-wheel==0.45.1
+
+# Database
+dj-database-url==1.2.0
+psycopg2-binary==2.9.7
+
+# Static files
 whitenoise==6.5.0
+
+# Media (Cloudinary)
+django-cloudinary-storage==0.3.0
+cloudinary==1.44.1
+Pillow==10.4.0
+
+# Security
+django_csp==3.8
+
+# Env
+python-dotenv==1.0.0
