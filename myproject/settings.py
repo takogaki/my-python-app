@@ -254,7 +254,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # ← 共通staticのみ指定する
 STATICFILES_DIRS = [
-    BASE_DIR / "myproject" / "static",
+    BASE_DIR / "static"
 ]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
@@ -370,5 +370,3 @@ else:
     SESSION_CACHE_ALIAS = "default"
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-print(BASE_DIR)
