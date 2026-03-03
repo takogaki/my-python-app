@@ -12,6 +12,8 @@ load_dotenv()
 #daphne myproject.asgi:application
 # ==============================
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
@@ -248,8 +250,6 @@ USE_TZ = True
 # ----------------------------------
 # 静的ファイル
 # ----------------------------------
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # ← 共通staticのみ指定する
