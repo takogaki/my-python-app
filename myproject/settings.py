@@ -31,7 +31,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
-DEBUG = True
+# DEBUG = True
 
 # DEBUG = False
 # ALLOWED_HOSTS = ["*"]  # 一時的
