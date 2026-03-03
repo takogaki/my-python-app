@@ -5,7 +5,6 @@ from django.db import models
 from django.db.models import Count
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from faker import Faker
 from .forms import CommentForm, PostForm
 from .models import Post, Comment, Report, CommentReport
 from django.contrib import messages
@@ -19,8 +18,6 @@ from .utils import get_device_id
 
 
 User = get_user_model()
-
-fake = Faker()
 
 
 def notify_admins(request, obj, level):
