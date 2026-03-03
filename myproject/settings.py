@@ -5,14 +5,28 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ==============================
-# 基本設定
-# ==============================
-# ==============================
 #ローカルサーバー起動
 #daphne myproject.asgi:application
 # ==============================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ----------------------------------
+# 静的ファイル
+# ----------------------------------
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+# ← 共通staticのみ指定する
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# ==============================
+# 基本設定
+# ==============================
 
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
@@ -247,18 +261,6 @@ TIME_ZONE = "Asia/Tokyo"
 USE_I18N = True
 USE_TZ = True
 
-# ----------------------------------
-# 静的ファイル
-# ----------------------------------
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-# ← 共通staticのみ指定する
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 # ----------------------------------
 # メール
