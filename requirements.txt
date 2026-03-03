@@ -20,6 +20,7 @@ Faker==33.1.0
 gunicorn==20.1.0
 jsonpointer==2.1
 mysqlclient==2.2.6
+Pillow==10.4.0
 protobuf==3.20.3
 psycopg2-binary==2.9.7
 py-ubjson==0.16.1
