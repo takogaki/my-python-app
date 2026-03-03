@@ -143,24 +143,28 @@ CLOUDINARY_STORAGE = {
 # アプリケーション定義
 # ----------------------------------
 INSTALLED_APPS = [
-    'django.contrib.sitemaps',
-    "cloudinary_storage",
-    "cloudinary",
-    "csp",
+    # Django core（必須）
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    'django.contrib.staticfiles',
-    "accounts.apps.AccountsConfig",
-    "diary.apps.DiaryConfig",
-    "blog.apps.BlogConfig",
+    "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
+
+    # Third-party（本番で実際に使っているもの）
+    "channels",
+    "cloudinary",
+    "cloudinary_storage",
+    "csp",
+
+    # Your apps（実際に存在しているアプリのみ）
+    "accounts",
+    "diary",
+    "blog",
     "videochat",
     "user_messages",
-    "django_extensions",
     "notifications",
-    "channels",
 ]
 
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True
