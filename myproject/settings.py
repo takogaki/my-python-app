@@ -12,8 +12,6 @@ load_dotenv()
 #daphne myproject.asgi:application
 # ==============================
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "development")
 DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
@@ -250,9 +248,14 @@ USE_TZ = True
 # ----------------------------------
 # 静的ファイル
 # ----------------------------------
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# ← 共通staticのみ指定する
+STATICFILES_DIRS = [
+    BASE_DIR / "myproject" / "static",
+]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
