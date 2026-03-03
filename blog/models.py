@@ -7,8 +7,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-fake = Faker()
-
 
 class Post(models.Model):
     VIDEO_TYPE_CHOICES = [
