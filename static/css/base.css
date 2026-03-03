@@ -31,6 +31,20 @@
     margin-bottom: 1.4em;
 }
 
+.user-count {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.85rem;
+    color: #777;
+}
+
+.small {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 4px;
+}
+
 
 /* =========================
    リセット & 共通設定
