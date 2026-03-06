@@ -1,14 +1,4 @@
 /* =========================
-   共通レイアウト
-========================= */
-.content-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 16px;
-    box-sizing: border-box;
-}
-
-/* =========================
    ページ導入（タイトル・説明）
 ========================= */
 .page-title {
@@ -23,21 +13,6 @@
     color: #666;
     line-height: 1.6;
     margin-bottom: 20px;
-}
-
-/* =========================
-   共通カード
-========================= */
-.intro-card,
-.post-form-card,
-.info-card,
-.post {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 680px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
 /* =========================

@@ -1,3 +1,28 @@
+/* =========================
+   共通レイアウト
+========================= */
+.content-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* =========================
+   共通カード
+========================= */
+.intro-card,
+.post-form-card,
+.info-card,
+.post {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 680px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
 .logo-text {
     display: inline-block;
     text-decoration: none;
@@ -45,6 +70,21 @@
     margin-top: 4px;
 }
 
+.site-footer{
+    text-align:center;
+    padding:30px 0;
+    font-size:14px;
+    color:#777;
+    border-top:1px solid #eee;
+}
+
+.site-footer .user-count{
+    margin-bottom: 6px;
+    font-size: 14px;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+}
 
 /* =========================
    リセット & 共通設定
