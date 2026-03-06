@@ -11,30 +11,27 @@
     <meta property="og:site_name" content="the.SPIRYTUS">
     <meta property="og:title" content="SPIRYTUS｜好きなときに、好きなだけ">
     <meta property="og:description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og/ogp_spirytus.png' %}">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'spirytus/images/og/ogp_spirytus.png' %}">
     <meta property="og:url" content="https://my-python-app-0t2k.onrender.com/">
 
     <!-- Twitter(X) -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SPIRYTUS｜好きなときに、好きなだけ">
     <meta name="twitter:description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
-    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og/ogp_spirytus.png' %}">
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'spirytus/images/og/ogp_spirytus.png' %}">
 
     <!-- Google -->
     <meta name="google-site-verification" content="GUHdMs02t79910_YzaHxrFxZIThm4GNQdTJ0NKlbR98" />
 
     <!-- Standard favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'diary/img/favicon-32.png' %}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'diary/img/favicon-192.png' %}">
-    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'diary/img/favicon-512.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'spirytus/images/og/favicon-32.png' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'spirytus/images/og/favicon-192.png' %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'spirytus/images/og/favicon-512.png' %}">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'blog/css/blog_form.css' %}">
-    <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
-    <link rel="stylesheet" href="{% static 'chat/css/video_chat.css' %}">
+    <link rel="stylesheet" href="{% static 'spirytus/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'spirytus/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'spirytus/css/style.css' %}">
     {% block extra_css %}{% endblock %}
 
     <!-- Meta -->
@@ -42,7 +39,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- JS -->
-    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'spirytus/js/base.js' %}"></script>
 
     <!-- Title & Description -->
     <title>{% block title %}the.SPIRYTUS | 出会い・趣味共有・学び合いができる新世代SNS{% endblock %}</title>
