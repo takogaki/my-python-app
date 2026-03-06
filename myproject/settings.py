@@ -18,7 +18,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # ← 共通staticのみ指定する
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    BASE_DIR / "myproject" / "static",
 ]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
