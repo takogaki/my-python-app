@@ -5,6 +5,10 @@
 参加申請中｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'videochat/css/video_chat.css' %}">
+{% endblock %}
+
 {% block body %}
 <main class="top">
     <div class="dashboard">
@@ -29,4 +33,8 @@
 
     </div>
 </main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'videochat/js/video_chat.js' %}"></script>
 {% endblock %}

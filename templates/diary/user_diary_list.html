@@ -4,6 +4,10 @@
 相手の公開日記を見る｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+{% endblock %}
+
 {% block body %}
 
 <h1>{{ user.username }} の公開日記</h1>

@@ -5,26 +5,68 @@
 思い出を残す｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+{% endblock %}
+
 {% block body %}
-<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
 
-<div class="intro-card">
-    <h2 class="page-title">日記を書く</h2>
-    <p class="page-description">
-        今日のこと、少しだけ書いてみませんか。
-    </p>
+<div class="container diary-page">
+
+    <div class="intro-card">
+        <h2 class="page-title">日記を書く</h2>
+        <p class="page-description">
+            今日のこと、少しだけ書いてみませんか。
+        </p>
+    </div>
+
+    <div class="post-form-card">
+        <form method="POST" enctype="multipart/form-data" class="post-form">
+            {% csrf_token %}
+        
+            <div class="form-group">
+                <label>タイトル</label>
+                {{ form.title }}
+            </div>
+            
+            <div class="form-group">
+                <label>本文</label>
+                {{ form.body }}
+            </div>
+            
+            <div class="form-group">
+                <label>日付</label>
+                {{ form.page_date }}
+            </div>
+            
+            <div class="form-group">
+                <label>写真</label>
+                {{ form.picture }}
+            </div>
+            
+            <!-- チェックボックス -->
+            <div class="checkbox-center">
+                <label class="checkbox-label">
+                    {{ form.is_public }}
+                    <span>チェックをつけて公開する</span>
+                </label>
+            </div>
+
+            <div class="form-submit">
+                <button type="submit" class="submit-btn">
+                    保存する
+                </button>
+            </div>
+
+        
+        </form>
+    </div>
+
 </div>
 
-<div class="post-form-card">
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="submit-btn">保存する</button>
-    </form>
-</div>
+{% endblock %}
+
 
 {% block extra_js %}
 <script src="{% static 'diary/js/diary.js' %}"></script>
-{% endblock %}
-
 {% endblock %}

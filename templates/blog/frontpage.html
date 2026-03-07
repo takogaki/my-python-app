@@ -6,8 +6,12 @@
 話す、みる｜SPIRYTUS
 {% endblock %}
 
-{% block body %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+<link rel="stylesheet" href="{% static 'blog/css/blog_form.css' %}">
+{% endblock %}
+
+{% block body %}
 
 <p class="post-content">
     {{ post.content|linebreaksbr }}
@@ -129,6 +133,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<link rel="stylesheet" href="{% static 'blog/css/blog_form.css' %}">
-<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+<link rel="stylesheet" href="{% static 'blog/css/blog.js' %}">
 {% endblock %}

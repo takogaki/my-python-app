@@ -5,6 +5,11 @@
 思い出を見る｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+<link rel="stylesheet" href="{% static 'diary/css/diary_detail.css' %}">
+{% endblock %}
+
 {% block body %}
 
 <div class="page-container">
@@ -26,9 +31,9 @@
         <!-- 公開 / 非公開 -->
         <p class="post-author">
             {% if page.is_public %}
-            <span style="color: #4da6ff; font-weight: bold;">公開中</span>
+            <span class="status-public">公開中</span>
             {% else %}
-            <span style="color: #ff6b6b; font-weight: bold;">非公開</span>
+            <span class="status-private">非公開</span>
             {% endif %}
         </p>
 

@@ -4,6 +4,10 @@
 日記の更新｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+{% endblock %}
+
 {% block body %}
 
 <form method="POST" enctype="multipart/form-data">

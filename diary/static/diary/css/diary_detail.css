@@ -1,0 +1,13 @@
+/* =========================
+   公開ステータス
+========================= */
+
+.status-public{
+    color:#4da6ff;
+    font-weight:bold;
+}
+
+.status-private{
+    color:#ff6b6b;
+    font-weight:bold;
+}

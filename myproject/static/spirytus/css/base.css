@@ -1,6 +1,10 @@
 /* =========================
    共通レイアウト
 ========================= */
+body{
+    background:#f5f6f8;
+}
+
 .content-container {
     max-width: 800px;
     margin: 0 auto;
@@ -169,6 +173,98 @@ header h1 a {
 
 .btn:hover {
     background: #4338ca;
+}
+
+/* =========================
+   ログイン画面
+========================= */
+.post-form-card{
+    max-width:640px;
+    margin:40px auto;
+    padding:30px;
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    text-align:center;
+}
+
+.intro-card{
+    text-align:center;
+    margin:40px auto 20px;
+}
+
+.page-title{
+    font-size:26px;
+    margin-bottom:10px;
+}
+
+.page-description{
+    color:#666;
+}
+
+.intro-card{
+    text-align:center;
+    margin:40px auto 20px;
+}
+
+.page-title{
+    font-size:26px;
+    margin-bottom:10px;
+}
+
+.page-description{
+    color:#666;
+}
+
+.post-form-card form p{
+    margin-bottom:18px;
+    text-align:left;
+}
+
+.post-form-card input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:14px;
+}
+
+.post-form-card input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:14px;
+}
+
+.submit-btn{
+    width:100%;
+    padding:12px;
+    background:#222;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-size:15px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.submit-btn:hover{
+    background:#000;
+}
+
+.form-footer{
+    margin-top:20px;
+    font-size:14px;
+}
+
+.form-footer a{
+    color:#0077ff;
+    text-decoration:none;
+}
+
+.form-footer a:hover{
+    text-decoration:underline;
 }
 
 /* =========================

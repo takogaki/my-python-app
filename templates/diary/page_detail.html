@@ -5,8 +5,11 @@
 日記の詳細｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+{% endblock %}
+
 {% block body %}
-<link rel="stylesheet" href="{% static 'diary/css/base.css' %}">
 
 <div class="content-container">
 
