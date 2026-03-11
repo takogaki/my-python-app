@@ -1,0 +1,13 @@
+@keyframes live-blink{
+0%{opacity:1}
+50%{opacity:0.35}
+100%{opacity:1}
+}
+
+.video-label.live{
+color:#fff;
+background:red;
+padding:6px 12px;
+border-radius:999px;
+animation:live-blink 2s infinite;
+}

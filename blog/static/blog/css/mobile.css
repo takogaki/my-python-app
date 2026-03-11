@@ -1,0 +1,11 @@
+@media(max-width:600px){
+
+.post-title{
+font-size:1.3rem;
+}
+
+.comment.reply{
+margin-left:20px;
+}
+
+}

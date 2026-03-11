@@ -1,0 +1,77 @@
+/* =========================
+   コメントエリア
+========================= */
+
+.comments{
+max-width:700px;
+margin:auto;
+}
+
+.comment-block{
+margin-bottom:25px;
+}
+
+/* コメント */
+
+.comment{
+background:#fff;
+padding:14px;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+/* 返信 */
+
+.comment.reply{
+margin-left:35px;
+background:#f7f7f7;
+}
+
+/* ヘッダー */
+
+.comment-header{
+font-weight:600;
+margin-bottom:5px;
+}
+
+/* 本文 */
+
+.comment-body{
+line-height:1.6;
+margin-bottom:10px;
+}
+
+/* 操作 */
+
+.comment-actions{
+display:flex;
+gap:12px;
+font-size:13px;
+}
+
+.comment-actions button{
+border:none;
+background:none;
+cursor:pointer;
+color:#555;
+}
+
+/* 返信リスト */
+
+.replies{
+margin-top:10px;
+margin-left:30px;
+border-left:2px solid #eee;
+padding-left:10px;
+}
+
+/* 返信フォーム */
+
+.reply-form{
+display:none;
+margin-top:10px;
+}
+
+.reply-form.active{
+display:block;
+}
