@@ -80,3 +80,41 @@
 .checkbox-label input{
     width:auto;
 }
+
+
+/* =========================
+   Edit Image Preview
+========================= */
+
+.current-image{
+    width:100%;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+/* 画像サイズ完全制御 */
+
+.edit-image-preview{
+    display:block;
+    max-width:100%;
+    height:auto;
+    margin:0 auto;
+    border-radius:10px;
+}
+
+/* 画像ラッパー */
+
+.media-wrapper{
+    width:100%;
+    overflow:hidden;
+}
+
+/* Django自動クリアチェックボックスを非表示 */
+
+input[type="checkbox"][name$="-clear"]{
+display:none;
+}
+
+label[for$="-clear_id"]{
+display:none;
+}

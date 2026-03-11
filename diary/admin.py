@@ -13,7 +13,25 @@ class PageAdmin(admin.ModelAdmin):
 
 @admin.register(LikeRecord)
 class LikeRecordAdmin(admin.ModelAdmin):
-    list_display = ('user', 'page', 'like_count', 'created_at', 'updated_at')
-    list_filter = ('created_at', 'updated_at')
-    search_fields = ('user__username', 'page__title')
-    ordering = ('-updated_at',)
+    list_display = (
+        "user",
+        "page",
+        "like_count",
+        "created_at",
+        "updated_at",
+    )
+
+    list_filter = (
+        "created_at",
+        "updated_at",
+        "page",
+    )
+
+    search_fields = (
+        "user__username",
+        "page__title",
+    )
+
+    autocomplete_fields = ("user", "page")
+
+    ordering = ("-updated_at",)

@@ -1,4 +1,5 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
 
 {% block title %}
 日記の更新｜SPIRYTUS
@@ -6,22 +7,99 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+<link rel="stylesheet" href="{% static 'diary/css/diary_detail.css' %}">
 {% endblock %}
 
 {% block body %}
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">更新</button>
-</form>
+<div class="diary-page">
 
-<div class="back-area">
-    <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">← 戻る</a>
+    <div class="intro-card">
+        <h1 class="page-title">日記を編集</h1>
+    </div>
+
+    <div class="post-form-card">
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <!-- タイトル -->
+            <div class="form-group">
+                <label>タイトル</label>
+                {{ form.title }}
+            </div>
+
+            <!-- 本文 -->
+            <div class="form-group">
+                <label>本文</label>
+                {{ form.body }}
+            </div>
+
+            <!-- 日付 -->
+            <div class="form-group">
+                <label>日付</label>
+                {{ form.page_date }}
+            </div>
+
+            <div class="form-group">
+            
+                <label>写真</label>
+            
+                {% if form.instance.picture %}
+                <div class="current-image">
+            
+                    <p class="current-label">現在の画像</p>
+            
+                    <img src="{{ form.instance.picture.url }}" class="edit-image-preview">
+            
+                    <!-- 削除チェックボックス -->
+                    <div class="checkbox-center">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="{{ form.picture.html_name }}-clear"
+                                id="{{ form.picture.id_for_label }}-clear">
+                            <span>画像を削除する</span>
+                        </label>
+                    </div>
+            
+                </div>
+                {% endif %}
+            
+                <!-- 新しい画像 -->
+                <div class="new-image">
+                    {{ form.picture }}
+                </div>
+            
+            </div>
+
+            <!-- チェックボックス（page_form と統一） -->
+            <div class="checkbox-center">
+                <label class="checkbox-label">
+                    {{ form.is_public }}
+                    <span>チェックをつけて日記を公開する</span>
+                </label>
+            </div>
+
+            <div class="form-submit">
+                <button type="submit" class="submit-btn">
+                    更新する
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <div class="back-area">
+        <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">
+            ← 戻る
+        </a>
+    </div>
+
 </div>
+
+{% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'diary/js/diary.js' %}"></script>
-{% endblock %}
-
 {% endblock %}

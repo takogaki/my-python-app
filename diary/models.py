@@ -6,6 +6,9 @@ import uuid
 
 
 class Page(models.Model):
+    class Meta:
+        ordering = ["-page_date"]  # 日付の降順で表示
+
     """
     日記ページを表すモデル
     """

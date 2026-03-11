@@ -1,0 +1,33 @@
+/* =========================
+   共通 画像モーダル
+========================= */
+
+.image-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+#modal-image{
+    max-width:90%;
+    max-height:90vh;
+    object-fit:contain;
+    border-radius:8px;
+}
+
+.image-modal .close{
+    position:absolute;
+    top:20px;
+    right:30px;
+    font-size:40px;
+    color:white;
+    cursor:pointer;
+}
+
+.image-modal .close:hover{
+    opacity:0.7;
+}

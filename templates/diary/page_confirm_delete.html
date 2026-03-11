@@ -7,6 +7,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+<link rel="stylesheet" href="{% static 'diary/css/diary_detail.css' %}">
 {% endblock %}
 
 {% block body %}
@@ -14,51 +15,56 @@
 <div class="content-container">
 
     <!-- 削除確認カード -->
-    <div class="post-detail-card">
+    <div class="post-detail-card delete-card">
 
-        <h1 class="post-title" style="color:#dc2626;">
+        <h1 class="post-title delete-title">
             ⚠️ 日記の削除確認
         </h1>
 
-        <p style="margin-bottom: 20px; color:#555;">
+        <p class="delete-warning">
             この日記を削除すると、<strong>元に戻すことはできません</strong>。<br>
             本当に削除してもよろしいですか？
         </p>
 
         <!-- 確認用 日記内容 -->
         <div class="post-meta">
-            <small>🕒 {{ page.page_date }}</small><br>
-            <small>✍️ {{ page.author }}</small>
+            <small>🕒 {{ object.page_date }}</small><br>
+            <small>✍️ {{ object.author }}</small>
         </div>
 
-        <h2 class="subtitle">{{ page.title }}</h2>
+        <h2 class="subtitle">{{ object.title }}</h2>
 
         <div class="post-body">
-            {{ page.body|linebreaks }}
+            {{ object.body|linebreaks }}
         </div>
 
-        {% if page.picture %}
-        <img src="{{ page.picture.url }}" class="comment-media-thumb">
+        {% if object.picture %}
+        <div class="media-wrapper">
+            <img src="{{ object.picture.url }}" class="comment-media-thumb">
+        </div>
         {% endif %}
 
         <!-- 削除フォーム -->
-        <form method="POST" style="margin-top: 30px;">
+        <form method="POST" class="delete-form">
             {% csrf_token %}
-            <button type="submit" class="submit-btn" style="background:#dc2626;">
+            <button type="submit" class="delete-btn">
                 この日記を削除する
             </button>
         </form>
 
         <!-- 戻る -->
         <div class="back-area">
-            <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">← 戻る</a>
+            <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">
+                ← 戻る
+            </a>
         </div>
+
     </div>
 
 </div>
 
-{% block extra_js %}
-<script src="{% static 'diary/js/diary.js' %}"></script>
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'diary/js/diary.js' %}"></script>
 {% endblock %}

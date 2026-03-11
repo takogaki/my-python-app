@@ -7,6 +7,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'diary/css/diary_form.css' %}">
+<link rel="stylesheet" href="{% static 'diary/css/diary_detail.css' %}">
 {% endblock %}
 
 {% block body %}
@@ -18,7 +19,13 @@
 
         <div class="post-meta">
             <small>🕒 {{ page.page_date }}</small><br>
-            <small>✍️ {{ page.author }}</small>
+            <small>✍️ {{ page.author }}</small><br>
+        
+            {% if page.is_public %}
+            <span class="status public">🌍 公開中</span>
+            {% else %}
+            <span class="status private">🔒 非公開</span>
+            {% endif %}
         </div>
 
         <h1 class="post-title">{{ page.title }}</h1>
@@ -29,15 +36,15 @@
 
         {% if page.picture %}
         <div class="media-wrapper">
-            <img src="{{ page.picture.url }}" class="comment-media-thumb">
+            <img src="{{ page.picture.url }}" class="diary-media-thumb">
         </div>
         {% endif %}
 
         <!-- 作成者のみ編集・削除 -->
         {% if page.author == request.user %}
         <div class="action-area">
-            <a href="{% url 'diary:page_update' page.id %}" class="action-link">✏️ 編集</a>
-            <a href="{% url 'diary:page_delete' page.id %}" class="action-link danger">🗑 削除</a>
+            <a href="{% url 'diary:page_update' page.pk %}" class="action-link">✏️ 編集</a>
+            <a href="{% url 'diary:page_delete' page.pk %}" class="action-link danger">🗑 削除</a>
         </div>
         {% endif %}
     </div>
@@ -76,8 +83,13 @@
 
 </div>
 
-{% block extra_js %}
-<script src="{% static 'diary/js/diary.js' %}"></script>
+<!-- 画像モーダル -->
+<div id="media-modal" class="media-modal">
+    <div id="media-content"></div>
+</div>
+
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'diary/js/diary.js' %}"></script>
 {% endblock %}

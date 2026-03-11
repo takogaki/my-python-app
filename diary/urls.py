@@ -11,7 +11,7 @@ urlpatterns = [
     path("page/<uuid:pk>/update/", views.page_update, name="page_update"),
     path("page/<uuid:pk>/delete/", views.page_delete, name="page_delete"),
     path('user/<int:user_id>/diaries/', views.user_diary_list, name='user_diary_list'),
-    path('diary/<int:diary_id>/edit/', views.page_update, name='page_update'),
+    # path('diary/<int:diary_id>/edit/', views.page_update, name='page_update'),
     path('like/<uuid:pk>/', views.like_diary, name='like_diary'),  # いいねAPI
 ]
 

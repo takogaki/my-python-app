@@ -1,110 +1,161 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 {% load static %}
 
 <head>
     <meta charset="UTF-8">
+
+    <!-- Viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSRF -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
 
     <!-- OGP -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="the.SPIRYTUS">
     <meta property="og:title" content="SPIRYTUS｜好きなときに、好きなだけ">
     <meta property="og:description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'spirytus/images/og/ogp_spirytus.png' %}">
+    <meta property="og:image"
+        content="{{ request.scheme }}://{{ request.get_host }}{% static 'spirytus/images/og/ogp_spirytus.png' %}">
     <meta property="og:url" content="https://my-python-app-0t2k.onrender.com/">
 
     <!-- Twitter(X) -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SPIRYTUS｜好きなときに、好きなだけ">
     <meta name="twitter:description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
-    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'spirytus/images/og/ogp_spirytus.png' %}">
+    <meta name="twitter:image"
+        content="{{ request.scheme }}://{{ request.get_host }}{% static 'spirytus/images/og/ogp_spirytus.png' %}">
 
-    <!-- Google -->
-    <meta name="google-site-verification" content="GUHdMs02t79910_YzaHxrFxZIThm4GNQdTJ0NKlbR98" />
+    <!-- Google verification -->
+    <meta name="google-site-verification" content="GUHdMs02t79910_YzaHxrFxZIThm4GNQdTJ0NKlbR98">
 
-    <!-- Standard favicon -->
+    <!-- Description -->
+    <meta name="description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
+
+    <!-- Title -->
+    <title>{% block title %}the.SPIRYTUS | 出会い・趣味共有・学び合いができる新世代SNS{% endblock %}</title>
+
+    <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'spirytus/images/og/favicon-32.png' %}">
     <link rel="icon" type="image/png" sizes="192x192" href="{% static 'spirytus/images/og/favicon-192.png' %}">
     <link rel="icon" type="image/png" sizes="512x512" href="{% static 'spirytus/images/og/favicon-512.png' %}">
 
     <!-- CSS -->
-    
     <link rel="stylesheet" href="{% static 'spirytus/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'spirytus/css/image_modal.css' %}">
     <link rel="stylesheet" href="{% static 'videochat/css/video_warning.css' %}">
     <link rel="stylesheet" href="{% static 'spirytus/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'spirytus/css/style.css' %}">
     {% block extra_css %}{% endblock %}
 
-    <!-- Meta -->
-    <meta name="csrf-token" content="{{ csrf_token }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <!-- JS -->
-    <script src="{% static 'spirytus/js/base.js' %}"></script>
+    <script src="{% static 'spirytus/js/base.js' %}" defer></script>
 
-    <!-- Title & Description -->
-    <title>{% block title %}the.SPIRYTUS | 出会い・趣味共有・学び合いができる新世代SNS{% endblock %}</title>
-    <meta name="description" content="the.SPIRYTUSは、同じ価値観の人と出会えるSNS。趣味や考えを共有し、情報を学び合える場所です。">
-
-    <!-- Site Name Structured Data -->
+    <!-- Structured Data -->
     <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "the.SPIRYTUS",
-            "alternateName": "SPIRYTUS",
-            "url": "https://my-python-app-0t2k.onrender.com/"
-        }
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "the.SPIRYTUS",
+        "alternateName": "SPIRYTUS",
+        "url": "https://my-python-app-0t2k.onrender.com/"
+    }
     </script>
+
 </head>
 
-<body class="{% if unclosed_room %}has-warning{% endif %}">
+<body data-post="{{ post.id }}" class="{% if unclosed_room %}has-warning{% endif %}">
+
     <header class="site-header">
         <div class="header-inner">
+
             <h1 class="site-title">
                 <a href="{% url 'diary:index' %}" class="logo-text">
                     the.SPIRYTUS
                     <span class="logo-sub">出会いやすさの限界到達°</span>
                 </a>
             </h1>
+
             <div class="user-area">
                 {% if user.is_authenticated %}
+
                 <span class="welcome">
-                        <a class="btn btn-outline" href="{% url 'accounts:mypage' %}">{{ request.user.username }}</a>
+                    <a class="btn btn-outline" href="{% url 'accounts:mypage' %}">
+                        {{ request.user.username }}
+                    </a>
                 </span>
+
                 {% else %}
-                <a class="btn btn-outline" href="{% url 'accounts:login' %}">ログイン</a>
-                <!-- <a class="btn" href="{% url 'accounts:signup' %}">新規登録</a> -->
-                
+
+                <a class="btn btn-outline" href="{% url 'accounts:login' %}">
+                    ログイン
+                </a>
+
                 {% endif %}
             </div>
+
         </div>
     </header>
 
+
     {% if unclosed_room %}
     <div class="warning-bar">
+
         <div class="warning-bar-inner">
-            <span>⚠️ 前回の配信が終了していません</span>
+
+            <span>
+                ⚠️ 前回の配信が終了していません
+            </span>
+
             <a href="{% url 'videochat:force_close' unclosed_room.id %}" class="warning-action">
+
                 配信を終了する
+
             </a>
+
         </div>
+
     </div>
     {% endif %}
 
+
     <main class="container">
+
         {% block body %}
         {% endblock %}
+
     </main>
 
+
     <footer class="site-footer">
+
         <p class="user-count">
             ログインユーザー数：{{ logged_in_users_count }}
         </p>
-        <small>© MAX96°</small>
+
+        <small>
+            © MAX96°
+        </small>
+
     </footer>
+
+
+    <!-- Image Modal -->
+
+    <div id="image-modal" class="image-modal">
+
+        <span class="close">
+            &times;
+        </span>
+
+        <img id="modal-image">
+
+    </div>
+
+
     {% block extra_js %}{% endblock %}
+
 </body>
 
 </html>
