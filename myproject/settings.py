@@ -18,9 +18,17 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # ← 共通staticのみ指定する
 STATICFILES_DIRS = [
-    BASE_DIR / "myproject" / "static",
+    BASE_DIR / "static",
 ]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 #本番では使用しない
 # MEDIA_URL = "/media/"
@@ -170,8 +178,6 @@ INSTALLED_APPS = [
 ]
 
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True
-
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
