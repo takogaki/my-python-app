@@ -15,8 +15,8 @@ psycopg2-binary==2.9.7
 whitenoise==6.5.0
 
 # Media (Cloudinary)
-django-cloudinary-storage==0.3.0
-cloudinary==1.44.1
+cloudinary
+django-cloudinary-storage
 Pillow==10.4.0
 
 # Security

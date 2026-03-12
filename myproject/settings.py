@@ -21,8 +21,10 @@ STATICFILES_DIRS = [
     BASE_DIR / "myproject" / "static",
 ]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+
+#本番では使用しない
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = BASE_DIR / "media"
 
 # ==============================
 # 基本設定
