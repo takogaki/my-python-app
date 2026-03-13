@@ -358,6 +358,7 @@ CONTENT_SECURITY_POLICY = {
         "img-src": (
             "'self'",
             "data:",
+            "https://res.cloudinary.com",
             "https:",
         ),
     }
