@@ -310,18 +310,40 @@ TEMPLATES[0]["OPTIONS"]["context_processors"] += [
 
 
 # =========================
-# Content Security Policy (django-csp 4.x+)
+# Content Security Policy
 # =========================
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
+
         "default-src": ("'self'",),
+
+        # JavaScript
+        "script-src": (
+            "'self'",
+            "'unsafe-inline'",
+            "https://www.youtube.com",
+            "https://www.youtube-nocookie.com",
+            "https://www.tiktok.com",
+            "https://www.instagram.com",
+            "https://platform.twitter.com",
+            "https://connect.facebook.net",
+        ),
+
+        # CSS
         "style-src": (
             "'self'",
-            "'unsafe-inline'",  # ←ここを追加
+            "'unsafe-inline'",
         ),
-        
 
+        # 画像
+        "img-src": (
+            "'self'",
+            "data:",
+            "https://res.cloudinary.com",
+        ),
+
+        # iframe (動画・ビデオ通話)
         "frame-src": (
             "'self'",
             "https://meet.jit.si",
@@ -333,33 +355,25 @@ CONTENT_SECURITY_POLICY = {
             "https://platform.twitter.com",
         ),
 
+        # API / WebSocket
         "connect-src": (
             "'self'",
             "https://meet.jit.si",
+            "wss://my-python-app-0t2k.onrender.com",
             "ws://127.0.0.1:8000",
             "ws://localhost:8000",
-            "wss://my-python-app-0t2k.onrender.com",
         ),
 
-        "script-src": (
-            "'self'",
-            "https://www.youtube.com",
-            "https://www.tiktok.com",
-            "https://www.instagram.com",
-            "https://platform.twitter.com",
-            "https://connect.facebook.net",
-        ),
-
-        "style-src": (
-            "'self'",
-            "'unsafe-inline'",  # Instagram / TikTok embed 必須
-        ),
-
-        "img-src": (
+        # フォント
+        "font-src": (
             "'self'",
             "data:",
+        ),
+
+        # メディア
+        "media-src": (
+            "'self'",
             "https://res.cloudinary.com",
-            "https:",
         ),
     }
 }
