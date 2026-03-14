@@ -74,7 +74,7 @@ class PageUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
 
-        if "picture-clear" in self.request.POST:
+        if self.request.POST.get("picture-clear"):
             if form.instance.picture:
                 form.instance.picture.delete(save=False)
             form.instance.picture = None
@@ -83,7 +83,7 @@ class PageUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("diary:page_detail", kwargs={"pk": self.object.pk})
-
+    
 class PageDeleteView(LoginRequiredMixin, DeleteView):
     model = Page
     template_name = "diary/page_confirm_delete.html"
@@ -91,14 +91,6 @@ class PageDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Page.objects.filter(author=self.request.user)
-
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        if self.object.picture:
-            self.object.picture.delete(save=False)
-
-        return super().delete(request, *args, **kwargs)
 
 
 @login_required
