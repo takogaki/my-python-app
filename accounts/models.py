@@ -6,6 +6,7 @@ from datetime import date
 import uuid
 from django.conf import settings
 from blog.models import Post
+from cloudinary.models import CloudinaryField
 
 
 class CustomUser(AbstractUser):
@@ -29,11 +30,10 @@ class CustomUser(AbstractUser):
         verbose_name="性別"
     )
 
-    profile_image = models.ImageField(
-        upload_to="profile_images/",
+    profile_image = CloudinaryField(
+        "profile_image",
         blank=True,
         null=True,
-        verbose_name="プロフィール画像"
     )
 
     is_active = models.BooleanField(default=False)
@@ -78,8 +78,8 @@ class Profile(models.Model):
         related_name="profile"
     )
 
-    profile_image = models.ImageField(
-        upload_to="profile_images/",
+    profile_image = CloudinaryField(
+        "profile_image",
         blank=True,
         null=True
     )
