@@ -3,7 +3,7 @@ from pathlib import Path
 from django.conf import settings  # settings.AUTH_USER_MODELを使用するため
 from django.utils import timezone
 from cloudinary.models import CloudinaryField
-import uuid
+import uuid, cloudinary.uploader
 
 
 
@@ -57,9 +57,13 @@ class Page(models.Model):
         return self.title
 
     # 投稿削除時にCloudinary画像削除
+    picture = CloudinaryField("image", blank=True, null=True)
+
     def delete(self, *args, **kwargs):
+
         if self.picture:
-            self.picture.delete(save=False)
+            cloudinary.uploader.destroy(self.picture.public_id)
+
         super().delete(*args, **kwargs)
 
     @classmethod
