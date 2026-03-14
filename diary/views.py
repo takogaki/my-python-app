@@ -74,8 +74,9 @@ class PageUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
 
-        if self.request.POST.get("picture-clear"):
-            form.instance.picture.delete(save=False)
+        if "picture-clear" in self.request.POST:
+            if form.instance.picture:
+                form.instance.picture.delete(save=False)
             form.instance.picture = None
 
         return super().form_valid(form)
@@ -90,6 +91,14 @@ class PageDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Page.objects.filter(author=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if self.object.picture:
+            self.object.picture.delete(save=False)
+
+        return super().delete(request, *args, **kwargs)
 
 
 @login_required
@@ -132,35 +141,38 @@ class UserDetailView(DetailView):
 @login_required
 def like_diary(request, pk):
 
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
     page = get_object_or_404(Page, pk=pk)
 
-    if request.method == "POST":
+    # likesをDBで直接増加
+    Page.objects.filter(pk=pk).update(likes=F("likes") + 1)
 
-        page.likes = F("likes") + 1
-        page.save()
-        page.refresh_from_db()
+    # 最新取得
+    page.refresh_from_db()
 
-        like_record, created = LikeRecord.objects.get_or_create(
-            user=request.user,
-            page=page
-        )
+    # LikeRecord取得 or 作成
+    like_record, created = LikeRecord.objects.get_or_create(
+        user=request.user,
+        page=page
+    )
 
-        like_record.like_count += 1
-        like_record.save()
+    # ユーザーのいいね回数更新（race condition防止）
+    LikeRecord.objects.filter(pk=like_record.pk).update(
+        like_count=F("like_count") + 1
+    )
 
-        if request.user not in page.liked_users.all():
-            page.liked_users.add(request.user)
+    like_record.refresh_from_db()
 
-        page.save()
+    # ManyToMany（重複防止はDB側）
+    page.liked_users.add(request.user)
 
-        return JsonResponse({
-            "likes": page.likes,
-            "unique_users": page.unique_likes_count(),
-            "user_like_count": like_record.like_count
-        })
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
+    return JsonResponse({
+        "likes": page.likes,
+        "unique_users": page.unique_likes_count(),
+        "user_like_count": like_record.like_count
+    })
 
 index = IndexView.as_view()
 page_create = PageCreateView.as_view()

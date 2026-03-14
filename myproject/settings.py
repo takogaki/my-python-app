@@ -153,6 +153,12 @@ CLOUDINARY_STORAGE = {
 # アプリケーション定義
 # ----------------------------------
 INSTALLED_APPS = [
+    # Third-party（本番で実際に使っているもの）
+    "csp",
+    "channels",
+    "cloudinary",
+    "cloudinary_storage",
+
     # Django core（必須）
     "django.contrib.admin",
     "django.contrib.auth",
@@ -161,12 +167,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
-
-    # Third-party（本番で実際に使っているもの）
-    "channels",
-    "cloudinary",
-    "cloudinary_storage",
-    "csp",
 
     # Your apps（実際に存在しているアプリのみ）
     "accounts",
