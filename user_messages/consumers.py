@@ -21,27 +21,41 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_name = f"chat_{min(user1, user2)}_{max(user1, user2)}"
         self.room_group_name = self.room_name
 
+        self.user_group = f"user_{self.scope['user'].id}"
+
         await self.channel_layer.group_add(
             self.room_group_name,
+            self.channel_name
+        )
+
+        await self.channel_layer.group_add(
+            self.user_group,
             self.channel_name
         )
 
         await self.accept()
 
     async def disconnect(self, close_code):
+
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
+        await self.channel_layer.group_discard(
+            self.user_group,
+            self.channel_name
+        )
+
     async def receive(self, text_data):
-        # print("🔥 receive called")
 
         data = json.loads(text_data)
         message_text = data["message"]
 
         sender = self.scope["user"]
-        recipient = await sync_to_async(User.objects.get)(username=self.username)
+        recipient = await sync_to_async(User.objects.filter(username=self.username).first)()
+        if not recipient:
+            return
 
         message = await sync_to_async(Message.objects.create)(
             sender=sender,
@@ -51,25 +65,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         image_url = await sync_to_async(self.get_image_url)(sender)
 
-        # 🔥 ここで毎回取り直す
         user = await sync_to_async(User.objects.get)(pk=self.scope["user"].pk)
 
+        # チャット送信
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": "chat_message",
+                "id": message.id,
                 "message": message.content,
                 "sender": user.username,
-                "image_url": user.profile_image.url if user.profile_image else "",
+                "image_url": image_url,
+                "sent_at": str(message.sent_at),
+            }
+        )
+
+        # 通知送信
+        await self.channel_layer.group_send(
+            f"user_{recipient.id}",
+            {
+                "type": "chat_notification",
+                "sender": sender.username,
             }
         )
 
     async def chat_message(self, event):
         # print("🔥 chat_message called")
         await self.send(text_data=json.dumps({
-            "message": event["message"],
-            "sender": event["sender"],
+            "id"       : event["id"],
+            "message"  : event["message"],
+            "sender"   : event["sender"],
             "image_url": event["image_url"],
+            "sent_at"  : event["sent_at"],
         }))
 
     def get_image_url(self, user):
@@ -82,3 +109,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return image.url
 
         return ""
+    
+    async def chat_notification(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "notification",
+            "sender": event["sender"],
+        }))

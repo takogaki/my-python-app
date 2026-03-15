@@ -38,8 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // ユーザー名
         const usernameEl = document.createElement("a");
         usernameEl.classList.add("chat-username");
-        usernameEl.textContent = data.sender;
-
+        usernameEl.href = "/accounts/" + data.sender + "/";
+        
         // メッセージバブル
         const bubble = document.createElement("div");
         bubble.classList.add("chat-bubble");
