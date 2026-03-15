@@ -3,6 +3,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from asgiref.sync import sync_to_async
 from .models import Message
+from django.core.mail import send_mail
+from django.conf import settings
 
 User = get_user_model()
 
@@ -87,6 +89,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "type": "chat_notification",
                 "sender": sender.username,
             }
+        )
+
+        # =====================
+        # メール通知
+        # =====================
+        await sync_to_async(send_mail)(
+            subject="SPIRYTUS 新しいメッセージ",
+            message=f"{sender.username}さんからメッセージが届きました。\n\n{message_text}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient.email],
+            fail_silently=True,
         )
 
     async def chat_message(self, event):

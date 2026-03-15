@@ -209,7 +209,25 @@ def mypage(request):
 
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
-    messages = Message.objects.filter(recipient=user)
+
+    # =========================
+    # メッセージ（ユーザーごと最新）
+    # =========================
+    all_messages = (
+        Message.objects
+        .filter(Q(sender=user) | Q(recipient=user))
+        .order_by("-sent_at")
+    )
+
+    conversations = {}
+
+    for m in all_messages:
+        other = m.recipient if m.sender == user else m.sender
+
+        if other.id not in conversations:
+            conversations[other.id] = m
+
+    messages = list(conversations.values())
 
     saved_posts = (
         SavedPost.objects
