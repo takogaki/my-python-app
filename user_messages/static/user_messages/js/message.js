@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 受信メッセージ処理
     socket.onmessage = function (e) {
+        
         const data = JSON.parse(e.data);
 
         // チャット行の作成
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const usernameEl = document.createElement("a");
         usernameEl.classList.add("chat-username");
         usernameEl.href = "/accounts/" + data.sender + "/";
-        
+
         // メッセージバブル
         const bubble = document.createElement("div");
         bubble.classList.add("chat-bubble");
