@@ -103,6 +103,8 @@ RENDER_INTERNAL_HOSTNAME = os.environ.get("RENDER_INTERNAL_HOSTNAME")
 if RENDER_INTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_INTERNAL_HOSTNAME)
 
+SITE_URL = "https://my-python-app-0t2k.onrender.com"
+
 # ----------------------------------
 # セキュリティ設定
 # ----------------------------------

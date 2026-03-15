@@ -203,22 +203,33 @@
         {% endwith %}
     
         {% for msg in messages %}
-        <div class="list-item {% if not msg.is_read %}unread{% endif %}">
-            <a href="{% url 'user_messages:message_detail' msg.id %}" class="item-title">
-                {% if msg.is_important %}★ {% endif %}
-                {{ msg.sender.username }}
-                {% if not msg.is_read %}
-                    <span class="badge unread">未読</span>
-                {% endif %}
-            </a>
         
-            <div class="item-meta">
-                {{ msg.content|truncatechars:50 }}<br>
-                {{ msg.sent_at|date:"Y/m/d H:i" }}
-            </div>
+        <div class="list-item {% if not msg.is_read %}unread{% endif %}">
+        
+            {% if msg.sender == request.user %}
+            <a href="{% url 'user_messages:send_message' msg.recipient.username %}" class="item-title">
+                {{ msg.recipient.username }}
+                {% else %}
+                <a href="{% url 'user_messages:send_message' msg.sender.username %}" class="item-title">
+                    {{ msg.sender.username }}
+                    {% endif %}
+        
+                    {% if not msg.is_read %}
+                    <span class="badge unread">未読</span>
+                    {% endif %}
+        
+                </a>
+        
+                <div class="item-meta">
+                    {{ msg.content|truncatechars:50 }}<br>
+                    {{ msg.sent_at|date:"Y/m/d H:i" }}
+                </div>
+        
         </div>
+        
         {% empty %}
-            <p class="empty-text">メッセージはありません</p>
+        <p class="empty-text">メッセージはありません</p>
+        
         {% endfor %}
     </section>
 </div>

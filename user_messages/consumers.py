@@ -5,6 +5,7 @@ from asgiref.sync import sync_to_async
 from .models import Message
 from django.core.mail import send_mail
 from django.conf import settings
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -94,9 +95,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # =====================
         # メール通知
         # =====================
+        chat_url = settings.SITE_URL + reverse(
+            "user_messages:send_message",
+            args=[sender.username]
+        )
+
         await sync_to_async(send_mail)(
-            subject="SPIRYTUS 新しいメッセージ",
-            message=f"{sender.username}さんからメッセージが届きました。\n\n{message_text}",
+            subject="【SPIRYTUS】新しいメッセージがあります",
+            message=(
+                f"{sender.username}さんから新しいメッセージがあります。\n\n"
+                f"「{message_text}」\n\n"
+                "返信はこちらから\n"
+                f"{chat_url}\n\n"
+                "※このメールは自動送信です\n"
+                "※このメールに返信することはできません"
+            ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[recipient.email],
             fail_silently=True,
