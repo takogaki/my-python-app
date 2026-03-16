@@ -16,10 +16,7 @@ User = get_user_model()
 
 
 def index(request):
-    user_count = CustomUser.objects.filter(is_active=True).count()
-    return render(request, "diary/index.html", {
-        "user_count": user_count,  # ここを追加
-    })
+    return render(request, "diary/index.html")
 
 
 class IndexView(View):

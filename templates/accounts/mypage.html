@@ -105,11 +105,13 @@
             {# 🔔 コメント通知一覧 #}
             <div class="notification-list">
                 {% for n in notifications %}
+                {% if n.post == post %}
                 <div class="notification-item">
                     <a href="{% url 'notifications:open_notification' n.id %}">
                         {{ n.verb }}
                     </a>
                 </div>
+                {% endif %}
                 {% empty %}
                 <p>通知はありません</p>
                 {% endfor %}
