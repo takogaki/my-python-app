@@ -11,8 +11,6 @@ urlpatterns = [
     # 認証
     path("signup/", SignUpView.as_view(), name="signup"),
     path("signup/done/", views.signup_done, name="signup_done"),
-# ★ これが最重要
-    path("activate/<uidb64>/<token>/", views.activate, name="activate"),
 
     path("login/", LoginView.as_view(template_name="accounts/login.html"), name="login"),
     path("logout/", LogoutView.as_view(template_name="accounts/logout.html"), name="logout"),
@@ -45,4 +43,9 @@ urlpatterns = [
     #likeユーザー
     path("like/<int:user_id>/", views.like_user, name="like_user"),
     path("matches/", views.match_list, name="match_list"),
+
+    #本人確認
+    path("verify/", views.create_verification_session, name="verify"),
+    path("verify/complete/", views.verification_complete, name="verification_complete"),
+    path("stripe/webhook/", views.stripe_webhook, name="stripe_webhook"),
 ]

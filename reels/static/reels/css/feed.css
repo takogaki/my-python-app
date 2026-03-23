@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  background: black;
+  overflow: hidden;
+}
+
+.video-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+
+.video-item {
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+video {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: cover;
+}

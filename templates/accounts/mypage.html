@@ -49,6 +49,14 @@
             <p><strong>年齢：</strong>{{ age }}歳</p>
             {% endif %}
             {% endwith %}
+            
+            <h3>年齢確認</h3>
+            {% if user.is_age_verified %}
+            <p style="color:green;">✅ 年齢確認済み</p>
+            {% else %}
+            <p style="color:orange;">⏳ 未確認</p>
+            <button id="verify-btn">年齢確認を開始する</button>
+            {% endif %}
         </div>
     </section>
 
@@ -270,6 +278,8 @@
     </p>
 </section>
 
+{% endblock %}
 
-
+{% block extra_js %}
+<script src="{% static 'accounts/js/verify.js' %}"></script>
 {% endblock %}

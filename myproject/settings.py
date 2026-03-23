@@ -60,6 +60,15 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "my-python-app-0t2k.onrender.com",
     ".onrender.com",
+    ".ngrok-free.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+
+    # 👇ワイルドカード
+    "https://*.ngrok-free.app",
 ]
 
 # blog/security.py（新規作成を推奨）
@@ -144,13 +153,47 @@ else:
         "http://localhost:8000",
     ]
 
+# Stripe設定(本番では環境変数から取得することを推奨)
+#本番用
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+
+# =========================
+# 開発環境
+# =========================
+if DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+
+# =========================
+# 本番環境
+# =========================
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # ⚠️ これだけでOK。import cloudinary は不要
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
-    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
-}
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+        "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+    }
 
 
 # ----------------------------------
@@ -179,6 +222,7 @@ INSTALLED_APPS = [
     "videochat",
     "user_messages",
     "notifications",
+    'reels',
 ]
 
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True

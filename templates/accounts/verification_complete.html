@@ -1,0 +1,19 @@
+{% extends "base/diary_base.html" %}
+
+{% block body %}
+<div style="text-align:center; padding: 50px;">
+
+    {% if user.is_age_verified %}
+    <h2>✅ 年齢確認済み</h2>
+    <p>すべての機能が利用可能です。</p>
+    {% else %}
+    <h2>⚠️ 確認中です</h2>
+    <p>反映まで少し時間がかかる場合があります。</p>
+    {% endif %}
+
+    <a href="{% url 'accounts:mypage' %}">
+        マイページへ戻る
+    </a>
+
+</div>
+{% endblock %}

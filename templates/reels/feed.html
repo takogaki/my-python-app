@@ -1,0 +1,29 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+好きなときに、好きなだけ｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reels/css/feed.css' %}">    
+{% endblock %}
+
+{% block body %}
+
+    <div class="video-container">
+        {% for post in posts %}
+        <div class="video-item">
+            <video class="video" muted playsinline loop preload="auto">
+                <source src="{{ post.video.url }}" type="video/mp4">
+                お使いのブラウザは動画再生に対応していません。
+            </video>
+        </div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script src="{% static 'reels/js/feed.js' %}"></script>
+    {% endblock %}
+    

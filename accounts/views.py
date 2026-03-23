@@ -1,20 +1,19 @@
 # accounts/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DetailView
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.http import JsonResponse
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
-from django.utils.http import urlencode
-from django.contrib.auth import login
-from django.contrib.auth import logout
+from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils import timezone
+from datetime import date
 
 from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
@@ -22,18 +21,16 @@ from accounts.models import SavedPost
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
 from django.db.models import Count, Q
 
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 
-from .forms import ActivateProfileImageForm
-from .forms import CustomUserCreationForm
-from .forms import ProfileForm
+from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm
 from notifications.models import Notification
 
-from .models import CustomUser, UserLike, Match
+from .models import CustomUser, UserLike, Match, VerificationLog
 
-import uuid
+import uuid, stripe
+from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
 
@@ -199,6 +196,160 @@ def activate(request, token):
         "accounts/activate_success.html",
         {"form": form}
     )
+
+# =========================
+# ★ 年齢確認セッション作成API
+# =========================
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+@login_required
+def create_verification_session(request):
+    user = request.user
+
+    session = stripe.identity.VerificationSession.create(
+        type="document",
+        metadata={
+            "user_id": user.id
+        },
+        return_url=request.build_absolute_uri(
+            reverse("accounts:verification_complete")
+        )
+    )
+
+    # 保存
+    user.stripe_verification_session_id = session.id
+    user.save(update_fields=["stripe_verification_session_id"])
+
+    return JsonResponse({
+        "url": session.url
+    })
+
+# =========================
+# ★ 年齢確認完了ページ（リダイレクト先）
+# =========================
+@login_required
+def verification_complete(request):
+    return render(request, "accounts/verification_complete.html")
+
+# =========================
+# ★ Stripe Webhook（完全版）
+# =========================
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+
+    # =========================
+    # 署名検証
+    # =========================
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError:
+        return JsonResponse({"error": "invalid payload"}, status=400)
+    except stripe.error.SignatureVerificationError:
+        return JsonResponse({"error": "invalid signature"}, status=400)
+
+    event_type = event["type"]
+
+    # =========================
+    # 本人確認成功
+    # =========================
+    if event_type == "identity.verification_session.verified":
+        session = event["data"]["object"]
+
+        user_id = session.get("metadata", {}).get("user_id")
+        session_id = session.get("id")
+
+        if not user_id:
+            return JsonResponse({"status": "no_user"})
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({"status": "user_not_found"})
+
+        # 🔥 二重実行防止
+        if user.is_age_verified:
+            return JsonResponse({"status": "already_verified"})
+
+        # =========================
+        # DOB取得
+        # =========================
+        dob = session.get("verified_outputs", {}).get("dob")
+
+        if dob:
+            try:
+                birth_date = date(
+                    dob["year"],
+                    dob["month"],
+                    dob["day"]
+                )
+                user.birth_date = birth_date
+            except Exception:
+                pass
+
+        # =========================
+        # 年齢チェック
+        # =========================
+        age = user.get_age()
+
+        if age is not None and age >= 18:
+            user.is_age_verified = True
+            user.verified_at = timezone.now()
+            user.stripe_verification_session_id = session_id
+
+            user.save(update_fields=[
+                "birth_date",
+                "is_age_verified",
+                "verified_at",
+                "stripe_verification_session_id"
+            ])
+
+            # ログ保存（モデルある場合）
+            try:
+                VerificationLog.objects.create(
+                    user=user,
+                    session_id=session_id,
+                    status="verified"
+                )
+            except:
+                pass
+
+        else:
+            # 未成年ログ
+            try:
+                VerificationLog.objects.create(
+                    user=user,
+                    session_id=session_id,
+                    status="under_18"
+                )
+            except:
+                pass
+
+    # =========================
+    # 本人確認失敗
+    # =========================
+    elif event_type == "identity.verification_session.requires_input":
+        session = event["data"]["object"]
+
+        user_id = session.get("metadata", {}).get("user_id")
+
+        if user_id:
+            try:
+                user = CustomUser.objects.get(id=user_id)
+
+                VerificationLog.objects.create(
+                    user=user,
+                    session_id=session.get("id"),
+                    status="failed"
+                )
+            except:
+                pass
+
+    return JsonResponse({"status": "success"})
 
 # =========================
 # ★ マイページ
@@ -454,37 +605,6 @@ class UserListView(ListView):
     def get_queryset(self):
         # 自分以外のユーザーを表示
         return User.objects.exclude(id=self.request.user.id)
-
-
-@login_required
-def like_user(request, user_id):
-    if request.method == "POST":
-        to_user = get_object_or_404(User, id=user_id)
-
-        # 🚫 自分にLIKE禁止
-        if request.user == to_user:
-            return JsonResponse({"status": "error", "message": "自分にはLIKEできません"})
-
-        like, created = UserLike.objects.get_or_create(
-            from_user=request.user,
-            to_user=to_user
-        )
-
-        # すでに押してた場合
-        if not created:
-            return JsonResponse({"status": "already_liked"})
-
-        # 🔥 相手が自分をLIKEしているか確認
-        is_match = UserLike.objects.filter(
-            from_user=to_user,
-            to_user=request.user
-        ).exists()
-
-        if is_match:
-            return JsonResponse({"status": "matched"})
-
-        return JsonResponse({"status": "liked"})
-    
 
 @login_required
 def like_user(request, user_id):

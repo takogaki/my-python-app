@@ -6,7 +6,7 @@ from datetime import date
 import uuid
 from django.conf import settings
 from blog.models import Post
-from cloudinary.models import CloudinaryField
+# from cloudinary.models import CloudinaryField
 
 
 class CustomUser(AbstractUser):
@@ -30,8 +30,8 @@ class CustomUser(AbstractUser):
         verbose_name="性別"
     )
 
-    profile_image = CloudinaryField(
-        "profile_image",
+    profile_image = models.ImageField(
+        upload_to="profiles/",
         blank=True,
         null=True,
     )
@@ -46,6 +46,27 @@ class CustomUser(AbstractUser):
     )
 
     is_supporter = models.BooleanField(default=False)
+
+    # =========================
+    # 🔥 ここから追加（安全拡張）
+    # =========================
+    is_age_verified = models.BooleanField(
+        default=False,
+        verbose_name="年齢確認済み"
+    )
+
+    stripe_verification_session_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    verified_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="認証日時"
+    )
+    # =========================
 
     def get_age(self):
         if not self.birth_date:
@@ -71,6 +92,22 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+# =========================
+# 🔥 追加：認証ログ（新規）
+# =========================
+class VerificationLog(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    session_id = models.CharField(max_length=255)
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.status}"
+
+
 class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -78,8 +115,8 @@ class Profile(models.Model):
         related_name="profile"
     )
 
-    profile_image = CloudinaryField(
-        "profile_image",
+    profile_image = models.ImageField(
+        upload_to="profiles/",
         blank=True,
         null=True
     )
@@ -123,7 +160,6 @@ class UserLike(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # 🔥 追加：通知管理用
     is_read = models.BooleanField(default=False)
 
     class Meta:
@@ -133,16 +169,12 @@ class UserLike(models.Model):
         return f"{self.from_user.username} → {self.to_user.username}"
 
     def is_match(self):
-        """
-        相互LIKEならTrue
-        """
         return UserLike.objects.filter(
             from_user=self.to_user,
             to_user=self.from_user
         ).exists()
 
     def save(self, *args, **kwargs):
-        # 🚫 自分にLIKE禁止
         if self.from_user == self.to_user:
             return
         super().save(*args, **kwargs)

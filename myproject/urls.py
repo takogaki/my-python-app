@@ -21,6 +21,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path("videochat/", include("videochat.urls")),
     path("notifications/", include("notifications.urls")),
+    path('reels/', include('reels.urls')),
 ] 
 
 if settings.DEBUG:
