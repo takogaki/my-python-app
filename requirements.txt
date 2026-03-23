@@ -23,5 +23,8 @@ Pillow==10.4.0
 # Security
 django_csp==4.0
 
+# Stripe
+stripe==14.4.1
+
 # Env
 python-dotenv==1.0.0
