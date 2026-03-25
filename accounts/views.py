@@ -34,6 +34,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
 # =========================
 # 既存機能（そのまま）
 # =========================
@@ -197,39 +199,55 @@ def activate(request, token):
         {"form": form}
     )
 
+
 # =========================
 # ★ 年齢確認セッション作成API
 # =========================
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 @login_required
 def create_verification_session(request):
     user = request.user
 
-    session = stripe.identity.VerificationSession.create(
-        type="document",
-        metadata={
-            "user_id": user.id
-        },
-        return_url=request.build_absolute_uri(
-            reverse("accounts:verification_complete")
-        )
-    )
+    # 🔥 連打防止
+    if user.is_verification_pending:
+        return JsonResponse({"error": "確認中です"}, status=400)
 
-    # 保存
+    # 🔥 すでに完了している場合
+    if user.is_age_verified:
+        return JsonResponse({"error": "すでに確認済みです"}, status=400)
+
+    try:
+        session = stripe.identity.VerificationSession.create(
+            type="document",
+            metadata={
+                "user_id": user.id
+            },
+            return_url=request.build_absolute_uri(
+                reverse("accounts:verification_complete")
+            )
+        )
+    except stripe.error.StripeError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+    # 🔥 一回で保存（無駄削減）
+    user.is_verification_pending = True
     user.stripe_verification_session_id = session.id
-    user.save(update_fields=["stripe_verification_session_id"])
+    user.save(update_fields=[
+        "is_verification_pending",
+        "stripe_verification_session_id"
+    ])
 
     return JsonResponse({
         "url": session.url
     })
 
+
 # =========================
-# ★ 年齢確認完了ページ（リダイレクト先）
+# ★ 年齢確認完了ページ
 # =========================
 @login_required
 def verification_complete(request):
     return render(request, "accounts/verification_complete.html")
+
 
 # =========================
 # ★ Stripe Webhook（完全版）
@@ -271,9 +289,9 @@ def stripe_webhook(request):
         except CustomUser.DoesNotExist:
             return JsonResponse({"status": "user_not_found"})
 
-        # 🔥 二重実行防止
-        if user.is_age_verified:
-            return JsonResponse({"status": "already_verified"})
+        # 🔥 二重実行防止（Stripeは再送する）
+        if user.stripe_verification_session_id == session_id and user.is_age_verified:
+            return JsonResponse({"status": "already_processed"})
 
         # =========================
         # DOB取得
@@ -282,12 +300,11 @@ def stripe_webhook(request):
 
         if dob:
             try:
-                birth_date = date(
+                user.birth_date = date(
                     dob["year"],
                     dob["month"],
                     dob["day"]
                 )
-                user.birth_date = birth_date
             except Exception:
                 pass
 
@@ -298,35 +315,39 @@ def stripe_webhook(request):
 
         if age is not None and age >= 18:
             user.is_age_verified = True
+            user.is_verification_pending = False
             user.verified_at = timezone.now()
             user.stripe_verification_session_id = session_id
 
             user.save(update_fields=[
                 "birth_date",
                 "is_age_verified",
+                "is_verification_pending",
                 "verified_at",
                 "stripe_verification_session_id"
             ])
 
-            # ログ保存（モデルある場合）
+            # ログ保存
             try:
                 VerificationLog.objects.create(
                     user=user,
                     session_id=session_id,
                     status="verified"
                 )
-            except:
+            except Exception:
                 pass
 
         else:
-            # 未成年ログ
+            user.is_verification_pending = False
+            user.save(update_fields=["is_verification_pending"])
+
             try:
                 VerificationLog.objects.create(
                     user=user,
                     session_id=session_id,
                     status="under_18"
                 )
-            except:
+            except Exception:
                 pass
 
     # =========================
@@ -334,23 +355,24 @@ def stripe_webhook(request):
     # =========================
     elif event_type == "identity.verification_session.requires_input":
         session = event["data"]["object"]
-
         user_id = session.get("metadata", {}).get("user_id")
 
         if user_id:
             try:
                 user = CustomUser.objects.get(id=user_id)
 
+                user.is_verification_pending = False
+                user.save(update_fields=["is_verification_pending"])
+
                 VerificationLog.objects.create(
                     user=user,
                     session_id=session.get("id"),
                     status="failed"
                 )
-            except:
+            except Exception:
                 pass
 
     return JsonResponse({"status": "success"})
-
 # =========================
 # ★ マイページ
 # =========================

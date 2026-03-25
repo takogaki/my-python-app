@@ -55,6 +55,8 @@ class CustomUser(AbstractUser):
         verbose_name="年齢確認済み"
     )
 
+    is_verification_pending = models.BooleanField(default=False)
+
     stripe_verification_session_id = models.CharField(
         max_length=255,
         blank=True,
