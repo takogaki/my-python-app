@@ -48,14 +48,22 @@ class CustomUser(AbstractUser):
     is_supporter = models.BooleanField(default=False)
 
     # =========================
-    # 🔥 ここから追加（安全拡張）
+    # 🔥 Stripe関連（完成形）
     # =========================
-    is_age_verified = models.BooleanField(
-        default=False,
-        verbose_name="年齢確認済み"
+    verification_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("unverified", "未確認"),
+            ("pending", "確認中"),
+            ("verified", "確認済み"),
+            ("failed", "失敗"),
+        ],
+        default="unverified",
+        db_index=True
     )
 
-    is_verification_pending = models.BooleanField(default=False)
+    # ↓追加（再挑戦制御に使う）
+    verification_attempts = models.IntegerField(default=0)
 
     stripe_verification_session_id = models.CharField(
         max_length=255,

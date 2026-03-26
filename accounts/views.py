@@ -207,34 +207,18 @@ def activate(request, token):
 def create_verification_session(request):
     user = request.user
 
-    # 🔥 連打防止
-    if user.is_verification_pending:
-        return JsonResponse({"error": "確認中です"}, status=400)
-
-    # 🔥 すでに完了している場合
-    if user.is_age_verified:
-        return JsonResponse({"error": "すでに確認済みです"}, status=400)
-
-    try:
-        session = stripe.identity.VerificationSession.create(
-            type="document",
-            metadata={
-                "user_id": user.id
-            },
-            return_url=request.build_absolute_uri(
-                reverse("accounts:verification_complete")
-            )
+    session = stripe.identity.VerificationSession.create(
+        type="document",
+        metadata={
+            "user_id": user.id
+        },
+        return_url=request.build_absolute_uri(
+            reverse("accounts:verification_complete")
         )
-    except stripe.error.StripeError as e:
-        return JsonResponse({"error": str(e)}, status=400)
+    )
 
-    # 🔥 一回で保存（無駄削減）
-    user.is_verification_pending = True
     user.stripe_verification_session_id = session.id
-    user.save(update_fields=[
-        "is_verification_pending",
-        "stripe_verification_session_id"
-    ])
+    user.save(update_fields=["stripe_verification_session_id"])
 
     return JsonResponse({
         "url": session.url
@@ -242,7 +226,7 @@ def create_verification_session(request):
 
 
 # =========================
-# ★ 年齢確認完了ページ
+# ★ 完了ページ
 # =========================
 @login_required
 def verification_complete(request):
@@ -258,119 +242,100 @@ def stripe_webhook(request):
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 
-    # =========================
-    # 署名検証
-    # =========================
     try:
         event = stripe.Webhook.construct_event(
             payload, sig_header, endpoint_secret
         )
-    except ValueError:
-        return JsonResponse({"error": "invalid payload"}, status=400)
-    except stripe.error.SignatureVerificationError:
-        return JsonResponse({"error": "invalid signature"}, status=400)
+    except Exception:
+        return JsonResponse({"error": "invalid"}, status=400)
 
     event_type = event["type"]
+    session = event["data"]["object"]
+
+    user_id = session.get("metadata", {}).get("user_id")
+    if not user_id:
+        return JsonResponse({"status": "no_user"})
+
+    try:
+        user = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
+        return JsonResponse({"status": "user_not_found"})
+
+    session_id = session.get("id")
 
     # =========================
-    # 本人確認成功
+    # 処理中
     # =========================
-    if event_type == "identity.verification_session.verified":
-        session = event["data"]["object"]
+    if event_type == "identity.verification_session.processing":
+        if user.verification_status != "pending":
+            user.verification_status = "pending"
+            user.stripe_verification_session_id = session_id
+            user.save(update_fields=[
+                "verification_status",
+                "stripe_verification_session_id"
+            ])
 
-        user_id = session.get("metadata", {}).get("user_id")
-        session_id = session.get("id")
+    # =========================
+    # 成功（ここ超重要）
+    # =========================
+    elif event_type == "identity.verification_session.verified":
 
-        if not user_id:
-            return JsonResponse({"status": "no_user"})
-
-        try:
-            user = CustomUser.objects.get(id=user_id)
-        except CustomUser.DoesNotExist:
-            return JsonResponse({"status": "user_not_found"})
-
-        # 🔥 二重実行防止（Stripeは再送する）
-        if user.stripe_verification_session_id == session_id and user.is_age_verified:
-            return JsonResponse({"status": "already_processed"})
-
-        # =========================
         # DOB取得
-        # =========================
         dob = session.get("verified_outputs", {}).get("dob")
 
         if dob:
             try:
-                user.birth_date = date(
+                birth_date = date(
                     dob["year"],
                     dob["month"],
                     dob["day"]
                 )
+                user.birth_date = birth_date
             except Exception:
                 pass
 
-        # =========================
-        # 年齢チェック
-        # =========================
         age = user.get_age()
 
+        # 18歳以上のみ通す
         if age is not None and age >= 18:
-            user.is_age_verified = True
-            user.is_verification_pending = False
+            user.verification_status = "verified"
             user.verified_at = timezone.now()
-            user.stripe_verification_session_id = session_id
-
-            user.save(update_fields=[
-                "birth_date",
-                "is_age_verified",
-                "is_verification_pending",
-                "verified_at",
-                "stripe_verification_session_id"
-            ])
-
-            # ログ保存
-            try:
-                VerificationLog.objects.create(
-                    user=user,
-                    session_id=session_id,
-                    status="verified"
-                )
-            except Exception:
-                pass
-
         else:
-            user.is_verification_pending = False
-            user.save(update_fields=["is_verification_pending"])
+            user.verification_status = "failed"
 
-            try:
-                VerificationLog.objects.create(
-                    user=user,
-                    session_id=session_id,
-                    status="under_18"
-                )
-            except Exception:
-                pass
+        user.stripe_verification_session_id = session_id
+
+        user.save(update_fields=[
+            "birth_date",
+            "verification_status",
+            "verified_at",
+            "stripe_verification_session_id"
+        ])
+
+        # ログ
+        VerificationLog.objects.create(
+            user=user,
+            session_id=session_id,
+            status=user.verification_status
+        )
 
     # =========================
-    # 本人確認失敗
+    # 失敗
     # =========================
     elif event_type == "identity.verification_session.requires_input":
-        session = event["data"]["object"]
-        user_id = session.get("metadata", {}).get("user_id")
+        user.verification_status = "failed"
+        user.stripe_verification_session_id = session_id
 
-        if user_id:
-            try:
-                user = CustomUser.objects.get(id=user_id)
+        user.save(update_fields=[
+            "verification_status",
+            "stripe_verification_session_id"
+        ])
 
-                user.is_verification_pending = False
-                user.save(update_fields=["is_verification_pending"])
-
-                VerificationLog.objects.create(
-                    user=user,
-                    session_id=session.get("id"),
-                    status="failed"
-                )
-            except Exception:
-                pass
+        VerificationLog.objects.create(
+            user=user,
+            session_id=session_id,
+            status="failed"
+        )
 
     return JsonResponse({"status": "success"})
 # =========================

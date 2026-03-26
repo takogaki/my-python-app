@@ -52,16 +52,20 @@
             
             <h3>年齢確認</h3>
             
-            {% if user.is_age_verified %}
+            {% if user.verification_status == "verified" %}
             <p style="color:green;">✅ 年齢確認済み</p>
             
-            {% elif user.is_verification_pending %}
+            {% elif user.verification_status == "pending" %}
             <p style="color:blue;">🔄 確認中</p>
             <button disabled>確認中です...</button>
             
+            {% elif user.verification_status == "failed" %}
+            <p style="color:red;">❌ 失敗（再試行してください）</p>
+            <button class="verify-btn">再度確認する</button>
+            
             {% else %}
             <p style="color:orange;">⏳ 未確認</p>
-            <button id="verify-btn">年齢確認を開始する</button>
+            <button class="verify-btn">年齢確認を開始する</button>
             {% endif %}
         </div>
     </section>
