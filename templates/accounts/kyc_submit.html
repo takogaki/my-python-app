@@ -9,62 +9,127 @@
 
 <div class="container" style="max-width:600px;margin:40px auto;">
 
-    <h2>年齢確認（本人確認）</h2>
+    <h2>🪪 年齢確認（本人確認）</h2>
 
-    <!-- 🔥 ステータス表示 -->
+    <!-- =========================
+    🔥 ステータス表示
+    ========================= -->
     {% if kyc %}
-    <p>現在のステータス：
+    <p>
+        現在のステータス：
         {% if kyc.status == "pending" %}
-        <span style="color:blue;">確認中</span>
+        <span style="color:blue;">🔄 確認中</span>
         {% elif kyc.status == "approved" %}
-        <span style="color:green;">認証済み</span>
+        <span style="color:green;">✅ 認証済み</span>
         {% elif kyc.status == "rejected" %}
-        <span style="color:red;">却下（再提出してください）</span>
+        <span style="color:red;">❌ 却下（再提出してください）</span>
         {% endif %}
     </p>
     {% endif %}
 
-    <!-- 🔥 エラー表示 -->
+    <!-- =========================
+    🔥 エラー表示
+    ========================= -->
     {% if form.errors %}
     <div style="color:red; margin-bottom:15px;">
         {{ form.errors }}
     </div>
     {% endif %}
 
-    <!-- 🔥 pending中は送信不可 -->
-    {% if kyc and kyc.status == "pending" %}
-    <p style="color:gray;">現在審査中のため再提出できません。</p>
-    {% else %}
+    <!-- =========================
+    🔥 PC / スマホ分岐
+    ========================= -->
+    <div id="pc-only" style="display:none; text-align:center;">
+        <h3>📱 スマホで本人確認を行ってください</h3>
+        <p>以下のQRコードをスマホで読み取ってください</p>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={{ request.build_absolute_uri }}">
+    </div>
 
-        <!-- 🔥 本人確認書類 -->
-        <div style="margin-bottom:20px;">
-            <label>本人確認書類（免許証・マイナンバーなど）</label><br>
-            <input type="file" name="id_image" accept="image/*" capture="environment" required>
-        </div>
+    <div id="mobile-only" style="display:none;">
 
-        <!-- 🔥 セルフィー -->
-        <div style="margin-bottom:20px;">
-            <label>顔写真（セルフィー）</label><br>
-            <input type="file" name="selfie_image" accept="image/*" capture="user" required>
-        </div>
+        <!-- 🔥 pending中は送信不可 -->
+        {% if kyc and kyc.status == "pending" %}
+        <p style="color:gray;">現在審査中のため再提出できません。</p>
+        {% else %}
 
-        <!-- 🔥 注意書き -->
-        <div style="font-size:12px; color:gray; margin-bottom:20px;">
-            ・顔がはっきり見える状態で撮影してください<br>
-            ・加工・ぼかしは禁止です<br>
-            ・不正が確認された場合は利用停止となる可能性があります
-        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <button type="submit" class="btn btn-primary">
-            送信する
-        </button>
-    </form>
+            <!-- 本人確認書類 -->
+            <div style="margin-bottom:20px;">
+                <label>📄 本人確認書類</label><br>
+                <input type="file" name="id_image" accept="image/*" capture="environment" required
+                    onchange="previewImage(event, 'preview1')">
+                <img id="preview1" style="width:100%; margin-top:10px; display:none;" />
+            </div>
 
-    {% endif %}
+            <!-- セルフィー -->
+            <div style="margin-bottom:20px;">
+                <label>🤳 顔写真（セルフィー）</label><br>
+                <input type="file" name="selfie_image" accept="image/*" capture="user" required
+                    onchange="previewImage(event, 'preview2')">
+                <img id="preview2" style="width:100%; margin-top:10px; display:none;" />
+            </div>
+
+            <!-- 注意 -->
+            <div style="font-size:12px; color:gray; margin-bottom:20px;">
+                ・顔がはっきり見える状態で撮影してください<br>
+                ・加工・ぼかしは禁止です<br>
+                ・不正が確認された場合は利用停止となる可能性があります
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                🚀 送信する
+            </button>
+
+        </form>
+
+        {% endif %}
+    </div>
 
 </div>
+
+<!-- =========================
+🔥 JS（ガチ重要）
+========================= -->
+<script>
+
+    // モバイル判定
+    function isMobile() {
+        return /iPhone|Android.+Mobile/.test(navigator.userAgent);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (isMobile()) {
+            document.getElementById("mobile-only").style.display = "block";
+        } else {
+            document.getElementById("pc-only").style.display = "block";
+        }
+    });
+
+    // 画像プレビュー
+    function previewImage(event, id) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            const output = document.getElementById(id);
+            output.src = reader.result;
+            output.style.display = "block";
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    // ファイルサイズ制限（5MB）
+    document.addEventListener("change", function (e) {
+        if (e.target.type === "file") {
+            const file = e.target.files[0];
+            if (file && file.size > 5 * 1024 * 1024) {
+                alert("ファイルサイズは5MB以下にしてください");
+                e.target.value = "";
+            }
+        }
+    });
+
+</script>
 
 {% endblock %}
