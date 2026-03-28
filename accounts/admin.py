@@ -1,8 +1,7 @@
 from django.contrib import admin
-from .models import CustomUser
+from .models import CustomUser, KYCSubmission
 from django.db.models.deletion import Collector
 from django.db import router
-
 
 @admin.action(description="選択したユーザーと関連データを完全削除")
 def delete_users_and_all_related_data(modeladmin, request, queryset):
@@ -20,3 +19,40 @@ class CustomUserAdmin(admin.ModelAdmin):
     search_fields = ['username', 'email']
     list_filter = ("is_supporter", "is_active")
     actions = [delete_users_and_all_related_data]
+
+
+@admin.register(KYCSubmission)
+class KYCSubmissionAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "status", "created_at")
+    list_filter = ("status",)
+    search_fields = ("user__username",)
+    readonly_fields = ("created_at",)
+
+    # 🔥 画像プレビュー
+    def id_image_preview(self, obj):
+        if obj.id_image:
+            return f'<img src="{obj.id_image.url}" width="200" />'
+        return "-"
+    id_image_preview.allow_tags = True
+
+    def selfie_image_preview(self, obj):
+        if obj.selfie_image:
+            return f'<img src="{obj.selfie_image.url}" width="200" />'
+        return "-"
+    selfie_image_preview.allow_tags = True
+
+
+@admin.action(description="承認する")
+def approve_kyc(modeladmin, request, queryset):
+    for kyc in queryset:
+        kyc.status = "approved"
+        kyc.save()
+
+        user = kyc.user
+        user.verification_status = "verified"
+        user.save(update_fields=["verification_status"])
+
+@admin.register(KYCSubmission)
+class KYCSubmissionAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "status", "created_at")
+    actions = [approve_kyc]

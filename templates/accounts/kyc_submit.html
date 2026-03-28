@@ -11,6 +11,7 @@
 
     <h2>年齢確認（本人確認）</h2>
 
+    <!-- 🔥 ステータス表示 -->
     {% if kyc %}
     <p>現在のステータス：
         {% if kyc.status == "pending" %}
@@ -23,23 +24,46 @@
     </p>
     {% endif %}
 
+    <!-- 🔥 エラー表示 -->
+    {% if form.errors %}
+    <div style="color:red; margin-bottom:15px;">
+        {{ form.errors }}
+    </div>
+    {% endif %}
+
+    <!-- 🔥 pending中は送信不可 -->
+    {% if kyc and kyc.status == "pending" %}
+    <p style="color:gray;">現在審査中のため再提出できません。</p>
+    {% else %}
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <div style="margin-bottom:15px;">
-            <label>本人確認書類</label><br>
-            {{ form.id_image }}
+        <!-- 🔥 本人確認書類 -->
+        <div style="margin-bottom:20px;">
+            <label>本人確認書類（免許証・マイナンバーなど）</label><br>
+            <input type="file" name="id_image" accept="image/*" capture="environment" required>
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label>セルフィー（顔写真）</label><br>
-            {{ form.selfie_image }}
+        <!-- 🔥 セルフィー -->
+        <div style="margin-bottom:20px;">
+            <label>顔写真（セルフィー）</label><br>
+            <input type="file" name="selfie_image" accept="image/*" capture="user" required>
+        </div>
+
+        <!-- 🔥 注意書き -->
+        <div style="font-size:12px; color:gray; margin-bottom:20px;">
+            ・顔がはっきり見える状態で撮影してください<br>
+            ・加工・ぼかしは禁止です<br>
+            ・不正が確認された場合は利用停止となる可能性があります
         </div>
 
         <button type="submit" class="btn btn-primary">
             送信する
         </button>
     </form>
+
+    {% endif %}
 
 </div>
 
