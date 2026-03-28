@@ -101,7 +101,8 @@ class KYCSubmission(models.Model):
     # 🔥 1ユーザー1件（超重要）
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="kyc"
     )
 
     id_image = models.ImageField(upload_to="kyc/id/")

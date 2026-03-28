@@ -205,7 +205,8 @@ def activate(request, token):
 def kyc_submit(request):
     user = request.user
 
-    if user.verification_status == "pending":
+    # 🔥 DBベースで判定（ここが最重要修正）
+    if KYCSubmission.objects.filter(user=user, status="pending").exists():
         messages.error(request, "現在確認中です。しばらくお待ちください。")
         return redirect("accounts:mypage")
 
@@ -214,7 +215,7 @@ def kyc_submit(request):
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
 
-        form.request = request  # ← フォームにリクエストを渡す（cleanで使用）
+        form.request = request  # ← これはOK
 
         if form.is_valid():
             kyc = form.save(commit=False)
@@ -222,6 +223,7 @@ def kyc_submit(request):
             kyc.status = "pending"
             kyc.save()
 
+            # 🔥 ここはそのままでOK（UI用）
             user.verification_status = "pending"
             user.verification_attempts += 1
             user.save(update_fields=[

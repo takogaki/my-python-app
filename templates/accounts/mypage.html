@@ -52,19 +52,14 @@
             
             <h3>年齢確認</h3>
             
-            {% if user.verification_status == "verified" %}
-            <p>✅ 確認済み</p>
-            
-            {% elif user.verification_status == "pending" %}
-            <p>🔄 確認中</p>
-            
-            {% elif user.verification_status == "failed" %}
-            <p>❌ 失敗</p>
-            <a href="{% url 'accounts:kyc_submit' %}">再申請</a>
-            
-            {% else %}
-            <p>⏳ 未確認</p>
-            <a href="{% url 'accounts:kyc_submit' %}">本人確認する</a>
+            {% if not kyc %}
+            未認証
+            {% elif kyc.status == "pending" %}
+            <span style="color:blue;">確認中</span>
+            {% elif kyc.status == "approved" %}
+            <span style="color:green;">認証済み</span>
+            {% elif kyc.status == "rejected" %}
+            <span style="color:red;">却下</span>
             {% endif %}
         </div>
     </section>
