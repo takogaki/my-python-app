@@ -205,13 +205,11 @@ def activate(request, token):
 def kyc_submit(request):
     user = request.user
 
-    # 🔥 pending中はブロック
     if user.verification_status == "pending":
         messages.error(request, "現在確認中です。しばらくお待ちください。")
         return redirect("accounts:mypage")
 
-    # 🔥 既存データ取得（あれば上書き）
-    kyc = KYCSubmission.objects.filter(user=user).first()
+    kyc = KYCSubmission.objects.filter(user=user).order_by("-created_at").first()
 
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
@@ -222,7 +220,6 @@ def kyc_submit(request):
             kyc.status = "pending"
             kyc.save()
 
-            # 🔥 ユーザー状態更新
             user.verification_status = "pending"
             user.verification_attempts += 1
             user.save(update_fields=[
@@ -237,7 +234,8 @@ def kyc_submit(request):
         form = KYCForm(instance=kyc)
 
     return render(request, "accounts/kyc_submit.html", {
-        "form": form
+        "form": form,
+        "kyc": kyc
     })
 
 # =========================

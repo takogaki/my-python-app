@@ -1,0 +1,46 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+年齢確認 | SPIRYTUS
+{% endblock %}
+
+{% block body %}
+
+<div class="container" style="max-width:600px;margin:40px auto;">
+
+    <h2>年齢確認（本人確認）</h2>
+
+    {% if kyc %}
+    <p>現在のステータス：
+        {% if kyc.status == "pending" %}
+        <span style="color:blue;">確認中</span>
+        {% elif kyc.status == "approved" %}
+        <span style="color:green;">認証済み</span>
+        {% elif kyc.status == "rejected" %}
+        <span style="color:red;">却下（再提出してください）</span>
+        {% endif %}
+    </p>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div style="margin-bottom:15px;">
+            <label>本人確認書類</label><br>
+            {{ form.id_image }}
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label>セルフィー（顔写真）</label><br>
+            {{ form.selfie_image }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            送信する
+        </button>
+    </form>
+
+</div>
+
+{% endblock %}
