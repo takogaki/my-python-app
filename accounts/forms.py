@@ -202,7 +202,7 @@ class KYCForm(forms.ModelForm):
 
         user = getattr(self.instance, "user", None)
 
-        # 新規時はrequest.userを使う（viewと連携）
+        # 🔥 requestから取得（←これが本命）
         if not user and hasattr(self, "request"):
             user = self.request.user
 
