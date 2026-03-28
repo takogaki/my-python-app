@@ -52,15 +52,40 @@
             
             <h3>年齢確認</h3>
             
-            {% if not kyc %}
-            未認証
-            {% elif kyc.status == "pending" %}
-            <span style="color:blue;">確認中</span>
-            {% elif kyc.status == "approved" %}
-            <span style="color:green;">認証済み</span>
-            {% elif kyc.status == "rejected" %}
-            <span style="color:red;">却下</span>
-            {% endif %}
+            <div style="margin-top:10px; font-size:16px;">
+            
+                <!-- 未認証 -->
+                {% if user.verification_status == "unverified" %}
+                <a href="{% url 'accounts:kyc_submit' %}" style="text-decoration:none; color:#dc3545;">
+                    ❌ 未認証（クリックして認証する）
+                </a>
+            
+                <!-- 確認中 -->
+                {% elif user.verification_status == "pending" %}
+                <span style="color:#0d6efd;">
+                    ⏳ 確認中（通常1〜24時間以内）
+                </span>
+            
+                <!-- 認証済み -->
+                {% elif user.verification_status == "verified" %}
+                <span style="color:#198754;">
+                    ✅ 認証済み
+                </span>
+            
+                <!-- 却下 -->
+                {% elif user.verification_status == "failed" or user.verification_status == "rejected" %}
+                <a href="{% url 'accounts:kyc_submit' %}" style="text-decoration:none; color:#dc3545;">
+                    ⚠️ 却下（クリックして再申請）
+                </a>
+            
+                <!-- 想定外（保険） -->
+                {% else %}
+                <a href="{% url 'accounts:kyc_submit' %}">
+                    ❓ 状態不明（再申請）
+                </a>
+                {% endif %}
+            
+            </div>
         </div>
     </section>
 
