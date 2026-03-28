@@ -5,7 +5,7 @@ from datetime import datetime
 from .models import Profile
 from django.contrib.auth import get_user_model
 import re
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 
 User = get_user_model()
 
@@ -191,9 +191,6 @@ class KYCForm(forms.ModelForm):
         model = KYCSubmission
         fields = ["id_image", "selfie_image"]
 
-    # =========================
-    # 個別バリデーション
-    # =========================
     def clean_id_image(self):
         image = self.cleaned_data.get("id_image")
         return validate_kyc_image(image)
@@ -202,24 +199,24 @@ class KYCForm(forms.ModelForm):
         image = self.cleaned_data.get("selfie_image")
         return validate_kyc_image(image)
 
-    # =========================
-    # 全体バリデーション（重要）
-    # =========================
     def clean(self):
         cleaned_data = super().clean()
 
-        # 🔥 instanceから安全に取得（例外回避）
-        user = getattr(self.instance, "user", None)
+        user = None
 
-        # 🔥 instanceに無ければrequestから取得（最強ルート）
+        # 🔥 ここが最重要（例外を握り潰す）
+        try:
+            user = self.instance.user
+        except ObjectDoesNotExist:
+            user = None
+
+        # 🔥 requestから取得（これが本命）
         if not user and hasattr(self, "request"):
             user = self.request.user
 
-        # 🔥 それでも無ければ何もしない（安全終了）
         if not user:
             return cleaned_data
 
-        # 🔥 試行回数制限
         if user.verification_attempts >= 3:
             raise ValidationError(
                 "認証の試行回数が上限に達しました。サポートにお問い合わせください。"
