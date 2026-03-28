@@ -23,6 +23,9 @@ Pillow==10.4.0
 # Security
 django_csp==4.0
 
+# QR Code generation
+qrcode==26.0.1
+
 # Stripe
 stripe==14.4.1
 

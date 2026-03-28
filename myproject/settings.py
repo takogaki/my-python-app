@@ -390,6 +390,7 @@ CONTENT_SECURITY_POLICY = {
             "'self'",
             "data:",
             "https://res.cloudinary.com",
+            "https://api.qrserver.com",
         ),
 
         # iframe (動画・ビデオ通話)

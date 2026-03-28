@@ -1,4 +1,6 @@
 # accounts/views.py
+import uuid, qrcode, base64
+from io import BytesIO
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, ListView
@@ -19,17 +21,11 @@ from blog.models import Post, Comment      # ブログ投稿
 from accounts.models import SavedPost
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
 from django.db.models import Count, Q
-
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
-
 from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm, KYCForm
 from notifications.models import Notification
-
 from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission
-
-
-import uuid
 from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
@@ -212,10 +208,19 @@ def kyc_submit(request):
 
     kyc = KYCSubmission.objects.filter(user=user).order_by("-created_at").first()
 
+    # =========================
+    # 🔥 QRコード生成（追加ここだけ）
+    # =========================
+    url = request.build_absolute_uri()
+    qr = qrcode.make(url)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_code = base64.b64encode(buffer.getvalue()).decode()
+    # =========================
+
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
-
-        form.request = request  # ← これはOK
+        form.request = request
 
         if form.is_valid():
             kyc = form.save(commit=False)
@@ -223,7 +228,6 @@ def kyc_submit(request):
             kyc.status = "pending"
             kyc.save()
 
-            # 🔥 ここはそのままでOK（UI用）
             user.verification_status = "pending"
             user.verification_attempts += 1
             user.save(update_fields=[
@@ -239,21 +243,8 @@ def kyc_submit(request):
 
     return render(request, "accounts/kyc_submit.html", {
         "form": form,
-        "kyc": kyc
-    })
-
-# =========================
-# ★ 管理人向け KYC申請一覧ビュー
-# =========================
-@login_required
-def admin_kyc_list(request):
-    if not request.user.is_superuser:
-        return redirect("/")
-
-    kycs = KYCSubmission.objects.select_related("user").order_by("-created_at")
-
-    return render(request, "accounts/admin_kyc_list.html", {
-        "kycs": kycs
+        "kyc": kyc,
+        "qr_code": qr_code,  # ← これ追加
     })
 
 # =========================
