@@ -49,4 +49,5 @@ urlpatterns = [
     path("admin/kyc/", views.admin_kyc_list, name="admin_kyc_list"),
     path("admin/kyc/<int:kyc_id>/approve/", views.admin_kyc_approve, name="admin_kyc_approve"),
     path("admin/kyc/<int:kyc_id>/reject/", views.admin_kyc_reject, name="admin_kyc_reject"),
+    path("kyc/complete/mobile/", views.kyc_complete_mobile, name="kyc_complete_mobile"),
 ]

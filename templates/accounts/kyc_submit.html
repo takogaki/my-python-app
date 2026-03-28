@@ -40,7 +40,7 @@
     </div>
 
     <!-- ========================= -->
-    <!-- 🔥 スマホ用（即カメラ） -->
+    <!-- 🔥 スマホ用 -->
     <!-- ========================= -->
     <div id="mobile-only" style="display:none;">
 
@@ -77,26 +77,8 @@
 
 </div>
 
-<!-- ========================= -->
-<!-- 🔥 デバイス判定（最重要） -->
-<!-- ========================= -->
-<script>
-    const isMobile = /iPhone|Android.+Mobile|iPad/.test(navigator.userAgent);
+{% endblock %}
 
-    if (isMobile) {
-        document.getElementById("mobile-only").style.display = "block";
-
-        // 🔥 ページ開いた瞬間にカメラ起動
-        setTimeout(() => {
-            const fileInput = document.querySelector('input[name="id_image"]');
-            if (fileInput) {
-                fileInput.click();
-            }
-        }, 500);
-
-    } else {
-        document.getElementById("pc-only").style.display = "block";
-    }
-</script>
-
+{% block extra_js %}
+<script src="{% static 'accounts/js/kyc.js' %}"></script>
 {% endblock %}

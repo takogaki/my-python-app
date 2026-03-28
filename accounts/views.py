@@ -195,29 +195,61 @@ def activate(request, token):
     )
 
 # =========================
-# KYC申請ビュー（完全版） - 1ユーザー1件、pending中はブロック、既存データあれば上書き
+# KYC申請ビュー（完成版）
 # =========================
 @login_required
 def kyc_submit(request):
     user = request.user
 
-    # 🔥 DBベースで判定（ここが最重要修正）
+    # =========================
+    # 🔥 トークン生成（PC→スマホ用）
+    # =========================
+    if "kyc_qr_token" not in request.session:
+        request.session["kyc_qr_token"] = str(uuid.uuid4())
+        request.session["kyc_user_id"] = user.id
+
+    token = request.GET.get("token")
+    session_token = request.session.get("kyc_qr_token")
+
+    # =========================
+    # 🔥 不正アクセス防止
+    # =========================
+    if token:
+        if token != session_token:
+            messages.error(request, "不正なアクセスです")
+            return redirect("accounts:mypage")
+
+        if request.session.get("kyc_user_id") != user.id:
+            messages.error(request, "別アカウントでは申請できません")
+            return redirect("accounts:mypage")
+
+    # =========================
+    # 🔥 pending中はブロック
+    # =========================
     if KYCSubmission.objects.filter(user=user, status="pending").exists():
         messages.error(request, "現在確認中です。しばらくお待ちください。")
         return redirect("accounts:mypage")
 
+    # =========================
+    # 🔥 既存データ取得
+    # =========================
     kyc = KYCSubmission.objects.filter(user=user).order_by("-created_at").first()
 
     # =========================
-    # 🔥 QRコード生成（追加ここだけ）
+    # 🔥 QRコード生成（トークン付き）
     # =========================
-    url = request.build_absolute_uri()
-    qr = qrcode.make(url)
+    is_qr = request.GET.get("qr") == "1"
+    qr_url = request.build_absolute_uri(f"/accounts/kyc/?token={session_token}")
+
+    url = request.build_absolute_uri(request.path) + "?qr=1"
+    qr = qrcode.make(qr_url)
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
     qr_code = base64.b64encode(buffer.getvalue()).decode()
-    # =========================
 
+    # =========================
+    # 🔥 POST処理
+    # =========================
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
         form.request = request
@@ -235,17 +267,40 @@ def kyc_submit(request):
                 "verification_attempts"
             ])
 
+            # 🔥 セッション削除（再利用防止）
+            request.session.pop("kyc_qr_token", None)
+            request.session.pop("kyc_user_id", None)
+
             messages.success(request, "本人確認を送信しました。")
+
+            # 🔥 QR経由なら専用ページへ
+            if request.GET.get("qr") == "1":
+                return redirect("accounts:kyc_complete_mobile")
+
             return redirect("accounts:mypage")
 
     else:
         form = KYCForm(instance=kyc)
 
+    # =========================
+    # 🔥 デバイス判定
+    # =========================
+    is_mobile = "Mobile" in request.META.get("HTTP_USER_AGENT", "")
+
     return render(request, "accounts/kyc_submit.html", {
         "form": form,
         "kyc": kyc,
-        "qr_code": qr_code,  # ← これ追加
+        "qr_code": qr_code,
+        "is_mobile": is_mobile,
+        "is_qr": is_qr,   # ← これ追加
     })
+
+# =========================
+# ★ KYC申請完了（スマホ専用） - QRコード経由でアクセスしたユーザーだけが見れる特別なページ
+# =========================
+@login_required
+def kyc_complete_mobile(request):
+    return render(request, "accounts/kyc_complete_mobile.html")
 
 # =========================
 # ★ 管理人向け KYC申請承認アクション（超重要） - 承認 → ユーザー状態更新
