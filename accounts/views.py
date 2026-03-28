@@ -214,6 +214,8 @@ def kyc_submit(request):
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
 
+        form.request = request  # ← フォームにリクエストを渡す（cleanで使用）
+
         if form.is_valid():
             kyc = form.save(commit=False)
             kyc.user = user

@@ -199,10 +199,16 @@ class KYCForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        user = self.instance.user if self.instance and self.instance.user else None
 
-        # 🔥 再申請制限（例：3回まで）
+        user = getattr(self.instance, "user", None)
+
+        # 新規時はrequest.userを使う（viewと連携）
+        if not user and hasattr(self, "request"):
+            user = self.request.user
+
         if user and user.verification_attempts >= 3:
-            raise ValidationError("認証の試行回数が上限に達しました。サポートにお問い合わせください。")
+            raise ValidationError(
+                "認証の試行回数が上限に達しました。サポートにお問い合わせください。"
+            )
 
         return cleaned_data
