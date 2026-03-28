@@ -1,12 +1,9 @@
-# accounts/models.py
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import date
 import uuid
 from django.conf import settings
 from blog.models import Post
-# from cloudinary.models import CloudinaryField
 
 
 class CustomUser(AbstractUser):
@@ -48,7 +45,7 @@ class CustomUser(AbstractUser):
     is_supporter = models.BooleanField(default=False)
 
     # =========================
-    # 🔥 Stripe関連（完成形）
+    # 🔥 年齢認証（完全版）
     # =========================
     verification_status = models.CharField(
         max_length=20,
@@ -62,14 +59,7 @@ class CustomUser(AbstractUser):
         db_index=True
     )
 
-    # ↓追加（再挑戦制御に使う）
     verification_attempts = models.IntegerField(default=0)
-
-    stripe_verification_session_id = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
 
     verified_at = models.DateTimeField(
         null=True,
@@ -88,10 +78,6 @@ class CustomUser(AbstractUser):
         return age
 
     def get_profile_image(self):
-        """
-        テンプレート用安全取得
-        既存構造を壊さない
-        """
         if self.profile_image:
             return self.profile_image.url
         if hasattr(self, "profile") and self.profile.profile_image:
@@ -103,14 +89,48 @@ class CustomUser(AbstractUser):
 
 
 # =========================
-# 🔥 追加：認証ログ（新規）
+# 🔥 KYC申請（最重要）
+# =========================
+class KYCSubmission(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "確認中"),
+        ("approved", "承認"),
+        ("rejected", "却下"),
+    ]
+
+    # 🔥 1ユーザー1件（超重要）
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    id_image = models.ImageField(upload_to="kyc/id/")
+    selfie_image = models.ImageField(upload_to="kyc/selfie/")
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+        db_index=True
+    )
+
+    # 任意：却下理由
+    rejection_reason = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.status}"
+
+
+# =========================
+# 🔥 認証ログ
 # =========================
 class VerificationLog(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
-    session_id = models.CharField(max_length=255)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,6 +1,5 @@
-# accounts/forms.py
 from django import forms
-from .models import CustomUser
+from .models import CustomUser, KYCSubmission
 from django.contrib.auth.forms import UserCreationForm
 from datetime import datetime
 from .models import Profile
@@ -8,10 +7,11 @@ from django.contrib.auth import get_user_model
 import re
 from django.core.exceptions import ValidationError
 
-# ユーザーネーム編集フォーム
 User = get_user_model()
 
-
+# =========================
+# 🔥 共通バリデーション
+# =========================
 def validate_profile_image(image):
     if not image:
         return image
@@ -23,9 +23,7 @@ def validate_profile_image(image):
     ]
 
     if image.content_type not in allowed_types:
-        raise ValidationError(
-            "画像形式は PNG / JPG / WEBP のみ対応しています。"
-        )
+        raise ValidationError("画像形式は PNG / JPG / WEBP のみ対応しています。")
 
     max_size = 2 * 1024 * 1024  # 2MB
     if image.size > max_size:
@@ -34,21 +32,40 @@ def validate_profile_image(image):
     return image
 
 
-def validate_username_ascii(value):
-    """
-    英数字・アンダースコアのみ許可
-    """
-    if not re.match(r'^[a-zA-Z0-9_]+$', value):
-        raise ValidationError(
-            "ユーザー名は英数字とアンダースコアのみ使用できます。"
-        )
+def validate_kyc_image(image):
+    if not image:
+        raise ValidationError("画像をアップロードしてください。")
 
+    allowed_types = [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+    ]
+
+    if image.content_type not in allowed_types:
+        raise ValidationError("対応形式は PNG / JPG / WEBP のみです。")
+
+    max_size = 5 * 1024 * 1024  # 5MB
+    if image.size > max_size:
+        raise ValidationError("画像サイズは5MB以内にしてください。")
+
+    return image
+
+
+def validate_username_ascii(value):
+    if not re.match(r'^[a-zA-Z0-9_]+$', value):
+        raise ValidationError("ユーザー名は英数字とアンダースコアのみ使用できます。")
+
+
+# =========================
+# 🔥 ユーザー登録
+# =========================
 class CustomUserCreationForm(UserCreationForm):
 
     username = forms.CharField(
-            label="ユーザー名",
-            validators=[validate_username_ascii],
-        )
+        label="ユーザー名",
+        validators=[validate_username_ascii],
+    )
 
     birth_date_input = forms.CharField(
         max_length=8,
@@ -72,44 +89,40 @@ class CustomUserCreationForm(UserCreationForm):
             "birth_date_input",
         ]
 
-
-# ★ ここが重要
     def clean_username(self):
         username = self.cleaned_data["username"]
-
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError(
-                "このユーザー名はすでに使用されています。"
-            )
-
+            raise ValidationError("このユーザー名はすでに使用されています。")
         return username
-
 
     def clean_birth_date_input(self):
         value = self.cleaned_data["birth_date_input"]
 
         if not value.isdigit() or len(value) != 8:
-            raise forms.ValidationError("生年月日は数字8桁で入力してください（例：19901114）")
+            raise ValidationError("生年月日は数字8桁で入力してください（例：19901114）")
 
         try:
             birth_date = datetime.strptime(value, "%Y%m%d").date()
         except ValueError:
-            raise forms.ValidationError("存在しない日付です")
+            raise ValidationError("存在しない日付です")
 
         if birth_date > datetime.now().date():
-            raise forms.ValidationError("未来の日付は指定できません")
+            raise ValidationError("未来の日付は指定できません")
 
         return birth_date
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.birth_date = self.cleaned_data["birth_date_input"]
-        user.is_active = False  # ← 本番対応ポイント
+        user.is_active = False
         if commit:
             user.save()
         return user
-    
 
+
+# =========================
+# 🔥 プロフィール編集
+# =========================
 class ProfileForm(forms.ModelForm):
     username = forms.CharField(
         required=False,
@@ -123,6 +136,7 @@ class ProfileForm(forms.ModelForm):
             "accept": "image/png,image/jpeg,image/webp"
         })
     )
+
     class Meta:
         model = User
         fields = ["username", "profile_image"]
@@ -134,13 +148,9 @@ class ProfileForm(forms.ModelForm):
     def clean_username(self):
         username = self.cleaned_data.get("username")
 
-        
-
-        # 空なら変更しない
         if not username:
             return self.instance.username
 
-        # 自分以外で重複チェック
         if User.objects.exclude(pk=self.instance.pk).filter(username=username).exists():
             raise ValidationError("このユーザー名は既に使用されています。")
 
@@ -151,9 +161,11 @@ class ProfileForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-    
 
-    # accounts/forms.py
+
+# =========================
+# 🔥 初回プロフィール画像
+# =========================
 class ActivateProfileImageForm(forms.ModelForm):
     profile_image = forms.ImageField(
         required=False,
@@ -161,6 +173,7 @@ class ActivateProfileImageForm(forms.ModelForm):
             "accept": "image/png,image/jpeg,image/webp"
         })
     )
+
     class Meta:
         model = User
         fields = ["profile_image"]
@@ -168,3 +181,28 @@ class ActivateProfileImageForm(forms.ModelForm):
     def clean_profile_image(self):
         image = self.cleaned_data.get("profile_image")
         return validate_profile_image(image)
+
+
+# =========================
+# 🔥 KYCフォーム（超重要）
+# =========================
+class KYCForm(forms.ModelForm):
+    class Meta:
+        model = KYCSubmission
+        fields = ["id_image", "selfie_image"]
+
+    def clean_id_image(self):
+        return validate_kyc_image(self.cleaned_data.get("id_image"))
+
+    def clean_selfie_image(self):
+        return validate_kyc_image(self.cleaned_data.get("selfie_image"))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        user = self.instance.user if self.instance and self.instance.user else None
+
+        # 🔥 再申請制限（例：3回まで）
+        if user and user.verification_attempts >= 3:
+            raise ValidationError("認証の試行回数が上限に達しました。サポートにお問い合わせください。")
+
+        return cleaned_data

@@ -14,7 +14,6 @@ from django.conf import settings
 from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils import timezone
 from datetime import date
-
 from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
 from accounts.models import SavedPost
@@ -24,17 +23,17 @@ from django.db.models import Count, Q
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 
-from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm
+from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm, KYCForm
 from notifications.models import Notification
 
-from .models import CustomUser, UserLike, Match, VerificationLog
+from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission
 
-import uuid, stripe
+
+import uuid
 from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # =========================
 # 既存機能（そのまま）
@@ -199,145 +198,103 @@ def activate(request, token):
         {"form": form}
     )
 
-
 # =========================
-# ★ 年齢確認セッション作成API
+# KYC申請ビュー（完全版） - 1ユーザー1件、pending中はブロック、既存データあれば上書き
 # =========================
 @login_required
-def create_verification_session(request):
+def kyc_submit(request):
     user = request.user
 
-    session = stripe.identity.VerificationSession.create(
-        type="document",
-        metadata={
-            "user_id": user.id
-        },
-        return_url=request.build_absolute_uri(
-            reverse("accounts:verification_complete")
-        )
-    )
+    # 🔥 pending中はブロック
+    if user.verification_status == "pending":
+        messages.error(request, "現在確認中です。しばらくお待ちください。")
+        return redirect("accounts:mypage")
 
-    user.stripe_verification_session_id = session.id
-    user.save(update_fields=["stripe_verification_session_id"])
+    # 🔥 既存データ取得（あれば上書き）
+    kyc = KYCSubmission.objects.filter(user=user).first()
 
-    return JsonResponse({
-        "url": session.url
-    })
+    if request.method == "POST":
+        form = KYCForm(request.POST, request.FILES, instance=kyc)
 
+        if form.is_valid():
+            kyc = form.save(commit=False)
+            kyc.user = user
+            kyc.status = "pending"
+            kyc.save()
 
-# =========================
-# ★ 完了ページ
-# =========================
-@login_required
-def verification_complete(request):
-    return render(request, "accounts/verification_complete.html")
-
-
-# =========================
-# ★ Stripe Webhook（完全版）
-# =========================
-@csrf_exempt
-def stripe_webhook(request):
-    payload = request.body
-    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
-    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except Exception:
-        return JsonResponse({"error": "invalid"}, status=400)
-
-    event_type = event["type"]
-    session = event["data"]["object"]
-
-    user_id = session.get("metadata", {}).get("user_id")
-    if not user_id:
-        return JsonResponse({"status": "no_user"})
-
-    try:
-        user = CustomUser.objects.get(id=user_id)
-    except CustomUser.DoesNotExist:
-        return JsonResponse({"status": "user_not_found"})
-
-    session_id = session.get("id")
-
-    # =========================
-    # 処理中
-    # =========================
-    if event_type == "identity.verification_session.processing":
-        if user.verification_status != "pending":
+            # 🔥 ユーザー状態更新
             user.verification_status = "pending"
-            user.stripe_verification_session_id = session_id
+            user.verification_attempts += 1
             user.save(update_fields=[
                 "verification_status",
-                "stripe_verification_session_id"
+                "verification_attempts"
             ])
 
-    # =========================
-    # 成功（ここ超重要）
-    # =========================
-    elif event_type == "identity.verification_session.verified":
+            messages.success(request, "本人確認を送信しました。")
+            return redirect("accounts:mypage")
 
-        # DOB取得
-        dob = session.get("verified_outputs", {}).get("dob")
+    else:
+        form = KYCForm(instance=kyc)
 
-        if dob:
-            try:
-                birth_date = date(
-                    dob["year"],
-                    dob["month"],
-                    dob["day"]
-                )
-                user.birth_date = birth_date
-            except Exception:
-                pass
+    return render(request, "accounts/kyc_submit.html", {
+        "form": form
+    })
 
-        age = user.get_age()
+# =========================
+# ★ 管理人向け KYC申請一覧ビュー
+# =========================
+@login_required
+def admin_kyc_list(request):
+    if not request.user.is_superuser:
+        return redirect("/")
 
-        # 18歳以上のみ通す
-        if age is not None and age >= 18:
-            user.verification_status = "verified"
-            user.verified_at = timezone.now()
-        else:
-            user.verification_status = "failed"
+    kycs = KYCSubmission.objects.select_related("user").order_by("-created_at")
 
-        user.stripe_verification_session_id = session_id
+    return render(request, "accounts/admin_kyc_list.html", {
+        "kycs": kycs
+    })
 
-        user.save(update_fields=[
-            "birth_date",
-            "verification_status",
-            "verified_at",
-            "stripe_verification_session_id"
-        ])
+# =========================
+# ★ 管理人向け KYC申請承認アクション（超重要） - 承認 → ユーザー状態更新
+# =========================
+@login_required
+def admin_kyc_approve(request, kyc_id):
+    if not request.user.is_superuser:
+        return redirect("/")
 
-        # ログ
-        VerificationLog.objects.create(
-            user=user,
-            session_id=session_id,
-            status=user.verification_status
-        )
+    kyc = get_object_or_404(KYCSubmission, id=kyc_id)
 
-    # =========================
-    # 失敗
-    # =========================
-    elif event_type == "identity.verification_session.requires_input":
-        user.verification_status = "failed"
-        user.stripe_verification_session_id = session_id
+    kyc.status = "approved"
+    kyc.save(update_fields=["status"])
 
-        user.save(update_fields=[
-            "verification_status",
-            "stripe_verification_session_id"
-        ])
+    user = kyc.user
+    user.verification_status = "verified"
+    user.verified_at = timezone.now()
+    user.save(update_fields=["verification_status", "verified_at"])
 
-        VerificationLog.objects.create(
-            user=user,
-            session_id=session_id,
-            status="failed"
-        )
+    messages.success(request, "承認しました")
+    return redirect("accounts:admin_kyc_list")
 
-    return JsonResponse({"status": "success"})
+# =========================
+# ★管理者向け KYC申請却下アクション（超重要） - 却下 → ユーザー状態更新
+# =========================
+@login_required
+def admin_kyc_reject(request, kyc_id):
+    if not request.user.is_superuser:
+        return redirect("/")
+
+    kyc = get_object_or_404(KYCSubmission, id=kyc_id)
+
+    kyc.status = "rejected"
+    kyc.save(update_fields=["status"])
+
+    user = kyc.user
+    user.verification_status = "failed"
+    user.save(update_fields=["verification_status"])
+
+    messages.error(request, "却下しました")
+    return redirect("accounts:admin_kyc_list")
+
 # =========================
 # ★ マイページ
 # =========================

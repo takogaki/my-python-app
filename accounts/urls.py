@@ -44,8 +44,9 @@ urlpatterns = [
     path("like/<int:user_id>/", views.like_user, name="like_user"),
     path("matches/", views.match_list, name="match_list"),
 
-    #本人確認
-    path("verify/", views.create_verification_session, name="verify"),
-    path("verify/complete/", views.verification_complete, name="verification_complete"),
-    path("stripe/webhook/", views.stripe_webhook, name="stripe_webhook"),
+    #本人確認（KYC）
+    path("kyc/", views.kyc_submit, name="kyc_submit"),
+    path("admin/kyc/", views.admin_kyc_list, name="admin_kyc_list"),
+    path("admin/kyc/<int:kyc_id>/approve/", views.admin_kyc_approve, name="admin_kyc_approve"),
+    path("admin/kyc/<int:kyc_id>/reject/", views.admin_kyc_reject, name="admin_kyc_reject"),
 ]
