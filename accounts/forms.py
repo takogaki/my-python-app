@@ -191,22 +191,36 @@ class KYCForm(forms.ModelForm):
         model = KYCSubmission
         fields = ["id_image", "selfie_image"]
 
+    # =========================
+    # 個別バリデーション
+    # =========================
     def clean_id_image(self):
-        return validate_kyc_image(self.cleaned_data.get("id_image"))
+        image = self.cleaned_data.get("id_image")
+        return validate_kyc_image(image)
 
     def clean_selfie_image(self):
-        return validate_kyc_image(self.cleaned_data.get("selfie_image"))
+        image = self.cleaned_data.get("selfie_image")
+        return validate_kyc_image(image)
 
+    # =========================
+    # 全体バリデーション（重要）
+    # =========================
     def clean(self):
         cleaned_data = super().clean()
 
+        # 🔥 instanceから安全に取得（例外回避）
         user = getattr(self.instance, "user", None)
 
-        # 🔥 requestから取得（←これが本命）
+        # 🔥 instanceに無ければrequestから取得（最強ルート）
         if not user and hasattr(self, "request"):
             user = self.request.user
 
-        if user and user.verification_attempts >= 3:
+        # 🔥 それでも無ければ何もしない（安全終了）
+        if not user:
+            return cleaned_data
+
+        # 🔥 試行回数制限
+        if user.verification_attempts >= 3:
             raise ValidationError(
                 "認証の試行回数が上限に達しました。サポートにお問い合わせください。"
             )
