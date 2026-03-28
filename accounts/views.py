@@ -269,6 +269,20 @@ def admin_kyc_approve(request, kyc_id):
     return redirect("accounts:admin_kyc_list")
 
 # =========================
+# ★KYC申請一覧（管理者用） - 申請内容確認、承認・却下アクションへの入り口（超重要）
+# =========================
+@login_required
+def admin_kyc_list(request):
+    if not request.user.is_superuser:
+        return redirect("/")
+
+    kycs = KYCSubmission.objects.select_related("user").order_by("-created_at")
+
+    return render(request, "accounts/admin_kyc_list.html", {
+        "kycs": kycs
+    })
+
+# =========================
 # ★管理者向け KYC申請却下アクション（超重要） - 却下 → ユーザー状態更新
 # =========================
 @login_required
