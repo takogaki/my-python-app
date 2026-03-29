@@ -347,6 +347,13 @@ def admin_kyc_reject(request, kyc_id):
     return redirect("accounts:admin_kyc_list")
 
 # =========================
+# ★ KYC申請完了（スマホ専用）
+# =========================
+@login_required
+def kyc_complete_mobile(request):
+    return render(request, "accounts/kyc_complete_mobile.html")
+
+# =========================
 # ★ マイページ
 # =========================
 @login_required
