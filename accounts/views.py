@@ -195,7 +195,7 @@ def activate(request, token):
     )
 
 # =========================
-# KYC申請ビュー（完成版）
+# KYC申請ビュー（完成版・修正版）
 # =========================
 @login_required
 def kyc_submit(request):
@@ -212,16 +212,27 @@ def kyc_submit(request):
     session_token = request.session.get("kyc_qr_token")
 
     # =========================
-    # 🔥 不正アクセス防止
+    # 🔥 QR経由判定（POSTでも使うため先に確定）
+    # =========================
+    is_qr = request.GET.get("qr") == "1" or request.session.get("is_qr")
+
+    # =========================
+    # 🔥 不正アクセス防止（整理済）
     # =========================
     if token:
         if token != session_token:
             messages.error(request, "不正なアクセスです")
             return redirect("accounts:mypage")
 
-        if request.session.get("kyc_user_id") != user.id:
-            messages.error(request, "別アカウントでは申請できません")
+        session_user_id = request.session.get("kyc_user_id")
+
+        if not session_user_id or session_user_id != user.id:
+            messages.error(request, "このQRコードは別のアカウント専用です")
             return redirect("accounts:mypage")
+
+        # 🔥 QR経由フラグをセッション保存（超重要）
+        request.session["is_qr"] = True
+        is_qr = True
 
     # =========================
     # 🔥 pending中はブロック
@@ -236,12 +247,12 @@ def kyc_submit(request):
     kyc = KYCSubmission.objects.filter(user=user).order_by("-created_at").first()
 
     # =========================
-    # 🔥 QRコード生成（トークン付き）
+    # 🔥 QRコード生成（ここ修正済）
     # =========================
-    is_qr = request.GET.get("qr") == "1"
-    qr_url = request.build_absolute_uri(f"/accounts/kyc/?token={session_token}")
+    qr_url = request.build_absolute_uri(
+        f"/accounts/kyc/?token={session_token}&qr=1"
+    )
 
-    url = request.build_absolute_uri(request.path) + "?qr=1"
     qr = qrcode.make(qr_url)
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
@@ -253,6 +264,9 @@ def kyc_submit(request):
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
         form.request = request
+
+        # 🔥 ここで判定を先に取る（超重要）
+        is_qr = request.GET.get("qr") == "1"
 
         if form.is_valid():
             kyc = form.save(commit=False)
@@ -267,20 +281,20 @@ def kyc_submit(request):
                 "verification_attempts"
             ])
 
-            # 🔥 セッション削除（再利用防止）
+            # 🔥 セッション削除
             request.session.pop("kyc_qr_token", None)
             request.session.pop("kyc_user_id", None)
 
             messages.success(request, "本人確認を送信しました。")
 
-            # 🔥 QR経由なら専用ページへ
-            if request.GET.get("qr") == "1":
+            # =========================
+            # 🔥 QR経由ならスマホ専用完了画面へ
+            # =========================
+            if is_qr:
                 return redirect("accounts:kyc_complete_mobile")
 
+            # 🔥 通常（PC or スマホ直アクセス）
             return redirect("accounts:mypage")
-
-    else:
-        form = KYCForm(instance=kyc)
 
     # =========================
     # 🔥 デバイス判定
@@ -292,18 +306,20 @@ def kyc_submit(request):
         "kyc": kyc,
         "qr_code": qr_code,
         "is_mobile": is_mobile,
-        "is_qr": is_qr,   # ← これ追加
+        "is_qr": is_qr,
     })
 
+
 # =========================
-# ★ KYC申請完了（スマホ専用） - QRコード経由でアクセスしたユーザーだけが見れる特別なページ
+# ★ KYC申請完了（スマホ専用）
 # =========================
 @login_required
 def kyc_complete_mobile(request):
     return render(request, "accounts/kyc_complete_mobile.html")
 
+
 # =========================
-# ★ 管理人向け KYC申請承認アクション（超重要） - 承認 → ユーザー状態更新
+# ★ 管理人向け 承認
 # =========================
 @login_required
 def admin_kyc_approve(request, kyc_id):
@@ -323,8 +339,9 @@ def admin_kyc_approve(request, kyc_id):
     messages.success(request, "承認しました")
     return redirect("accounts:admin_kyc_list")
 
+
 # =========================
-# ★KYC申請一覧（管理者用） - 申請内容確認、承認・却下アクションへの入り口（超重要）
+# ★ 管理者一覧
 # =========================
 @login_required
 def admin_kyc_list(request):
@@ -337,8 +354,9 @@ def admin_kyc_list(request):
         "kycs": kycs
     })
 
+
 # =========================
-# ★管理者向け KYC申請却下アクション（超重要） - 却下 → ユーザー状態更新
+# ★ 却下
 # =========================
 @login_required
 def admin_kyc_reject(request, kyc_id):

@@ -56,9 +56,9 @@
             
                 <!-- 未認証 -->
                 {% if user.verification_status == "unverified" %}
-                <!-- <a href="{% url 'accounts:kyc_submit' %}" style="text-decoration:none; color:#dc3545;">
+                <a href="{% url 'accounts:kyc_submit' %}" style="text-decoration:none; color:#dc3545;">
                     ❌ 未認証（クリックして認証する）
-                </a> -->
+                </a>
             
                 <!-- 確認中 -->
                 {% elif user.verification_status == "pending" %}
@@ -74,9 +74,9 @@
             
                 <!-- 却下 -->
                 {% elif user.verification_status == "failed" or user.verification_status == "rejected" %}
-                <!-- <a href="{% url 'accounts:kyc_submit' %}" style="text-decoration:none; color:#dc3545;">
+                <a href="{% url 'accounts:kyc_submit' %}" style="text-decoration:none; color:#dc3545;">
                     ⚠️ 却下（クリックして再申請）
-                </a> -->
+                </a>
             
                 <!-- 想定外（保険） -->
                 {% else %}

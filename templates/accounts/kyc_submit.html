@@ -35,14 +35,28 @@
     <!-- 🔥 PC用（QR表示） -->
     <!-- ========================= -->
     <div id="pc-only" style="display:none; text-align:center;">
+
         <p>📱 スマホでQRコードを読み取ってください</p>
+
         <img src="data:image/png;base64,{{ qr_code }}" width="220">
+
+        <div style="margin-top:15px; font-size:13px; color:gray;">
+            スマホで撮影・送信を行います
+        </div>
+
     </div>
 
     <!-- ========================= -->
     <!-- 🔥 スマホ用 -->
     <!-- ========================= -->
     <div id="mobile-only" style="display:none;">
+
+        <!-- 🔥 QR経由メッセージ -->
+        {% if is_qr %}
+        <div style="text-align:center; margin-bottom:15px; color:orange;">
+            📷 この端末で撮影・送信してください
+        </div>
+        {% endif %}
 
         {% if kyc and kyc.status == "pending" %}
         <p style="color:gray;">現在審査中のため再提出できません。</p>
@@ -51,16 +65,19 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
+            <!-- 本人確認書類 -->
             <div style="margin-bottom:20px;">
                 <label>本人確認書類</label><br>
                 <input type="file" name="id_image" accept="image/*" capture="environment" required>
             </div>
 
+            <!-- セルフィー -->
             <div style="margin-bottom:20px;">
                 <label>顔写真（セルフィー）</label><br>
                 <input type="file" name="selfie_image" accept="image/*" capture="user" required>
             </div>
 
+            <!-- 注意 -->
             <div style="font-size:12px; color:gray; margin-bottom:20px;">
                 ・顔がはっきり見える状態で撮影してください<br>
                 ・加工禁止<br>
@@ -73,6 +90,7 @@
         </form>
 
         {% endif %}
+
     </div>
 
 </div>
