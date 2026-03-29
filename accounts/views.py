@@ -290,6 +290,63 @@ def kyc_submit(request):
     })
 
 # =========================
+# ★ 管理者 KYC一覧
+# =========================
+@login_required
+def admin_kyc_list(request):
+    if not request.user.is_superuser:
+        return redirect("/")
+
+    kycs = KYCSubmission.objects.select_related("user").order_by("-created_at")
+
+    return render(request, "accounts/admin_kyc_list.html", {
+        "kycs": kycs
+    })
+
+
+# =========================
+# ★ 承認
+# =========================
+@login_required
+def admin_kyc_approve(request, kyc_id):
+    if not request.user.is_superuser:
+        return redirect("/")
+
+    kyc = get_object_or_404(KYCSubmission, id=kyc_id)
+
+    kyc.status = "approved"
+    kyc.save(update_fields=["status"])
+
+    user = kyc.user
+    user.verification_status = "verified"
+    user.verified_at = timezone.now()
+    user.save(update_fields=["verification_status", "verified_at"])
+
+    messages.success(request, "承認しました")
+    return redirect("accounts:admin_kyc_list")
+
+
+# =========================
+# ★ 却下
+# =========================
+@login_required
+def admin_kyc_reject(request, kyc_id):
+    if not request.user.is_superuser:
+        return redirect("/")
+
+    kyc = get_object_or_404(KYCSubmission, id=kyc_id)
+
+    kyc.status = "rejected"
+    kyc.save(update_fields=["status"])
+
+    user = kyc.user
+    user.verification_status = "failed"
+    user.save(update_fields=["verification_status"])
+
+    messages.error(request, "却下しました")
+    return redirect("accounts:admin_kyc_list")
+
+# =========================
 # ★ マイページ
 # =========================
 @login_required
