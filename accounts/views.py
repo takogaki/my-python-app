@@ -194,15 +194,12 @@ def activate(request, token):
         {"form": form}
     )
 
-# =========================
-# KYC申請ビュー（完成版・修正版）
-# =========================
 @login_required
 def kyc_submit(request):
     user = request.user
 
     # =========================
-    # 🔥 トークン生成（PC→スマホ用）
+    # 🔥 トークン生成
     # =========================
     if "kyc_qr_token" not in request.session:
         request.session["kyc_qr_token"] = str(uuid.uuid4())
@@ -212,12 +209,7 @@ def kyc_submit(request):
     session_token = request.session.get("kyc_qr_token")
 
     # =========================
-    # 🔥 QR経由判定（POSTでも使うため先に確定）
-    # =========================
-    is_qr = request.GET.get("qr") == "1" or request.session.get("is_qr")
-
-    # =========================
-    # 🔥 不正アクセス防止（整理済）
+    # 🔥 不正アクセス防止
     # =========================
     if token:
         if token != session_token:
@@ -225,33 +217,27 @@ def kyc_submit(request):
             return redirect("accounts:mypage")
 
         session_user_id = request.session.get("kyc_user_id")
-
         if not session_user_id or session_user_id != user.id:
             messages.error(request, "このQRコードは別のアカウント専用です")
             return redirect("accounts:mypage")
 
-        # 🔥 QR経由フラグをセッション保存（超重要）
-        request.session["is_qr"] = True
-        is_qr = True
-
     # =========================
-    # 🔥 pending中はブロック
+    # 🔥 pendingブロック
     # =========================
     if KYCSubmission.objects.filter(user=user, status="pending").exists():
         messages.error(request, "現在確認中です。しばらくお待ちください。")
         return redirect("accounts:mypage")
 
     # =========================
-    # 🔥 既存データ取得
+    # 🔥 既存データ
     # =========================
     kyc = KYCSubmission.objects.filter(user=user).order_by("-created_at").first()
 
     # =========================
-    # 🔥 QRコード生成（ここ修正済）
+    # 🔥 QR生成
     # =========================
-    qr_url = request.build_absolute_uri(
-        f"/accounts/kyc/?token={session_token}&qr=1"
-    )
+    is_qr = request.GET.get("qr") == "1"
+    qr_url = request.build_absolute_uri(f"/accounts/kyc/?token={session_token}&qr=1")
 
     qr = qrcode.make(qr_url)
     buffer = BytesIO()
@@ -259,14 +245,16 @@ def kyc_submit(request):
     qr_code = base64.b64encode(buffer.getvalue()).decode()
 
     # =========================
+    # 🔥 form生成
+    # =========================
+    form = KYCForm(instance=kyc)
+
+    # =========================
     # 🔥 POST処理
     # =========================
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
         form.request = request
-
-        # 🔥 ここで判定を先に取る（超重要）
-        is_qr = request.GET.get("qr") == "1"
 
         if form.is_valid():
             kyc = form.save(commit=False)
@@ -281,99 +269,25 @@ def kyc_submit(request):
                 "verification_attempts"
             ])
 
-            # 🔥 セッション削除
+            # 🔥 トークン破棄
             request.session.pop("kyc_qr_token", None)
             request.session.pop("kyc_user_id", None)
 
             messages.success(request, "本人確認を送信しました。")
 
-            # =========================
-            # 🔥 QR経由ならスマホ専用完了画面へ
-            # =========================
             if is_qr:
                 return redirect("accounts:kyc_complete_mobile")
-
-            # 🔥 通常（PC or スマホ直アクセス）
             return redirect("accounts:mypage")
 
     # =========================
-    # 🔥 デバイス判定
+    # 🔥 renderはここ1回だけ
     # =========================
-    is_mobile = "Mobile" in request.META.get("HTTP_USER_AGENT", "")
-
     return render(request, "accounts/kyc_submit.html", {
         "form": form,
         "kyc": kyc,
         "qr_code": qr_code,
-        "is_mobile": is_mobile,
         "is_qr": is_qr,
     })
-
-
-# =========================
-# ★ KYC申請完了（スマホ専用）
-# =========================
-@login_required
-def kyc_complete_mobile(request):
-    return render(request, "accounts/kyc_complete_mobile.html")
-
-
-# =========================
-# ★ 管理人向け 承認
-# =========================
-@login_required
-def admin_kyc_approve(request, kyc_id):
-    if not request.user.is_superuser:
-        return redirect("/")
-
-    kyc = get_object_or_404(KYCSubmission, id=kyc_id)
-
-    kyc.status = "approved"
-    kyc.save(update_fields=["status"])
-
-    user = kyc.user
-    user.verification_status = "verified"
-    user.verified_at = timezone.now()
-    user.save(update_fields=["verification_status", "verified_at"])
-
-    messages.success(request, "承認しました")
-    return redirect("accounts:admin_kyc_list")
-
-
-# =========================
-# ★ 管理者一覧
-# =========================
-@login_required
-def admin_kyc_list(request):
-    if not request.user.is_superuser:
-        return redirect("/")
-
-    kycs = KYCSubmission.objects.select_related("user").order_by("-created_at")
-
-    return render(request, "accounts/admin_kyc_list.html", {
-        "kycs": kycs
-    })
-
-
-# =========================
-# ★ 却下
-# =========================
-@login_required
-def admin_kyc_reject(request, kyc_id):
-    if not request.user.is_superuser:
-        return redirect("/")
-
-    kyc = get_object_or_404(KYCSubmission, id=kyc_id)
-
-    kyc.status = "rejected"
-    kyc.save(update_fields=["status"])
-
-    user = kyc.user
-    user.verification_status = "failed"
-    user.save(update_fields=["verification_status"])
-
-    messages.error(request, "却下しました")
-    return redirect("accounts:admin_kyc_list")
 
 # =========================
 # ★ マイページ
