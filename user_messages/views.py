@@ -4,12 +4,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from .forms import ReplyMessageForm
 from .models import Message
-from accounts.models import CustomUser
+from accounts.models import CustomUser, Match
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.db.models import Max, Q
-from accounts.models import Match
 from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
@@ -43,8 +43,15 @@ def message_box(request):
 
 @login_required
 def send_message(request, username):
-    recipient = get_object_or_404(User, username=username)
+
     sender = request.user
+
+    # 🔥 年齢認証チェック（最初にやる）
+    if sender.verification_status != "verified":
+        messages.warning(request, "メッセージ機能は年齢確認後に利用できます")
+        return redirect("accounts:kyc_submit")
+
+    recipient = get_object_or_404(User, username=username)
 
     # 🔐 マッチ確認
     is_matched = Match.objects.filter(
@@ -57,15 +64,22 @@ def send_message(request, username):
             "target_user": recipient
         }, status=403)
 
-    # ✅ ここに追加（未読 → 既読）
+    # ✅ 未読 → 既読
     Message.objects.filter(
         sender=recipient,
         recipient=sender,
         is_read=False
     ).update(is_read=True)
 
-    # POSTならメッセージ保存
+    # =========================
+    # 🔥 POST処理
+    # =========================
     if request.method == "POST":
+
+        # 🔥 二重防御（API直叩き対策）
+        if sender.verification_status != "verified":
+            return JsonResponse({"error": "KYC required"}, status=403)
+
         content = request.POST.get("message")
 
         if content and content.strip():

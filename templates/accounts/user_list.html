@@ -41,21 +41,27 @@
 
                 <div class="pc-buttons">
                 
-                    {% if is_match_page %}
-                    <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
-                        💬
-                    </a>
-                
-                    {% elif user.id in matched_user_ids %}
-                    <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
-                        💬
-                    </a>
-                
+                    {% if is_match_page or user.id in matched_user_ids %}
+                    
+                        {% if request.user.verification_status == "verified" %}
+                        <!-- ✅ 認証済み：普通にDM -->
+                        <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
+                            💬
+                        </a>
+                        {% else %}
+                        <!-- 🔒 未認証：KYCへ誘導 -->
+                        <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
+                            🔒メッセージは年齢確認後に解放されます
+                        </a>
+                        {% endif %}
+                    
                     {% else %}
-                    <button type="button" class="likeBtn {% if user.id in liked_user_ids %}liked{% endif %}"
-                        data-user-id="{{ user.id }}">
+                    
+                    <!-- ❤️ LIKE -->
+                    <button type="button" class="likeBtn {% if user.id in liked_user_ids %}liked{% endif %}" data-user-id="{{ user.id }}">
                         ❤
                     </button>
+                    
                     {% endif %}
                 
                 </div>
