@@ -53,8 +53,16 @@
 
         <!-- 🔥 QR経由メッセージ -->
         {% if is_qr %}
-        <div style="text-align:center; margin-bottom:15px; color:orange;">
-            📷 この端末で撮影・送信してください
+        <div style="text-align:center; margin-bottom:20px;">
+        
+            <p style="color:orange; font-weight:bold;">
+                📷 この端末で撮影してください
+            </p>
+        
+            <button type="button" onclick="startCamera()" class="btn btn-success" style="margin-top:10px;">
+                カメラを起動する
+            </button>
+        
         </div>
         {% endif %}
 
@@ -68,7 +76,7 @@
             <!-- 本人確認書類 -->
             <div style="margin-bottom:20px;">
                 <label>本人確認書類</label><br>
-                <input type="file" name="id_image" accept="image/*" capture="environment" required>
+                <input id="id_image_input" type="file" name="id_image" accept="image/*" capture="environment" required>
             </div>
 
             <!-- セルフィー -->

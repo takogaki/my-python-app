@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const isMobile = /iPhone|Android.+Mobile|iPad/.test(navigator.userAgent);
 
     // =========================
-    // 🔥 QR経由判定
+    // 🔥 QR判定
     // =========================
     const params = new URLSearchParams(window.location.search);
     const isQR = params.get("qr") === "1";
@@ -16,36 +16,47 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     const pc = document.getElementById("pc-only");
     const mobile = document.getElementById("mobile-only");
-    const fileInput = document.querySelector('input[name="id_image"]');
 
     // =========================
-    // 🔥 初期状態リセット（安全対策）
+    // 🔥 初期リセット
     // =========================
     if (pc) pc.style.display = "none";
     if (mobile) mobile.style.display = "none";
 
     // =========================
-    // 🔥 分岐処理
+    // 🔥 表示分岐
     // =========================
     if (isMobile) {
 
-        // モバイル表示
         if (mobile) mobile.style.display = "block";
 
-        // =========================
-        // 🔥 QR経由のみカメラ自動起動
-        // =========================
-        if (isQR && fileInput) {
+        if (isQR) {
+            console.log("QR経由でアクセス");
+
+            // 🔥 スクロール誘導（ここに統合）
             setTimeout(() => {
-                fileInput.click();
-            }, 500);
+                window.scrollTo({
+                    top: 300,
+                    behavior: "smooth"
+                });
+            }, 300);
         }
 
     } else {
 
-        // PC表示（QR表示）
         if (pc) pc.style.display = "block";
 
     }
 
 });
+
+
+// =========================
+// 🔥 カメラ起動（ユーザー操作必須）
+// =========================
+function startCamera() {
+    const input = document.getElementById("id_image_input");
+    if (input) {
+        input.click();
+    }
+}

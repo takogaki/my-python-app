@@ -198,28 +198,18 @@ def activate(request, token):
 def kyc_submit(request):
     user = request.user
 
-    # =========================
-    # 🔥 トークン生成
-    # =========================
-    if "kyc_qr_token" not in request.session:
-        request.session["kyc_qr_token"] = str(uuid.uuid4())
-        request.session["kyc_user_id"] = user.id
-
     token = request.GET.get("token")
-    session_token = request.session.get("kyc_qr_token")
+    uid = request.GET.get("uid")
+    is_qr = request.GET.get("qr") == "1"
 
     # =========================
-    # 🔥 不正アクセス防止
+    # 🔥 QRアクセス時（最重要）
     # =========================
-    if token:
-        if token != session_token:
-            messages.error(request, "不正なアクセスです")
-            return redirect("accounts:mypage")
-
-        session_user_id = request.session.get("kyc_user_id")
-        if not session_user_id or session_user_id != user.id:
-            messages.error(request, "このQRコードは別のアカウント専用です")
-            return redirect("accounts:mypage")
+    if is_qr:
+        # UID一致チェック（これが本体）
+        if str(request.user.id) != str(uid):
+            messages.error(request, "別アカウントです。ログインし直してください")
+            return redirect("accounts:login")
 
     # =========================
     # 🔥 pendingブロック
@@ -234,10 +224,11 @@ def kyc_submit(request):
     kyc = KYCSubmission.objects.filter(user=user).order_by("-created_at").first()
 
     # =========================
-    # 🔥 QR生成
+    # 🔥 QR生成（tokenはもう不要）
     # =========================
-    is_qr = request.GET.get("qr") == "1"
-    qr_url = request.build_absolute_uri(f"/accounts/kyc/?token={session_token}&qr=1")
+    qr_url = request.build_absolute_uri(
+        f"/accounts/kyc/?uid={user.id}&qr=1"
+    )
 
     qr = qrcode.make(qr_url)
     buffer = BytesIO()
@@ -245,16 +236,15 @@ def kyc_submit(request):
     qr_code = base64.b64encode(buffer.getvalue()).decode()
 
     # =========================
-    # 🔥 form生成
+    # 🔥 form
     # =========================
     form = KYCForm(instance=kyc)
 
     # =========================
-    # 🔥 POST処理
+    # 🔥 POST
     # =========================
     if request.method == "POST":
         form = KYCForm(request.POST, request.FILES, instance=kyc)
-        form.request = request
 
         if form.is_valid():
             kyc = form.save(commit=False)
@@ -269,19 +259,13 @@ def kyc_submit(request):
                 "verification_attempts"
             ])
 
-            # 🔥 トークン破棄
-            request.session.pop("kyc_qr_token", None)
-            request.session.pop("kyc_user_id", None)
-
             messages.success(request, "本人確認を送信しました。")
 
             if is_qr:
                 return redirect("accounts:kyc_complete_mobile")
+
             return redirect("accounts:mypage")
 
-    # =========================
-    # 🔥 renderはここ1回だけ
-    # =========================
     return render(request, "accounts/kyc_submit.html", {
         "form": form,
         "kyc": kyc,
