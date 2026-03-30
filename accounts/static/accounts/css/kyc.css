@@ -1,0 +1,86 @@
+.kyc-container {
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.kyc-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.kyc-title {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.kyc-status {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.status.pending {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status.approved {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status.rejected {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.kyc-error {
+    color: red;
+    margin-top: 10px;
+}
+
+.center {
+    text-align: center;
+}
+
+.kyc-qr {
+    width: 200px;
+    margin-top: 10px;
+}
+
+.kyc-subtext {
+    font-size: 13px;
+    color: gray;
+    margin-top: 10px;
+}
+
+.kyc-qr-guide {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.kyc-field {
+    margin-bottom: 20px;
+}
+
+.kyc-help {
+    font-size: 12px;
+    color: gray;
+    margin-bottom: 20px;
+}
+
+.kyc-submit {
+    width: 100%;
+}
+
+.kyc-note {
+    color: gray;
+}

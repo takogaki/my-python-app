@@ -5,100 +5,87 @@
 年齢確認 | SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/kyc.css' %}">
+{% endblock %}
+
 {% block body %}
 
-<div class="container" style="max-width:600px;margin:40px auto;">
+<div class="kyc-container">
 
-    <h2>年齢確認（本人確認）</h2>
+    <!-- タイトル -->
+    <div class="kyc-card">
+        <h2 class="kyc-title">年齢確認（本人確認）</h2>
 
-    <!-- 🔥 ステータス -->
-    {% if kyc %}
-    <p>
-        {% if kyc.status == "pending" %}
-        🔵 確認中
-        {% elif kyc.status == "approved" %}
-        🟢 認証済み
-        {% elif kyc.status == "rejected" %}
-        🔴 却下（再提出してください）
-        {% endif %}
-    </p>
-    {% endif %}
-
-    <!-- 🔥 エラー -->
-    {% if form.errors %}
-    <div style="color:red; margin-bottom:15px;">
-        {{ form.errors }}
-    </div>
-    {% endif %}
-
-    <!-- ========================= -->
-    <!-- 🔥 PC用（QR表示） -->
-    <!-- ========================= -->
-    <div id="pc-only" style="display:none; text-align:center;">
-
-        <p>📱 スマホでQRコードを読み取ってください</p>
-
-        <img src="data:image/png;base64,{{ qr_code }}" width="220">
-
-        <div style="margin-top:15px; font-size:13px; color:gray;">
-            スマホで撮影・送信を行います
+        <!-- ステータス -->
+        {% if kyc %}
+        <div class="kyc-status">
+            {% if kyc.status == "pending" %}
+            <span class="status pending">確認中</span>
+            {% elif kyc.status == "approved" %}
+            <span class="status approved">認証済み</span>
+            {% elif kyc.status == "rejected" %}
+            <span class="status rejected">却下（再提出してください）</span>
+            {% endif %}
         </div>
+        {% endif %}
 
+        <!-- エラー -->
+        {% if form.errors %}
+        <div class="kyc-error">
+            {{ form.errors }}
+        </div>
+        {% endif %}
     </div>
 
-    <!-- ========================= -->
-    <!-- 🔥 スマホ用 -->
-    <!-- ========================= -->
-    <div id="mobile-only" style="display:none;">
+    <!-- PC表示 -->
+    <div id="pc-only" class="kyc-card center" style="display:none;">
+        <p class="kyc-text">📱 スマホでQRコードを読み取ってください</p>
+        <img src="data:image/png;base64,{{ qr_code }}" class="kyc-qr">
+        <p class="kyc-subtext">スマホで撮影・送信を行います</p>
+    </div>
 
-        <!-- 🔥 QR経由メッセージ -->
+    <!-- モバイル -->
+    <div id="mobile-only" class="kyc-card" style="display:none;">
+
         {% if is_qr %}
-        <div style="text-align:center; margin-bottom:20px;">
-        
-            <p style="color:orange; font-weight:bold;">
-                📷 この端末で撮影してください
-            </p>
-        
-            <button type="button" onclick="startCamera()" class="btn btn-success" style="margin-top:10px;">
+        <div class="kyc-qr-guide">
+            <p>📷 この端末で撮影してください</p>
+            <button type="button" onclick="startCamera()" class="btn btn-success">
                 カメラを起動する
             </button>
-        
         </div>
         {% endif %}
 
         {% if kyc and kyc.status == "pending" %}
-        <p style="color:gray;">現在審査中のため再提出できません。</p>
+        <p class="kyc-note">現在審査中のため再提出できません。</p>
         {% else %}
 
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" class="kyc-form">
             {% csrf_token %}
 
-            <!-- 本人確認書類 -->
-            <div style="margin-bottom:20px;">
-                <label>本人確認書類</label><br>
+            <div class="kyc-field">
+                <label>本人確認書類</label>
                 <input id="id_image_input" type="file" name="id_image" accept="image/*" capture="environment" required>
             </div>
 
-            <!-- セルフィー -->
-            <div style="margin-bottom:20px;">
-                <label>顔写真（セルフィー）</label><br>
+            <div class="kyc-field">
+                <label>顔写真（セルフィー）</label>
                 <input type="file" name="selfie_image" accept="image/*" capture="user" required>
             </div>
 
-            <!-- 注意 -->
-            <div style="font-size:12px; color:gray; margin-bottom:20px;">
+            <div class="kyc-help">
                 ・顔がはっきり見える状態で撮影してください<br>
                 ・加工禁止<br>
                 ・不正は即BAN対象
             </div>
 
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary kyc-submit">
                 送信する
             </button>
         </form>
 
         {% endif %}
-
     </div>
 
 </div>

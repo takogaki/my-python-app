@@ -1,20 +1,52 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+送信完了 | SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/kyc.css' %}">
+{% endblock %}
 
 {% block body %}
 
-<div style="text-align:center; padding:40px;">
-    <h2>✅ 送信完了</h2>
+<div class="kyc-container">
 
-    <p>本人確認を送信しました。</p>
+    <div class="kyc-card center">
 
-    <p style="color:gray; margin-top:20px;">
-        この端末では操作は完了しています。<br>
-        元のPC画面に戻ってください。
-    </p>
+        <h2 class="kyc-title">✅ 送信完了</h2>
 
-    <button onclick="window.close()" style="margin-top:20px;">
-        この画面を閉じる
-    </button>
+        <p class="kyc-text">
+            本人確認を送信しました。
+        </p>
+
+        <p class="kyc-subtext">
+            この端末での操作は完了しています。<br>
+            元のPC画面に戻ってください。
+        </p>
+
+        <!-- 🔥 閉じるボタン -->
+        <button onclick="handleClose()" class="btn btn-primary kyc-submit" style="margin-top:20px;">
+            この画面を閉じる
+        </button>
+
+    </div>
+
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function handleClose() {
+        // 🔥 window.close()は効かないケース多いのでフォールバック
+        window.close();
+
+        // 🔥 ダメな場合は案内
+        setTimeout(() => {
+            alert("このタブを閉じて、PC画面に戻ってください。");
+        }, 500);
+    }
+</script>
 {% endblock %}
