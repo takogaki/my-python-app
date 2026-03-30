@@ -36,17 +36,3 @@
 </div>
 
 {% endblock %}
-
-{% block extra_js %}
-<script>
-    function handleClose() {
-        // 🔥 window.close()は効かないケース多いのでフォールバック
-        window.close();
-
-        // 🔥 ダメな場合は案内
-        setTimeout(() => {
-            alert("このタブを閉じて、PC画面に戻ってください。");
-        }, 500);
-    }
-</script>
-{% endblock %}
