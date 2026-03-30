@@ -1,6 +1,7 @@
 # accounts/views.py
 import uuid, qrcode, base64
 from io import BytesIO
+from urllib.parse import urlencode
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, ListView
@@ -27,6 +28,7 @@ from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm
 from notifications.models import Notification
 from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission
 from django.views.decorators.csrf import csrf_exempt
+
 
 User = get_user_model()
 
@@ -198,7 +200,6 @@ def activate(request, token):
 def kyc_submit(request):
     user = request.user
 
-    token = request.GET.get("token")
     uid = request.GET.get("uid")
     is_qr = request.GET.get("qr") == "1"
 
@@ -206,10 +207,14 @@ def kyc_submit(request):
     # 🔥 QRアクセス時（最重要）
     # =========================
     if is_qr:
-        # UID一致チェック（これが本体）
-        if str(request.user.id) != str(uid):
+        if str(user.id) != str(uid):
+
+            # 🔥 今のURLをそのままnextへ
+            login_url = reverse("accounts:login")
+            next_url = request.get_full_path()
+
             messages.error(request, "別アカウントです。ログインし直してください")
-            return redirect("accounts:login")
+            return redirect(f"{login_url}?next={next_url}")
 
     # =========================
     # 🔥 pendingブロック
@@ -224,7 +229,7 @@ def kyc_submit(request):
     kyc = KYCSubmission.objects.filter(user=user).order_by("-created_at").first()
 
     # =========================
-    # 🔥 QR生成（tokenはもう不要）
+    # 🔥 QR生成
     # =========================
     qr_url = request.build_absolute_uri(
         f"/accounts/kyc/?uid={user.id}&qr=1"
