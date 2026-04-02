@@ -229,3 +229,20 @@ class Match(models.Model):
 
     def __str__(self):
         return f"{self.user1} ❤️ {self.user2}"
+    
+    
+# =========================
+# 🔥 足跡（最重要）
+# =========================
+class Footprint(models.Model):
+    from_user = models.ForeignKey(
+        CustomUser,
+        related_name="footprints_sent",
+        on_delete=models.CASCADE
+    )
+    to_user = models.ForeignKey(
+        CustomUser,
+        related_name="footprints_received",
+        on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)

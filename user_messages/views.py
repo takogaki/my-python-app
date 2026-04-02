@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from django.db.models import Max, Q
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 
 
 User = get_user_model()
@@ -90,14 +91,14 @@ def send_message(request, username):
             )
 
     # 🔥 履歴取得
-    messages = Message.objects.filter(
+    chat_messages = Message.objects.filter(
         Q(sender=sender, recipient=recipient) |
         Q(sender=recipient, recipient=sender)
     ).order_by("sent_at")
 
     return render(request, "message/send_message.html", {
         "recipient": recipient,
-        "messages": messages
+        "messages": chat_messages
     })
 
 

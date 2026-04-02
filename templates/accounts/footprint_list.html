@@ -1,0 +1,32 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}足あと{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/footprint_list.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="mypage">
+
+    <section class="content-card">
+        <h3 class="section-title">👀 足あと</h3>
+
+        {% for f in footprints %}
+        <div class="list-item">
+            <a href="{% url 'accounts:user_detail' f.from_user.id %}" class="item-title">
+                👤 {{ f.from_user.username }}
+            </a>
+        
+            <div class="item-meta">
+                🕒 {{ f.created_at|date:"Y/m/d H:i" }}
+            </div>
+        </div>
+        {% empty %}
+        <p class="empty-text">足あとはまだありません</p>
+        {% endfor %}
+    </section>
+
+</div>
+{% endblock %}

@@ -32,6 +32,13 @@
             <div class="profile-card">
                 <h2>
                     {{ user.username }}
+
+                    {% if user.verification_status == "verified" %}
+                    <span class="kyc-badge">✔</span>
+                    {% else %}
+                    <span class="kyc-badge gray">未認証</span>
+                    {% endif %}
+
                     {% if user.get_age %}, {{ user.get_age }}{% endif %}
                 </h2>
 
@@ -39,32 +46,25 @@
                 <p>{{ user.get_gender_display }}</p>
                 {% endif %}
 
-                <div class="pc-buttons">
+                {% if is_match_page or user.id in matched_user_ids %}
                 
-                    {% if is_match_page or user.id in matched_user_ids %}
-                    
-                        {% if request.user.verification_status == "verified" %}
-                        <!-- ✅ 認証済み：普通にDM -->
-                        <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
-                            💬
-                        </a>
-                        {% else %}
-                        <!-- 🔒 未認証：KYCへ誘導 -->
-                        <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
-                            🔒メッセージは年齢確認後に解放されます
-                        </a>
-                        {% endif %}
-                    
+                    {% if request.user.verification_status == "verified" %}
+                    <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
+                        💬
+                    </a>
                     {% else %}
-                    
-                    <!-- ❤️ LIKE -->
-                    <button type="button" class="likeBtn {% if user.id in liked_user_ids %}liked{% endif %}" data-user-id="{{ user.id }}">
-                        ❤
-                    </button>
-                    
+                    <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock" title="年齢確認が必要です">
+                        🔒
+                    </a>
                     {% endif %}
                 
-                </div>
+                {% else %}
+                
+                <button type="button" class="likeBtn {% if user.id in liked_user_ids %}liked{% endif %}" data-user-id="{{ user.id }}">
+                    ❤
+                </button>
+                
+                {% endif %}
 
             </div>
 

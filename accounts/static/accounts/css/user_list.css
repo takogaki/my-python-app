@@ -185,3 +185,10 @@ body {
     background: #ff4d6d;
     color: white;
 }
+
+
+.kyc-badge {
+    color: #00c853;
+    font-size: 14px;
+    margin-left: 5px;
+}

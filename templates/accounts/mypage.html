@@ -5,6 +5,10 @@
 わたし｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}">
+{% endblock %}
+
 {% block body %}
 <div class="mypage">
 
@@ -89,6 +93,69 @@
         </div>
     </section>
 
+    <!-- 🔔 通知 -->
+    <section class="content-card">
+        <h3 class="section-title">🔔 通知</h3>
+    
+        {% for n in notifications %}
+        <div class="list-item {% if not n.is_read %}unread{% endif %}">
+    
+            <a href="{% url 'accounts:notification_read' n.id %}">
+            
+                {% if n.type == "like" %}
+                ❤️
+                {% elif n.type == "footprint" %}
+                👀
+                {% elif n.type == "match" %}
+                💖
+                {% endif %}
+            
+                {% if n.actor %}
+                {{ n.actor.username }}{{ n.verb }}
+                {% else %}
+                {{ n.verb }}
+                {% endif %}
+            
+            </a>
+    
+            <div class="item-meta">
+                {{ n.created_at|date:"Y/m/d H:i" }}
+            </div>
+    
+        </div>
+        {% empty %}
+        <p class="empty-text">通知はありません</p>
+        {% endfor %}
+    </section>
+
+    <section class="content-card">
+        <h3 class="section-title">🤝 交流</h3>
+    
+        <div class="action-grid">
+    
+            <!-- 足跡 -->
+            <a href="{% url 'accounts:footprints' %}" class="action-item">
+                👀 足あと
+            </a>
+    
+            <!-- いいね -->
+            <a href="{% url 'accounts:liked_me' %}" class="action-item">
+                ❤️ ライクされた
+            </a>
+    
+            <!-- マッチ -->
+            <a href="{% url 'accounts:match_list' %}" class="action-item">
+                💖 マッチユーザー
+            </a>
+    
+            <!-- メッセージ -->
+            <a href="{% url 'user_messages:message_box' %}" class="action-item">
+                💌 メッセージ
+            </a>
+    
+        </div>
+    </section>
+
     <!-- 日記 -->
     <section class="content-card">
         <h3 class="section-title">📔 日記一覧</h3>
@@ -141,7 +208,7 @@
     
             {# 🔔 コメント通知一覧 #}
             <div class="notification-list">
-                {% for n in notifications %}
+                {% for n in post_notifications %}
                 {% if n.post == post %}
                 <div class="notification-item">
                     <a href="{% url 'notifications:open_notification' n.id %}">
@@ -216,61 +283,7 @@
             {% endfor %}
     </section>
     {% endif %}
-
-    <!-- メッセージ -->
-    <section class="content-card">
-        {% comment %} ===== 未読数カウント（表示用・副作用なし） ===== {% endcomment %}
-        {% with unread_count=0 %}
-        {% for m in messages %}
-        {% if not m.is_read %}
-        {% with unread_count|add:1 as unread_count %}
-        {% endwith %}
-        {% endif %}
-        {% endfor %}
-
-        <h2><a href="{% url 'accounts:match_list' %}" class="match-btn">
-            ❤️ マッチユーザー一覧
-        </a></h2>
         
-    
-        <h3 class="section-title">
-            💌 受信メッセージ
-            {% if unread_count > 0 %}
-                <span class="badge unread">{{ unread_count }}</span>
-            {% endif %}
-        </h3>
-        {% endwith %}
-    
-        {% for msg in messages %}
-        
-        <div class="list-item {% if not msg.is_read %}unread{% endif %}">
-        
-            {% if msg.sender == request.user %}
-            <a href="{% url 'user_messages:send_message' msg.recipient.username %}" class="item-title">
-                {{ msg.recipient.username }}
-                {% else %}
-                <a href="{% url 'user_messages:send_message' msg.sender.username %}" class="item-title">
-                    {{ msg.sender.username }}
-                    {% endif %}
-        
-                    {% if not msg.is_read %}
-                    <span class="badge unread">未読</span>
-                    {% endif %}
-        
-                </a>
-        
-                <div class="item-meta">
-                    {{ msg.content|truncatechars:50 }}<br>
-                    {{ msg.sent_at|date:"Y/m/d H:i" }}
-                </div>
-        
-        </div>
-        
-        {% empty %}
-        <p class="empty-text">メッセージはありません</p>
-        
-        {% endfor %}
-    </section>
 </div>
 
 <a href="{% url 'accounts:contact_eden' %}" class="dashboard-button ghost">

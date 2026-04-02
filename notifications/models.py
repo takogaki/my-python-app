@@ -1,8 +1,22 @@
 from django.db import models
 from django.conf import settings
 
-
 class Notification(models.Model):
+
+    TYPE_CHOICES = [
+        ("like", "いいね"),
+        ("footprint", "足跡"),
+        ("match", "マッチ"),
+        ("comment", "コメント"),
+        ("system", "システム"),
+    ]
+
+    type = models.CharField(
+        max_length=50,
+        choices=TYPE_CHOICES,
+        default="system"
+    )
+
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -17,20 +31,15 @@ class Notification(models.Model):
         related_name="acted_notifications"
     )
 
+
     verb = models.CharField(max_length=255)
 
-    # ⭐ 追加：どの投稿の通知か
     post = models.ForeignKey(
-        "blog.Post",              # ← あなたのPostモデルに合わせる
+        "blog.Post",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="notifications"
-    )
-
-    target_url = models.CharField(
-        max_length=500,
-        blank=True
     )
 
     is_read = models.BooleanField(default=False)

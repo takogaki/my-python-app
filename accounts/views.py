@@ -16,7 +16,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils import timezone
-from datetime import date
+from datetime import date, timedelta
 from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
 from accounts.models import SavedPost
@@ -26,7 +26,7 @@ from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm, KYCForm
 from notifications.models import Notification
-from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission
+from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -75,7 +75,53 @@ def user_detail(request, pk):
         is_superuser=False,
         is_active=True
     )
-    return render(request, "accounts/user_detail.html", {"user": user})
+
+    # =========================
+    # 足跡記録
+    # =========================
+    if request.user != user:
+
+        Footprint.objects.update_or_create(
+            from_user=request.user,
+            to_user=user,
+            defaults={"created_at": timezone.now()}
+        )
+
+        # =========================
+        # 通知（6時間に1回）
+        # =========================
+        recent = Notification.objects.filter(
+            recipient=user,
+            actor=request.user,
+            type="footprint",
+            created_at__gte=timezone.now() - timedelta(hours=6)
+        ).exists()
+
+        if not recent:
+            Notification.objects.create(
+                recipient=user,
+                actor=request.user,
+                type="footprint",
+                verb="さんがプロフィールを見ました",
+                post=None
+            )
+
+    return render(request, "accounts/user_detail.html", {
+        "user": user
+    })
+
+# ========================
+# 足跡リストビュー（自分のプロフィールを見たユーザーのリスト）
+# ========================
+@login_required
+def footprint_list(request):
+    footprints = Footprint.objects.filter(
+        to_user=request.user
+    ).select_related("from_user").order_by("-created_at")
+
+    return render(request, "accounts/footprint_list.html", {
+        "footprints": footprints
+    })
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
@@ -196,6 +242,9 @@ def activate(request, token):
         {"form": form}
     )
 
+# ========================
+# ★ KYC申請（超重要）
+# ========================
 @login_required
 def kyc_submit(request):
     user = request.user
@@ -381,6 +430,12 @@ def mypage(request):
         recipient=user,
         is_read=False
     ).order_by("-created_at")
+    
+    unread_count = notifications.count()
+
+    post_notifications = notifications.filter(
+        post__isnull=False
+    )
 
     # =========================
     # ★ 管理者用 通報一覧
@@ -412,6 +467,7 @@ def mypage(request):
             "messages": messages,
             "profile": user,
             "notifications": notifications,
+            "unread_count": unread_count,
             "saved_posts": saved_posts,
             "reported_posts": reported_posts,
             "reported_comments": reported_comments,
@@ -503,6 +559,7 @@ def profile_image_delete(request):
 def withdraw_confirm(request):
     return render(request, "accounts/withdraw_confirm.html")
 
+# 退会処理（POSTのみ）
 @login_required
 def withdraw_execute(request):
     if request.method == "POST":
@@ -586,7 +643,7 @@ def contact_eden_public(request):
     return redirect("/")
 
 
-
+# matting用のユーザーリストビュー（自分以外全員表示）
 @method_decorator(login_required, name="dispatch")
 class UserListView(ListView):
     model = User
@@ -596,44 +653,110 @@ class UserListView(ListView):
     def get_queryset(self):
         # 自分以外のユーザーを表示
         return User.objects.exclude(id=self.request.user.id)
+    
+def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
 
+    matches = Match.objects.filter(
+        Q(user1=self.request.user) | Q(user2=self.request.user)
+    )
+
+    match_users = []
+    for match in matches:
+        if match.user1 == self.request.user:
+            match_users.append(match.user2)
+        else:
+            match_users.append(match.user1)
+
+    context["match_users"] = match_users
+    return context
+
+# =========================
+# ★ LIKE機能（重要）
+# ＝========================
 @login_required
 def like_user(request, user_id):
-    if request.method == "POST":
-        to_user = get_object_or_404(User, id=user_id)
+    if request.method != "POST":
+        return JsonResponse({"status": "error"})
 
-        if request.user == to_user:
-            return JsonResponse({"status": "error"})
+    to_user = get_object_or_404(User, id=user_id)
 
-        like, created = UserLike.objects.get_or_create(
-            from_user=request.user,
-            to_user=to_user
+    if request.user == to_user:
+        return JsonResponse({"status": "error"})
+
+    # =========================
+    # LIKE作成
+    # =========================
+    like, created = UserLike.objects.get_or_create(
+        from_user=request.user,
+        to_user=to_user
+    )
+
+    # =========================
+    # マッチ判定（←ここを常にやる）
+    # =========================
+    is_match = UserLike.objects.filter(
+        from_user=to_user,
+        to_user=request.user
+    ).exists()
+
+    if is_match:
+        user1 = min(request.user, to_user, key=lambda u: u.id)
+        user2 = max(request.user, to_user, key=lambda u: u.id)
+
+        Match.objects.get_or_create(
+            user1=user1,
+            user2=user2
         )
 
-        # 🔥 相互LIKE確認
-        is_match = UserLike.objects.filter(
-            from_user=to_user,
-            to_user=request.user
-        ).exists()
+        # 通知
+        Notification.objects.create(
+            recipient=request.user,
+            actor=to_user,
+            type="match",
+            verb="さんとマッチしました"
+        )
 
-        if is_match:
-            # 🔥 重複防止のためID順に固定
-            user1 = min(request.user, to_user, key=lambda u: u.id)
-            user2 = max(request.user, to_user, key=lambda u: u.id)
+        Notification.objects.create(
+            recipient=to_user,
+            actor=request.user,
+            type="match",
+            verb="さんとマッチしました"
+        )
 
-            Match.objects.get_or_create(
-                user1=user1,
-                user2=user2
-            )
+        return redirect("user_messages:send_message", username=to_user.username)
 
-            return JsonResponse({"status": "matched"})
+    # =========================
+    # 新規ライク時だけ通知
+    # =========================
+    if created:
+        Notification.objects.create(
+            recipient=to_user,
+            actor=request.user,
+            type="like",
+            verb="さんがライクしました"
+        )
 
-        if not created:
-            return JsonResponse({"status": "already_liked"})
+    return JsonResponse({"status": "liked"})
 
-        return JsonResponse({"status": "liked"})
+
     
+# like_meビュー（自分がLIKEされたユーザーのリスト）
+@login_required
+def liked_me(request):
+    users = CustomUser.objects.filter(
+        id__in=UserLike.objects.filter(
+            to_user=request.user
+        ).values_list("from_user_id", flat=True)
+    ).annotate(
+        like_count=Count("likes_received")
+    ).order_by("-like_count")
 
+    return render(request, "accounts/liked_me.html", {
+        "users": users
+    })
+    
+# match_listビュー（自分がマッチしたユーザーのリスト）
 @login_required
 def match_list(request):
     matches = Match.objects.filter(
@@ -651,3 +774,22 @@ def match_list(request):
         "users": match_users,   # ← user_listと同じ変数名にする
         "is_match_page": True   # ← オプション（後で使える）
     })
+
+
+@login_required
+def notification_read(request, id):
+    n = get_object_or_404(Notification, id=id, recipient=request.user)
+
+    n.is_read = True
+    n.save(update_fields=["is_read"])
+
+    # ユーザー系通知
+    if n.type in ["like", "footprint", "match"]:
+        if n.actor:
+            return redirect("accounts:user_detail", username=n.actor.username)
+
+    # コメント通知（今後拡張用）
+    if n.type == "comment" and n.post:
+        return redirect("blog:post_detail", slug=n.post.slug)
+
+    return redirect("accounts:mypage")

@@ -1,0 +1,47 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}ライクされた{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/liked_me.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="mypage">
+
+    <section class="content-card">
+        <h3 class="section-title">❤️ ライクされたユーザー</h3>
+
+        {% for user in users %}
+        <div class="list-item">
+
+            <!-- ユーザー名 -->
+            <a href="{% url 'accounts:user_detail_by_username' user.username %}" class="item-title">
+                {{ user.username }}
+            </a>
+
+            <!-- メタ情報 -->
+            <div class="item-meta">
+                ❤️ ライク数：{{ user.like_count }}
+            </div>
+
+            <!-- マッチ済み表示 -->
+            {% if user not in match_users %}
+            <form method="post" action="{% url 'accounts:like_user' user.id %}">
+                {% csrf_token %}
+                <button class="meta-link danger">❤️ ライク返してマッチ</button>
+            </form>
+            {% else %}
+            <span class="badge">💖 マッチ済み</span>
+            {% endif %}
+
+        </div>
+        {% empty %}
+        <p class="empty-text">まだ誰からもライクされていません</p>
+        {% endfor %}
+
+    </section>
+
+</div>
+{% endblock %}

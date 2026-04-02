@@ -40,7 +40,11 @@ urlpatterns = [
     # 404エラー未ログイン時
     path("contact-eden-public/", views.contact_eden_public, name="contact_eden_public"),
 
+    # footprint（足跡）
+    path("footprints/", views.footprint_list, name="footprints"),
+
     #likeユーザー
+    path("liked/", views.liked_me, name="liked_me"),
     path("like/<int:user_id>/", views.like_user, name="like_user"),
     path("matches/", views.match_list, name="match_list"),
 
@@ -50,4 +54,7 @@ urlpatterns = [
     path("admin/kyc/<int:kyc_id>/approve/", views.admin_kyc_approve, name="admin_kyc_approve"),
     path("admin/kyc/<int:kyc_id>/reject/", views.admin_kyc_reject, name="admin_kyc_reject"),
     path("kyc/complete/mobile/", views.kyc_complete_mobile, name="kyc_complete_mobile"),
+
+    # 通知
+    path("notification/<int:id>/", views.notification_read, name="notification_read"),
 ]
