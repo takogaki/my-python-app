@@ -127,13 +127,26 @@
         本規約の解釈には日本法を準拠法とし、本サービスに関して紛争が生じた場合は、運営者所在地を管轄する裁判所を専属的合意管轄とします。
     </p>
 
-    <div class="terms-actions">
+    {% if is_authenticated %}
     
-        <!-- 戻るボタン -->
+    <!-- 🔵 既存ユーザー -->
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="agree-btn">
+            利用規約に同意する
+        </button>
+    </form>
+    
+    {% else %}
+    
+    <!-- 🟢 未登録ユーザー -->
+    <div class="terms-actions">
         <a href="{% url 'accounts:signup' %}" class="btn-back">
-            ← 仮登録画面に戻る
+            仮登録へ進む
         </a>
     </div>
+    
+    {% endif %}
 
 </div>
 
