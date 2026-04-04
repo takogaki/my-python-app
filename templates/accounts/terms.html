@@ -130,12 +130,18 @@
     {% if is_authenticated %}
     
     <!-- 🔵 既存ユーザー -->
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="agree-btn">
-            利用規約に同意する
-        </button>
-    </form>
+    <div class="terms-agree-wrapper">
+    
+        <form method="POST">
+            {% csrf_token %}
+    
+            <button type="submit" class="agree-btn">
+                利用規約に同意する
+            </button>
+    
+        </form>
+    
+    </div>
     
     {% else %}
     

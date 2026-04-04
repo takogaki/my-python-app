@@ -99,3 +99,45 @@
   text-decoration: none;
   font-size: 14px;
 }
+
+/* =========================
+   利用規約に同意するボタン（中央・おしゃれ）
+========================= */
+
+.terms-agree-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.agree-btn {
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+/* ホバー */
+.agree-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.2);
+}
+
+/* クリック */
+.agree-btn:active {
+  transform: scale(0.96);
+}
+
+/* スマホ */
+@media (max-width: 600px) {
+  .agree-btn {
+    width: 100%;
+    font-size: 15px;
+  }
+}
