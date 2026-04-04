@@ -6,6 +6,7 @@ from .models import Profile
 from django.contrib.auth import get_user_model
 import re
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -62,6 +63,19 @@ def validate_username_ascii(value):
 # =========================
 class CustomUserCreationForm(UserCreationForm):
 
+    agree = forms.BooleanField(
+        required=True,
+        label="利用規約に同意する"
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not cleaned_data.get("agree"):
+            raise ValidationError("利用規約に同意してください")
+
+        return cleaned_data
+
     username = forms.CharField(
         label="ユーザー名",
         validators=[validate_username_ascii],
@@ -87,6 +101,7 @@ class CustomUserCreationForm(UserCreationForm):
             "gender",
             "email",
             "birth_date_input",
+            "agree",
         ]
 
     def clean_username(self):
@@ -115,6 +130,9 @@ class CustomUserCreationForm(UserCreationForm):
         user = super().save(commit=False)
         user.birth_date = self.cleaned_data["birth_date_input"]
         user.is_active = False
+
+        user.agreed_terms_at = timezone.now()
+
         if commit:
             user.save()
         return user

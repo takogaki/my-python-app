@@ -15,6 +15,9 @@ urlpatterns = [
     path("login/", LoginView.as_view(template_name="accounts/login.html"), name="login"),
     path("logout/", LogoutView.as_view(template_name="accounts/logout.html"), name="logout"),
 
+    # 利用規約
+    path('terms/', views.terms, name='terms'),
+
     # ユーザー一覧・詳細
     path("users/", views.user_list, name="user_list"),
     path("users/<str:username>/", views.UserDetailView.as_view(), name="user_detail"),

@@ -36,7 +36,6 @@ User = get_user_model()
 # =========================
 # 既存機能（そのまま）
 # =========================
-
 @login_required
 def user_list(request):
     users = CustomUser.objects.filter(
@@ -184,6 +183,12 @@ class SignUpView(generic.CreateView):
         )
 
         return super().form_valid(form)
+    
+# =========================
+# 利用規約
+# =========================
+def terms(request):
+    return render(request, 'accounts/terms.html')
     
 
 # =========================

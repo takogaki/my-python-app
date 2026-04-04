@@ -44,6 +44,9 @@ class CustomUser(AbstractUser):
 
     is_supporter = models.BooleanField(default=False)
 
+    agreed_terms_at = models.DateTimeField(null=True, blank=True)
+    terms_version = models.CharField(max_length=10, default="1.0")
+
     # =========================
     # 🔥 年齢認証（完全版）
     # =========================

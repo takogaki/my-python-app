@@ -1,35 +1,107 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
+
+{% block title %}
 新規登録｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/signup.css' %}">
+{% endblock %}
 
 {% block body %}
 
-<!-- タイトル＋説明カード -->
-<div class="intro-card">
-    <h2 class="page-title">新規登録</h2>
-    <p class="page-description">
-        アカウントを作成すると、<br>
-        日記の作成・動画の共有・登録ユーザー同時でメッセージのやり取りができるようになります。
-    </p>
+<div class="signup-container">
+
+    <!-- タイトル -->
+    <div class="intro-card">
+        <h2 class="page-title">新規登録</h2>
+        <p class="page-description">
+            アカウントを作成すると、<br>
+            日記・動画投稿・メッセージ機能が利用できます。
+        </p>
+    </div>
+
+    <!-- フォーム -->
+    <div class="post-form-card">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <!-- 🔴 エラー表示 -->
+            {% if form.errors %}
+            <div class="error-box">
+                {% for field in form %}
+                {% for error in field.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- 🔥 利用規約同意 -->
+            <div class="terms-box">
+                <label class="terms-label">
+                    {{ form.agree }}
+                    <span>
+                        <a href="{% url 'accounts:terms' %}" target="_blank">
+                            利用規約
+                        </a>
+                        に同意してください。
+                    </span>
+                </label>
+            </div>
+
+            <!-- 各フィールド -->
+            <div class="form-group">
+                <label>ユーザー名</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label>メールアドレス</label>
+                {{ form.email }}
+            </div>
+
+            <div class="form-group">
+                <label>パスワード</label>
+                {{ form.password1 }}
+            </div>
+
+            <div class="form-group">
+                <label>パスワード（確認）</label>
+                {{ form.password2 }}
+            </div>
+
+            <div class="form-group">
+                <label>性別</label>
+                {{ form.gender }}
+            </div>
+
+            <div class="form-group">
+                <label>生年月日（8桁）</label>
+                {{ form.birth_date_input }}
+            </div>
+
+            <!-- 登録ボタン -->
+            <button type="submit" id="submitBtn" class="submit-btn" disabled>
+                仮登録する
+            </button>
+
+        </form>
+
+        <p class="form-note">
+            登録後、確認メールが届きます。<br>
+            メール内リンクをクリックすると本登録が完了します。
+        </p>
+    </div>
+
 </div>
 
+{% endblock %}
 
-<!-- フォームカード -->
-<div class="post-form-card">
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <button type="submit" class="submit-btn">
-            仮登録する
-        </button>
-    </form>
-
-    <p class="form-note">
-        登録後、確認メールが届きます。<br>
-        メール内のリンクをクリックすると本登録が完了します。
-    </p>
-</div>
-
+{% block extra_js %}
+<script src="{% static 'accounts/js/signup.js' %}"></script>
 {% endblock %}
