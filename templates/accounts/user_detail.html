@@ -5,6 +5,10 @@
 相手のプロフィール｜SPIRYTUS
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/user_detail.css' %}">
+{% endblock %}
+
 {% block body %}
 
 <!-- =====================
@@ -40,6 +44,13 @@
                 <img class="image-modal-content" id="modal-image">
             </div>
 
+        {% if score is not None %}
+        <div class="match-score">
+            💘 相性 {{ score }}%
+        </div>
+        {% endif %}
+
+
         <div class="profile-info">
             <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
 
@@ -48,6 +59,24 @@
             <p><strong>年齢：</strong>{{ age }}歳</p>
             {% endif %}
             {% endwith %}
+        </div>
+
+        <div class="profile-tags">
+        
+            {% regroup profile_tags by tag.category as category_list %}
+        
+            {% for category in category_list %}
+            <div class="tag-category">
+                <h4>{{ category.grouper.name }}</h4>
+        
+                {% for pt in category.list %}
+                <span class="tag-chip" data-level="{{ pt.level }}">
+                    {{ pt.tag.name }}（{{ pt.get_level_display }}）
+                </span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        
         </div>
 
         <div class="card-actions">

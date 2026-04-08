@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 import re
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.utils import timezone
+from PIL import Image
 
 User = get_user_model()
 
@@ -161,13 +162,33 @@ class ProfileForm(forms.ModelForm):
 
     def clean_profile_image(self):
         image = self.cleaned_data.get("profile_image")
-        return validate_profile_image(image)
+
+        # 画像未選択ならそのままOK
+        if not image:
+            return image
+
+        # =========================
+        # 🔥 Pillowで画像検証
+        # =========================
+        try:
+            img = Image.open(image)
+            img.verify()  # ← ここが本質（壊れてる画像弾く）
+        except Exception:
+            raise forms.ValidationError("有効な画像ファイルをアップロードしてください")
+
+        # =========================
+        # 🔥 サイズ制限（任意）
+        # =========================
+        if image.size > 5 * 1024 * 1024:
+            raise forms.ValidationError("画像サイズは5MB以下にしてください")
+
+        return image
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
 
         if not username:
-            return self.instance.username
+            user = self.instance.user
 
         if User.objects.exclude(pk=self.instance.pk).filter(username=username).exists():
             raise ValidationError("このユーザー名は既に使用されています。")

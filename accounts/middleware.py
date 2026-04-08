@@ -7,8 +7,17 @@ class TermsAgreementMiddleware:
 
     def __call__(self, request):
 
+        # 🔴 絶対に通すべきパス（←ここが追加ポイント）
+        always_allowed_paths = [
+            "/favicon.ico",
+            "/robots.txt",
+        ]
+
+        if request.path in always_allowed_paths:
+            return self.get_response(request)
+
         # 🔴 静的ファイル・メディアは通す
-        if request.path.startswith("/static/") or request.path.startswith("/media/"):
+        if request.path.startswith(("/static/", "/media/", "/favicon.ico", "/robots.txt")):
             return self.get_response(request)
 
         # 🔴 ログイン済ユーザーのみ対象
@@ -27,6 +36,7 @@ class TermsAgreementMiddleware:
                     reverse("accounts:signup"),
                 ]
 
+                # 🔴 ここも強化（prefix対応）
                 if request.path not in allowed_paths:
                     return redirect("accounts:terms")
 

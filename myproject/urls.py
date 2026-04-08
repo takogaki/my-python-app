@@ -5,12 +5,14 @@ from django.conf.urls.static import static
 from diary.views import index
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import StaticViewSitemap
+from django.views.generic import TemplateView
 
 sitemaps = {
     'static': StaticViewSitemap,
 }
 
 urlpatterns = [
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),
     path("", index, name="index"),   # ← トップページ
     path('user_messages/', include('user_messages.urls')),  

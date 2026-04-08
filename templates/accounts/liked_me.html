@@ -17,7 +17,7 @@
         <div class="list-item">
 
             <!-- ユーザー名 -->
-            <a href="{% url 'accounts:user_detail_by_username' user.username %}" class="item-title">
+            <a href="{% url 'accounts:user_detail' username=user.username %}" class="item-title">
                 {{ user.username }}
             </a>
 

@@ -28,6 +28,14 @@
             ここはあなたのおかげで続けられています
         </p>
         {% endif %}
+
+        <div class="completion-box">
+            <p>プロフィール完成度：{{ completion }}%</p>
+        
+            <div class="progress-bar">
+                <div class="progress" data-width="{{ completion }}"></div>
+            </div>
+        </div>
     
         {% if user.profile_image %}
         <img src="{{ user.profile_image.url }}" class="avatar avatar-clickable" alt="プロフィール画像">
@@ -41,10 +49,6 @@
             <img class="image-modal-content" id="modal-image">
         </div>
     
-        <div class="profile-actions">
-            <a href="{% url 'accounts:profile_edit' %}">編集</a>
-        </div>
-    
         <div class="profile-info">
             <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
     
@@ -53,6 +57,28 @@
             <p><strong>年齢：</strong>{{ age }}歳</p>
             {% endif %}
             {% endwith %}
+
+            <div class="profile-tags">
+            
+                {% regroup profile_tags by tag.category as category_list %}
+            
+                {% for category in category_list %}
+                <div class="tag-category">
+                    <h4>{{ category.grouper.name }}</h4>
+            
+                    {% for pt in category.list %}
+                    <a href="{% url 'accounts:users_by_tag' pt.tag.id %}" class="tag-chip">
+                        {{ pt.tag.name }}（{{ pt.get_level_display }}）
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            
+            </div>
+
+            <div class="profile-actions">
+                <a href="{% url 'accounts:profile_edit' %}">プロフィールの作成</a>
+            </div>
             
             <h3>年齢確認</h3>
             
@@ -145,7 +171,7 @@
     
             <!-- マッチ -->
             <a href="{% url 'accounts:match_list' %}" class="action-item">
-                💖 マッチユーザー
+                💖 マッチユーザー(⚠️調整中⚠️)
             </a>
     
             <!-- メッセージ -->
@@ -324,4 +350,5 @@
 
 {% block extra_js %}
 <script src="{% static 'accounts/js/verify.js' %}"></script>
+<script src="{% static 'accounts/js/mypage.js' %}"></script>
 {% endblock %}

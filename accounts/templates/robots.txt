@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://my-python-app-0t2k.onrender.com/sitemap.xml

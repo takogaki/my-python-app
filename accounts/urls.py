@@ -24,7 +24,7 @@ urlpatterns = [
 
     # ユーザー公開ページ（username指定）
     path("mypage/", views.mypage, name="mypage"),
-    path("user/<str:username>/", UserDetailView.as_view(), name="user_detail_by_username"),
+    # path("user/<str:username>/", UserDetailView.as_view(), name="user_detail_by_username"),
 
     # メール認証（★これが唯一の activate）
     path("activate/<uuid:token>/", views.activate, name="activate"),
@@ -60,4 +60,7 @@ urlpatterns = [
 
     # 通知
     path("notification/<int:id>/", views.notification_read, name="notification_read"),
+
+    # タグでユーザーを絞り込む
+    path("tag/<int:tag_id>/", views.users_by_tag, name="users_by_tag"),
 ]

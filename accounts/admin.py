@@ -2,9 +2,15 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.db.models.deletion import Collector
 from django.db import router
+from .models import CustomUser, KYCSubmission, TagCategory, Tag, ProfileTag
 
-from .models import CustomUser, KYCSubmission
 
+# =========================
+# タグ関連
+# =========================
+admin.site.register(TagCategory)
+admin.site.register(Tag)
+admin.site.register(ProfileTag)
 
 # =========================
 # 🔥 ユーザー完全削除（関連データごと）

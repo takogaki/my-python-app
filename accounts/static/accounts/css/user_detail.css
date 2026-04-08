@@ -1,0 +1,100 @@
+.profile-tags {
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+/* =========================
+   プロフィール全体
+========================= */
+.profile-info {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+/* テキスト */
+.profile-info p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: #444;
+}
+
+/* =========================
+   タグ全体
+========================= */
+.profile-tags {
+    margin-top: 20px;
+}
+
+/* カテゴリごと */
+.tag-category {
+    margin-bottom: 16px;
+}
+
+/* カテゴリタイトル */
+.tag-category h4 {
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #888;
+    border-left: 4px solid #ff7a7a;
+    padding-left: 8px;
+}
+
+/* =========================
+   タグチップ（超重要）
+========================= */
+.tag-chip {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffe0e0, #ffd6ff);
+    color: #444;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    margin: 4px 4px 0 0;
+    transition: all 0.2s ease;
+}
+
+/* ホバーでちょい浮く */
+.tag-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* =========================
+   プロフィールボタン
+========================= */
+.profile-actions {
+    margin-top: 20px;
+}
+
+.profile-actions a {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff7a7a, #ff4d6d);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.profile-actions a:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+}
+
+.tag-chip[data-level="1"] { opacity: 0.6; }
+.tag-chip[data-level="2"] { opacity: 0.85; }
+.tag-chip[data-level="3"] { font-weight: bold; }
+
+.profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.empty-tags {
+    font-size: 13px;
+    color: #aaa;
+}

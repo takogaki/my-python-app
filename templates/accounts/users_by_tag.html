@@ -1,10 +1,10 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
 
-{% block title %}みんな｜SPIRYTUS{% endblock %}
+{% block title %}同じタグの相手｜SPIRYTUS{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'accounts/css/user_list.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/users_by_tag.css' %}">
 {% endblock %}
 
 {% block body %}
@@ -14,23 +14,22 @@
 <div class="swipe-wrapper">
 
     {% if empty_message %}
-    <div class="match-message">
-        <p>{{ empty_message }}</p>
-        <p class="match-hint">あなたと相性が良い可能性があります</p>
+    <div class="empty-message-card">
+        <div class="empty-icon">✨</div>
+        <p class="empty-title">新しい出会いを表示中</p>
+        <p class="empty-text">{{ empty_message }}</p>
     </div>
     {% endif %}
 
     <div class="swipe-container">
 
-        <!-- 左矢印 -->
         <button type="button" class="nav-arrow left" id="prevBtn">‹</button>
-
-        <!-- 右矢印 -->
         <button type="button" class="nav-arrow right" id="nextBtn">›</button>
 
         {% for user in users %}
         <div class="card" data-user-id="{{ user.id }}">
 
+            <!-- 画像 -->
             <a href="{% url 'accounts:user_detail' user.username %}">
                 {% if user.profile_image %}
                 <img src="{{ user.profile_image.url }}" class="card-img">
@@ -39,7 +38,9 @@
                 {% endif %}
             </a>
 
+            <!-- 🔥 プロフィール情報 -->
             <div class="profile-card">
+
                 <h2>
                     {{ user.username }}
 
@@ -56,14 +57,18 @@
                 <p>{{ user.get_gender_display }}</p>
                 {% endif %}
 
-                {% if is_match_page or user.id in matched_user_ids %}
+                <!-- 🔥 相性ヒント -->
+                <p class="match-hint">あなたと相性が良い可能性があります</p>
+
+                <!-- 🔥 アクション -->
+                {% if user.id in matched_user_ids %}
 
                 {% if request.user.verification_status == "verified" %}
                 <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
                     💬
                 </a>
                 {% else %}
-                <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock" title="年齢確認が必要です">
+                <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
                     🔒
                 </a>
                 {% endif %}
@@ -87,36 +92,13 @@
 
 {% else %}
 
-<!-- 👇 完全に誰もいない場合 -->
 <div class="empty-state">
-
-    {% if is_match_page %}
-    <h2>まだマッチしていません</h2>
-    <p>ライクを送るとマッチが成立します。</p>
-
-    {% elif is_tag_page %}
     <h2>同じタグのユーザーはいません</h2>
     <p>まだこのタグを設定している人がいません。</p>
 
-    {% else %}
-    <h2>ユーザーがいません</h2>
-    <p>しばらくしてからもう一度お試しください。</p>
-    {% endif %}
-
-    <p class="match-hint">
-        あなたに合いそうな人を優先表示しています
-    </p>
-
-    <div class="empty-actions">
-        <a href="{% url 'accounts:user_list' %}" class="btn primary">
-            👀 ユーザーを見る
-        </a>
-
-        <a href="{% url 'accounts:profile_edit' %}" class="btn ghost">
-            🛠 プロフィールを充実させる
-        </a>
-    </div>
-
+    <a href="{% url 'accounts:user_list' %}" class="btn">
+        他のユーザーを見る
+    </a>
 </div>
 
 {% endif %}

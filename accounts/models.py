@@ -90,6 +90,45 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
+# =========================
+# 🔥 タグ（趣味・性格・目的・ライフスタイル・価値観）
+# =========================
+class TagCategory(models.Model):
+    name = models.CharField(max_length=50)
+    order = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+    category = models.ForeignKey(
+        TagCategory,
+        on_delete=models.CASCADE,
+        related_name="tags"
+    )
+
+    def __str__(self):
+        return self.name
+    
+class ProfileTag(models.Model):
+    profile = models.ForeignKey(
+        "Profile",
+        on_delete=models.CASCADE,
+        related_name="profile_tags"
+    )
+
+    tag = models.ForeignKey("Tag", on_delete=models.CASCADE)
+
+    LEVEL_CHOICES = [
+        (1, "少し"),
+        (2, "普通"),
+        (3, "かなり"),
+    ]
+
+    level = models.IntegerField(choices=LEVEL_CHOICES, default=2)
+
+    class Meta:
+        unique_together = ("profile", "tag")
 
 # =========================
 # 🔥 KYC申請（最重要）
@@ -154,6 +193,20 @@ class Profile(models.Model):
         blank=True,
         null=True
     )
+
+    # 🔥 タグ（コア）
+    tags = models.ManyToManyField("Tag", blank=True)
+
+    # 🔥 自由記述
+    bio = models.TextField(blank=True)
+
+    # 🔥 ライフスタイル
+    drinking = models.CharField(max_length=20, blank=True)
+    smoking = models.CharField(max_length=20, blank=True)
+
+    # 🔥 スペック（任意）
+    job = models.CharField(max_length=100, blank=True)
+    income = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return self.user.username

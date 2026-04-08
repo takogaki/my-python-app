@@ -19,16 +19,19 @@ from django.utils import timezone
 from datetime import date, timedelta
 from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
-from accounts.models import SavedPost
+from accounts.models import SavedPost      # 保存した投稿
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
 from django.db.models import Count, Q
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm, KYCForm
 from notifications.models import Notification
-from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint
+from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint, Profile, TagCategory, ProfileTag, Tag, TagCategory # タグ関連
 from django.views.decorators.csrf import csrf_exempt
-
+from accounts.utils import compatibility, profile_completion
+from collections import defaultdict
+from .utils import compatibility
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -75,8 +78,15 @@ def user_detail(request, pk):
         is_active=True
     )
 
+    # 🔥 これだけでOK
+    profile, _ = Profile.objects.get_or_create(user=user)
+
+    profile_tags = ProfileTag.objects.filter(
+        profile=profile
+    ).select_related("tag__category")
+
     # =========================
-    # 足跡記録
+    # 足跡
     # =========================
     if request.user != user:
 
@@ -86,9 +96,6 @@ def user_detail(request, pk):
             defaults={"created_at": timezone.now()}
         )
 
-        # =========================
-        # 通知（6時間に1回）
-        # =========================
         recent = Notification.objects.filter(
             recipient=user,
             actor=request.user,
@@ -105,12 +112,19 @@ def user_detail(request, pk):
                 post=None
             )
 
+    # =========================
+    # 相性スコア
+    # =========================
+    score = compatibility(request.user, user) if request.user.is_authenticated else None
+
     return render(request, "accounts/user_detail.html", {
-        "user": user
+        "user": user,
+        "profile_tags": profile_tags,
+        "score": score,
     })
 
 # ========================
-# 足跡リストビュー（自分のプロフィールを見たユーザーのリスト）
+# 足跡リスト
 # ========================
 @login_required
 def footprint_list(request):
@@ -137,14 +151,25 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        user = self.object
+
+        # 🔥 これを追加（最重要）
+        profile, _ = Profile.objects.get_or_create(user=user)
+
+        context["profile_tags"] = ProfileTag.objects.filter(
+            profile=profile
+        ).select_related("tag__category")
+
+        # 既存
         context["public_pages"] = Page.objects.filter(
-            author=self.object,
+            author=user,
             is_public=True
         ).order_by("-page_date")
 
         context["blog_posts"] = Post.objects.filter(
-                author=self.object
-            ).order_by("-posted_date")
+            author=user
+        ).order_by("-posted_date")
 
         return context
 
@@ -412,8 +437,14 @@ def kyc_complete_mobile(request):
 def mypage(request):
     user = request.user
 
+    profile, _ = Profile.objects.get_or_create(user=user)
+
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
+
+    profile_tags = ProfileTag.objects.filter(
+        profile=profile
+    ).select_related("tag__category")
 
     # =========================
     # メッセージ（ユーザーごと最新）
@@ -425,26 +456,30 @@ def mypage(request):
     )
 
     conversations = {}
-
     for m in all_messages:
         other = m.recipient if m.sender == user else m.sender
-
-        if other.id not in conversations:
+        if other and other.id not in conversations:
             conversations[other.id] = m
 
     messages = list(conversations.values())
 
+    # =========================
+    # 保存投稿
+    # =========================
     saved_posts = (
         SavedPost.objects
-        .filter(user=request.user)
+        .filter(user=user)
         .select_related("post")
     )
 
+    # =========================
+    # 通知
+    # =========================
     notifications = Notification.objects.filter(
         recipient=user,
         is_read=False
     ).order_by("-created_at")
-    
+
     unread_count = notifications.count()
 
     post_notifications = notifications.filter(
@@ -452,7 +487,7 @@ def mypage(request):
     )
 
     # =========================
-    # ★ 管理者用 通報一覧
+    # 管理者用 通報
     # =========================
     reported_posts = Post.objects.none()
     reported_comments = Comment.objects.none()
@@ -472,14 +507,18 @@ def mypage(request):
             .order_by("-report_count")
         )
 
+    # =========================
+    # 🔥 最後にまとめてreturn
+    # =========================
     return render(
         request,
         "accounts/mypage.html",
         {
             "diaries": diaries,
             "blog_posts": blog_posts,
+            "profile_tags": profile_tags,  # ←これ重要
             "messages": messages,
-            "profile": user,
+            "profile": profile,
             "notifications": notifications,
             "unread_count": unread_count,
             "saved_posts": saved_posts,
@@ -487,7 +526,6 @@ def mypage(request):
             "reported_comments": reported_comments,
         }
     )
-
 
 # =========================
 # ★ 管理人向けメッセージ
@@ -533,25 +571,66 @@ def admin_message_detail(request, pk):
 # =========================
 @login_required
 def profile_edit(request):
-    user = request.user
+    profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        form = ProfileForm(
-            request.POST,
-            request.FILES,
-            instance=user
-        )
-        if form.is_valid():
-            form.save()
-            return redirect("accounts:mypage")
-    else:
-        form = ProfileForm(instance=user)
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
 
-    return render(
-        request,
-        "accounts/profile_edit.html",
-        {"form": form}
-    )
+        if form.is_valid():
+            profile = form.save()
+
+            # 🔥 POSTから取得
+            tag_ids = request.POST.getlist("tags")
+
+            # 🔥 一旦削除
+            ProfileTag.objects.filter(profile=profile).delete()
+
+            profile_tags = []
+
+            for tag_id in tag_ids:
+                try:
+                    level = int(request.POST.get(f"level_{tag_id}", 2))  # デフォルト2
+
+                    profile_tags.append(
+                        ProfileTag(
+                            profile=profile,
+                            tag_id=int(tag_id),
+                            level=level
+                        )
+                    )
+                except (ValueError, TypeError):
+                    continue  # 不正値スキップ
+
+            # 🔥 一括保存（高速）
+            ProfileTag.objects.bulk_create(profile_tags)
+
+            return redirect("accounts:mypage")
+
+    else:
+        form = ProfileForm(instance=profile)
+
+    # =========================
+    # タグ
+    # =========================
+    categories = TagCategory.objects.prefetch_related("tags").order_by("order")
+
+    # 🔥 tag_id → level の辞書
+    selected_tags = {
+        pt.tag_id: pt.level
+        for pt in ProfileTag.objects.filter(profile=profile)
+    }
+
+    # =========================
+    # 完成度
+    # =========================
+    completion = profile_completion(profile)
+
+    return render(request, "accounts/profile_edit.html", {
+        "form": form,
+        "categories": categories,
+        "completion": completion,
+        "selected_tags": selected_tags,
+    })
 
 # =========================
 # ★ プロフィール画像削除ビュー（削除）
@@ -585,7 +664,72 @@ def withdraw_execute(request):
     return redirect("accounts:withdraw_confirm")
 
 
+# =========================
+# ★ タグでユーザーを絞り込むビュー
+# =========================
+@login_required
+def users_by_tag(request, tag_id):
+
+    users = CustomUser.objects.filter(
+        profile__profile_tags__tag_id=tag_id,
+        is_active=True,
+        is_superuser=False
+    ).exclude(id=request.user.id).distinct()
+
+    # 🔥 マッチ取得
+    matches = Match.objects.filter(
+        Q(user1=request.user) | Q(user2=request.user)
+    )
+
+    matched_user_ids = []
+    for match in matches:
+        if match.user1 == request.user:
+            matched_user_ids.append(match.user2.id)
+        else:
+            matched_user_ids.append(match.user1.id)
+
+    # 🔥 LIKE済み
+    liked_user_ids = UserLike.objects.filter(
+        from_user=request.user
+    ).values_list("to_user_id", flat=True)
+
+    # =========================
+    # 🔥 タグ一致がない場合
+    # =========================
+    if not users.exists():
+
+        fallback_users = CustomUser.objects.filter(
+            is_active=True,
+            is_superuser=False
+        ).exclude(id=request.user.id)[:50]
+
+        users = sorted(
+            fallback_users,
+            key=lambda u: compatibility(request.user, u),
+            reverse=True
+        )
+
+        empty_message = "同じタグのユーザーはいません。おすすめユーザーを表示しています"
+
+    else:
+        users = sorted(
+            users,
+            key=lambda u: compatibility(request.user, u),
+            reverse=True
+        )
+
+        empty_message = None
+
+    return render(request, "accounts/users_by_tag.html", {
+        "users": users,
+        "matched_user_ids": matched_user_ids,
+        "liked_user_ids": list(liked_user_ids),
+        "empty_message": empty_message,
+    })
+
+# =========================
 # エラー時、管理人宛てにメッセージ送信
+# =========================
 @login_required
 def contact_eden(request):
     try:
@@ -784,9 +928,27 @@ def match_list(request):
         else:
             match_users.append(match.user1)
 
+    # 👇 マッチ0人対策
+    if not match_users:
+        match_users = list(
+            User.objects.exclude(id=request.user.id)[:20]
+        )
+        empty_message = "まだマッチはいませんが、あなたに合いそうな人を表示しています"
+    else:
+        empty_message = None
+
+    # 👇 相性順ソート（ここが核）
+    match_users = sorted(
+        match_users,
+        key=lambda u: compatibility(request.user, u),
+        reverse=True
+    )
+
     return render(request, "accounts/user_list.html", {
-        "users": match_users,   # ← user_listと同じ変数名にする
-        "is_match_page": True   # ← オプション（後で使える）
+        "users": match_users,
+        "is_match_page": True,
+        "is_empty_match": len(matches) == 0,
+        "empty_message": empty_message,
     })
 
 

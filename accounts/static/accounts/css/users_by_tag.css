@@ -194,51 +194,52 @@ body {
 }
 
 
+.match-hint {
+    font-size: 13px;
+    margin-top: 6px;
+    color: #ffd166;
+    font-weight: 500;
+}
 
-/*  */
-.empty-banner {
+/* =========================
+   空状態メッセージ（Swipe用）
+========================= */
+
+.empty-message-card {
     position: absolute;
-    top: 80px;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255,255,255,0.9);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    z-index: 999;
-}
-
-.empty-state {
+    
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    
+    padding: 14px 18px;
+    border-radius: 14px;
+    
     text-align: center;
-    padding: 100px 20px;
-    color: white;
+    color: #fff;
+    
+    z-index: 1000;
+    max-width: 90%;
 }
 
-.empty-actions {
-    margin-top: 20px;
+/* アイコン */
+.empty-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
 }
 
-.empty-actions .btn {
-    margin: 5px;
-}
-
-
-/*  */
-.match-message {
-    position: absolute;
-    top: 80px;
-    width: 100%;
-    text-align: center;
-    z-index: 20;
-}
-
-.match-message p {
-    color: white;
+/* タイトル */
+.empty-title {
     font-size: 14px;
-    margin: 4px 0;
+    font-weight: bold;
+    margin: 0;
 }
 
-.match-hint {
+/* 本文 */
+.empty-text {
     font-size: 12px;
-    opacity: 0.8;
+    margin-top: 4px;
+    opacity: 0.85;
 }
