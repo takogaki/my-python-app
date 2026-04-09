@@ -21,8 +21,11 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# 厳しい設定
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# 上でデプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 STORAGES = {
     "default": {

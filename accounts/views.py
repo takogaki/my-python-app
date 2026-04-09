@@ -437,14 +437,23 @@ def kyc_complete_mobile(request):
 def mypage(request):
     user = request.user
 
+    # プロフィール取得
     profile, _ = Profile.objects.get_or_create(user=user)
 
+    # =========================
+    # 投稿系
+    # =========================
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
 
-    profile_tags = ProfileTag.objects.filter(
-        profile=profile
-    ).select_related("tag__category")
+    # =========================
+    # タグ
+    # =========================
+    profile_tags = (
+        ProfileTag.objects
+        .filter(profile=profile)
+        .select_related("tag__category")
+    )
 
     # =========================
     # メッセージ（ユーザーごと最新）
@@ -452,6 +461,7 @@ def mypage(request):
     all_messages = (
         Message.objects
         .filter(Q(sender=user) | Q(recipient=user))
+        .select_related("sender", "recipient")
         .order_by("-sent_at")
     )
 
@@ -475,16 +485,13 @@ def mypage(request):
     # =========================
     # 通知
     # =========================
-    notifications = Notification.objects.filter(
-        recipient=user,
-        is_read=False
-    ).order_by("-created_at")
+    notifications = (
+        Notification.objects
+        .filter(recipient=user, is_read=False)
+        .order_by("-created_at")
+    )
 
     unread_count = notifications.count()
-
-    post_notifications = notifications.filter(
-        post__isnull=False
-    )
 
     # =========================
     # 管理者用 通報
@@ -508,20 +515,31 @@ def mypage(request):
         )
 
     # =========================
-    # 🔥 最後にまとめてreturn
+    # ★ プロフィール完成度（重要）
+    # =========================
+    completion = profile_completion(profile)
+
+    # =========================
+    # レンダリング
     # =========================
     return render(
         request,
         "accounts/mypage.html",
         {
+            "profile": profile,
+            "completion": completion,  # ← ここが鍵
+
             "diaries": diaries,
             "blog_posts": blog_posts,
-            "profile_tags": profile_tags,  # ←これ重要
+            "profile_tags": profile_tags,
+
             "messages": messages,
-            "profile": profile,
+
             "notifications": notifications,
             "unread_count": unread_count,
+
             "saved_posts": saved_posts,
+
             "reported_posts": reported_posts,
             "reported_comments": reported_comments,
         }

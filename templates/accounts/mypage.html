@@ -28,14 +28,6 @@
             ここはあなたのおかげで続けられています
         </p>
         {% endif %}
-
-        <div class="completion-box">
-            <p>プロフィール完成度：{{ completion }}%</p>
-        
-            <div class="progress-bar">
-                <div class="progress" data-width="{{ completion }}"></div>
-            </div>
-        </div>
     
         {% if user.profile_image %}
         <img src="{{ user.profile_image.url }}" class="avatar avatar-clickable" alt="プロフィール画像">
@@ -48,6 +40,15 @@
             <span class="close">&times;</span>
             <img class="image-modal-content" id="modal-image">
         </div>
+
+        <div class="progress">
+            <div class="progress-bar" style="width: {{ completion }}%;">
+                {{ completion }}%
+            </div>
+        </div>
+        
+        {% if completion < 100 %} <p>プロフィールを充実させるとマッチ率が上がります</p>
+            {% endif %}
     
         <div class="profile-info">
             <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
