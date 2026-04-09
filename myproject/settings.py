@@ -27,14 +27,14 @@ STATICFILES_DIRS = [
 # 上でデプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+#     },
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#     },
+# }
 
 #本番では使用しない
 # MEDIA_URL = "/media/"
@@ -166,20 +166,15 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 # =========================
 # 開発環境
 # =========================
-# if DEBUG:
-#     STORAGES = {
-#         "default": {
-#             "BACKEND": "django.core.files.storage.FileSystemStorage",
-#         },
-#         "staticfiles": {
-#             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#         },
-#     }
-
 if DEBUG:
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
-else:
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
