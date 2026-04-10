@@ -1,45 +1,50 @@
-def compatibility(user1, user2):
-    # プロフィールが無い場合
-    if not hasattr(user1, "profile") or not hasattr(user2, "profile"):
-        return 0
-
-    tags1 = set(user1.profile.tags.values_list("id", flat=True))
-    tags2 = set(user2.profile.tags.values_list("id", flat=True))
-
-    # タグ未設定対策
-    if not tags1 or not tags2:
-        return 0
-
-    common = tags1 & tags2
-
-    # スコア（そのまま数）
-    return len(common)
-
-
 def profile_completion(profile):
     score = 0
-    total = 8  # 項目数
 
+    # =========================
+    # 基本情報
+    # =========================
     if profile.profile_image:
-        score += 1
+        score += 10
+
     if profile.bio:
-        score += 1
-    if profile.tags.exists():
-        score += 1
-    if profile.drinking:
-        score += 1
-    if profile.smoking:
-        score += 1
-    if profile.job:
-        score += 1
-    if profile.income:
-        score += 1
-    if profile.user.birth_date:
-        score += 1
+        score += 10
 
-    return int((score / total) * 100)
+    # =========================
+    # タグ（重要）
+    # =========================
+    tag_count = profile.profile_tags.count()
 
-# 共通タグ + レベル差でスコア算出
+    if tag_count >= 5:
+        score += 10
+    if tag_count >= 10:
+        score += 10
+    if tag_count >= 20:
+        score += 10
+    if tag_count >= 30:
+        score += 10
+
+    # =========================
+    # 詳細情報
+    # =========================
+    if getattr(profile, "drinking", None):
+        score += 5
+
+    if getattr(profile, "smoking", None):
+        score += 5
+
+    if getattr(profile, "job", None):
+        score += 5
+
+    if getattr(profile, "income", None):
+        score += 5
+
+    if hasattr(profile.user, "birth_date") and profile.user.birth_date:
+        score += 5
+
+    return min(score, 100)
+
+
 def compatibility(user1, user2):
 
     if not hasattr(user1, "profile") or not hasattr(user2, "profile"):
@@ -60,7 +65,8 @@ def compatibility(user1, user2):
     for tag_id in tags1:
         if tag_id in tags2:
             score += 10
+
             diff = abs(tags1[tag_id] - tags2[tag_id])
-            score += (3 - diff)
+            score += max(0, 3 - diff)  # ← マイナス防止
 
     return score

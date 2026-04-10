@@ -41,9 +41,12 @@
             <img class="image-modal-content" id="modal-image">
         </div>
 
-        <div class="progress">
-            <div class="progress-bar" style="width: {{ completion }}%;">
-                {{ completion }}%
+        <div class="completion-wrapper">
+            <div class="completion-bar-bg">
+                <div class="completion-bar" style="width: {{ completion }}%;"></div>
+            </div>
+            <div class="completion-text">
+                完成度 {{ completion }}%
             </div>
         </div>
         
