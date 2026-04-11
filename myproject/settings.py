@@ -241,7 +241,7 @@ INSTALLED_APPS = [
     'reels',
 ]
 
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+# WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
