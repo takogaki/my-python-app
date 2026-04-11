@@ -25,7 +25,8 @@ STATICFILES_DIRS = [
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # 上でデプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # STORAGES = {
 #     "default": {
@@ -172,7 +173,8 @@ if DEBUG:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            # 👇これに変更
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
 
@@ -200,7 +202,7 @@ else:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
 
@@ -242,6 +244,8 @@ INSTALLED_APPS = [
 ]
 
 # WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+WHITENOISE_AUTOREFRESH = True  # 開発中は自動リフレッシュを有効にする
+WHITENOISE_USE_FINDERS = True  # 開発中はfindersを使用して静的ファイルを見つける
 
 MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
