@@ -26,7 +26,8 @@ STATICFILES_DIRS = [
 
 # 上でデプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
-# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+
 
 # STORAGES = {
 #     "default": {
