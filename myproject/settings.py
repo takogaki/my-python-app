@@ -21,20 +21,16 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# 厳しい設定
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# 上でデプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
-
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-#     },
-#     "staticfiles": {
-#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#     },
-# }
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 #本番では使用しない
 # MEDIA_URL = "/media/"
@@ -182,25 +178,13 @@ if DEBUG:
 # =========================
 # 本番環境
 # =========================
-# きびしい設定
-# else:
-#     STORAGES = {
-#         "default": {
-#             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-#         },
-#         "staticfiles": {
-#             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#         },
-#     }
-
-# デプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
 else:
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
 
