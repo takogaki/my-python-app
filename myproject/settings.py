@@ -26,7 +26,7 @@ STATICFILES_DIRS = [
 
 # 上でデプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 
 # STORAGES = {
@@ -174,13 +174,20 @@ if DEBUG:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            # 👇これに変更
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
 
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = BASE_DIR / "media"
+    # 🔥 これ追加（超重要）
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+        "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+    }
+
+    # 👇 これは削除推奨
+    # MEDIA_URL = "/media/"
+    # MEDIA_ROOT = BASE_DIR / "media"
 
 # =========================
 # 本番環境
@@ -454,7 +461,7 @@ CONTENT_SECURITY_POLICY = {
 # キャッシュ・セッション設定（Redis / 開発用切り替え）
 # ==========================
 if "REDIS_URL" in os.environ:
-    # 本番 Redis 用
+    # 本番 Redis
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
@@ -462,16 +469,20 @@ if "REDIS_URL" in os.environ:
             "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
         }
     }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
+
+    # 🔥 ここが重要（cache → cached_db に変更）
+    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+
 else:
-    # 開発用 LocMemCache
+    # 開発
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
+
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+    SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
+    SESSION_SAVE_EVERY_REQUEST = True
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

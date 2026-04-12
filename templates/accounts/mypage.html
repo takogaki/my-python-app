@@ -29,10 +29,10 @@
         </p>
         {% endif %}
     
-        {% if user.profile_image %}
-        <img src="{{ user.profile_image.url }}" class="avatar avatar-clickable" alt="プロフィール画像">
+        {% if user.profile.profile_image %}
+        <img src="{{ user.profile.profile_image.url }}" class="avatar avatar-clickable" alt="プロフィール画像">
         {% else %}
-        <img src="{% static 'accounts/img/default_avatar.png' %}" class="avatar avatar-clickable" alt="プロフィール画像">
+        <img src="{% static 'images/default.png' %}" class="avatar avatar-clickable" alt="プロフィール画像">
         {% endif %}
         
         <!-- モーダル -->
@@ -175,7 +175,7 @@
     
             <!-- マッチ -->
             <a href="{% url 'accounts:match_list' %}" class="action-item">
-                💖 マッチユーザー(⚠️調整中⚠️)
+                💖 マッチユーザー
             </a>
     
             <!-- メッセージ -->

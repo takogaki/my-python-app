@@ -24,7 +24,7 @@ from user_messages.models import Message   # メッセージ（※名前は実�
 from django.db.models import Count, Q
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
-from .forms import ActivateProfileImageForm, CustomUserCreationForm, ProfileForm, KYCForm
+from .forms import ActivateProfileImageForm, CustomUserCreationForm, UserForm, ProfileForm, KYCForm
 from notifications.models import Notification
 from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint, Profile, TagCategory, ProfileTag, Tag, TagCategory # タグ関連
 from django.views.decorators.csrf import csrf_exempt
@@ -565,31 +565,33 @@ def admin_message_detail(request, pk):
 
 
 
-# =========================
-# ★ マイページ　ユーザーネーム編集ビュー（編集）
-# =========================
 @login_required
 def profile_edit(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        # 🔥 正しく分離
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        user_form = UserForm(request.POST, request.FILES, instance=request.user)
 
-        if form.is_valid():
-            profile = form.save()
+        if profile_form.is_valid() and user_form.is_valid():
+            # 🔥 保存順重要（User → Profile）
+            user = user_form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
 
-            # 🔥 POSTから取得
+            # =========================
+            # タグ処理
+            # =========================
             tag_ids = request.POST.getlist("tags")
 
-            # 🔥 一旦削除
             ProfileTag.objects.filter(profile=profile).delete()
 
             profile_tags = []
-
             for tag_id in tag_ids:
                 try:
-                    level = int(request.POST.get(f"level_{tag_id}", 2))  # デフォルト2
-
+                    level = int(request.POST.get(f"level_{tag_id}", 2))
                     profile_tags.append(
                         ProfileTag(
                             profile=profile,
@@ -598,34 +600,37 @@ def profile_edit(request):
                         )
                     )
                 except (ValueError, TypeError):
-                    continue  # 不正値スキップ
+                    continue
 
-            # 🔥 一括保存（高速）
             ProfileTag.objects.bulk_create(profile_tags)
 
             return redirect("accounts:mypage")
 
+        else:
+            # 🔥 デバッグ（重要）
+            print("USER FORM ERROR:", user_form.errors)
+            print("PROFILE FORM ERROR:", profile_form.errors)
+            print("FILES:", request.FILES)
+
     else:
-        form = ProfileForm(instance=profile)
+        profile_form = ProfileForm(instance=profile)
+        user_form = UserForm(instance=request.user)
 
     # =========================
     # タグ
     # =========================
     categories = TagCategory.objects.prefetch_related("tags").order_by("order")
 
-    # 🔥 tag_id → level の辞書
     selected_tags = {
         pt.tag_id: pt.level
         for pt in ProfileTag.objects.filter(profile=profile)
     }
 
-    # =========================
-    # 完成度
-    # =========================
     completion = profile_completion(profile)
 
     return render(request, "accounts/profile_edit.html", {
-        "form": form,
+        "profile_form": profile_form,
+        "user_form": user_form,
         "categories": categories,
         "completion": completion,
         "selected_tags": selected_tags,

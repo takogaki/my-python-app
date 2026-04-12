@@ -1,64 +1,136 @@
-.tag-level {
-    display: none;
-}
-
-.profile-tags {
-    display: flex !important;
-    flex-wrap: wrap !important;
-}
-
 /* =========================
-   TAG SYSTEM (PROFILE EDIT ONLY)
+   全体
 ========================= */
+.profile-edit {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px 16px;
+}
 
-.profile-edit .tag-category {
+/* タイトル */
+.page-title {
+    text-align: center;
+    font-size: 1.5rem;
     margin-bottom: 24px;
 }
 
-.profile-edit .tag-category h4 {
-    font-size: 13px;
-    font-weight: 600;
-    color: #888;
-    margin-bottom: 10px;
-    letter-spacing: 0.03em;
+/* =========================
+   画像エリア（ここ強化）
+========================= */
+.image-upload-wrapper {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 12px;
+}
+
+/* アップロードボタン */
+.image-upload-btn {
+    display: inline-block;
+    padding: 10px 16px;
+    background: #4f46e5;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.image-upload-wrapper {
+    text-align: center;
+}
+
+/* hover */
+.image-upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+}
+
+/* 押した感 */
+.image-upload-btn:active {
+    transform: scale(0.96);
+}
+
+/* inputは完全非表示 */
+.image-upload-btn input {
+    display: none;
+}
+
+/* inputは完全に隠す */
+#imageInput {
+    display: none;
 }
 
 /* =========================
-   TAG LIST
+   フォーム
 ========================= */
-.profile-edit .tag-list {
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #555;
+    text-align: center;
+}
+
+textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* =========================
+   タグ
+========================= */
+.tag-section {
+    margin-top: 20px;
+}
+
+.tag-category-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.tag-category-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #666;
+    border-left: 4px solid #ff7a7a;
+    padding-left: 8px;
+}
+
+.tag-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
 }
 
-/* =========================
-   TAG BLOCK（追加：安定化）
-========================= */
-.profile-edit .tag-block {
-    display: flex;
-    align-items: center;
-}
-
-/* =========================
-   TAG ITEM
-========================= */
-.profile-edit .tag-block {
+/* タグ */
+.tag-item {
     position: relative;
     cursor: pointer;
 }
 
-/* checkbox完全非表示 */
-.profile-edit .tag-item input {
+.tag-item input {
     position: absolute;
     opacity: 0;
-    pointer-events: none;
 }
 
-/* =========================
-   DEFAULT TAG
-========================= */
-.profile-edit .tag-item span {
+.tag-item span {
     display: inline-flex;
     align-items: center;
     padding: 7px 14px;
@@ -66,151 +138,25 @@
     background: #f2f2f2;
     color: #555;
     font-size: 13px;
-    transition: all 0.2s ease;
-    user-select: none;
+    transition: 0.2s;
 }
 
-/* hover */
-.profile-edit .tag-item:hover span {
+.tag-item:hover span {
     background: #e8e8e8;
-    transform: translateY(-1px);
 }
 
-/* checked */
-.profile-edit .tag-item input:checked + span {
+.tag-item input:checked + span {
     background: #ff4d6d;
     color: #fff;
-    box-shadow: 0 4px 10px rgba(255, 77, 109, 0.25);
-    transform: translateY(-1px);
-}
-
-/* click感 */
-.profile-edit .tag-item:active span {
-    transform: scale(0.96);
-}
-
-/* 区切り */
-.profile-edit .tag-category + .tag-category {
-    border-top: 1px solid #f0f0f0;
-    padding-top: 18px;
-}
-
-/* チェックマーク */
-.profile-edit .tag-item input:checked + span::before {
-    content: "✓";
-    margin-right: 6px;
 }
 
 /* =========================
-   🔥 SELECT（ここ修正）
-========================= */
-.profile-edit .tag-level {
-    display: none; /* ←ここで制御 */
-    margin-left: 8px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    font-size: 12px;
-    background: #fff;
-}
-
-/* =========================
-   ANIMATION
-========================= */
-.fade-in {
-    animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* =========================
-   TAG CHIP
+   選択タグ表示
 ========================= */
 #selected-tags {
     margin-top: 10px;
 }
 
-.tag-chip {
-    display: inline-block;
-    background: #ff4d6d;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 20px;
-    margin: 3px;
-    font-size: 12px;
-}
-
-.category-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 15px;
-}
-
-.tab-btn {
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: none;
-    background: #eee;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.tab-btn.active {
-    background: #ff4d6d;
-    color: #fff;
-}
-
-/* =========================
-   プロフィール全体
-========================= */
-.profile-info {
-    margin-top: 20px;
-    padding: 20px;
-    border-radius: 16px;
-    background: #ffffff;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-/* テキスト */
-.profile-info p {
-    margin: 6px 0;
-    font-size: 14px;
-    color: #444;
-}
-
-/* =========================
-   タグ全体
-========================= */
-.profile-tags {
-    margin-top: 20px;
-}
-
-/* カテゴリごと */
-.tag-category {
-    margin-bottom: 16px;
-}
-
-/* カテゴリタイトル */
-.tag-category h4 {
-    font-size: 13px;
-    margin-bottom: 8px;
-    color: #888;
-    border-left: 4px solid #ff7a7a;
-    padding-left: 8px;
-}
-
-/* =========================
-   タグチップ（超重要）
-========================= */
 .tag-chip {
     display: inline-block;
     background: linear-gradient(135deg, #ffe0e0, #ffd6ff);
@@ -222,113 +168,39 @@
     transition: all 0.2s ease;
 }
 
-/* ホバーでちょい浮く */
 .tag-chip:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* =========================
-   プロフィールボタン
-========================= */
-.profile-actions {
-    margin-top: 20px;
-}
-
-.profile-actions a {
-    display: inline-block;
-    background: linear-gradient(135deg, #ff7a7a, #ff4d6d);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 999px;
-    text-decoration: none;
-    font-size: 13px;
-    transition: all 0.2s ease;
-}
-
-.profile-actions a:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
-}
-
+/* レベル別 */
 .tag-chip[data-level="1"] { opacity: 0.6; }
 .tag-chip[data-level="2"] { opacity: 0.85; }
 .tag-chip[data-level="3"] { font-weight: bold; }
 
-.profile-tags {
-    display: flex;
-    flex-wrap: wrap;
+
+/* =========================
+   保存ボタン
+========================= */
+.btn-primary {
+    display: block;
+    margin: 30px auto 10px auto;
+    width: 80%;
+    max-width: 280px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #4f46e5;
+    color: white;
+    font-weight: bold;
+    text-align: center;
 }
 
-.empty-tags {
-    font-size: 13px;
-    color: #aaa;
+.btn-primary:hover {
+    background: #4338ca;
 }
 
-/* ===== タグ全体 ===== */
-.tag-section {
-    margin-top: 20px;
-}
-
-/* カテゴリカード */
-.tag-category-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-/* タイトル */
-.tag-category-title {
-    font-size: 14px;
-    margin-bottom: 10px;
-    color: #666;
-    border-left: 4px solid #ff7a7a;
-    padding-left: 8px;
-}
-
-/* タグ一覧 */
-.tag-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* タグ1つ */
-.tag-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #f8f9fa;
-    padding: 6px 10px;
-    border-radius: 999px;
-    transition: 0.2s;
-}
-
-/* ホバー */
-.tag-item:hover {
-    background: #ffe0e0;
-}
-
-/* ラベル */
-.tag-label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-}
-
-/* タグ名 */
-.tag-name {
-    font-size: 12px;
-}
-
-/* レベル */
-.tag-level {
-    border: none;
-    background: transparent;
-    font-size: 11px;
-    color: #666;
-    cursor: pointer;
+/* 戻る */
+.back-link {
+    text-align: center;
+    margin-top: 10px;
 }

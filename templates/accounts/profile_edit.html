@@ -11,33 +11,58 @@
 {% endblock %}
 
 {% block body %}
-<div class="container profile-edit">
+<form method="post" enctype="multipart/form-data" class="profile-form">
+    {% csrf_token %}
 
-    <h1 class="page-title">プロフィール作成</h1>
+    <div class="container profile-edit">
 
-    {% if user.get_profile_image %}
-    <div class="current-image">
-        <p>現在の画像</p>
-        <img src="{{ user.get_profile_image }}" class="avatar-large">
-    </div>
-    {% endif %}
+        <h1 class="page-title">プロフィール作成</h1>
 
-    <form method="post" enctype="multipart/form-data" class="profile-form">
-        {% csrf_token %}
+        <!-- 🔥 フォーム全体エラー -->
+        {% if user_form.non_field_errors %}
+        <div class="error-box">
+            {{ user_form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {% if profile_form.non_field_errors %}
+        <div class="error-box">
+            {{ profile_form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- ユーザー名 -->
+        <div class="form-group">
+            <label>ユーザー名</label>
+            {{ user_form.username }}
+            <div class="error-text">{{ user_form.username.errors }}</div>
+        </div>
 
         <!-- 画像 -->
-        <div class="form-group">
-            <label>プロフィール画像</label>
-            <input type="file" name="profile_image">
+        <div class="image-upload-wrapper">
+        
+            {% if user.get_profile_image %}
+            <img id="preview" src="{{ user.get_profile_image }}" class="avatar-large">
+            {% else %}
+            <img id="preview" src="{% static 'images/default.png' %}" class="avatar-large">
+            {% endif %}
+        
+            <!-- 🔥 完全カスタム -->
+            <label class="image-upload-btn">
+                画像を選択
+                <input type="file" name="profile_image" accept="image/*" id="imageInput">
+            </label>
+        
         </div>
 
-        <!-- 自己紹介 -->
+        <!-- 一言 -->
         <div class="form-group">
             <label>ひとこと</label>
-            <textarea name="bio">{{ form.instance.bio }}</textarea>
+            {{ profile_form.bio }}
+            <div class="error-text">{{ profile_form.bio.errors }}</div>
         </div>
 
-        <!-- 🔥 カテゴリー -->
+        <!-- タグ -->
         <div class="tag-section">
 
             {% for category in categories %}
@@ -47,7 +72,6 @@
                     {{ category.name }}
                 </h3>
 
-                <!-- 🔥 選択結果表示エリア -->
                 <div id="selected-{{ category.id }}" class="selected-tags"></div>
 
                 <div class="tag-list">
@@ -55,26 +79,17 @@
                     {% for tag in category.tags.all %}
                     <div class="tag-block" data-category-id="{{ category.id }}">
 
-                        <!-- チェック -->
                         <label class="tag-label">
                             <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id in selected_tags %}checked{% endif %}>
-
-                            <span class="tag-name">
-                                {{ tag.name }}
-                            </span>
+                            <span class="tag-name">{{ tag.name }}</span>
                         </label>
 
-                        <!-- レベル -->
                         <select name="level_{{ tag.id }}" class="tag-level">
-
                             {% with selected_tags|get_item:tag.id as level %}
-
                             <option value="1" {% if level == 1 %}selected{% endif %}>低</option>
                             <option value="2" {% if level == 2 %}selected{% endif %}>中</option>
                             <option value="3" {% if level == 3 %}selected{% endif %}>高</option>
-
                             {% endwith %}
-
                         </select>
 
                     </div>
@@ -86,16 +101,17 @@
 
         </div>
 
+        <!-- 保存ボタン -->
         <button type="submit" class="btn btn-primary">
             保存
         </button>
-    </form>
 
-    <div class="back-link">
-        <a href="{% url 'accounts:mypage' %}">← マイページに戻る</a>
+        <div class="back-link">
+            <a href="{% url 'accounts:mypage' %}">← マイページに戻る</a>
+        </div>
+
     </div>
-
-</div>
+</form>
 {% endblock %}
 
 {% block extra_js %}

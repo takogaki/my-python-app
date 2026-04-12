@@ -1,3 +1,6 @@
+// =========================
+// プロフィール編集のタグ選択＆下書き保存
+// =========================
 document.addEventListener("DOMContentLoaded", function () {
 
     const tagBlocks = document.querySelectorAll(".tag-block");
@@ -99,6 +102,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             elements.forEach(el => {
 
+                // 🔥 file inputは完全スキップ
+                if (el.type === "file") {
+                    return;
+                }
+
                 if (el.type === "checkbox") {
                     if (Array.isArray(data[name])) {
                         el.checked = data[name].includes(el.value);
@@ -117,4 +125,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // 初期描画
     // =========================
     updateSelectedTags();
+});
+
+// =========================
+// 🔥 プロフィール画像プレビュー
+// ========================
+document.addEventListener("DOMContentLoaded", function () {
+
+    const input = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+
+    if (!input || !preview) return;
+
+    input.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+
 });

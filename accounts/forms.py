@@ -137,22 +137,41 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
-
+    
+# =========================
+# 🔥 ユーザー情報編集
+# =========================
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username"]
+        widgets = {
+            "username": forms.TextInput(attrs={
+                "placeholder": "ユーザー名を入力",
+                "class": "form-input"
+            })
+        }
 
 # =========================
 # 🔥 プロフィール編集
 # =========================
 class ProfileForm(forms.ModelForm):
-    username = forms.CharField(
-        required=False,
-        label="ユーザー名",
-        validators=[validate_username_ascii],
-    )
+    class Meta:
+        model = Profile
+        fields = ["bio", "profile_image"]
+        widgets = {
+            "bio": forms.Textarea(attrs={
+                "placeholder": "ひとこと書いてみましょう",
+                "rows": 3,
+                "class": "form-textarea"
+            })
+        }
 
     profile_image = forms.ImageField(
         required=False,
-        widget=forms.ClearableFileInput(attrs={
-            "accept": "image/png,image/jpeg,image/webp"
+        widget=forms.FileInput(attrs={
+            "accept": "image/png,image/jpeg,image/webp",
+            "id": "imageInput"
         })
     )
 
@@ -163,26 +182,21 @@ class ProfileForm(forms.ModelForm):
     def clean_profile_image(self):
         image = self.cleaned_data.get("profile_image")
 
-        # 画像未選択ならそのままOK
         if not image:
             return image
 
-        # =========================
-        # 🔥 Pillowで画像検証
-        # =========================
         try:
             img = Image.open(image)
-            img.verify()  # ← ここが本質（壊れてる画像弾く）
+            img.verify()
+            image.seek(0)  # 🔥 これが超重要
         except Exception:
             raise forms.ValidationError("有効な画像ファイルをアップロードしてください")
 
-        # =========================
-        # 🔥 サイズ制限（任意）
-        # =========================
         if image.size > 5 * 1024 * 1024:
             raise forms.ValidationError("画像サイズは5MB以下にしてください")
 
         return image
+
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
