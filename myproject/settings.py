@@ -24,6 +24,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # cloudinary対策（必須）
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # ==============================
 # Cloudinary（画像）
