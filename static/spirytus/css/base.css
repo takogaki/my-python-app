@@ -744,3 +744,100 @@ section h3 {
     background: #e9ecef;
     transform: translateY(-2px);
 }
+
+
+/* =========================
+   ダッシュボード全体
+========================= */
+.dashboard {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px 16px;
+}
+
+/* =========================
+   タイトル
+========================= */
+.dashboard-title {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 28px;
+    color: #333;
+}
+
+/* =========================
+   セクション
+========================= */
+.dashboard-section {
+    margin-bottom: 28px;
+}
+
+.dashboard-section h3 {
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    color: #555;
+}
+
+/* =========================
+   ボタン
+========================= */
+.dashboard-button {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.95rem;
+
+    background: #e5e7eb;
+    color: #333;
+
+    transition: background 0.2s, transform 0.1s;
+}
+
+.dashboard-button:hover {
+    background: #d1d5db;
+    transform: translateY(-1px);
+}
+
+/* メイン */
+.dashboard-button.primary {
+    background: #4f46e5;
+    color: white;
+}
+
+.dashboard-button.primary:hover {
+    background: #4338ca;
+}
+
+/* サブ */
+.dashboard-button.ghost {
+    background: white;
+    border: 1px solid #ccc;
+}
+
+/* =========================
+   時計
+========================= */
+.dashboard-clock {
+    text-align: center;
+    font-size: 1.1rem;
+    margin: 20px 0 28px;
+    color: #666;
+}
+
+/* =========================
+   建設中表示
+========================= */
+.disabled-box {
+    background: #fff3cd;
+    color: #856404;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    text-align: center;
+}
