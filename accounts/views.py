@@ -32,6 +32,7 @@ from accounts.utils import compatibility, profile_completion
 from collections import defaultdict
 from .utils import compatibility
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 
 User = get_user_model()
 
@@ -569,6 +570,9 @@ def admin_message_detail(request, pk):
 def profile_edit(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
+    if profile.user != request.user:
+        raise PermissionDenied("不正アクセス")
+
     if request.method == "POST":
         # 🔥 正しく分離
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
@@ -906,6 +910,7 @@ def like_user(request, user_id):
 # like_meビュー（自分がLIKEされたユーザーのリスト）
 @login_required
 def liked_me(request):
+
     users = CustomUser.objects.filter(
         id__in=UserLike.objects.filter(
             to_user=request.user
@@ -914,10 +919,27 @@ def liked_me(request):
         like_count=Count("likes_received")
     ).order_by("-like_count")
 
+    # =========================
+    # 🔥 マッチIDを高速取得（ここ）
+    # =========================
+    match_pairs = Match.objects.filter(
+        Q(user1=request.user) | Q(user2=request.user)
+    ).values_list("user1_id", "user2_id")
+
+    match_user_ids = set()
+    for u1, u2 in match_pairs:
+        match_user_ids.add(u1)
+        match_user_ids.add(u2)
+
+    # 自分は除外（重要）
+    match_user_ids.discard(request.user.id)
+
     return render(request, "accounts/liked_me.html", {
-        "users": users
+        "users": users,
+        "match_user_ids": match_user_ids,
     })
-    
+
+
 # match_listビュー（自分がマッチしたユーザーのリスト）
 @login_required
 def match_list(request):

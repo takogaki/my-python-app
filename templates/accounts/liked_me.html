@@ -27,7 +27,7 @@
             </div>
 
             <!-- マッチ済み表示 -->
-            {% if user not in match_users %}
+            {% if user.id not in match_user_ids %}
             <form method="post" action="{% url 'accounts:like_user' user.id %}">
                 {% csrf_token %}
                 <button class="meta-link danger">❤️ ライク返してマッチ</button>

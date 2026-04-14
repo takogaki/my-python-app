@@ -37,6 +37,9 @@ class TermsAgreementMiddleware:
                 ]
 
                 # 🔴 ここも強化（prefix対応）
+                if request.method == "POST":
+                    return self.get_response(request)
+
                 if request.path not in allowed_paths:
                     return redirect("accounts:terms")
 
