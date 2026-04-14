@@ -21,6 +21,63 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+# =========================
+# 開発環境
+# =========================
+if DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
+    # 🔥 これ追加（超重要）
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+        "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+    }
+
+    # 👇 これは削除推奨
+    # MEDIA_URL = "/media/"
+    # MEDIA_ROOT = BASE_DIR / "media"
+
+# =========================
+# 本番環境
+# =========================
+# きびしい設定
+# else:
+#     STORAGES = {
+#         "default": {
+#             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+#         },
+#         "staticfiles": {
+#             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#         },
+#     }
+
+# デプロイ失敗が続く場合は、少し緩い設定にする（ただしキャッシュ対策は別途必要）
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
+# ⚠️ これだけでOK。import cloudinary は不要
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+        "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+    }
+
+
 # 厳しい設定
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
