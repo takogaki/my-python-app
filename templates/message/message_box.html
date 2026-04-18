@@ -26,21 +26,21 @@
     <div class="post block {% if message.recipient == request.user and not message.is_read %}unread{% endif %}">
 
         <p class="post-author">
-
+        
             {% if message.sender == request.user %}
-            <a href="{% url 'user_messages:send_message' message.recipient.username %}">
+            <a href="{% url 'accounts:user_detail' message.recipient.username %}">
                 {{ message.recipient.username }}
             </a>
             {% else %}
-            <a href="{% url 'user_messages:send_message' message.sender.username %}">
+            <a href="{% url 'accounts:user_detail' message.sender.username %}">
                 {{ message.sender.username }}
             </a>
             {% endif %}
-
+        
             {% if message.recipient == request.user and not message.is_read %}
             <span class="badge unread">未読</span>
             {% endif %}
-
+        
         </p>
 
         <p class="post-body">

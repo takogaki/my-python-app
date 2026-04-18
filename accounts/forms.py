@@ -176,13 +176,6 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ["bio", "profile_image"]
-        widgets = {
-            "bio": forms.Textarea(attrs={
-                "placeholder": "ひとこと書いてみましょう",
-                "rows": 3,
-                "class": "form-textarea"
-            })
-        }
 
     def clean_profile_image(self):
         image = self.cleaned_data.get("profile_image")
@@ -207,24 +200,6 @@ class ProfileForm(forms.ModelForm):
         if commit:
             profile.save()
         return profile
-
-
-    def clean_username(self):
-        username = self.cleaned_data.get("username")
-
-        if not username:
-            user = self.instance.user
-
-        if User.objects.exclude(pk=self.instance.pk).filter(username=username).exists():
-            raise ValidationError("このユーザー名は既に使用されています。")
-
-        return username
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        if commit:
-            user.save()
-        return user
 
 
 # =========================

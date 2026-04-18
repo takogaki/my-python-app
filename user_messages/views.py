@@ -10,6 +10,9 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.db.models import Max, Q
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from notifications.models import Notification
+from datetime import timedelta
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -89,6 +92,24 @@ def send_message(request, username):
                 recipient=recipient,
                 content=content.strip()
             )
+
+            # =========================
+            # 🔥 通知追加（ここ）
+            # =========================
+            recent = Notification.objects.filter(
+                recipient=recipient,
+                actor=sender,
+                type="message",
+                created_at__gte=timezone.now() - timedelta(minutes=5)
+            ).exists()
+
+            if not recent:
+                Notification.objects.create(
+                    recipient=recipient,
+                    actor=sender,
+                    type="message",
+                    verb="さんからメッセージが届きました"
+                )
 
     # 🔥 履歴取得
     chat_messages = Message.objects.filter(

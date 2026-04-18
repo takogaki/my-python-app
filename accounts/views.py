@@ -611,13 +611,17 @@ def profile_edit(request):
 
                 # プロフィール保存
                 profile = profile_form.save(commit=False)
-                profile.user = user
+
+                if profile.user and profile.user != request.user:
+                        raise PermissionDenied("不正なuser書き換え")
+
+                profile.user = request.user  # ← 絶対入れる
                 profile.save()
 
                 # =========================
                 # 🔥 タグ処理（完成版）
                 # =========================
-                tag_ids = request.POST.getlist("tags")  # ["1","2","3"]
+                tag_ids = request.POST.getlist("tags") or []  # ["1","2","3"]
 
                 if not tag_ids:
                     # 全解除
@@ -1074,16 +1078,32 @@ def match_list(request):
 def notification_read(request, id):
     n = get_object_or_404(Notification, id=id, recipient=request.user)
 
+    # 既読化
     n.is_read = True
     n.save(update_fields=["is_read"])
 
+    # =========================
+    # 🔥 メッセージ通知（最優先）
+    # =========================
+    if n.type == "message":
+        if n.actor:
+            return redirect("user_messages:send_message", username=n.actor.username)
+        return redirect("accounts:mypage")
+
+    # =========================
     # ユーザー系通知
+    # =========================
     if n.type in ["like", "footprint", "match"]:
         if n.actor:
             return redirect("accounts:user_detail", username=n.actor.username)
 
-    # コメント通知（今後拡張用）
+    # =========================
+    # コメント通知
+    # =========================
     if n.type == "comment" and n.post:
         return redirect("blog:post_detail", slug=n.post.slug)
 
+    # =========================
+    # fallback
+    # =========================
     return redirect("accounts:mypage")
