@@ -18,7 +18,6 @@ from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_d
 from django.utils import timezone
 from datetime import date, timedelta
 
-from sqlalchemy import Transaction
 from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
 from accounts.models import SavedPost      # 保存した投稿
