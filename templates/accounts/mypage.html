@@ -162,6 +162,11 @@
         <h3 class="section-title">🤝 交流</h3>
     
         <div class="action-grid">
+
+            <!-- タグ一致 -->
+            <a href="{% url 'accounts:tag_match_users' %}" class="action-item">
+                🏷 タグ一致ユーザー
+            </a>
     
             <!-- 足跡 -->
             <a href="{% url 'accounts:footprints' %}" class="action-item">
@@ -169,9 +174,9 @@
             </a>
     
             <!-- いいね -->
-            <a href="{% url 'accounts:liked_me' %}" class="action-item">
-                ❤️ ライクされた
-            </a>
+            <!-- <a href="{% url 'accounts:liked_me' %}" class="action-item"> -->
+                ❤️ ライクされた(調整中)
+            <!-- </a> -->
     
             <!-- マッチ -->
             <a href="{% url 'accounts:match_list' %}" class="action-item">

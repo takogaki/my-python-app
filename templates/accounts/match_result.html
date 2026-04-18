@@ -1,0 +1,34 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block body %}
+<div class="match-modal">
+
+    <h1>🎉 マッチしました！</h1>
+
+    <div class="match-user">
+        {{ user.username }}
+    </div>
+
+    <div class="actions">
+
+        <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
+            💬 メッセージする
+        </a>
+
+        <a href="{% url 'accounts:user_detail' user.username %}" class="btn">
+            👀 プロフィールを見る
+        </a>
+
+        <a href="{% url 'accounts:user_list' %}" class="btn ghost">
+            🔥 他のユーザーを見る
+        </a>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'accounts/js/match_result.js' %}"></script>
+{% endblock %}

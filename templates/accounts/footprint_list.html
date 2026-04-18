@@ -1,32 +1,154 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
 
-{% block title %}足あと{% endblock %}
+{% block title %}足あと｜SPIRYTUS{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'accounts/css/footprint_list.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/user_list.css' %}">
+<style>
+    .footprint-badge {
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .footprint-badge.green {
+        color: #00c853;
+    }
+
+    .footprint-badge.yellow {
+        color: #ffd600;
+    }
+
+    .footprint-badge.gray {
+        color: #aaa;
+    }
+
+    .common-tags {
+        font-size: 12px;
+        margin-top: 4px;
+        opacity: 0.8;
+    }
+
+    .revisit-btn {
+        margin-top: 6px;
+        display: inline-block;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 10px;
+        background: #eee;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-<div class="mypage">
 
-    <section class="content-card">
-        <h3 class="section-title">👀 足あと</h3>
+{% if footprints %}
+
+<div class="swipe-wrapper">
+
+    <div class="swipe-container">
+
+        <button type="button" class="nav-arrow left" id="prevBtn">‹</button>
+        <button type="button" class="nav-arrow right" id="nextBtn">›</button>
 
         {% for f in footprints %}
-        <div class="list-item">
-            <a href="{% url 'accounts:user_detail' f.from_user.id %}" class="item-title">
-                👤 {{ f.from_user.username }}
+        {% with user=f.from_user %}
+        <div class="card" data-user-id="{{ user.id }}">
+
+            <a href="{% url 'accounts:user_detail' user.username %}">
+                {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" class="card-img">
+                {% else %}
+                <img src="{% static 'accounts/img/default_avatar.png' %}" class="card-img">
+                {% endif %}
             </a>
-        
-            <div class="item-meta">
-                🕒 {{ f.created_at|date:"Y/m/d H:i" }}
+
+            <div class="profile-card">
+                <h2>
+                    {{ user.username }}
+
+                    {% if user.verification_status == "verified" %}
+                    <span class="kyc-badge">✔</span>
+                    {% else %}
+                    <span class="kyc-badge gray">未認証</span>
+                    {% endif %}
+
+                    {% if user.get_age %}, {{ user.get_age }}{% endif %}
+                </h2>
+
+                <!-- 🔥 足あと時間 -->
+                {% now "U" as now_ts %}
+                {% with diff=now_ts|add:"-"|add:f.created_at|date:"U" %}
+
+                {% if diff < 3600 %} <div class="footprint-badge green">🟢 さっき見に来ました
             </div>
+            {% elif diff < 86400 %} <div class="footprint-badge yellow">🟡 最近見に来ました
         </div>
-        {% empty %}
-        <p class="empty-text">足あとはまだありません</p>
-        {% endfor %}
-    </section>
+        {% else %}
+        <div class="footprint-badge gray">⚪ 少し前に見に来ました</div>
+        {% endif %}
+
+        {% endwith %}
+
+        <!-- 🔥 共通タグ -->
+        {% if user.common_tags %}
+        <div class="common-tags">
+            共通タグ {{ user.common_tags }}個
+        </div>
+        {% endif %}
+
+        <!-- 🔥 行動導線 -->
+        {% if user.id in matched_user_ids %}
+
+        {% if request.user.verification_status == "verified" %}
+        <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
+            💬 話す
+        </a>
+        {% else %}
+        <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
+            🔒
+        </a>
+        {% endif %}
+
+        {% else %}
+
+        <button type="button" class="likeBtn {% if user.id in liked_user_ids %}liked{% endif %}"
+            data-user-id="{{ user.id }}">
+            ❤ いいね
+        </button>
+
+        <div class="revisit-btn">
+            👀 プロフをもう一度見る
+        </div>
+
+        {% endif %}
+
+    </div>
 
 </div>
+{% endwith %}
+{% endfor %}
+
+</div>
+</div>
+
+{% else %}
+
+<div class="empty-state">
+    <h2>足あとがありません</h2>
+    <p>プロフィールを充実させると見られやすくなります。</p>
+
+    <div class="empty-actions">
+        <a href="{% url 'accounts:profile_edit' %}" class="btn primary">
+            🛠 プロフ改善
+        </a>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'accounts/js/user_swipe.js' %}"></script>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
 
-{% block title %}ライクされた｜SPIRYTUS{% endblock %}
+{% block title %}マッチ｜SPIRYTUS{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'accounts/css/user_list.css' %}">
@@ -15,14 +15,16 @@
 
     <div class="swipe-container">
 
-        <!-- ナビ -->
+        <!-- 左矢印 -->
         <button type="button" class="nav-arrow left" id="prevBtn">‹</button>
+
+        <!-- 右矢印 -->
         <button type="button" class="nav-arrow right" id="nextBtn">›</button>
 
         {% for user in users %}
         <div class="card" data-user-id="{{ user.id }}">
 
-            <!-- プロフ画像 -->
+            <!-- プロフ -->
             <a href="{% url 'accounts:user_detail' user.username %}">
                 {% if user.profile_image %}
                 <img src="{{ user.profile_image.url }}" class="card-img">
@@ -32,8 +34,6 @@
             </a>
 
             <div class="profile-card">
-
-                <!-- 名前 -->
                 <h2>
                     {{ user.username }}
 
@@ -46,32 +46,19 @@
                     {% if user.get_age %}, {{ user.get_age }}{% endif %}
                 </h2>
 
-                <!-- 🔥 ライク強度 -->
-                <p class="like-power">
-                    ❤️ あなたに興味あり（{{ user.like_count }}）
-                </p>
+                {% if user.gender %}
+                <p>{{ user.get_gender_display }}</p>
+                {% endif %}
 
-                <!-- 🔥 アクション -->
-                {% if user.id not in match_user_ids %}
-
-                <!-- 返す＝即マッチ -->
-                <button type="button" class="likeBtn" data-user-id="{{ user.id }}">
-                    ❤ ライク返してマッチ
-                </button>
-
-                {% else %}
-
-                <!-- マッチ済み -->
+                <!-- 🔥 マッチページは必ずDM -->
                 {% if request.user.verification_status == "verified" %}
                 <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
-                    💬 話す
+                    💬
                 </a>
                 {% else %}
                 <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
                     🔒
                 </a>
-                {% endif %}
-
                 {% endif %}
 
             </div>
@@ -84,13 +71,18 @@
 
 {% else %}
 
+<!-- 空状態 -->
 <div class="empty-state">
-    <h2>まだライクされていません</h2>
-    <p>プロフィールを充実させると反応が増えます。</p>
+    <h2>まだマッチしていません</h2>
+    <p>ライクを送るとマッチが成立します。</p>
 
     <div class="empty-actions">
-        <a href="{% url 'accounts:profile_edit' %}" class="btn primary">
-            🛠 プロフ改善
+        <a href="{% url 'accounts:user_list' %}" class="btn primary">
+            👀 ユーザーを見る
+        </a>
+
+        <a href="{% url 'accounts:profile_edit' %}" class="btn ghost">
+            🛠 プロフィールを充実させる
         </a>
     </div>
 </div>

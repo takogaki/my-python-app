@@ -129,12 +129,43 @@ def user_detail(request, pk):
 # ========================
 @login_required
 def footprint_list(request):
+    user = request.user
+
+    # 🔥 足あと取得
     footprints = Footprint.objects.filter(
-        to_user=request.user
+        to_user=user
     ).select_related("from_user").order_by("-created_at")
 
+    # 🔥 タグ取得
+    my_tags = user.profile.tags.all()
+
+    # 🔥 共通タグ付きでユーザー情報強化
+    users_qs = CustomUser.objects.annotate(
+        common_tags=Count(
+            "profile__tags",
+            filter=Q(profile__tags__in=my_tags)
+        )
+    )
+
+    # 🔥 マッチ
+    matched_pairs = Match.objects.filter(
+        Q(user1=user) | Q(user2=user)
+    ).values_list("user1", "user2")
+
+    matched_user_ids = set([
+        u for pair in matched_pairs for u in pair if u != user.id
+    ])
+
+    # 🔥 いいね済み
+    liked_user_ids = set(
+        UserLike.objects.filter(from_user=user)
+        .values_list("to_user", flat=True)
+    )
+
     return render(request, "accounts/footprint_list.html", {
-        "footprints": footprints
+        "footprints": footprints,
+        "matched_user_ids": matched_user_ids,
+        "liked_user_ids": liked_user_ids,
     })
 
 class UserDetailView(LoginRequiredMixin, DetailView):
@@ -736,6 +767,47 @@ def users_by_tag(request, tag_id):
     })
 
 # =========================
+# ★ タグ完全一致ユーザービュー（タグマッチング）
+# =========================
+@login_required
+def tag_match_users(request):
+    user = request.user
+
+    my_tags = user.profile.tags.all()
+
+    if not my_tags.exists():
+        users = CustomUser.objects.none()
+    else:
+        users = CustomUser.objects.filter(
+            profile__tags__in=my_tags
+        ).exclude(
+            id=user.id
+        ).annotate(
+            common_tags=Count("profile__tags")
+        ).order_by(
+            "-common_tags"
+        ).distinct()
+
+    # 🔥 ここ追加（超重要）
+    matched_user_ids = Match.objects.filter(
+        Q(user1=user) | Q(user2=user)
+    ).values_list("user1", "user2")
+
+    matched_user_ids = set([
+        u for pair in matched_user_ids for u in pair if u != user.id
+    ])
+
+    liked_user_ids = UserLike.objects.filter(
+        from_user=user
+    ).values_list("to_user", flat=True)
+
+    return render(request, "accounts/tag_users.html", {
+        "users": users,
+        "matched_user_ids": matched_user_ids,
+        "liked_user_ids": liked_user_ids,
+    })
+
+# =========================
 # エラー時、管理人宛てにメッセージ送信
 # =========================
 @login_required
@@ -890,7 +962,12 @@ def like_user(request, user_id):
             verb="さんとマッチしました"
         )
 
-        return redirect("user_messages:send_message", username=to_user.username)
+        request.session["matched_user"] = to_user.username
+
+        return JsonResponse({
+            "status": "match",
+            "username": to_user.username
+        })
 
     # =========================
     # 新規ライク時だけ通知
@@ -910,71 +987,76 @@ def like_user(request, user_id):
 # like_meビュー（自分がLIKEされたユーザーのリスト）
 @login_required
 def liked_me(request):
+    user = request.user
 
+    # =========================
+    # 🔥 ライクしてきたユーザー（最適化）
+    # =========================
     users = CustomUser.objects.filter(
-        id__in=UserLike.objects.filter(
-            to_user=request.user
-        ).values_list("from_user_id", flat=True)
+        likes_sent__to_user=user
     ).annotate(
-        like_count=Count("likes_received")
-    ).order_by("-like_count")
+        # 🔥 「この人が自分に送ったライク数」
+        like_count=Count(
+            "likes_sent",
+            filter=Q(likes_sent__to_user=user)
+        )
+    ).order_by("-like_count", "-last_login").distinct()
 
     # =========================
-    # 🔥 マッチIDを高速取得（ここ）
+    # 🔥 マッチユーザーID（最適化）
     # =========================
-    match_pairs = Match.objects.filter(
-        Q(user1=request.user) | Q(user2=request.user)
-    ).values_list("user1_id", "user2_id")
+    match_user_ids = set(
+        Match.objects.filter(
+            Q(user1=user) | Q(user2=user)
+        ).values_list("user1_id", "user2_id")
+    )
 
-    match_user_ids = set()
-    for u1, u2 in match_pairs:
-        match_user_ids.add(u1)
-        match_user_ids.add(u2)
+    # flatten（超スマート）
+    match_user_ids = {
+        uid for pair in match_user_ids for uid in pair
+    }
 
-    # 自分は除外（重要）
-    match_user_ids.discard(request.user.id)
+    match_user_ids.discard(user.id)
 
     return render(request, "accounts/liked_me.html", {
         "users": users,
         "match_user_ids": match_user_ids,
     })
 
+# =========================
+# match_resultビュー（LIKEした相手が自分をLIKEしてたときの結果表示）
+# =========================
+@login_required
+def match_result(request):
+    username = request.session.pop("matched_user", None)
+
+    if not username:
+        return redirect("accounts:user_list")
+
+    user = get_object_or_404(CustomUser, username=username)
+
+    return render(request, "accounts/match_result.html", {
+        "user": user
+    })
+
 
 # match_listビュー（自分がマッチしたユーザーのリスト）
-@login_required
 def match_list(request):
+    user = request.user
+
     matches = Match.objects.filter(
-        Q(user1=request.user) | Q(user2=request.user)
+        Q(user1=user) | Q(user2=user)
     )
 
-    match_users = []
+    users = []
     for match in matches:
-        if match.user1 == request.user:
-            match_users.append(match.user2)
+        if match.user1 == user:
+            users.append(match.user2)
         else:
-            match_users.append(match.user1)
+            users.append(match.user1)
 
-    # 👇 マッチ0人対策
-    if not match_users:
-        match_users = list(
-            User.objects.exclude(id=request.user.id)[:20]
-        )
-        empty_message = "まだマッチはいませんが、あなたに合いそうな人を表示しています"
-    else:
-        empty_message = None
-
-    # 👇 相性順ソート（ここが核）
-    match_users = sorted(
-        match_users,
-        key=lambda u: compatibility(request.user, u),
-        reverse=True
-    )
-
-    return render(request, "accounts/user_list.html", {
-        "users": match_users,
-        "is_match_page": True,
-        "is_empty_match": len(matches) == 0,
-        "empty_message": empty_message,
+    return render(request, "accounts/match_list.html", {
+        "users": users
     })
 
 

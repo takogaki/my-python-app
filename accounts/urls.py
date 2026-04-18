@@ -50,6 +50,7 @@ urlpatterns = [
     path("liked/", views.liked_me, name="liked_me"),
     path("like/<int:user_id>/", views.like_user, name="like_user"),
     path("matches/", views.match_list, name="match_list"),
+    path("match-result/", views.match_result, name="match_result"),
 
     #本人確認（KYC）
     path("kyc/", views.kyc_submit, name="kyc_submit"),
@@ -63,4 +64,5 @@ urlpatterns = [
 
     # タグでユーザーを絞り込む
     path("tag/<int:tag_id>/", views.users_by_tag, name="users_by_tag"),
+    path("tag-users/", views.tag_match_users, name="tag_match_users"),
 ]

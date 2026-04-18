@@ -1,0 +1,36 @@
+<div class="user-card">
+
+    <!-- プロフ画像 -->
+    <div class="user-image">
+        <img src="{{ user.get_profile_image }}" alt="{{ user.username }}">
+    </div>
+
+    <!-- ユーザー情報 -->
+    <div class="user-info">
+        <div class="user-name">
+            {{ user.username }}
+            {% if user.get_age %}
+            ({{ user.get_age }}歳)
+            {% endif %}
+        </div>
+
+        <!-- タグ -->
+        {% if user.profile.tags.all %}
+        <div class="user-tags">
+            {% for tag in user.profile.tags.all|slice:":3" %}
+            <span class="tag">{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- アクション -->
+    <div class="user-actions">
+        {% if is_match %}
+        <a href="{% url 'user_messages:send_message' user.username %}">💬</a>
+        {% else %}
+        <span>🔒</span>
+        {% endif %}
+    </div>
+
+</div>
