@@ -35,6 +35,7 @@ from .utils import compatibility
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.views.decorators.cache import never_cache
 
 User = get_user_model()
 
@@ -455,6 +456,7 @@ def kyc_complete_mobile(request):
 # =========================
 # ★ マイページ
 # =========================
+@never_cache
 @login_required
 def mypage(request):
     user = request.user
@@ -588,6 +590,7 @@ def admin_message_detail(request, pk):
 # =========================
 # ★ プロフィール編集ビュー（タグ処理完成版）
 # =========================
+@never_cache
 @login_required
 def profile_edit(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)

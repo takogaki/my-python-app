@@ -13,6 +13,7 @@ from django.contrib import messages
 from notifications.models import Notification
 from datetime import timedelta
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 
 
 User = get_user_model()
@@ -45,6 +46,7 @@ def message_box(request):
         {"messages": messages}
     )
 
+@never_cache
 @login_required
 def send_message(request, username):
 
