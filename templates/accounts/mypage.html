@@ -357,6 +357,10 @@
 
 {% endblock %}
 
+<script>
+    localStorage.removeItem("profile_draft");
+</script>
+
 {% block extra_js %}
 <script src="{% static 'accounts/js/verify.js' %}"></script>
 <script src="{% static 'accounts/js/mypage.js' %}"></script>

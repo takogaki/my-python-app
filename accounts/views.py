@@ -17,6 +17,8 @@ from django.conf import settings
 from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils import timezone
 from datetime import date, timedelta
+
+from sqlalchemy import Transaction
 from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
 from accounts.models import SavedPost      # 保存した投稿
@@ -595,54 +597,68 @@ def admin_message_detail(request, pk):
         {"message": message}
     )
 
-
-
+# =========================
+# ★ プロフィール編集ビュー（タグ処理完成版）
+# =========================
 @login_required
 def profile_edit(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
+    profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if profile.user != request.user:
         raise PermissionDenied("不正アクセス")
 
     if request.method == "POST":
-        # 🔥 正しく分離
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         user_form = UserForm(request.POST, request.FILES, instance=request.user)
 
         if profile_form.is_valid() and user_form.is_valid():
-            # 🔥 保存順重要（User → Profile）
-            user = user_form.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
 
             # =========================
-            # タグ処理
+            # 🔥 全体をトランザクションで保護
             # =========================
-            tag_ids = request.POST.getlist("tags")
+            with Transaction.atomic():
 
-            ProfileTag.objects.filter(profile=profile).delete()
+                # ユーザー保存
+                user = user_form.save()
 
-            profile_tags = []
-            for tag_id in tag_ids:
-                try:
-                    level = int(request.POST.get(f"level_{tag_id}", 2))
-                    profile_tags.append(
-                        ProfileTag(
-                            profile=profile,
-                            tag_id=int(tag_id),
-                            level=level
-                        )
-                    )
-                except (ValueError, TypeError):
-                    continue
+                # プロフィール保存
+                profile = profile_form.save(commit=False)
+                profile.user = user
+                profile.save()
 
-            ProfileTag.objects.bulk_create(profile_tags)
+                # =========================
+                # 🔥 タグ処理（完成版）
+                # =========================
+                tag_ids = request.POST.getlist("tags")  # ["1","2","3"]
 
+                if not tag_ids:
+                    # 全解除
+                    ProfileTag.objects.filter(profile=profile).delete()
+                else:
+                    # 不要削除
+                    ProfileTag.objects.filter(
+                        profile=profile
+                    ).exclude(tag_id__in=tag_ids).delete()
+
+                    # 追加・更新
+                    for tag_id in tag_ids:
+                        try:
+                            level = int(request.POST.get(f"level_{tag_id}", 2))
+
+                            ProfileTag.objects.update_or_create(
+                                profile=profile,
+                                tag_id=int(tag_id),
+                                defaults={"level": level}
+                            )
+
+                        except (ValueError, TypeError):
+                            continue
+
+            messages.success(request, "プロフィールを保存しました")
             return redirect("accounts:mypage")
 
         else:
-            # 🔥 デバッグ（重要）
+            # デバッグ
             print("USER FORM ERROR:", user_form.errors)
             print("PROFILE FORM ERROR:", profile_form.errors)
             print("FILES:", request.FILES)
@@ -652,7 +668,7 @@ def profile_edit(request):
         user_form = UserForm(instance=request.user)
 
     # =========================
-    # タグ
+    # 🔥 表示用データ
     # =========================
     categories = TagCategory.objects.prefetch_related("tags").order_by("order")
 

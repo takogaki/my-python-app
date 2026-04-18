@@ -108,11 +108,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 if (el.type === "checkbox") {
-                    if (Array.isArray(data[name])) {
-                        el.checked = data[name].includes(el.value);
-                    } else {
-                        el.checked = true;
-                    }
+
+                if (Array.isArray(data[name])) {
+                    el.checked = data[name].includes(el.value);
+                } else {
+                    // 🔥 単一選択時の正しい処理
+                    el.checked = (el.value === data[name]);
+                }
+                
                 } else {
                     el.value = data[name];
                 }

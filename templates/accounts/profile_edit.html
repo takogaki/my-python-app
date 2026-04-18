@@ -80,7 +80,7 @@
                     <div class="tag-block" data-category-id="{{ category.id }}">
 
                         <label class="tag-label">
-                            <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id in selected_tags %}checked{% endif %}>
+                            <input type="checkbox" name="tags" value="{{ tag.id }}" {% if selected_tags|get_item:tag.id %}checked{% endif %}>
                             <span class="tag-name">{{ tag.name }}</span>
                         </label>
 
