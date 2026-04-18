@@ -107,8 +107,16 @@ class CustomUserCreationForm(UserCreationForm):
 
     def clean_username(self):
         username = self.cleaned_data["username"]
-        if User.objects.filter(username=username).exists():
-            raise ValidationError("このユーザー名はすでに使用されています。")
+
+        qs = CustomUser.objects.filter(username=username)
+
+        # 🔥 自分自身は除外
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise ValidationError("このユーザー名はすでに使われています")
+
         return username
 
     def clean_birth_date_input(self):
