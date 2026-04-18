@@ -59,6 +59,9 @@ STATICFILES_FINDERS = [
 # ==============================
 # ☁️ ストレージ設定
 # ==============================
+# staticfiles は WhiteNoise を使う（開発・本番ともに安定重視）
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+
 if DEBUG:
     # 開発
     STORAGES = {
