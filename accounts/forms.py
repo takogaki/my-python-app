@@ -164,6 +164,15 @@ class UserForm(forms.ModelForm):
 # 🔥 プロフィール編集
 # =========================
 class ProfileForm(forms.ModelForm):
+
+    profile_image = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            "accept": "image/png,image/jpeg,image/webp",
+            "id": "imageInput"
+        })
+    )
+
     class Meta:
         model = Profile
         fields = ["bio", "profile_image"]
@@ -175,18 +184,6 @@ class ProfileForm(forms.ModelForm):
             })
         }
 
-    profile_image = forms.ImageField(
-        required=False,
-        widget=forms.FileInput(attrs={
-            "accept": "image/png,image/jpeg,image/webp",
-            "id": "imageInput"
-        })
-    )
-
-    class Meta:
-        model = User
-        fields = ["username", "profile_image"]
-
     def clean_profile_image(self):
         image = self.cleaned_data.get("profile_image")
 
@@ -196,7 +193,7 @@ class ProfileForm(forms.ModelForm):
         try:
             img = Image.open(image)
             img.verify()
-            image.seek(0)  # 🔥 これが超重要
+            image.seek(0)
         except Exception:
             raise forms.ValidationError("有効な画像ファイルをアップロードしてください")
 
@@ -204,6 +201,12 @@ class ProfileForm(forms.ModelForm):
             raise forms.ValidationError("画像サイズは5MB以下にしてください")
 
         return image
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        if commit:
+            profile.save()
+        return profile
 
 
     def clean_username(self):
