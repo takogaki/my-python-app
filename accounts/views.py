@@ -789,17 +789,23 @@ def users_by_tag(request, tag_id):
 def tag_match_users(request):
     user = request.user
 
-    my_tags = user.profile.tags.all()
+    # 🔥 修正：ProfileTagから取得
+    my_tags = ProfileTag.objects.filter(
+        profile=user.profile
+    ).values_list("tag_id", flat=True)
 
-    if not my_tags.exists():
+    if not my_tags:
         users = CustomUser.objects.none()
     else:
         users = CustomUser.objects.filter(
-            profile__tags__in=my_tags
+            profile__profile_tags__tag_id__in=my_tags
         ).exclude(
             id=user.id
         ).annotate(
-            common_tags=Count("profile__tags")
+            common_tags=Count(
+                "profile__profile_tags",
+                filter=Q(profile__profile_tags__tag_id__in=my_tags)
+            )
         ).order_by(
             "-common_tags"
         ).distinct()
