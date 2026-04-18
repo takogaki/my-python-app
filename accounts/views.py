@@ -35,6 +35,7 @@ from collections import defaultdict
 from .utils import compatibility
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 
 User = get_user_model()
 
@@ -616,7 +617,7 @@ def profile_edit(request):
             # =========================
             # 🔥 全体をトランザクションで保護
             # =========================
-            with Transaction.atomic():
+            with transaction.atomic():
 
                 # ユーザー保存
                 user = user_form.save()
