@@ -36,6 +36,18 @@
             <label>ユーザー名</label>
             {{ user_form.username }}
             <div class="error-text">{{ user_form.username.errors }}</div>
+            <!-- 全エラー表示 -->
+            {% if user_form.errors %}
+            <div class="error-box">
+                {{ user_form.errors }}
+            </div>
+            {% endif %}
+            
+            {% if profile_form.errors %}
+            <div class="error-box">
+                {{ profile_form.errors }}
+            </div>
+            {% endif %}
         </div>
 
         <!-- 画像 -->

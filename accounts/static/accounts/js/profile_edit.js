@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 🔥 下書き保存
     // =========================
     function saveDraft() {
-        const form = document.querySelector("form");
+        const form = document.querySelector(".profile-form");
         const data = new FormData(form);
 
         // checkbox複数対応
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     // 🔥 単一選択時の正しい処理
                     el.checked = (el.value === data[name]);
                 }
-                
+
                 } else {
                     el.value = data[name];
                 }

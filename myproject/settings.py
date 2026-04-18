@@ -97,14 +97,15 @@ if DJANGO_ENV == "production":
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
 
     SESSION_COOKIE_SAMESITE = "None"
     CSRF_COOKIE_SAMESITE = "None"
 
     CSRF_TRUSTED_ORIGINS = [
         "https://my-python-app-0t2k.onrender.com",
+        "http://127.0.0.1:8000",
     ]
 
     SECURE_BROWSER_XSS_FILTER = True
@@ -123,6 +124,7 @@ else:
     CSRF_TRUSTED_ORIGINS = [
         "http://127.0.0.1:8000",
         "http://localhost:8000",
+        "http://0.0.0.0:8000",
     ]
 
 # ==============================
