@@ -32,7 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 from accounts.utils import compatibility, profile_completion
 from collections import defaultdict
 from .utils import compatibility
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.views.decorators.cache import never_cache
@@ -303,6 +303,14 @@ def activate(request, token):
         "accounts/activate_success.html",
         {"form": form}
     )
+
+# =========================
+# ★ カスタムログイン関数（セッションリセット付き）
+# =========================
+def custom_login(request, user):
+    request.session.flush()  # ← 超重要
+    login(request, user)
+
 
 # ========================
 # ★ KYC申請（超重要）

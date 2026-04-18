@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEBUG=True
-
 # ==============================
 # 📁 パス設定
 # ==============================
