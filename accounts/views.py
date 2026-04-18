@@ -601,78 +601,70 @@ def admin_message_detail(request, pk):
 @never_cache
 @login_required
 def profile_edit(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
-
-    if profile.user != request.user:
-        raise PermissionDenied("不正アクセス")
 
     if request.method == "POST":
-        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
-        user_form = UserForm(request.POST, request.FILES, instance=request.user)
 
-        if profile_form.is_valid() and user_form.is_valid():
+        with transaction.atomic():
 
-            # =========================
-            # 🔥 全体をトランザクションで保護
-            # =========================
-            with transaction.atomic():
+            profile = Profile.objects.select_for_update().get(
+                user=request.user
+            )
 
-                # ユーザー保存
-                user = user_form.save()
+            profile_form = ProfileForm(
+                request.POST,
+                request.FILES,
+                instance=profile
+            )
 
-                # プロフィール保存
-                profile = profile_form.save(commit=False)
+            user_form = UserForm(
+                request.POST,
+                instance=request.user
+            )
 
-                if profile.user and profile.user != request.user:
-                        raise PermissionDenied("不正なuser書き換え")
+            if profile_form.is_valid() and user_form.is_valid():
 
-                profile.user = request.user  # ← 絶対入れる
+                # =========================
+                # user保存
+                # =========================
+                user_form.save()
+
+                # =========================
+                # profile保存（完全固定）
+                # =========================
+                profile.bio = profile_form.cleaned_data.get("bio")
+                profile.profile_image = profile_form.cleaned_data.get("profile_image")
+                profile.user_id = request.user.id  # 保険
+
                 profile.save()
 
                 # =========================
-                # 🔥 タグ処理（完成版）
+                # タグ処理
                 # =========================
-                tag_ids = request.POST.getlist("tags") or []  # ["1","2","3"]
+                tag_ids = request.POST.getlist("tags") or []
 
-                if not tag_ids:
-                    # 全解除
-                    ProfileTag.objects.filter(profile=profile).delete()
-                else:
-                    # 不要削除
-                    ProfileTag.objects.filter(
-                        profile=profile
-                    ).exclude(tag_id__in=tag_ids).delete()
+                ProfileTag.objects.filter(profile=profile)\
+                    .exclude(tag_id__in=tag_ids).delete()
 
-                    # 追加・更新
-                    for tag_id in tag_ids:
-                        try:
-                            level = int(request.POST.get(f"level_{tag_id}", 2))
+                for tag_id in tag_ids:
+                    level = request.POST.get(f"level_{tag_id}", 2)
 
-                            ProfileTag.objects.update_or_create(
-                                profile=profile,
-                                tag_id=int(tag_id),
-                                defaults={"level": level}
-                            )
+                    ProfileTag.objects.update_or_create(
+                        profile=profile,
+                        tag_id=tag_id,
+                        defaults={"level": int(level)}
+                    )
 
-                        except (ValueError, TypeError):
-                            continue
+                messages.success(request, "保存しました")
+                return redirect("accounts:mypage")
 
-            messages.success(request, "プロフィールを保存しました")
-            return redirect("accounts:mypage")
-
-        else:
-            # デバッグ
-            print("USER FORM ERROR:", user_form.errors)
-            print("PROFILE FORM ERROR:", profile_form.errors)
-            print("FILES:", request.FILES)
+        # invalid時
+        messages.error(request, "入力にエラーがあります")
 
     else:
+        profile = Profile.objects.get(user=request.user)
         profile_form = ProfileForm(instance=profile)
         user_form = UserForm(instance=request.user)
 
-    # =========================
-    # 🔥 表示用データ
-    # =========================
     categories = TagCategory.objects.prefetch_related("tags").order_by("order")
 
     selected_tags = {

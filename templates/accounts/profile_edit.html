@@ -53,8 +53,8 @@
         <!-- 画像 -->
         <div class="image-upload-wrapper">
         
-            {% if user.get_profile_image %}
-            <img id="preview" src="{{ user.get_profile_image }}" class="avatar-large">
+            {% if profile.profile_image %}
+            <img id="preview" src="{{ profile.profile_image.url }}" class="avatar-large">
             {% else %}
             <img id="preview" src="{% static 'accounts/img/default_avatar.png' %}" class="avatar-large">
             {% endif %}
