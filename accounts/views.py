@@ -72,60 +72,6 @@ def user_list(request):
         "liked_user_ids": list(liked_user_ids),
     })
 
-@login_required
-def user_detail(request, pk):
-    user = get_object_or_404(
-        CustomUser,
-        pk=pk,
-        is_superuser=False,
-        is_active=True
-    )
-
-    # 🔥 これだけでOK
-    profile, _ = Profile.objects.get_or_create(user=user)
-
-    profile_tags = ProfileTag.objects.filter(
-        profile=profile
-    ).select_related("tag__category")
-
-    # =========================
-    # 足跡
-    # =========================
-    if request.user != user:
-
-        Footprint.objects.update_or_create(
-            from_user=request.user,
-            to_user=user,
-            defaults={"created_at": timezone.now()}
-        )
-
-        recent = Notification.objects.filter(
-            recipient=user,
-            actor=request.user,
-            type="footprint",
-            created_at__gte=timezone.now() - timedelta(hours=6)
-        ).exists()
-
-        if not recent:
-            Notification.objects.create(
-                recipient=user,
-                actor=request.user,
-                type="footprint",
-                verb="さんがプロフィールを見ました",
-                post=None
-            )
-
-    # =========================
-    # 相性スコア
-    # =========================
-    score = compatibility(request.user, user) if request.user.is_authenticated else None
-
-    return render(request, "accounts/user_detail.html", {
-        "user": user,
-        "profile_tags": profile_tags,
-        "score": score,
-    })
-
 # ========================
 # 足跡リスト
 # ========================
@@ -170,32 +116,74 @@ def footprint_list(request):
         "liked_user_ids": liked_user_ids,
     })
 
+# =========================
+# ★ ユーザープロフィール詳細ビュー（タグ表示＆足跡処理完成版）
+# =========================
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
     template_name = "accounts/user_detail.html"
     context_object_name = "user"
 
     def get_object(self):
-        return get_object_or_404(
+        user = get_object_or_404(
             User,
             username=self.kwargs["username"],
             is_superuser=False,
             is_active=True
         )
 
+        # =========================
+        # 🔥 足あと処理（最適化版）
+        # =========================
+        if self.request.user != user:
+
+            recent = Footprint.objects.filter(
+                from_user=self.request.user,
+                to_user=user,
+                created_at__gte=timezone.now() - timedelta(minutes=10)
+            ).exists()
+
+            if not recent:
+                Footprint.objects.update_or_create(
+                    from_user=self.request.user,
+                    to_user=user,
+                    defaults={"created_at": timezone.now()}
+                )
+
+            # 🔥 通知（6時間制限）
+            recent_notify = Notification.objects.filter(
+                recipient=user,
+                actor=self.request.user,
+                type="footprint",
+                created_at__gte=timezone.now() - timedelta(hours=6)
+            ).exists()
+
+            if not recent_notify:
+                Notification.objects.create(
+                    recipient=user,
+                    actor=self.request.user,
+                    type="footprint",
+                    verb="さんがプロフィールを見ました"
+                )
+
+        return user
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         user = self.object
 
-        # 🔥 これを追加（最重要）
+        # 🔥 プロフィール
         profile, _ = Profile.objects.get_or_create(user=user)
 
         context["profile_tags"] = ProfileTag.objects.filter(
             profile=profile
         ).select_related("tag__category")
 
-        # 既存
+        # 🔥 相性スコア
+        context["score"] = compatibility(self.request.user, user)
+
+        # 🔥 投稿
         context["public_pages"] = Page.objects.filter(
             author=user,
             is_public=True
