@@ -156,19 +156,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 👍 通常いいね
             if (data.status === "liked" || data.status === "already_liked") {
-
+                // 🔥 二重クリック防止
+                btn.disabled = true;
                 btn.classList.add("liked");
-
-                // 🔥 Tinder風：カード消す
+                
                 const card = btn.closest(".card");
                 if (card) {
-                    card.style.transform = "translateX(120%) rotate(10deg)";
-                    setTimeout(() => card.remove(), 300);
+                    card.classList.add("liked-effect");
+                    setTimeout(() => {
+                        card.classList.remove("liked-effect");
+                    }, 300);
                 }
             }
-
         })
         .catch(error => console.error("Error:", error));
     });
-
 });
