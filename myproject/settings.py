@@ -157,7 +157,7 @@ INSTALLED_APPS = [
     "videochat",
     "user_messages",
     "notifications",
-    "reels",
+    'videos',
 ]
 
 # ==============================
@@ -303,6 +303,17 @@ CONTENT_SECURITY_POLICY = {
         ),
     }
 }
+
+# ==============================
+# 🎥 アップロード制限（開発用）
+# ==============================
+
+# メモリ上限（大きい動画OKにする）
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 500  # 500MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 500   # 500MB
+
+# 1リクエストのアップロードサイズ制限解除寄り
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
 # ==============================
 # 🔧 その他

@@ -1,0 +1,50 @@
+{% extends "base/diary_base.html" %}
+{% load youtube_extras %}
+{% load static %}
+
+{% block title %}
+Spirytus動画｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'videos/css/feed.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="feed">
+
+    <div class="feed-inner">
+
+        {% for post in posts %}
+        <div class="video-card">
+
+            {% if post.media_type == "video" %}
+            <video class="video" muted playsinline preload="metadata">
+                <source src="{{ post.file.url }}">
+            </video>
+            {% else %}
+            <img class="media image" src="{{ post.file.url }}">
+            {% endif %}
+
+            <div class="overlay">
+                <h3>@{{ post.user.username }}</h3>
+                <p>{{ post.caption }}</p>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div> <!-- ★これ追加（超重要） -->
+
+</div>
+
+<a href="{% url 'video_upload' %}" class="fab">
+    +
+</a>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'videos/js/feed.js' %}"></script>
+{% endblock %}

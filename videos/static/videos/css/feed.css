@@ -1,0 +1,101 @@
+/* =========================
+   前提リセット（baseの影響を上書き）
+========================= */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* JS制御に統一 */
+    background: black;
+}
+
+/* =========================
+   ヘッダー高さ（固定値）
+========================= */
+:root {
+    --header-height: 60px;
+}
+
+/* =========================
+   フィード全体
+========================= */
+.feed {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+
+    /* ★ここが核心 */
+    height: calc(100vh - 60px);
+    overflow: hidden;
+}
+
+/* ★縦に積む（これが抜けてる） */
+.feed-inner {
+    height: 100%;
+    width: 100%;
+}
+
+/* =========================
+   各カード
+========================= */
+.video-card {
+    flex-shrink: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    background: black;
+}
+
+/* =========================
+   動画（トリミングOK）
+========================= */
+.video-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* =========================
+   画像（全部見せる）
+========================= */
+.video-card img {
+    max-width: 92%;
+    max-height: 92%;
+    object-fit: contain;
+}
+
+/* =========================
+   テキスト
+========================= */
+.overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 16px;
+    color: white;
+}
+
+/* =========================
+   FAB
+========================= */
+.fab {
+    position: fixed;
+    right: 18px;
+    bottom: 28px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #ff2d55;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    text-decoration: none;
+    z-index: 999;
+}

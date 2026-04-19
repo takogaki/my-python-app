@@ -1,0 +1,45 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'videos/css/upload.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="upload-wrapper">
+
+    <div class="upload-card">
+
+        <h1 class="title">投稿する</h1>
+
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+
+            <div class="field">
+                <label>タイプ</label>
+                <select name="media_type">
+                    <option value="video">動画</option>
+                    <option value="image">画像</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>メディア</label>
+                <input type="file" name="file" accept="image/*,video/*">
+            </div>
+
+            <div class="field">
+                <label>キャプション</label>
+                <textarea name="caption" placeholder="今日の一言を入力..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">投稿する</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
