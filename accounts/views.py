@@ -2,7 +2,7 @@
 import uuid, qrcode, base64
 from io import BytesIO
 from urllib.parse import urlencode
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, ListView
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
-from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_decode, url_has_allowed_host_and_scheme
 from django.utils import timezone
 from datetime import date, timedelta
 
@@ -36,6 +36,8 @@ from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.views.decorators.cache import never_cache
+from django.contrib.auth.views import LoginView
+
 
 User = get_user_model()
 
@@ -307,9 +309,29 @@ def activate(request, token):
 # =========================
 # ★ カスタムログイン関数（セッションリセット付き）
 # =========================
-def custom_login(request, user):
-    request.session.flush()  # ← 超重要
-    login(request, user)
+class CustomLoginView(LoginView):
+    template_name = "accounts/login.html"
+    redirect_authenticated_user = True
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("/accounts/mypage/")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        next_url = self.request.POST.get("next") or self.request.GET.get("next")
+
+        # =========================
+        # 🔥 安全なURLかチェック（重要）
+        # =========================
+        if next_url and url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={self.request.get_host()},
+            require_https=self.request.is_secure(),
+        ):
+            return next_url
+
+        return "/accounts/mypage/"
 
 
 # ========================
@@ -602,13 +624,17 @@ def admin_message_detail(request, pk):
 @login_required
 def profile_edit(request):
 
+    # =========================
+    # 🔥 まず必ず本人Profileをロック取得
+    # =========================
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
     if request.method == "POST":
 
         with transaction.atomic():
 
-            profile = Profile.objects.select_for_update().get(
-                user=request.user
-            )
+            # 🔥 ロックし直す（重要）
+            profile = Profile.objects.select_for_update().get(user=request.user)
 
             profile_form = ProfileForm(
                 request.POST,
@@ -626,14 +652,16 @@ def profile_edit(request):
                 # =========================
                 # user保存
                 # =========================
-                user_form.save()
+                user = user_form.save()
 
                 # =========================
                 # profile保存（完全固定）
                 # =========================
                 profile.bio = profile_form.cleaned_data.get("bio")
                 profile.profile_image = profile_form.cleaned_data.get("profile_image")
-                profile.user_id = request.user.id  # 保険
+
+                # 🔥 絶対に他ユーザーへ紐付かない保証
+                profile.user_id = request.user.id
 
                 profile.save()
 
@@ -657,7 +685,6 @@ def profile_edit(request):
                 messages.success(request, "保存しました")
                 return redirect("accounts:mypage")
 
-        # invalid時
         messages.error(request, "入力にエラーがあります")
 
     else:

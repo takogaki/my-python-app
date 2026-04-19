@@ -1,0 +1,118 @@
+/* =========================
+   全体リセット
+========================= */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* =========================
+   ログインページ全体レイアウト
+========================= */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* ← 上寄せ固定 */
+    align-items: center;
+    background: #f6f7fb;
+    padding: 0 20px 0; /* 上余白ゼロ */
+}
+
+/* =========================
+   ヘッダー
+========================= */
+.login-header {
+    text-align: center;
+    margin-top: 80px;   /* ← 上に寄せる */
+    margin-bottom: 10px;
+}
+
+.login-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.login-subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* =========================
+   カード
+========================= */
+.login-card {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+
+    margin-top: 0; /* ← 上に寄せる */
+}
+
+/* =========================
+   フォーム
+========================= */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* 入力 */
+.login-card input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+}
+
+/* フォーカス */
+.login-card input:focus {
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74,108,247,0.15);
+}
+
+/* =========================
+   ボタン
+========================= */
+.login-btn {
+    padding: 12px;
+    background: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.login-btn:hover {
+    background: #3a57d0;
+}
+
+/* =========================
+   フッター
+========================= */
+.login-footer {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #666;
+}
+
+.login-footer a {
+    color: #4a6cf7;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}

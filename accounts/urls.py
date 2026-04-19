@@ -1,9 +1,9 @@
-from django.contrib.auth.views import LoginView, LogoutView
+from .views import CustomLoginView
+from django.contrib.auth.views import LogoutView
 from django.urls import path
 from .views import SignUpView, UserDetailView, UserListView, like_user
 from . import views
 from .views import mypage
-
 
 app_name = "accounts"
 
@@ -12,25 +12,28 @@ urlpatterns = [
     path("signup/", SignUpView.as_view(), name="signup"),
     path("signup/done/", views.signup_done, name="signup_done"),
 
-    path("login/", LoginView.as_view(template_name="accounts/login.html"), name="login"),
-    path("logout/", LogoutView.as_view(template_name="accounts/logout.html"), name="logout"),
+    path("login/", CustomLoginView.as_view(), name="login"),
+    path("logout/", LogoutView.as_view(), name="logout"),
 
     # 利用規約
     path('terms/', views.terms, name='terms'),
 
-    # ユーザー一覧・詳細
+    # =========================
+    # 他人閲覧（プロフィール）
+    # =========================
     path("users/", views.user_list, name="user_list"),
     path("users/<str:username>/", views.UserDetailView.as_view(), name="user_detail"),
 
-    # ユーザー公開ページ（username指定）
+    # =========================
+    # 自分専用（mypage領域）
+    # =========================
     path("mypage/", views.mypage, name="mypage"),
-    # path("user/<str:username>/", UserDetailView.as_view(), name="user_detail_by_username"),
 
     # メール認証（★これが唯一の activate）
     path("activate/<uuid:token>/", views.activate, name="activate"),
 
     # プロフィール設定
-    path("profile/edit/", views.profile_edit, name="profile_edit"),
+    path("mypage/profile/edit/", views.profile_edit, name="profile_edit"),
     path("profile/image/delete/", views.profile_image_delete, name="profile_image_delete"),
 
     # アカウント削除（退会）

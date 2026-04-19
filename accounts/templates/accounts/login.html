@@ -1,37 +1,53 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
-ログインしてください｜SPIRYTUS
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/login.css' %}">
+{% endblock %}
+
 
 {% block body %}
 
-<div class="intro-card">
-    <h2 class="page-title">ログイン</h2>
-    <p class="page-description">
-        ここから先はログインが必要です。
-    </p>
-</div>
+<div class="login-wrapper">
 
-<div class="post-form-card">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+    <!-- ヘッダー -->
+    <div class="login-header">
+        <h1 class="login-title">SPIRYTUS</h1>
+        <p class="login-subtitle">ログインしてください</p>
+    </div>
 
-        {% if request.GET.next %}
-        <input type="hidden" name="next" value="{{ request.GET.next }}">
-        {% endif %}
+    <!-- フォームカード -->
+    <div class="login-card">
 
-        <button type="submit" class="submit-btn">
-            ログイン
-        </button>
-    </form>
+        <form method="post" autocomplete="off" class="login-form">
+            {% csrf_token %}
 
-    <div class="form-footer">
-        <p>
-            アカウントをお持ちでない方は<br>
+            <div class="input-group">
+                <label>ユーザー名</label>
+                <input type="text" name="username" autocomplete="off" placeholder="username">
+            </div>
+
+            <div class="input-group">
+                <label>パスワード</label>
+                <input type="password" name="password" autocomplete="new-password" placeholder="password">
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <button type="submit" class="login-btn">
+                ログイン
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>アカウントをお持ちでない方</p>
             <a href="{% url 'accounts:signup' %}?next={{ request.GET.next }}">
                 新規登録はこちら
             </a>
-        </p>
+        </div>
+
     </div>
+
 </div>
+
 {% endblock %}
