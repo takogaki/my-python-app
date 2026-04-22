@@ -5,6 +5,11 @@ body{
     background:#f5f6f8;
 }
 
+main.container {
+    padding-top: 60px;
+    min-height: calc(100vh - 60px);
+}
+
 .content-container {
     max-width: 800px;
     margin: 0 auto;

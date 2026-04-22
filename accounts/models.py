@@ -235,22 +235,25 @@ class SavedPost(models.Model):
 class UserLike(models.Model):
     from_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="likes_sent",
+        related_name="given_likes",
         on_delete=models.CASCADE
     )
 
     to_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="likes_received",
+        related_name="received_likes",
         on_delete=models.CASCADE
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
     is_read = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ("from_user", "to_user")
+        indexes = [
+            models.Index(fields=["from_user"]),
+            models.Index(fields=["to_user"]),
+        ]
 
     def __str__(self):
         return f"{self.from_user.username} → {self.to_user.username}"
@@ -262,9 +265,26 @@ class UserLike(models.Model):
         ).exists()
 
     def save(self, *args, **kwargs):
+        # 自分いいね禁止
         if self.from_user == self.to_user:
             return
+
         super().save(*args, **kwargs)
+
+        # 🔥 相互いいねならMatch生成
+        if UserLike.objects.filter(
+            from_user=self.to_user,
+            to_user=self.from_user
+        ).exists():
+
+            # 順序固定（A↔B問題解決）
+            user1 = min(self.from_user, self.to_user, key=lambda u: u.id)
+            user2 = max(self.from_user, self.to_user, key=lambda u: u.id)
+
+            Match.objects.get_or_create(
+                user1=user1,
+                user2=user2
+            )
 
 
 class Match(models.Model):
@@ -282,6 +302,10 @@ class Match(models.Model):
 
     class Meta:
         unique_together = ("user1", "user2")
+        indexes = [
+            models.Index(fields=["user1"]),
+            models.Index(fields=["user2"]),
+        ]
 
     def __str__(self):
         return f"{self.user1} ❤️ {self.user2}"
@@ -302,3 +326,9 @@ class Footprint(models.Model):
         on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["to_user"]),
+            models.Index(fields=["-created_at"]),
+        ]

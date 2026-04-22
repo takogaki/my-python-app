@@ -19,6 +19,36 @@ Spirytus動画｜SPIRYTUS
         {% for post in posts %}
         <div class="video-card">
 
+            <!-- 💥 ダブルタップ用 -->
+            <div class="double-heart">❤️</div>
+        
+            <div class="actions">
+
+                <!-- 👤 ユーザー -->
+                <a href="{% if request.user.id == post.user.id %}
+                                {% url 'accounts:mypage' %}
+                            {% else %}
+                                {% url 'accounts:user_detail' post.user.username %}
+                            {% endif %}" class="action-btn user-btn">
+                    <img src="{{ post.user.get_profile_image }}" class="user-avatar">
+                </a>
+        
+                <!-- Like -->
+                <button class="action-btn like-btn" data-id="{{ post.id }}"
+                    data-liked="{% if post.id in liked_ids %}1{% else %}0{% endif %}">
+                    <span class="icon">❤️</span>
+                    <span class="count">{{ post.like_count }}</span>
+                </button>
+        
+                <!-- コメント（今後） -->
+                <button class="action-btn comment-btn">
+                    <span class="icon">💬</span>
+                    <span class="count">{{ post.comment_count }}</span>
+                </button>
+        
+            </div>
+        
+            <!-- メディア -->
             {% if post.media_type == "video" %}
             <video class="video" muted playsinline preload="metadata">
                 <source src="{{ post.file.url }}">
@@ -26,12 +56,7 @@ Spirytus動画｜SPIRYTUS
             {% else %}
             <img class="media image" src="{{ post.file.url }}">
             {% endif %}
-
-            <div class="overlay">
-                <h3>@{{ post.user.username }}</h3>
-                <p>{{ post.caption }}</p>
-            </div>
-
+        
         </div>
         {% endfor %}
 
@@ -42,6 +67,30 @@ Spirytus動画｜SPIRYTUS
 <a href="{% url 'video_upload' %}" class="fab">
     +
 </a>
+
+<div id="commentModal" class="comment-modal">
+
+    <div class="comment-box">
+
+        <div class="comment-list"></div>
+
+        <div class="comment-input">
+        
+            {% if request.user.is_authenticated %}
+            <input type="text" id="commentText" placeholder="コメントを書く...">
+            <button id="sendComment">送信</button>
+            {% else %}
+            <input type="text" placeholder="ログインするとコメントできます" disabled>
+            <a href="{% url 'login' %}" class="comment-login-btn">
+                🔐 ログインしてコメント
+            </a>
+            {% endif %}
+        
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}
 
