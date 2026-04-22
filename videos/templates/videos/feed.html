@@ -25,11 +25,11 @@ Spirytus動画｜SPIRYTUS
             <div class="actions">
 
                 <!-- 👤 ユーザー -->
-                <a href="{% if request.user.id == post.user.id %}
-                                {% url 'accounts:mypage' %}
-                            {% else %}
-                                {% url 'accounts:user_detail' post.user.username %}
-                            {% endif %}" class="action-btn user-btn">
+                <a {% if not post.user.is_superuser %} href="{% if request.user.id == post.user.id %}
+                            {% url 'accounts:mypage' %}
+                        {% else %}
+                            {% url 'accounts:user_detail' post.user.username %}
+                        {% endif %}" {% endif %} class="action-btn user-btn {% if post.user.is_superuser %}no-click{% endif %}">
                     <img src="{{ post.user.get_profile_image }}" class="user-avatar">
                 </a>
         
