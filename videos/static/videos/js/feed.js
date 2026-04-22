@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let startY = 0;
     let currentY = 0;
     let isDragging = false;
+    let isCommentOpen = false;
 
     let isLocked = false;
 
@@ -147,6 +148,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // タッチ
     // =========================
     document.addEventListener("touchstart", (e) => {
+        
+        if (isCommentOpen) return;
+
         if (isLocked) return;
 
         isDragging = true;
@@ -157,6 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { passive: true });
 
     document.addEventListener("touchmove", (e) => {
+
+        if (isCommentOpen) return;
+
         if (!isDragging || isLocked) return;
 
         currentY = e.touches[0].clientY;
@@ -168,6 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { passive: true });
 
     document.addEventListener("touchend", () => {
+
+        if (isCommentOpen) return;
 
         if (!isDragging || isLocked) return;
         isDragging = false;
@@ -192,6 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let wheelLocked = false;
 
     document.addEventListener("wheel", (e) => {
+
+        if (isCommentOpen) return;
 
         if (wheelLocked || isLocked) return;
 
@@ -462,16 +473,61 @@ modal.addEventListener("click", (e) => {
 });
 
 // =========================
-// 💬 コメント内スワイプ無効化
+// 💬 コメント内スクロール制御（完全修正版）
+// =========================
+// =========================
+// 💬 コメント全体スワイプ制御（最適版）
 // =========================
 const commentBox = document.querySelector(".comment-box");
 
+let commentStartY = 0;
+
 if (commentBox) {
-    ["touchstart", "touchmove", "touchend", "wheel"].forEach(event => {
-        commentBox.addEventListener(event, (e) => {
-            e.stopPropagation();
-        }, { passive: false });
-    });
+
+    commentBox.addEventListener("touchstart", (e) => {
+        commentStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    commentBox.addEventListener("touchmove", (e) => {
+
+        const list = commentBox.querySelector(".comment-list");
+        if (!list) return;
+
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - commentStartY;
+
+        const isAtTop = list.scrollTop === 0;
+        const isAtBottom =
+            list.scrollHeight - list.scrollTop <= list.clientHeight;
+
+        // 上端・下端ならフィードに任せる
+        if ((isAtTop && diff > 0) || (isAtBottom && diff < 0)) {
+            return;
+        }
+
+        // それ以外はコメント内スクロール優先
+        e.stopPropagation();
+        e.preventDefault();
+
+    }, { passive: false });
+
+    // PCホイール
+    commentBox.addEventListener("wheel", (e) => {
+
+        const list = commentBox.querySelector(".comment-list");
+        if (!list) return;
+
+        const isAtTop = list.scrollTop === 0;
+        const isAtBottom =
+            list.scrollHeight - list.scrollTop <= list.clientHeight;
+
+        if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
+            return;
+        }
+
+        e.stopPropagation();
+
+    }, { passive: true });
 }
 
 });

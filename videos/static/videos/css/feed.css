@@ -81,6 +81,47 @@ html, body {
 }
 
 /* =========================
+   ✨ キャプション（完成版）
+========================= */
+.caption {
+    position: absolute;
+    text-align: center;
+    bottom: 0px;
+    left: 16px;
+    right: 80px;
+    max-width: 70%;
+    z-index: 5;
+    pointer-events: none;
+    backdrop-filter: blur(6px);
+}
+
+.caption::before {
+    backdrop-filter: blur(6px);
+    content: "";
+    position: absolute;
+    inset: -12px;
+
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.85),
+        rgba(0,0,0,0.55),
+        rgba(0,0,0,0.2),
+        transparent
+    );
+
+    z-index: -1;
+    border-radius: 12px;
+}
+
+.video-card .caption p {
+    color: #fff !important;
+
+    text-shadow:
+        0 2px 8px rgba(0,0,0,1),
+        0 0 12px rgba(0,0,0,0.8);
+}
+
+/* =========================
    FAB
 ========================= */
 .fab {
@@ -389,6 +430,7 @@ html, body {
 .comment-list {
     flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* iOS滑らか */
     padding: 14px;
 }
 
@@ -470,4 +512,9 @@ html, body {
         padding: 8px 14px;
         font-size: 12px;
     }
+}
+
+.no-click {
+    pointer-events: none;
+    opacity: 0.8;
 }

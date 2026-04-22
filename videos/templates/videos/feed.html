@@ -25,13 +25,19 @@ Spirytus動画｜SPIRYTUS
             <div class="actions">
 
                 <!-- 👤 ユーザー -->
-                <a {% if not post.user.is_superuser %} href="{% if request.user.id == post.user.id %}
-                            {% url 'accounts:mypage' %}
-                        {% else %}
-                            {% url 'accounts:user_detail' post.user.username %}
-                        {% endif %}" {% endif %} class="action-btn user-btn {% if post.user.is_superuser %}no-click{% endif %}">
+                {% if post.user.is_superuser %}
+                <div class="action-btn user-btn no-click">
+                    <img src="{{ post.user.get_profile_image }}" class="user-avatar">
+                </div>
+                {% else %}
+                <a href="{% if request.user.id == post.user.id %}
+                                {% url 'accounts:mypage' %}
+                            {% else %}
+                                {% url 'accounts:user_detail' post.user.username %}
+                            {% endif %}" class="action-btn user-btn">
                     <img src="{{ post.user.get_profile_image }}" class="user-avatar">
                 </a>
+                {% endif %}
         
                 <!-- Like -->
                 <button class="action-btn like-btn" data-id="{{ post.id }}"
@@ -56,11 +62,17 @@ Spirytus動画｜SPIRYTUS
             {% else %}
             <img class="media image" src="{{ post.file.url }}">
             {% endif %}
+
+            {% if post.caption %}
+            <div class="caption">
+                <p>{{ post.caption|linebreaksbr }}</p>
+            </div>
+            {% endif %}
         
         </div>
         {% endfor %}
 
-    </div> <!-- ★これ追加（超重要） -->
+    </div>
 
 </div>
 
