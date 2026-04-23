@@ -659,6 +659,7 @@ html, body {
     .user-avatar {
         width: 32px;     /* ← iconと完全一致させる */
         height: 32px;
+        top: 110px;
 
         border-radius: 50%;
         object-fit: cover;
