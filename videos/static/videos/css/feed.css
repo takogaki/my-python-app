@@ -610,7 +610,7 @@ html, body {
         left: 16px;
         right: 80px;
 
-        bottom: 60px; /* ← FABと同じ高さ */
+        bottom: 100px; /* ← FABと同じ高さ */
 
         z-index: 100;
         text-align: left;
