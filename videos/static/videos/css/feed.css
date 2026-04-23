@@ -612,7 +612,7 @@ html, body {
     .actions {
         position: absolute;
         right: 12px;
-        top: 550px; /* ← 少し上に調整 */
+        bottom: 100px; /* ← 少し上に調整 */
 
         display: flex;
         flex-direction: column;
