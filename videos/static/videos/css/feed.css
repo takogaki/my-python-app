@@ -573,7 +573,7 @@ html, body {
     }
 
     /* =========================
-       1画面 = 1カード
+    1画面完全固定（最重要）
     ========================= */
     .video-card {
         flex: 0 0 100%;
@@ -584,49 +584,60 @@ html, body {
         overflow: hidden;
 
         display: flex;
-        align-items: center;   /* ← 中央 */
-        justify-content: center;
+        align-items: center;     /* ← 中央固定 */
+        justify-content: center; /* ← 中央固定 */
 
         background: black;
     }
 
     /* =========================
-       メディア（完全中央）
+    メディア完全中央
     ========================= */
     .video-card video,
     .video-card img {
+        position: absolute;
+
+        top: 50%;
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+
         width: 100%;
         height: 100%;
-        object-fit: contain; /* ← ここ重要 */
+        object-fit: cover;
     }
 
     /* =========================
-       アイコン（カードに貼り付け）
+    アクション（右・上寄せ）
     ========================= */
     .actions {
-        position: absolute; /* ← ★これが正解 */
+        position: absolute;
+
         right: 12px;
-        bottom: 100px;
+        top: 40%; /* ← ここが重要（中央より少し上） */
+
+        transform: translateY(-50%);
 
         display: flex;
         flex-direction: column;
-        align-items: center;
         gap: 14px;
 
-        z-index: 20;
+        z-index: 100;
     }
 
     /* =========================
-       キャプション（画像の上）
+    キャプション（下すぎ禁止）
     ========================= */
     .caption {
         position: absolute;
 
-        left: 12px;
-        right: 70px;
-        bottom: 16px;
+        left: 16px;
+        right: 80px;
 
-        z-index: 20;
+        top: 65%; /* ← bottomやめて上基準に変更 */
+        transform: translateY(-50%);
+
+        z-index: 100;
 
         text-align: left;
     }
