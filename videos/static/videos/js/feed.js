@@ -163,10 +163,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("touchmove", (e) => {
 
         if (isCommentOpen) return;
-
         if (!isDragging || isLocked) return;
 
-        e.preventDefault();
+        e.preventDefault(); // ← ★これが無いと絶対ブレる
 
         currentY = e.touches[0].clientY;
         const diff = currentY - startY;
@@ -553,5 +552,7 @@ document.querySelectorAll(".more-btn").forEach(btn => {
     });
 
 });
+
+
 
 });

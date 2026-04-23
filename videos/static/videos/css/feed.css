@@ -558,22 +558,81 @@ html, body {
 }
 
 /* =========================
-📱 スマホ完全最適化
+📱 スマホ完全修正版（最重要）
 ========================= */
 @media (max-width: 768px) {
 
     /* =========================
-       アクションボタン（TikTok配置）
+       1画面固定（ズレ防止）
+    ========================= */
+    .feed {
+        position: fixed;
+        top: var(--header-height);
+        height: calc(100vh - var(--header-height));
+        overflow: hidden;
+        touch-action: none;
+    }
+
+    .feed-inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .video-card {
+        flex: 0 0 100%;
+        height: calc(100vh - var(--header-height));
+        position: relative;
+        overflow: hidden;
+
+        display: flex;
+        align-items: flex-start; /* 上寄せ */
+        justify-content: center;
+
+        padding-top: 12px;
+    }
+
+    /* =========================
+       メディア位置（上寄せ）
+    ========================= */
+    .video-card video,
+    .video-card img {
+        margin-top: 10px;
+        z-index: 1;
+        position: relative;
+    }
+
+    /* =========================
+       ❌ NG: fixed → 削除
+       ✅ OK: absoluteでカード固定
     ========================= */
     .actions {
-        position: fixed;
+        position: absolute; /* ← ここが本体 */
+
         right: 12px;
         bottom: 110px;
 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         gap: 14px;
-        z-index: 100;
+
+        z-index: 100; /* ← メディアより前 */
+        pointer-events: auto;
     }
 
+    /* =========================
+       FAB（そのままでOK）
+    ========================= */
+    .fab {
+        right: 14px;
+        bottom: 22px;
+        z-index: 999;
+    }
+
+    /* =========================
+       ボタンサイズ最適化
+    ========================= */
     .action-btn {
         width: 56px;
         height: 72px;
@@ -581,13 +640,10 @@ html, body {
 
     .action-btn .icon {
         font-size: 24px;
-        width: 28px;
-        height: 28px;
     }
 
     .action-btn .count {
         font-size: 11px;
-        margin-top: 4px;
     }
 
     .user-avatar {
@@ -596,63 +652,20 @@ html, body {
     }
 
     /* =========================
-       キャプション（スマホ最適）
+       キャプション
     ========================= */
     .caption {
         left: 12px;
-        right: 70px;   /* ← actions避ける */
+        right: 72px;
         bottom: 16px;
 
-        max-width: none;
         text-align: left;
+        z-index: 100;
     }
 
-    .caption-text {
-        font-size: 13px;
-        line-height: 1.4;
-    }
-
-    .more-btn {
-        font-size: 11px;
-    }
-
-    /* =========================
-       もっと見る展開時（神UX）
-    ========================= */
     .caption-text.open {
-        font-size: 14px;
-        line-height: 1.5;
-
         max-height: 50vh;
         overflow-y: auto;
-    }
-
-    /* =========================
-       コメントモーダル改善
-    ========================= */
-    .comment-box {
-        height: 65%; /* 少し広げる */
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-    }
-
-    .comment-list {
-        padding: 12px;
-    }
-
-    .comment {
-        font-size: 13px;
-    }
-
-    /* =========================
-       FAB微調整
-    ========================= */
-    .fab {
-        width: 52px;
-        height: 52px;
-        font-size: 28px;
-        right: 14px;
-        bottom: 22px;
     }
 
 }
