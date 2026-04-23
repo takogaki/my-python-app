@@ -550,23 +550,20 @@ html, body {
 }
 
 /* =========================
-📱 スマホ完全修正版（最重要）
+📱 スマホ完全修正版（これが正解）
 ========================= */
 @media (max-width: 768px) {
 
     /* =========================
-       1画面固定（ズレ防止）
+       フィード固定
     ========================= */
     .feed {
         position: fixed;
         top: var(--header-height);
         left: 0;
-
         width: 100%;
         height: calc(100vh - var(--header-height));
-
         overflow: hidden;
-        touch-action: none;
     }
 
     .feed-inner {
@@ -575,6 +572,9 @@ html, body {
         height: 100%;
     }
 
+    /* =========================
+       1画面 = 1カード
+    ========================= */
     .video-card {
         flex: 0 0 100%;
         width: 100%;
@@ -582,92 +582,63 @@ html, body {
 
         position: relative;
         overflow: hidden;
-        background: black;
 
         display: flex;
-        align-items: center;   /* ← 中央に戻す */
+        align-items: center;   /* ← 中央 */
         justify-content: center;
+
+        background: black;
     }
 
     /* =========================
-       メディア位置（上寄せ）
+       メディア（完全中央）
     ========================= */
     .video-card video,
     .video-card img {
-        max-width: 100%;
-        max-height: 100%;
-
-        object-fit: contain; /* ← これ重要 */
-        position: absolute;  /* ← これが核心 */
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* ← ここ重要 */
     }
 
     /* =========================
-       ❌ NG: fixed → 削除
-       ✅ OK: absoluteでカード固定
+       アイコン（カードに貼り付け）
     ========================= */
     .actions {
-        position: absolute;
-
+        position: absolute; /* ← ★これが正解 */
         right: 12px;
-        bottom: 120px;
+        bottom: 100px;
 
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 16px;
+        gap: 14px;
 
-        z-index: 100;
+        z-index: 20;
     }
 
     /* =========================
-       FAB（そのままでOK）
-    ========================= */
-    .fab {
-        right: 14px;
-        bottom: 22px;
-        z-index: 999;
-    }
-
-    /* =========================
-       ボタンサイズ最適化
-    ========================= */
-    .action-btn {
-        width: 56px;
-        height: 72px;
-    }
-
-    .action-btn .icon {
-        font-size: 24px;
-    }
-
-    .action-btn .count {
-        font-size: 11px;
-    }
-
-    .user-avatar {
-        width: 42px;
-        height: 42px;
-    }
-
-    /* =========================
-       キャプション
+       キャプション（画像の上）
     ========================= */
     .caption {
         position: absolute;
 
         left: 12px;
-        right: 80px;
-        bottom: 20px;
+        right: 70px;
+        bottom: 16px;
 
-        z-index: 100;
+        z-index: 20;
+
+        text-align: left;
     }
 
-    .caption-text.open {
-        max-height: 50vh;
-        overflow-y: auto;
+    /* =========================
+       FAB（これは固定でOK）
+    ========================= */
+    .fab {
+        position: fixed;
+        right: 14px;
+        bottom: 22px;
+        z-index: 999;
     }
 
 }
