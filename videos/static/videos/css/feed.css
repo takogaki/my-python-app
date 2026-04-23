@@ -677,11 +677,6 @@ html, body {
     /* =========================
     👤ユーザーだけ特別調整
     ========================= */
-    .user-btn .icon {
-        width: 32px;
-        height: 32px;
-    }
-
     .user-btn .count {
         visibility: hidden; /* 高さだけ確保 */
     }
