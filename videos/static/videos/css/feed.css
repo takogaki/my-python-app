@@ -544,14 +544,6 @@ html, body {
     transform: scale(0.95);
 }
 
-/* スマホでちょい控えめ */
-@media (max-width: 768px) {
-    .comment-login-btn {
-        padding: 8px 14px;
-        font-size: 12px;
-    }
-}
-
 .no-click {
     pointer-events: none;
     opacity: 0.8;
@@ -568,7 +560,11 @@ html, body {
     .feed {
         position: fixed;
         top: var(--header-height);
+        left: 0;
+
+        width: 100%;
         height: calc(100vh - var(--header-height));
+
         overflow: hidden;
         touch-action: none;
     }
@@ -581,15 +577,16 @@ html, body {
 
     .video-card {
         flex: 0 0 100%;
+        width: 100%;
         height: calc(100vh - var(--header-height));
+
         position: relative;
         overflow: hidden;
+        background: black;
 
         display: flex;
-        align-items: flex-start; /* 上寄せ */
+        align-items: center;   /* ← 中央に戻す */
         justify-content: center;
-
-        padding-top: 12px;
     }
 
     /* =========================
@@ -597,9 +594,14 @@ html, body {
     ========================= */
     .video-card video,
     .video-card img {
-        margin-top: 10px;
-        z-index: 1;
-        position: relative;
+        max-width: 100%;
+        max-height: 100%;
+
+        object-fit: contain; /* ← これ重要 */
+        position: absolute;  /* ← これが核心 */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
     /* =========================
@@ -607,18 +609,17 @@ html, body {
        ✅ OK: absoluteでカード固定
     ========================= */
     .actions {
-        position: absolute; /* ← ここが本体 */
+        position: absolute;
 
         right: 12px;
-        bottom: 110px;
+        bottom: 120px;
 
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 14px;
+        gap: 16px;
 
-        z-index: 100; /* ← メディアより前 */
-        pointer-events: auto;
+        z-index: 100;
     }
 
     /* =========================
@@ -655,11 +656,12 @@ html, body {
        キャプション
     ========================= */
     .caption {
-        left: 12px;
-        right: 72px;
-        bottom: 16px;
+        position: absolute;
 
-        text-align: left;
+        left: 12px;
+        right: 80px;
+        bottom: 20px;
+
         z-index: 100;
     }
 
