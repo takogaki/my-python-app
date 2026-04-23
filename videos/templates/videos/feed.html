@@ -23,14 +23,14 @@ Spirytus動画｜SPIRYTUS
             <div class="double-heart">❤️</div>
         
             <div class="actions">
-
+            
                 <!-- 👤 ユーザー -->
                 {% if post.user.is_superuser %}
                 <div class="action-btn user-btn no-click">
                     <span class="icon">
                         <img src="{{ post.user.get_profile_image }}" class="user-avatar">
                     </span>
-                    <span class="count"></span>
+                    <span class="count">0</span>
                 </div>
                 {% else %}
                 <a href="{% if request.user.id == post.user.id %}
@@ -41,23 +41,23 @@ Spirytus動画｜SPIRYTUS
                     <span class="icon">
                         <img src="{{ post.user.get_profile_image }}" class="user-avatar">
                     </span>
-                    <span class="count"></span>
+                    <span class="count">0</span>
                 </a>
                 {% endif %}
-        
-                <!-- Like -->
+            
+                <!-- ❤️ Like -->
                 <button class="action-btn like-btn" data-id="{{ post.id }}"
                     data-liked="{% if post.id in liked_ids %}1{% else %}0{% endif %}">
                     <span class="icon">❤️</span>
                     <span class="count">{{ post.like_count }}</span>
                 </button>
-        
-                <!-- コメント（今後） -->
+            
+                <!-- 💬 コメント -->
                 <button class="action-btn comment-btn">
                     <span class="icon">💬</span>
                     <span class="count">{{ post.comment_count }}</span>
                 </button>
-        
+            
             </div>
         
             <!-- メディア -->

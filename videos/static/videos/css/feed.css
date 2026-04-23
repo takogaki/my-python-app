@@ -238,17 +238,11 @@ html, body {
 ========================= */
 
 .user-avatar {
-
     width: 48px;
-
     height: 48px;
-
     border-radius: 50%;
-
     object-fit: cover;
-
     border: 2px solid white;
-
 }
 
 /* =========================
@@ -270,8 +264,8 @@ html, body {
    アイコン（ブレ防止）
 ========================= */
 .action-btn .icon {
-    width: 32px;              /* ← 横幅固定 */
-    height: 32px;             /* ← 縦幅固定 */
+    width: 60px;              /* ← 横幅固定 */
+    height: 60px;             /* ← 縦幅固定 */
 
     display: flex;
     align-items: center;
@@ -550,7 +544,7 @@ html, body {
 }
 
 /* =========================
-📱 スマホ完全修正版（これが正解）
+📱 スマホ完全安定版
 ========================= */
 @media (max-width: 768px) {
 
@@ -566,14 +560,10 @@ html, body {
         top: var(--header-height);
         left: 0;
         width: 100%;
-
-        height: calc(100dvh - var(--header-height)); /* ← ★ここ重要 */
+        height: calc(100dvh - var(--header-height));
         overflow: hidden;
     }
 
-    /* =========================
-    縦積み
-    ========================= */
     .feed-inner {
         display: flex;
         flex-direction: column;
@@ -581,12 +571,12 @@ html, body {
     }
 
     /* =========================
-    1画面 = 1カード（完全一致）
+    1画面完全固定
     ========================= */
     .video-card {
         flex: 0 0 100%;
         width: 100%;
-        height: calc(100dvh - var(--header-height)); /* ← ★完全一致 */
+        height: calc(100dvh - var(--header-height));
 
         position: relative;
         overflow: hidden;
@@ -598,12 +588,11 @@ html, body {
     }
 
     /* =========================
-    メディア（中央固定）
+    メディア（中央・はみ出し防止）
     ========================= */
     .video-card video,
     .video-card img {
         position: absolute;
-
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -618,24 +607,24 @@ html, body {
     }
 
     /* =========================
-       アクション（右・固定）
+    アクション（完全固定）
     ========================= */
     .actions {
         position: absolute;
-
         right: 12px;
-        bottom: 100px; /* ← FABより上 */
+        top: 110px; /* ← 少し上に調整 */
 
         display: flex;
         flex-direction: column;
         align-items: center;
+
         gap: 18px;
 
         z-index: 100;
     }
 
     /* =========================
-       ボタンサイズ固定（崩壊防止）
+    ボタン（完全統一BOX）
     ========================= */
     .action-btn {
         width: 56px;
@@ -646,56 +635,58 @@ html, body {
         align-items: center;
         justify-content: center;
 
-        flex-shrink: 0; /* ← ★これが超重要（伸び防止） */
+        flex-shrink: 0;
     }
 
     /* =========================
-    アイコン領域（完全固定）
+    アイコン（完全固定）
     ========================= */
     .action-btn .icon {
         width: 32px;
         height: 32px;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         font-size: 24px;
         line-height: 1;
     }
 
     /* =========================
-    数字（位置固定）
+    👤画像（ここがズレの原因だった）
+    ========================= */
+    .user-avatar {
+        width: 32px;     /* ← iconと完全一致させる */
+        height: 32px;
+
+        border-radius: 50%;
+        object-fit: cover;
+
+        display: block;
+    }
+
+    /* =========================
+    数字（高さ固定でズレ防止）
     ========================= */
     .action-btn .count {
         height: 16px;
         margin-top: 6px;
+
         font-size: 12px;
+
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    /* =========================
-    👤ユーザーだけ特別調整
-    ========================= */
-    .user-btn {
-        justify-content: center; /* ← アイコンと数字を中央寄せ */
-    }
-
+    /* 👤だけ非表示（でも高さ維持） */
     .user-btn .count {
-        visibility: hidden; /* 高さだけ確保 */
-    }
-
-    /* 👤画像サイズ固定（これ重要） */
-    .user-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        object-fit: cover;
-        bottom: 2000px;
+        visibility: hidden;
     }
 
     /* =========================
-       キャプション（FABと同列）
+    キャプション（位置最適化）
     ========================= */
     .caption {
         position: absolute;
@@ -703,14 +694,14 @@ html, body {
         left: 16px;
         right: 80px;
 
-        bottom: 22px; /* ← FABと同じ高さ */
+        bottom: 22px;
 
         z-index: 100;
         text-align: left;
     }
 
     /* =========================
-       FAB
+    FAB
     ========================= */
     .fab {
         position: fixed;
@@ -718,5 +709,4 @@ html, body {
         bottom: 22px;
         z-index: 999;
     }
-
 }
