@@ -62,13 +62,16 @@ Spirytus動画｜SPIRYTUS
             {% else %}
             <img class="media image" src="{{ post.file.url }}">
             {% endif %}
-
+            
             {% if post.caption %}
             <div class="caption">
-                <p>{{ post.caption|linebreaksbr }}</p>
+                <p class="caption-text">
+                    {{ post.caption|linebreaksbr }}
+                </p>
+                <span class="more-btn">…もっと見る</span>
             </div>
             {% endif %}
-        
+
         </div>
         {% endfor %}
 

@@ -389,6 +389,7 @@ document.querySelectorAll(".comment-btn").forEach(btn => {
         currentPostId = card.querySelector(".like-btn").dataset.id;
 
         modal.classList.add("show");
+        isCommentOpen = true;
 
         loadComments(currentPostId);
     });
@@ -469,6 +470,7 @@ document.getElementById("sendComment").addEventListener("click", () => {
 modal.addEventListener("click", (e) => {
     if (!e.target.closest(".comment-box")) {
         modal.classList.remove("show");
+        isCommentOpen = false;
     }
 });
 
@@ -529,5 +531,25 @@ if (commentBox) {
 
     }, { passive: true });
 }
+
+document.querySelectorAll(".more-btn").forEach(btn => {
+
+    btn.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+        const text = btn.previousElementSibling;
+
+        text.classList.toggle("open");
+
+        if (text.classList.contains("open")) {
+            btn.textContent = "閉じる";
+        } else {
+            btn.textContent = "…もっと見る";
+        }
+
+    });
+
+});
 
 });
