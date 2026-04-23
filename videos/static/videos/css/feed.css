@@ -672,7 +672,26 @@ html, body {
         display: flex;
         align-items: center;
         justify-content: center;
-        visibility: hidden;
+    }
+
+    /* =========================
+    👤ユーザーだけ特別調整
+    ========================= */
+    .user-btn .icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .user-btn .count {
+        visibility: hidden; /* 高さだけ確保 */
+    }
+
+    /* 👤画像サイズ固定（これ重要） */
+    .user-avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     /* =========================
