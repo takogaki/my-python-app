@@ -558,31 +558,15 @@ html, body {
        カード
     ========================= */
     .video-card {
-        position: relative;
+        flex: 0 0 100%; /* ← 絶対固定 */
         width: 100%;
         height: calc(100vh - var(--header-height));
-        overflow: hidden;
+        position: relative;
+        overflow: hidden; /* ← はみ出し防止 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: black;
-    }
-
-    /* =========================
-       メディア（絶対に全体表示）
-    ========================= */
-    .video-card video,
-    .video-card img {
-        position: absolute;
-
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-
-        max-width: 100%;
-        max-height: 100%;
-
-        width: auto;
-        height: auto;
-
-        object-fit: contain; /* ← ★これが超重要 */
     }
 
     /* =========================
@@ -592,7 +576,7 @@ html, body {
         position: absolute;
 
         right: 12px;
-        bottom: 110px; /* ← FABより上 */
+        bottom: 200px; /* ← FABより上 */
 
         display: flex;
         flex-direction: column;
@@ -617,13 +601,6 @@ html, body {
         flex-shrink: 0; /* ← ★これが超重要（伸び防止） */
     }
 
-    .user-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
     /* =========================
        キャプション（FABと同列）
     ========================= */
@@ -633,7 +610,7 @@ html, body {
         left: 16px;
         right: 80px;
 
-        bottom: 28px; /* ← FABと同じ高さ */
+        bottom: 22px; /* ← FABと同じ高さ */
 
         z-index: 100;
         text-align: left;
