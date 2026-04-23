@@ -677,16 +677,21 @@ html, body {
     /* =========================
     👤ユーザーだけ特別調整
     ========================= */
+    .user-btn {
+        justify-content: center; /* ← アイコンと数字を中央寄せ */
+    }
+
     .user-btn .count {
         visibility: hidden; /* 高さだけ確保 */
     }
 
     /* 👤画像サイズ固定（これ重要） */
     .user-avatar {
-        width: 100%;
-        height: 100%;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
         object-fit: cover;
+        bottom: 2000px;
     }
 
     /* =========================
