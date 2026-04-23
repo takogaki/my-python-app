@@ -549,10 +549,33 @@ html, body {
     opacity: 0.8;
 }
 
+/* =========================
+📱 スマホ完全修正版（これが正解）
+========================= */
 @media (max-width: 768px) {
 
     /* =========================
-    1画面固定（そのままでOK）
+       フィード固定
+    ========================= */
+    .feed {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        width: 100%;
+        height: calc(100vh - var(--header-height));
+        overflow: hidden;
+        touch-action: none;
+        overflow: hidden;
+    }
+
+    .feed-inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* =========================
+    1画面完全固定（最重要）
     ========================= */
     .video-card {
         flex: 0 0 100%;
@@ -563,8 +586,8 @@ html, body {
         overflow: hidden;
 
         display: flex;
-        align-items: center;
-        justify-content: center;
+        align-items: center;     /* ← 中央固定 */
+        justify-content: center; /* ← 中央固定 */
 
         background: black;
     }
@@ -575,24 +598,26 @@ html, body {
     .video-card video,
     .video-card img {
         position: absolute;
+
         top: 50%;
         left: 50%;
+
         transform: translate(-50%, -50%);
+
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
 
     /* =========================
-    🔥 アクション（最適位置）
+    アクション（右・上寄せ）
     ========================= */
     .actions {
         position: absolute;
 
         right: 12px;
+        top: 40%; /* ← ここが重要（中央より少し上） */
 
-        /* 🔥 ここを修正 */
-        top: 45%;   /* ← 前より上に */
         transform: translateY(-50%);
 
         display: flex;
@@ -603,7 +628,7 @@ html, body {
     }
 
     /* =========================
-    🔥 キャプション（上げる）
+    キャプション（下すぎ禁止）
     ========================= */
     .caption {
         position: absolute;
@@ -611,16 +636,16 @@ html, body {
         left: 16px;
         right: 80px;
 
-        /* 🔥 ここが重要 */
-        top: 55%;   /* ← 大幅に上げる */
+        top: 65%; /* ← bottomやめて上基準に変更 */
         transform: translateY(-50%);
 
         z-index: 100;
+
         text-align: left;
     }
 
     /* =========================
-    FAB（そのまま）
+       FAB（これは固定でOK）
     ========================= */
     .fab {
         position: fixed;
@@ -628,4 +653,5 @@ html, body {
         bottom: 22px;
         z-index: 999;
     }
+
 }
