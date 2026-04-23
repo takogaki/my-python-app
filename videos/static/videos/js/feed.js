@@ -166,13 +166,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!isDragging || isLocked) return;
 
+        e.preventDefault();
+
         currentY = e.touches[0].clientY;
         const diff = currentY - startY;
 
         feed.style.transform =
             `translateY(${-currentIndex * viewportHeight + diff}px)`;
 
-    }, { passive: true });
+    }, { passive: false });
 
     document.addEventListener("touchend", () => {
 
