@@ -624,7 +624,7 @@ html, body {
         position: absolute;
 
         right: 12px;
-        bottom: 200px; /* ← FABより上 */
+        bottom: 100px; /* ← FABより上 */
 
         display: flex;
         flex-direction: column;
@@ -658,7 +658,7 @@ html, body {
         left: 16px;
         right: 80px;
 
-        bottom: 100px; /* ← FABと同じ高さ */
+        bottom: 22px; /* ← FABと同じ高さ */
 
         z-index: 100;
         text-align: left;
