@@ -51,6 +51,10 @@ Spirytus動画｜SPIRYTUS
                     <span class="icon">💬</span>
                     <span class="count">{{ post.comment_count }}</span>
                 </button>
+
+                <a href="{% url 'video_upload' %}" class="fab">
+                    +
+                </a>
         
             </div>
         
@@ -78,10 +82,6 @@ Spirytus動画｜SPIRYTUS
     </div>
 
 </div>
-
-<a href="{% url 'video_upload' %}" class="fab">
-    +
-</a>
 
 <div id="commentModal" class="comment-modal">
 
