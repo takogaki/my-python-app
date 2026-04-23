@@ -164,7 +164,7 @@ html, body {
 ========================= */
 .fab {
     position: fixed;
-    right: 18px;
+    right: 12px;
     bottom: 28px;
     width: 58px;
     height: 58px;
@@ -189,19 +189,12 @@ html, body {
 .actions {
     position: absolute;
     right: 16px;
-    bottom: 110px;
+    bottom: 120px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     z-index: 10;
-}
-
-@media (max-width: 768px) {
-    .actions {
-        position: fixed;
-        z-index: 100;
-    }
 }
 
 /* =========================
@@ -564,9 +557,9 @@ html, body {
     .actions {
         position: fixed;
         right: 12px;
-        bottom: 100px;
+        bottom: 110px;
 
-        gap: 16px;
+        gap: 14px;
         z-index: 100;
     }
 
