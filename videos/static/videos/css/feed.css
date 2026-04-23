@@ -675,21 +675,6 @@ html, body {
     }
 
     /* =========================
-    👤ユーザーだけ特別調整
-    ========================= */
-    .user-btn {
-        justify-content: center;
-    }
-    /* 👤画像サイズ固定（これ重要） */
-    .user-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        object-fit: cover;
-        display: block;
-    }
-
-    /* =========================
        キャプション（FABと同列）
     ========================= */
     .caption {
