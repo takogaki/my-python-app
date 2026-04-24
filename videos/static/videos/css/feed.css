@@ -677,11 +677,6 @@ html, body {
         justify-content: center;
     }
 
-    .user-btn .count {
-        /* visibility: hidden; ← これに戻す */
-        
-    }
-
     /* =========================
     キャプション（位置最適化）
     ========================= */
