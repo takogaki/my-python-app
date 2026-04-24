@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 
 # =========================
 # 🎬 投稿（動画・画像統合）
 # =========================
 class PostVideo(models.Model):
+
     MEDIA_TYPE_CHOICES = [
         ("video", "動画"),
         ("image", "画像"),
@@ -22,15 +24,23 @@ class PostVideo(models.Model):
         choices=MEDIA_TYPE_CHOICES
     )
 
-    file = models.FileField(upload_to="videos/")
+    # 🔥 分離
+    image = CloudinaryField(
+        "image",
+        blank=True,
+        null=True
+    )
+
+    video = models.FileField(
+        upload_to="videos/",
+        blank=True,
+        null=True
+    )
 
     caption = models.TextField(blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     views_count = models.PositiveIntegerField(default=0)
-
-    # 🔥 追加（超重要）
     likes_count = models.PositiveIntegerField(default=0)
 
     class Meta:

@@ -16,7 +16,7 @@ def feed(request):
     posts = (
         PostVideo.objects
         .select_related("user")
-        .annotate(like_count=Count("likes"))
+        .annotate(likes_total=Count("likes"))
         .order_by("-created_at")
     )
 
@@ -40,12 +40,30 @@ def feed(request):
 @login_required
 def upload(request):
     if request.method == "POST":
-        PostVideo.objects.create(
+
+        media = request.FILES.get("media")  # ← name変更済み前提
+        media_type = request.POST.get("media_type")
+
+        if not media:
+            return render(request, "videos/upload.html", {
+                "error": "ファイルを選択してください"
+            })
+
+        post = PostVideo.objects.create(
             user=request.user,
-            media_type=request.POST.get("media_type"),
-            file=request.FILES.get("file"),
+            media_type=media_type,
             caption=request.POST.get("caption")
         )
+
+        # 🔥 分岐保存
+        if media:
+            if media_type == "image":
+                post.image = media
+            elif media_type == "video":
+                post.video = media
+
+        post.save()
+
         return redirect("feed")
 
     return render(request, "videos/upload.html")

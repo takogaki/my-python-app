@@ -13,6 +13,10 @@
 
         <h1 class="title">投稿する</h1>
 
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
         <form method="post" enctype="multipart/form-data" class="upload-form">
             {% csrf_token %}
 
@@ -26,7 +30,7 @@
 
             <div class="field">
                 <label>メディア</label>
-                <input type="file" name="file" accept="image/*,video/*">
+                <input type="file" name="media" accept="image/*,video/*">
             </div>
 
             <div class="field">

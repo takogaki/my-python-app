@@ -49,7 +49,7 @@ Spirytus動画｜SPIRYTUS
                 <button class="action-btn like-btn" data-id="{{ post.id }}"
                     data-liked="{% if post.id in liked_ids %}1{% else %}0{% endif %}">
                     <span class="icon">❤️</span>
-                    <span class="count">{{ post.like_count }}</span>
+                    <span class="count">{{ post.likes_total }}</span>
                 </button>
             
                 <!-- 💬 コメント -->
@@ -61,12 +61,12 @@ Spirytus動画｜SPIRYTUS
             </div>
         
             <!-- メディア -->
-            {% if post.media_type == "video" %}
+            {% if post.video %}
             <video class="video" muted playsinline preload="metadata">
-                <source src="{{ post.file.url }}">
+                <source src="{{ post.video.url }}">
             </video>
-            {% else %}
-            <img class="media image" src="{{ post.file.url }}">
+            {% elif post.image %}
+            <img class="media image" src="{{ post.image.url }}">
             {% endif %}
             
             {% if post.caption %}
