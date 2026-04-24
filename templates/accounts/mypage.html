@@ -198,13 +198,11 @@
         <div class="post-grid">
             {% for post in video_posts %}
             <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 }}">
-        
-                {% if post.media_type == "video" %}
-                <video src="{{ post.file.url }}" muted preload="metadata"></video>
-                {% else %}
-                <img src="{{ post.file.url }}">
+                {% if post.media_type == "video" and post.video %}
+                <video src="{{ post.video.url }}" muted preload="metadata"></video>
+                {% elif post.image %}
+                <img src="{{ post.image.url }}">
                 {% endif %}
-        
             </a>
             {% empty %}
             <p class="empty-text">投稿はまだありません</p>
