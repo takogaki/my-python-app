@@ -654,12 +654,27 @@ html, body {
     }
 
     /* =========================
+    アイコン（完全固定）
+    ========================= */
+    .action-btn .user_icon {
+        width: 32px;
+        height: 32px;
+        top: 100px; /* ← アイコン位置微調整 */
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    /* =========================
     👤画像（ここがズレの原因だった）
     ========================= */
     .user-avatar {
         width: 32px;     /* ← iconと完全一致させる */
         height: 32px;
-        top: 110px;
 
         border-radius: 50%;
         object-fit: cover;
