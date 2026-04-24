@@ -191,6 +191,27 @@
         </div>
     </section>
 
+    <!-- 投稿グリッド -->
+    <section class="content-card">
+        <h3 class="section-title">📹画像・動画の投稿一覧</h3>
+        
+        <div class="post-grid">
+            {% for post in video_posts %}
+            <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 }}">
+        
+                {% if post.media_type == "video" %}
+                <video src="{{ post.file.url }}" muted preload="metadata"></video>
+                {% else %}
+                <img src="{{ post.file.url }}">
+                {% endif %}
+        
+            </a>
+            {% empty %}
+            <p class="empty-text">投稿はまだありません</p>
+            {% endfor %}
+        </div>
+    </section>
+
     <!-- 日記 -->
     <section class="content-card">
         <h3 class="section-title">📔 日記一覧</h3>

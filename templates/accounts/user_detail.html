@@ -88,6 +88,29 @@
 </section>
 
 <!-- =====================
+画像・動画投稿一覧
+===================== -->
+<div class="card">
+    <h2 class="card-title">{{ user.username }}さんの動画・画像</h2>
+
+    <div class="post-grid">
+        {% for post in video_posts %}
+        <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 }}">
+
+            {% if post.media_type == "video" %}
+            <video src="{{ post.file.url }}" muted preload="metadata"></video>
+            {% else %}
+            <img src="{{ post.file.url }}">
+            {% endif %}
+
+        </a>
+        {% empty %}
+        <p class="empty-text">投稿はまだありません</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- =====================
 ブログ投稿一覧
 ===================== -->
 <div class="card">

@@ -5,6 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Count
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # =========================
 # 🎬 フィード
@@ -156,4 +159,19 @@ def add_comment(request, post_id):
         "icon": request.user.get_profile_image(),
         "text": comment.text,
         "count": count
+    })
+
+# =========================
+# 🔥 ユーザーフィード
+# =========================
+def user_video_feed(request, username):
+    user = get_object_or_404(User, username=username)
+
+    posts = PostVideo.objects.filter(user=user).order_by("-created_at")
+
+    start = int(request.GET.get("start", 0))
+
+    return render(request, "videos/feed.html", {
+        "posts": posts,
+        "start_index": start
     })

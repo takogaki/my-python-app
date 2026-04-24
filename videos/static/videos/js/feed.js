@@ -122,6 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
         feed.style.transform = `translateY(-${index * viewportHeight}px)`;
 
         updateVideos();
+        
+        // =========================
+        // 🔥 初期位置ジャンプ（これ追加）
+        // =========================
+        if (typeof startIndex !== "undefined") {
+            moveTo(startIndex);
+        }
 
         setTimeout(() => {
             isLocked = false;

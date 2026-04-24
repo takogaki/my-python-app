@@ -20,6 +20,7 @@ from datetime import date, timedelta
 
 from diary.models import Page              # 日記
 from blog.models import Post, Comment      # ブログ投稿
+from videos.models import PostVideo
 from accounts.models import SavedPost      # 保存した投稿
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
 from django.db.models import Count, Q
@@ -195,6 +196,10 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         context["blog_posts"] = Post.objects.filter(
             author=user
         ).order_by("-posted_date")
+
+        context["video_posts"] = PostVideo.objects.filter(
+            user=user
+        ).order_by("-created_at")
 
         return context
 
@@ -495,6 +500,8 @@ def mypage(request):
 
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
+    # 投稿（動画・画像）
+    video_posts = PostVideo.objects.filter(user=user).order_by("-created_at") 
 
     profile_tags = ProfileTag.objects.filter(
         profile=profile
@@ -568,6 +575,7 @@ def mypage(request):
         {
             "diaries": diaries,
             "blog_posts": blog_posts,
+            "video_posts": video_posts,
             "profile_tags": profile_tags,
             "messages": messages,
             "profile": profile,

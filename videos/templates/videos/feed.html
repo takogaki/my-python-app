@@ -116,5 +116,9 @@ Spirytus動画｜SPIRYTUS
 {% endblock %}
 
 {% block extra_js %}
+<script>
+    const startIndex = Number({{ start_index|default:"0" }});;
+</script>
+
 <script src="{% static 'videos/js/feed.js' %}"></script>
 {% endblock %}
