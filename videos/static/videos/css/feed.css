@@ -548,6 +548,12 @@ html, body {
 ========================= */
 @media (max-width: 768px) {
 
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
 .video-feed,
 .video-feed * {
     box-sizing: border-box;
