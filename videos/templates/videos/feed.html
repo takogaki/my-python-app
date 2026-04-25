@@ -61,12 +61,12 @@ Spirytus動画｜SPIRYTUS
             </div>
         
             <!-- メディア -->
-            {% if post.video %}
-            <video class="video" muted playsinline preload="metadata">
+            {% if post.media_type == "video" %}
+            <video muted playsinline preload="metadata">
                 <source src="{{ post.video.url }}">
             </video>
-            {% elif post.image %}
-            <img class="media image" src="{{ post.image.url }}">
+            {% elif post.media_type == "image" %}
+            <img src="{{ post.image.url }}">
             {% endif %}
             
             {% if post.caption %}
