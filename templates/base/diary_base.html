@@ -49,6 +49,7 @@
     <link rel="stylesheet" href="{% static 'videochat/css/video_warning.css' %}">
     <link rel="stylesheet" href="{% static 'spirytus/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'spirytus/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'spirytus/css/feed_footer.css' %}">
     {% block extra_css %}{% endblock %}
 
     <!-- JS -->
@@ -131,16 +132,12 @@
     </main>
 
 
-    <footer class="site-footer">
-
-        <p class="user-count">
-            👥 登録ユーザー数：{{ user_count }}
-        </p>
-
-        <small>
-            © MAX96°
-        </small>
-
+    <footer class="feed-footer">
+    
+        <a href="{% url 'video_upload' %}" class="fab">
+            +
+        </a>
+    
     </footer>
 
 

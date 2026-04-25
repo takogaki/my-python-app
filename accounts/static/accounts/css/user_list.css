@@ -1,6 +1,10 @@
 /* =========================
    Swipe Layout
 ========================= */
+:root {
+    --header-height: 60px;
+    --footer-height: 70px;
+}
 
 body {
     margin: 0;
@@ -10,10 +14,16 @@ body {
 
 .swipe-wrapper {
     position: fixed;
-    top: 67px;
+
+    top: var(--header-height);
+    bottom: var(--footer-height); /* ← これが核心 */
+
     left: 0;
-    width: 100vw;
-    height: calc(100dvh - 67px);
+    right: 0;
+
+    width: 100%;
+    height: auto; /* ← calc消す */
+
     background: #000;
 }
 

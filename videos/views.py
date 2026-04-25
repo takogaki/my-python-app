@@ -30,7 +30,9 @@ def feed(request):
 
     return render(request, "videos/feed.html", {
         "posts": posts,
-        "liked_ids": liked_ids
+        "liked_ids": liked_ids,
+
+        "is_feed": True,
     })
 
 

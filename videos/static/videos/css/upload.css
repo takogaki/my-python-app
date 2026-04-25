@@ -6,10 +6,10 @@ body {
 
 /* 中央レイアウト */
 .upload-wrapper {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
+
+    min-height: calc(100vh - 60px - 70px);
 }
 
 /* カードUI */
