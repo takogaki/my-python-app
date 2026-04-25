@@ -232,11 +232,8 @@ html, body {
 }
 
 /* =========================
-
    ユーザーアイコン（最重要）
-
 ========================= */
-
 .user-avatar {
     width: 48px;
     height: 48px;
@@ -543,3 +540,230 @@ html, body {
     opacity: 0.8;
 }
 
+/* =========================
+📱 完全隔離 TikTokフィード
+========================= */
+@media (max-width: 768px) {
+
+.video-feed {
+    position: fixed;
+    inset: 60px 0 0 0;
+
+    width: 100%;
+    height: calc(100vh - 60px);
+
+    background: #000;
+    overflow: hidden;
+
+    isolation: isolate; /* 🔥外部描画完全遮断 */
+    contain: layout paint size; /* 🔥ブラウザレベル隔離 */
+}
+
+/* =========================
+★ 完全リセット（スコープ内のみ）
+========================= */
+.video-feed,
+.video-feed * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    font-family: system-ui, sans-serif;
+}
+
+/* =========================
+スワイプ構造
+========================= */
+.video-feed .feed-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+1画面固定
+========================= */
+.video-feed .video-card {
+    position: relative;
+    flex: 0 0 100%;
+    height: 100%;
+    width: 100%;
+
+    overflow: hidden;
+    background: #000;
+
+    contain: layout paint; /* 🔥レイアウト分離 */
+}
+
+/* =========================
+メディア完全固定
+========================= */
+.video-feed .video-card video,
+.video-feed .video-card img {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+/* =========================
+UIレイヤー
+========================= */
+.video-feed .actions {
+    position: absolute;
+    right: 12px;
+    bottom: 100px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    z-index: 50;
+}
+
+/* =========================
+ボタン
+========================= */
+.video-feed .action-btn {
+    all: unset; /* 🔥完全リセット */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 52px;
+}
+
+/* =========================
+   数字（桁ズレ完全防止）
+========================= */
+.video-feed .count {
+    position: relative !important;
+    z-index: 99999 !important;
+
+    color: #fff !important;
+    background: rgba(0,0,0,0.4);
+
+    padding: 2px 4px;
+    border-radius: 4px;
+
+    display: inline-block !important;
+
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =========================
+アイコン
+========================= */
+.video-feed .icon {
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/* =========================
+👤 ユーザーアイコン完全安定
+========================= */
+
+/* 枠 */
+.video-feed .icon.user-icon {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 50%;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid red;
+}
+
+/* 画像（これが重要） */
+.video-feed .icon.user-icon img,
+.video-feed .user-avatar {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    position: static; /* ←絶対ここ重要 */
+}
+
+/* like/commentと絶対干渉させない */
+.video-feed .actions .icon {
+    position: relative;
+}
+
+/* =========================
+画像完全固定
+========================= */
+.video-feed .user-avatar {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    border-radius: 50%;
+
+    display: block;
+}
+
+/* =========================
+キャプション
+========================= */
+.video-feed .caption {
+    position: absolute;
+    left: 12px;
+    right: 80px;
+    bottom: 20px;
+
+    color: #fff;
+    z-index: 10;
+
+    overflow: hidden;
+}
+
+/* =========================
+＋ボタン
+========================= */
+.video-feed .fab {
+    position: fixed;
+    right: 14px;
+    bottom: 20px;
+    z-index: 100;
+}
+
+/* =========================
+完全遮断（footer含む）
+========================= */
+.site-footer,
+footer {
+    display: none !important;
+}
+
+/* =========================
+外部CSS無効化補強
+========================= */
+.video-feed a,
+.video-feed button,
+.video-feed img,
+.video-feed video {
+    all: unset;
+    display: block;
+}
+
+}
