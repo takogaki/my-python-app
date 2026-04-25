@@ -548,39 +548,38 @@ html, body {
 ========================= */
 @media (max-width: 768px) {
 
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-}
-
-.video-feed,
-.video-feed * {
-    box-sizing: border-box;
-}
-
 /* =========================
-🎬 フィード
+🧱 完全サンドボックス開始
 ========================= */
+
+/* ① body干渉を強制遮断 */
+body {
+    overflow: hidden !important;
+}
+
+/* ② このページだけ完全独立 */
 .video-feed {
-    /* ❌ all: initial はやめる */
-    all: unset;
+    all: initial; /* ← 一度リセット（重要） */
 
     position: fixed;
     top: 60px;
     left: 0;
 
     width: 100%;
-    height: calc(100vh - 60px);
-
-    overflow: hidden;
+    height: calc(100dvh - 60px);
 
     background: black;
 
     font-family: sans-serif;
 
-    /* 安定化 */
-    -webkit-overflow-scrolling: touch;
+    display: block;
+
+    overflow: hidden;
+}
+
+/* ③ 内部再構築 */
+.video-feed * {
+    box-sizing: border-box;
 }
 
 /* =========================
