@@ -12,7 +12,7 @@ Spirytus動画｜SPIRYTUS
 
 {% block body %}
 
-<div class="feed">
+<div class="feed video-feed">
 
     <div class="feed-inner">
 
@@ -27,7 +27,7 @@ Spirytus動画｜SPIRYTUS
                 <!-- 👤 ユーザー -->
                 {% if post.user.is_superuser %}
                 <div class="action-btn user-btn no-click">
-                    <span class="icon">
+                    <span class="icon user-icon">
                         <img src="{{ post.user.get_profile_image }}" class="user-avatar">
                     </span>
                     <span class="count">0</span>
@@ -38,7 +38,7 @@ Spirytus動画｜SPIRYTUS
                             {% else %}
                                 {% url 'accounts:user_detail' post.user.username %}
                             {% endif %}" class="action-btn user-btn">
-                    <span class="icon">
+                    <span class="icon user-icon">
                         <img src="{{ post.user.get_profile_image }}" class="user-avatar">
                     </span>
                     <span class="count">0</span>
