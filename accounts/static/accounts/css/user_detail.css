@@ -1,159 +1,312 @@
-.profile-tags {
-    display: flex !important;
-    flex-wrap: wrap !important;
+/* =========================
+全体ベース
+========================= */
+body {
+    background: #f6f7fb;
+}
+
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px auto;
+    max-width: 900px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.05);
 }
 
 /* =========================
-   プロフィール全体
+タイトル
 ========================= */
-.profile-info {
-    margin-top: 20px;
-    padding: 20px;
-    border-radius: 16px;
-    background: #ffffff;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #222;
 }
 
-/* テキスト */
+/* =========================
+プロフィールカード
+========================= */
+.profile-card .card {
+    text-align: center;
+}
+
+/* 名前 */
+.profile-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* サポーターバッジ */
+.supporter-badge {
+    margin-left: 6px;
+}
+
+/* サポーターメッセージ */
+.supporter-message {
+    font-size: 12px;
+    color: #ff6b81;
+    margin-bottom: 10px;
+}
+
+/* =========================
+プロフィール画像
+========================= */
+.avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 12px auto;
+    display: block;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.avatar:hover {
+    transform: scale(1.05);
+}
+
+/* =========================
+モーダル
+========================= */
+.image-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.image-modal-content {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+}
+
+.image-modal .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* =========================
+プロフィール情報
+========================= */
+.profile-info {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 12px;
+}
+
 .profile-info p {
     margin: 6px 0;
-    font-size: 14px;
+    font-size: 13px;
     color: #444;
 }
 
 /* =========================
-   タグ全体
+相性スコア
 ========================= */
-.profile-tags {
-    margin-top: 20px;
-}
-
-/* カテゴリごと */
-.tag-category {
-    margin-bottom: 16px;
-}
-
-/* カテゴリタイトル */
-.tag-category h4 {
-    font-size: 13px;
-    margin-bottom: 8px;
-    color: #888;
-    border-left: 4px solid #ff7a7a;
-    padding-left: 8px;
+.match-score {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #ff4d6d;
 }
 
 /* =========================
-   タグチップ（超重要）
+タグ
 ========================= */
+.profile-tags {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tag-category {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.tag-category h4 {
+    font-size: 12px;
+    color: #888;
+    border-left: 4px solid #ff7a7a;
+    padding-left: 8px;
+    margin-bottom: 6px;
+}
+
+/* タグチップ */
 .tag-chip {
     display: inline-block;
     background: linear-gradient(135deg, #ffe0e0, #ffd6ff);
     color: #444;
-    padding: 6px 10px;
+    padding: 5px 10px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 11px;
     margin: 4px 4px 0 0;
-    transition: all 0.2s ease;
+    transition: 0.2s;
 }
 
-/* ホバーでちょい浮く */
 .tag-chip:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-/* =========================
-   プロフィールボタン
-========================= */
-.profile-actions {
-    margin-top: 20px;
-}
-
-.profile-actions a {
-    display: inline-block;
-    background: linear-gradient(135deg, #ff7a7a, #ff4d6d);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 999px;
-    text-decoration: none;
-    font-size: 13px;
-    transition: all 0.2s ease;
-}
-
-.profile-actions a:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
 }
 
 .tag-chip[data-level="1"] { opacity: 0.6; }
 .tag-chip[data-level="2"] { opacity: 0.85; }
 .tag-chip[data-level="3"] { font-weight: bold; }
 
-.profile-tags {
-    display: flex;
-    flex-wrap: wrap;
+/* =========================
+ボタン
+========================= */
+.card-actions {
+    margin-top: 16px;
 }
 
-.empty-tags {
+.btn {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 999px;
+    text-decoration: none;
     font-size: 13px;
-    color: #aaa;
+    transition: 0.2s;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #ff7a7a, #ff4d6d);
+    color: #fff;
+}
+
+.btn.outline {
+    border: 1px solid #ddd;
+    color: #333;
+    background: #fff;
+}
+
+.btn:hover {
+    transform: scale(1.03);
 }
 
 /* =========================
-投稿グリッド（PC）
+投稿グリッド（動画・画像）
 ========================= */
 .post-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-
     gap: 6px;
-
-    max-width: 1200px;   /* ← これが超重要（横幅制限） */
-    margin: 0 auto;      /* ← 中央寄せ */
-    padding: 0 10px;     /* ← 端の余白 */
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-/* =========================
-各投稿（正方形固定）
-========================= */
+/* 正方形 */
 .post-grid a {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1; /* ← これが最重要 */
+    aspect-ratio: 1 / 1;
     overflow: hidden;
     background: #000;
+    border-radius: 10px;
 }
 
-/* =========================
-画像・動画フィット
-========================= */
+/* メディア */
 .post-grid img,
 .post-grid video {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* ← TikTok/インスタ風 */
-    display: block;
+    object-fit: cover;
 }
 
-/* =======================
-ホバーでズーム（PCのみ）※スマホはホバーできないので
-======================= */
+/* hover */
 @media (hover: hover) {
-    .post-grid a:hover img,
-    .post-grid a:hover video {
-        transform: scale(1.05);
+    .post-grid a:hover {
+        transform: scale(1.03);
         transition: 0.2s;
+        z-index: 2;
     }
 }
 
 /* =========================
-スマホ（3列）
+ブログ・日記カード（統一サブカード）
+========================= */
+.sub-card {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.sub-card-title {
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.sub-card-title a {
+    color: #222;
+    text-decoration: none;
+}
+
+.sub-card-date {
+    font-size: 11px;
+    color: #888;
+}
+
+.sub-card-body {
+    font-size: 13px;
+    color: #444;
+    margin-top: 8px;
+}
+
+/* LIKE */
+.sub-card-like {
+    font-size: 12px;
+    color: #ff4d6d;
+    margin-top: 8px;
+}
+
+/* LIVE */
+.post-live {
+    color: #ff3b30;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+/* =========================
+空状態
+========================= */
+.empty-text {
+    text-align: center;
+    font-size: 13px;
+    color: #aaa;
+    padding: 20px;
+}
+
+/* =========================
+戻る
+========================= */
+.card-footer.center {
+    text-align: center;
+    padding: 20px;
+}
+
+/* =========================
+スマホ最適化
 ========================= */
 @media (max-width: 768px) {
+
     .post-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
 
-        max-width: 600px; /* ← スマホでも中央固定 */
-        margin: 0 auto;
+    .card {
+        margin: 10px;
     }
 }

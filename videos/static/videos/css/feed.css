@@ -63,7 +63,7 @@ html, body {
 .video-card .actions {
     position: absolute !important;
     right: 12px !important;
-    bottom: 63px !important;
+    bottom: 70px !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -189,7 +189,7 @@ html, body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 63px; /* ← ここが必須（基準固定） */
+    bottom: 70px; /* ← ここが必須（基準固定） */
     width: calc(100% - 100px);
     max-width: 520px;
     z-index: 20;

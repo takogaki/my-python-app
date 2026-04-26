@@ -323,15 +323,39 @@ section h3 {
     background: #000;
 }
 
-/* =========================
-画像・動画フィット
-========================= */
+.post-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* 正方形 */
+.post-grid a {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #000;
+    border-radius: 10px;
+}
+
+/* メディア */
 .post-grid img,
 .post-grid video {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* ← TikTok/インスタ風 */
-    display: block;
+    object-fit: cover;
+}
+
+/* hover */
+@media (hover: hover) {
+    .post-grid a:hover {
+        transform: scale(1.03);
+        transition: 0.2s;
+        z-index: 2;
+    }
 }
 
 /* =======================
