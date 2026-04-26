@@ -2,6 +2,7 @@
    📌 フッター本体
 ========================= */
 .feed-footer {
+    border: 2px solid rgba(255,255,255,0.9);
     position: fixed;
     bottom: 0;
     left: 0;
@@ -16,7 +17,7 @@
     z-index: 9999;
 
     /* 背景（TikTok風） */
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(10px);
 
     pointer-events: none; /* 全体はクリック無効 */
@@ -26,6 +27,7 @@
    ➕ 中央FAB
 ========================= */
 .feed-footer .fab {
+    border: 2px solid rgba(255,255,255,0.9);
     pointer-events: auto; /* ボタンだけ有効 */
 
     width: 64px;

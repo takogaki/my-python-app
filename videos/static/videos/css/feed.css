@@ -1,749 +1,408 @@
 /* =========================
-   前提リセット（baseの影響を上書き）
+🔥 安定版 TikTokレイアウト
 ========================= */
+
+/* bodyは触らない（これ重要） */
 html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    overflow: hidden; /* JS制御に統一 */
-    background: black;
 }
 
-/* =========================
-   ヘッダー高さ（固定値）
-========================= */
-:root {
-    --header-height: 60px;
-    --footer-height: 70px;
-    --app-height: calc(100dvh - var(--header-height) - var(--footer-height));
-}
-
-/* =========================
-   フィード全体
-========================= */
-.feed {
-    position: fixed;
-    top: var(--header-height);
-    left: 0;
-    width: 100%;
-    height: var(--app-height);
+/* root：画面内に収めるだけ */
+#tiktok-root {
+    height: calc(100vh - 60px - 70px); /* header + footer */
 
     overflow: hidden;
+    background: #000;
 }
 
-/* ★縦に積む（これが抜けてる） */
-.feed-inner {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-}
-
-/* =========================
-   各カード
-========================= */
-/* =========================
-   1カード = 1画面固定
-========================= */
-.video-card {
-    flex: 0 0 100%; /* ← 絶対固定 */
-    width: 100%;
-    height: calc(100vh - var(--header-height));
-    position: relative;
-    overflow: hidden; /* ← はみ出し防止 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: black;
-}
-
-/* =========================
-   スクロールの“ふわふわ”防止
-========================= */
-.feed {
-    touch-action: none; /* ← スワイプのブレ完全防止 */
-}
-
-/* =========================
-   動画（トリミングOK）
-========================= */
-.video-card video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* =========================
-   画像（全部見せる）
-========================= */
-.video-card img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-/* =========================
-   テキスト
-========================= */
-.overlay {
-    position: absolute;
-    bottom: 20px;
-    left: 16px;
-    color: white;
-}
-
-/* =========================
-   ✨ キャプション（完成版）
-========================= */
-.caption {
-    position: absolute;
-    text-align: center;
-    bottom: 0px;
-    left: 16px;
-    right: 80px;
-    max-width: 70%;
-    z-index: 5;
-    pointer-events: none;
-    backdrop-filter: blur(6px);
-}
-
-.caption-text,
-.more-btn {
-    pointer-events: auto;
-}
-
-.caption::before {
-    backdrop-filter: blur(6px);
-    content: "";
-    position: absolute;
-    inset: -12px;
-
-    background: linear-gradient(
-        to top,
-        rgba(0,0,0,0.85),
-        rgba(0,0,0,0.55),
-        rgba(0,0,0,0.2),
-        transparent
-    );
-
-    z-index: -1;
-    border-radius: 12px;
-}
-
-.video-card .caption p {
-    color: #fff !important;
-
-    text-shadow:
-        0 2px 8px rgba(0,0,0,1),
-        0 0 12px rgba(0,0,0,0.8);
-}
-
-/* 通常（省略状態） */
-.caption-text {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-
-    overflow: hidden;
-    word-break: break-word;
-}
-
-/* 🔥 展開状態（ここが本体） */
-.caption-text.open {
-    display: block;
-    -webkit-line-clamp: unset;
-    overflow: visible;
-}
-
-/* 🔥 重なりOKにする */
-.caption {
-    position: absolute;
-    bottom: 0;
-    left: 16px;
-    right: 80px;
-
-    z-index: 50; /* ← 上に出す */
-}
-.more-btn {
-    color: #ccc;
-    font-size: 12px;
-    margin-left: 4px;
-    cursor: pointer;
-}
-
-.action-btn .icon {
-    font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
-}
-
-/* =========================
-   右側アクション全体
-========================= */
-.actions {
-    position: absolute;
-    right: 16px;
-    bottom: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 10;
-}
-
-/* =========================
-   共通ボタン（完全固定）
-========================= */
-.action-btn {
-    width: 64px;              /* ← 完全固定 */
-    height: 80px;             /* ← 完全固定 */
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    box-sizing: border-box;   /* ← これ重要 */
-
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-
-    padding: 0;
-    margin: 0;
-}
-
-/* =========================
-   ユーザーアイコン（最重要）
-========================= */
-.user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
-}
-
-/* =========================
-   アイコン
-========================= */
-.icon {
-    font-size: 30px;
-}
-
-.user-avatar {
-    border: 2px solid #ff2d55;
-}
-
-.action-btn:active {
-    transform: scale(0.9);
-}
-
-/* =========================
-   アイコン（ブレ防止）
-========================= */
-.action-btn .icon {
-    width: 60px;              /* ← 横幅固定 */
-    height: 60px;             /* ← 縦幅固定 */
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 26px;
-    line-height: 1;
-
-    text-align: center;
-}
-
-/* =========================
-   数字（桁ズレ完全防止）
-========================= */
-.action-btn .count {
-    min-width: 28px;          /* ← 桁ズレ防止 */
-    height: 16px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 12px;
-    margin-top: 6px;
-
-    line-height: 1;
-    text-align: center;
-}
-
-/* =========================
-   Like状態
-========================= */
-.like-btn.liked .icon {
-    color: #ff2d55;
-    transform: scale(1.15);
-}
-
-/* =========================
-   ハートポップ
-========================= */
-/* ❤️ ハート */
-.heart-pop {
-    position: absolute;
-
-    font-size: 26px;
-    color: #ff2d55;
-
-    pointer-events: none;
-
-    animation: heartPop 0.6s ease forwards;
-}
-
-@keyframes heartPop {
-    0% {
-        opacity: 0;
-        transform: scale(0.5) translateY(0);
-    }
-    30% {
-        opacity: 1;
-        transform: scale(1.3) translateY(-10px);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(1) translateY(-60px);
-    }
-}
-
-/* =========================
-   💥 ダブルタップハート（中央爆発）
-========================= */
-.double-heart {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%) scale(0.5);
-    font-size: 90px;
-    color: #ff2d55;
-
-    opacity: 0;
-    pointer-events: none;
-    z-index: 20;
-}
-
-.double-heart.show {
-    animation: heartBurst 0.8s ease forwards;
-}
-
-@keyframes heartBurst {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.5);
-    }
-    20% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.3);
-    }
-    60% {
-        transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(1.8);
-    }
-}
-
-/* コメントモーダル */
-/* =========================
-💬 モーダル全体
-========================= */
-.comment-modal {
-    position: fixed;
-    top: var(--header-height);
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    display: flex;
-
-    background: transparent; /* ← 全体は透明 */
-
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.2s;
-
-    z-index: 999;
-}
-
-.comment-modal.show {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-
-/* =========================
-💬 コメント本体（ここだけ黒）
-========================= */
-.comment-box {
-    width: 100%;
-    height: 60%;
-
-    background: rgba(0, 0, 0, 0.45); /* ← 半透明復活 */
-    color: white;
-
-    margin-top: auto;
-
-    transform: translateY(100%);
-    transition: 0.3s;
-
-    display: flex;
-    flex-direction: column;
-}
-
-.comment-modal.show .comment-box {
-    transform: translateY(0);
-}
-
-.comment-modal.show {
-    touch-action: none;
-}
-
-.comment-box {
-    touch-action: auto;
-    overflow-y: auto;
-    touch-action: pan-y;
-}
-
-/* =========================
-💻 PC（左側だけ表示）
-========================= */
-@media (min-width: 768px) {
-
-    .comment-modal {
-        justify-content: flex-start;
-        align-items: stretch;
-    }
-
-    .comment-box {
-        width: 360px;
-        height: 100%;
-
-        transform: translateX(-100%);
-    }
-
-    .comment-modal.show .comment-box {
-        transform: translateX(0);
-    }
-}
-
-
-/* =========================
-📄 コメント
-========================= */
-.comment-list {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* iOS滑らか */
-    padding: 14px;
-}
-
-.comment {
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: white;
-}
-
-.comment p {
-    margin: 4px 0 0;
-    color: #eee;
-}
-
-
-/* =========================
-✍️ 入力
-========================= */
-.comment-input {
-    display: flex;
-    border-top: 1px solid #333;
-}
-
-.comment-input input {
-    flex: 1;
-    padding: 12px;
-    background: black;
-    color: white;
-    border: none;
-}
-
-.comment-input button {
-    padding: 12px 18px;
-    background: #ff2d55;
-    border: none;
-    color: white;
-    cursor: pointer; /* ← これ重要 */
-}
-
-/* =========================
-   🔐 ログインボタン（コメント用）
-========================= */
-.comment-login-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 10px 18px;
-    margin: 6px;
-
-    border-radius: 999px;
-
-    background: linear-gradient(135deg, #ff2d55, #ff5f7a);
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-
-    text-decoration: none;
-
-    box-shadow: 0 4px 12px rgba(255, 45, 85, 0.3);
-
-    transition: all 0.2s ease;
-}
-
-/* ホバー（PC） */
-.comment-login-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 18px rgba(255, 45, 85, 0.5);
-}
-
-/* クリック */
-.comment-login-btn:active {
-    transform: scale(0.95);
-}
-
-.no-click {
-    pointer-events: none;
-    opacity: 0.8;
-}
-
-/* =========================
-📱 完全隔離 TikTokフィード
-========================= */
-@media (max-width: 768px) {
-
+/* スクロール担当はここだけ */
 .video-feed {
-    position: fixed;
-    inset: 60px 0 0 0;
-
-    width: 100%;
-    height: calc(100vh - 60px);
-
-    background: #000;
-    overflow: hidden;
-
-    isolation: isolate; /* 🔥外部描画完全遮断 */
-    contain: layout paint size; /* 🔥ブラウザレベル隔離 */
-}
-
-/* =========================
-★ 完全リセット（スコープ内のみ）
-========================= */
-.video-feed,
-.video-feed * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-
-    font-family: system-ui, sans-serif;
-}
-
-/* =========================
-スワイプ構造
-========================= */
-.video-feed .feed-inner {
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
 }
 
-/* =========================
-1画面固定
-========================= */
-.video-feed .video-card {
+/* 投稿は「画面サイズ固定」 */
+.video-card {
+    height: calc(100vh - 60px - 70px); /* ← ここが核心 */
+
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+
     position: relative;
-    flex: 0 0 100%;
-    height: 100%;
-    width: 100%;
-
     overflow: hidden;
-    background: #000;
-
-    contain: layout paint; /* 🔥レイアウト分離 */
 }
 
-/* =========================
-メディア完全固定
-========================= */
-.video-feed .video-card video,
-.video-feed .video-card img {
+/* メディア */
+.video-card img,
+.video-card video {
     position: absolute;
     inset: 0;
 
     width: 100%;
     height: 100%;
 
-    object-fit: contain;
+    object-fit: contain; /* ← containやめる */
+}
+
+.double-heart {
+    display: none;
 }
 
 /* =========================
-UIレイヤー
+🎯 右側縦アイコン（TikTok風・最適版）
 ========================= */
-.video-feed .actions {
-    position: absolute;
-    right: 12px;
-    bottom: 100px;
+/* =========================
+🎯 actions完全固定（順序・配置保証）
+========================= */
+/* =========================
+🎯 TikTok風アイコン（完全隔離版）
+========================= */
 
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.video-card .actions {
+    position: absolute !important;
+    right: 12px !important;
+    bottom: 12px !important;
 
-    z-index: 50;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+
+    width: 60px !important;
+    height: 220px !important;
+
+    align-items: center !important;
+
+    z-index: 100 !important;
+    pointer-events: auto !important;
 }
 
-/* =========================
-ボタン
-========================= */
-.video-feed .action-btn {
-    all: unset; /* 🔥完全リセット */
-    display: flex;
-    flex-direction: column;
+/* 子要素すべてリセット */
+.video-card .actions * {
+    all: unset;
+    box-sizing: border-box;
+}
+
+/* 各ボタン */
+.video-card .actions .action-btn {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100%;
+    cursor: pointer;
+
+    color: white !important;
+    font-size: 12px !important;
+
+    pointer-events: auto;
+}
+
+/* アイコン */
+.video-card .actions .icon {
+    display: flex !important;
+    justify-content: center;
     align-items: center;
 
-    width: 52px;
+    font-size: 26px !important;
 }
 
-/* =========================
-   数字（桁ズレ完全防止）
-========================= */
-.video-feed .count {
-    position: relative !important;
-    z-index: 99999 !important;
-
-    color: #fff !important;
-    background: rgba(0,0,0,0.4);
-
-    padding: 2px 4px;
-    border-radius: 4px;
-
-    display: inline-block !important;
-
-    opacity: 1 !important;
-    visibility: visible !important;
+/* カウント */
+.video-card .actions .count {
+    font-size: 12px !important;
+    margin-top: 4px;
 }
 
-/* =========================
-アイコン
-========================= */
-.video-feed .icon {
-    width: 44px;
-    height: 44px;
-
-    display: grid;
-    place-items: center;
+/* 👤 外枠（丸＋赤枠） */
+.video-card .actions .user-icon {
+    width: 48px;
+    height: 48px;
 
     border-radius: 50%;
-    overflow: hidden;
+    border: 2.5px solid #ff2d55;
+
+    overflow: hidden; /* ← ★これが本体（はみ出し防止） */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 👤 中の画像 */
+.video-card .actions .user-avatar {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    border-radius: 0; /* ← ★丸は外側でやるので不要 */
+}
+
+/* 👍 いいね状態 */
+.video-card .actions .like-btn.liked .icon {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 6px #ff2d55);
 }
 
 /* =========================
-👤 ユーザーアイコン完全安定
+💥 ハートばら撒き演出
 ========================= */
 
-/* 枠 */
-.video-feed .icon.user-icon {
-    width: 44px;
-    height: 44px;
+/* 基準になる親 */
+.video-card .actions {
+    position: absolute;
+}
 
-    border-radius: 50%;
+/* ハート本体 */
+/* ハート */
+
+.heart-pop {
+    position: absolute;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 999;
+    animation: heartFloat 0.8s ease-out forwards;
+}
+
+/* アニメーション */
+@keyframes heartFloat {
+    0% {
+        transform: translateY(0) scale(0.6);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1);
+    }
+    100% {
+        transform: translateY(-80px) scale(1.4);
+        opacity: 0;
+    }
+}
+
+/* =========================
+📝 キャプション（下中央固定）
+========================= */
+.video-card .caption {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px; /* ← ここが必須（基準固定） */
+    width: calc(100% - 100px);
+    max-width: 520px;
+    z-index: 20;
+    text-align: left;
+    pointer-events: auto;
+}
+
+/* テキスト（1行省略） */
+.video-card .caption-text {
+    margin: 0;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+
     overflow: hidden;
 
+    font-size: 14px;
+    line-height: 1.4;
+
+    /* 🔥 視認性UP */
+    font-weight: 600; /* ← 太くする */
+
+    color: #fff;
+
+    /* 🔥 黒縁（最重要） */
+    text-shadow:
+        0 1px 2px rgba(0,0,0,0.9),
+        0 -1px 2px rgba(0,0,0,0.9),
+        1px 0 2px rgba(0,0,0,0.9),
+        -1px 0 2px rgba(0,0,0,0.9);
+
+    /* 🔥 背景強化 */
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.75),
+        rgba(0,0,0,0)
+    );
+
+    padding: 6px 8px;
+    border-radius: 8px;
+}
+
+/* 展開時 */
+.video-card .caption-text.open {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+}
+
+/* もっと見る */
+.video-card .more-btn {
+    margin-top: 2px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.75),
+        rgba(0,0,0,0)
+    );
+
+    cursor: pointer;
+}
+
+/* =========================
+コメント
+========================= */
+.comment {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.2s ease;
+}
+
+.comment b {
+    display: block;
+    font-size: 12px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 4px;
+}
+
+.comment p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.4;
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* モーダル背景 */
+.comment-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    z-index: 999;
+}
+
+/* 表示 */
+.comment-modal.show {
+    display: block;
+}
+
+/* ボックス本体 */
+.comment-box {
+    position: absolute;
+    left: 0;
+    right: 0;
+
+    bottom: 70px; /* footer回避 */
+
+    background: #111;
+    border-radius: 16px 16px 0 0;
+
+    max-height: 70vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* コメント一覧 */
+.comment-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 12px;
+
+    /* 🔥 視認性の核 */
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.2),
+        rgba(0,0,0,0.6)
+    );
+}
+
+/* 🔥 入力バー固定（footer回避込み） */
+.comment-input-wrapper {
+    position: sticky;
+    bottom: 0;
+
+    background: rgba(17,17,17,0.95);
+    backdrop-filter: blur(10px);
+
+    padding: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* 入力UI */
+.comment-input {
+    display: flex;
+    gap: 8px;
+}
+
+.comment-input input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-size: 14px;
+}
+
+.comment-input button {
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: #ff2d55;
+    color: #fff;
+    border: none;
+}
+
+.comment-login-btn {
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border: 2px solid red;
-}
+    width: 30%;
+    padding: 10px 12px;
 
-/* 画像（これが重要） */
-.video-feed .icon.user-icon img,
-.video-feed .user-avatar {
-    width: 100%;
-    height: 100%;
+    border-radius: 999px;
 
-    object-fit: contain;
-
-    display: block;
-
-    margin: 0;
-    padding: 0;
-
-    position: static; /* ←絶対ここ重要 */
-}
-
-/* like/commentと絶対干渉させない */
-.video-feed .actions .icon {
-    position: relative;
-}
-
-/* =========================
-画像完全固定
-========================= */
-.video-feed .user-avatar {
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-    border-radius: 50%;
-
-    display: block;
-}
-
-/* =========================
-キャプション
-========================= */
-.caption {
-    position: absolute;
-    left: 12px;
-    right: 80px;
-
-    bottom: calc(var(--footer-height) + 12px);
+    /* 🔥 TikTok系カラー */
+    background: linear-gradient(135deg, #ff2d55, #ff5e62);
 
     color: #fff;
-    z-index: 10;
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    /* 🔥 立体感 */
+    box-shadow:
+        0 6px 18px rgba(255, 45, 85, 0.35),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.caption::before {
-    content: "";
-    position: absolute;
-    inset: -12px;
-
-    background: linear-gradient(
-        to top,
-        rgba(0,0,0,0.8),
-        rgba(0,0,0,0.4),
-        transparent
-    );
-
-    z-index: -1;
-    border-radius: 12px;
-}
-
-
-
-/* =========================
-外部CSS無効化補強
-========================= */
-.video-feed a,
-.video-feed button,
-.video-feed img,
-.video-feed video {
-    all: unset;
-    display: block;
-}
-
+/* 👇 押した感 */
+.comment-login-btn:active {
+    transform: scale(0.96);
+    box-shadow:
+        0 3px 10px rgba(255, 45, 85, 0.25);
 }
