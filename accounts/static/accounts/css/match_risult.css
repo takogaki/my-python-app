@@ -1,0 +1,110 @@
+/* 背景 */
+.match-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: radial-gradient(circle at center, #1a1a1a, #000);
+}
+
+/* カード */
+.match-card {
+    width: 90%;
+    max-width: 400px;
+    padding: 40px 25px;
+
+    border-radius: 20px;
+    text-align: center;
+    display: grid;
+    place-items: center;
+
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+
+    animation: fadeIn 0.6s ease;
+}
+
+/* タイトル */
+.match-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ff4d6d;
+    margin-bottom: 5px;
+}
+
+.match-sub {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* ユーザー */
+.match-user {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ボタン */
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn {
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+
+    background: #222;
+    color: #fff;
+
+    transition: 0.2s;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* メインCTA */
+.btn.primary {
+    background: linear-gradient(45deg, #ff4d6d, #ff8fa3);
+    color: white;
+}
+
+/* サブ */
+.btn.ghost {
+    background: transparent;
+    border: 1px solid #555;
+    color: #aaa;
+}
+
+/* アニメ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

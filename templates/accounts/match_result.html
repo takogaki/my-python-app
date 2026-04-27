@@ -1,28 +1,40 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/match_risult.css' %}">
+{% endblock %}
+
 {% block body %}
-<div class="match-modal">
+<div class="match-wrapper">
 
-    <h1>🎉 マッチしました！</h1>
+    <div class="match-card">
 
-    <div class="match-user">
-        {{ user.username }}
-    </div>
+        <h1 class="match-title">🎉 MATCH!</h1>
+        <p class="match-sub">お互いにLIKEしました</p>
 
-    <div class="actions">
+        <div class="match-user">
+            {% if user.profile_image %}
+            <img src="{{ user.profile_image.url }}" class="avatar">
+            {% else %}
+            <img src="{% static 'accounts/img/default.png' %}" class="avatar">
+            {% endif %}
+            <span>{{ user.username }}</span>
+        </div>
 
-        <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
-            💬 メッセージする
-        </a>
+        <div class="actions">
+            <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
+                💬 メッセージする
+            </a>
 
-        <a href="{% url 'accounts:user_detail' user.username %}" class="btn">
-            👀 プロフィールを見る
-        </a>
+            <a href="{% url 'accounts:user_detail' user.username %}" class="btn">
+                👀 プロフィール
+            </a>
 
-        <a href="{% url 'accounts:user_list' %}" class="btn ghost">
-            🔥 他のユーザーを見る
-        </a>
+            <a href="{% url 'accounts:user_list' %}" class="btn ghost">
+                🔥 スワイプに戻る
+            </a>
+        </div>
 
     </div>
 

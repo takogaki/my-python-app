@@ -970,38 +970,61 @@ def like_user(request, user_id):
         return JsonResponse({"status": "error"})
 
     to_user = get_object_or_404(User, id=user_id)
+    me = request.user
 
-    if request.user == to_user:
+    if me == to_user:
         return JsonResponse({"status": "error"})
 
     # =========================
-    # LIKE作成
+    # 🔥 既存LIKEチェック
     # =========================
-    like, created = UserLike.objects.get_or_create(
-        from_user=request.user,
+    existing_like = UserLike.objects.filter(
+        from_user=me,
+        to_user=to_user
+    ).first()
+
+    # =========================
+    # ❌ 既にLIKE → 取り消し
+    # =========================
+    if existing_like:
+        existing_like.delete()
+
+        # （任意）通知も消すならここ
+        Notification.objects.filter(
+            recipient=to_user,
+            actor=me,
+            type="like"
+        ).delete()
+
+        return JsonResponse({"status": "unliked"})
+
+    # =========================
+    # ✅ 新規LIKE
+    # =========================
+    UserLike.objects.create(
+        from_user=me,
         to_user=to_user
     )
 
     # =========================
-    # マッチ判定（←ここを常にやる）
+    # 🔥 マッチ判定
     # =========================
     is_match = UserLike.objects.filter(
         from_user=to_user,
-        to_user=request.user
+        to_user=me
     ).exists()
 
     if is_match:
-        user1 = min(request.user, to_user, key=lambda u: u.id)
-        user2 = max(request.user, to_user, key=lambda u: u.id)
+        user1 = min(me, to_user, key=lambda u: u.id)
+        user2 = max(me, to_user, key=lambda u: u.id)
 
         Match.objects.get_or_create(
             user1=user1,
             user2=user2
         )
 
-        # 通知
         Notification.objects.create(
-            recipient=request.user,
+            recipient=me,
             actor=to_user,
             type="match",
             verb="さんとマッチしました"
@@ -1009,7 +1032,7 @@ def like_user(request, user_id):
 
         Notification.objects.create(
             recipient=to_user,
-            actor=request.user,
+            actor=me,
             type="match",
             verb="さんとマッチしました"
         )
@@ -1022,18 +1045,16 @@ def like_user(request, user_id):
         })
 
     # =========================
-    # 新規ライク時だけ通知
+    # 👍 LIKE通知
     # =========================
-    if created:
-        Notification.objects.create(
-            recipient=to_user,
-            actor=request.user,
-            type="like",
-            verb="さんがライクしました"
-        )
+    Notification.objects.create(
+        recipient=to_user,
+        actor=me,
+        type="like",
+        verb="さんがライクしました"
+    )
 
     return JsonResponse({"status": "liked"})
-
 
     
 # like_meビュー（自分がLIKEされたユーザーのリスト）
@@ -1045,12 +1066,11 @@ def liked_me(request):
     # 🔥 ライクしてきたユーザー（最適化）
     # =========================
     users = CustomUser.objects.filter(
-        likes_sent__to_user=user
+        given_likes__to_user=user
     ).annotate(
-        # 🔥 「この人が自分に送ったライク数」
         like_count=Count(
-            "likes_sent",
-            filter=Q(likes_sent__to_user=user)
+            "given_likes",
+            filter=Q(given_likes__to_user=user)
         )
     ).order_by("-like_count", "-last_login").distinct()
 
@@ -1067,7 +1087,6 @@ def liked_me(request):
     match_user_ids = {
         uid for pair in match_user_ids for uid in pair
     }
-
     match_user_ids.discard(user.id)
 
     return render(request, "accounts/liked_me.html", {
@@ -1085,12 +1104,24 @@ def match_result(request):
     if not username:
         return redirect("accounts:user_list")
 
-    user = get_object_or_404(CustomUser, username=username)
+    matched_user = get_object_or_404(CustomUser, username=username)
+    me = request.user  # ← 自分
+
+    # =========================
+    # 🔥 遷移先を決定
+    # =========================
+    if not me.kyc or me.verification_status != "approved":
+        redirect_url = reverse("accounts:kyc_submit")
+    else:
+        redirect_url = reverse(
+            "user_messages:send_message",
+            args=[matched_user.username]
+        )
 
     return render(request, "accounts/match_result.html", {
-        "user": user
+        "user": matched_user,
+        "redirect_url": redirect_url,
     })
-
 
 # match_listビュー（自分がマッチしたユーザーのリスト）
 def match_list(request):

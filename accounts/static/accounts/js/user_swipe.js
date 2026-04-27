@@ -146,20 +146,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             console.log("Success:", data);
 
-            // 🔥 マッチ成立
+            // 🎉 マッチ
             if (data.status === "match") {
-
-                // 🎉 演出ページへ
                 window.location.href = "/accounts/match-result/";
                 return;
             }
 
-            // 👍 通常いいね
-            if (data.status === "liked" || data.status === "already_liked") {
-                // 🔥 二重クリック防止
-                btn.disabled = true;
+            // 👍 LIKE
+            if (data.status === "liked") {
                 btn.classList.add("liked");
-                
+
                 const card = btn.closest(".card");
                 if (card) {
                     card.classList.add("liked-effect");
@@ -168,6 +164,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     }, 300);
                 }
             }
+
+            // ❌ 取り消し（←追加）
+            if (data.status === "unliked") {
+                btn.classList.remove("liked");
+            }
+
         })
         .catch(error => console.error("Error:", error));
     });
