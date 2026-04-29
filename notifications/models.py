@@ -47,4 +47,6 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.recipient} - {self.verb}"
+        if self.actor:
+            return f"{self.actor} が {self.recipient} に {self.verb}"
+        return f"{self.recipient} に {self.verb}"

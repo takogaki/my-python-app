@@ -259,6 +259,8 @@ class Footprint(models.Model):
             models.Index(fields=["-created_at"]),
         ]
 
+    def __str__(self):
+            return f"{self.from_user} → {self.to_user}"
 
 # =========================
 # 💾 保存
