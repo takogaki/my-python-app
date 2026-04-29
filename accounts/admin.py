@@ -1,8 +1,9 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.db.models.deletion import Collector
 from django.db import router
 from .models import CustomUser, KYCSubmission, TagCategory, Tag, ProfileTag
+from django.utils import timezone
 
 
 # =========================
@@ -34,21 +35,32 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ("is_supporter", "is_active")
     actions = [delete_users_and_all_related_data]
 
-
 # =========================
-# 🔥 KYC承認
+# 🔥 KYC承認（画像自動削除つき）
 # =========================
-@admin.action(description="承認する")
+@admin.action(description="承認する（画像は自動削除）")
 def approve_kyc(modeladmin, request, queryset):
     for kyc in queryset:
+        # ステータス更新
         kyc.status = "approved"
         kyc.save(update_fields=["status"])
 
-        # 🔥 ユーザー状態も同期
+        # ユーザー状態も同期
         user = kyc.user
         user.verification_status = "verified"
-        user.save(update_fields=["verification_status"])
+        user.verified_at = timezone.now()
+        user.save(update_fields=["verification_status", "verified_at"])
 
+        # 🔥 画像削除
+        if kyc.id_image:
+            kyc.id_image.delete(save=False)
+        if kyc.selfie_image:
+            kyc.selfie_image.delete(save=False)
+
+        # DBクリア
+        kyc.id_image = None
+        kyc.selfie_image = None
+        kyc.save(update_fields=["id_image", "selfie_image"])
 
 # =========================
 # 🔥 KYC却下
@@ -72,6 +84,12 @@ def reject_kyc(modeladmin, request, queryset):
 def delete_kyc_and_reset_user(modeladmin, request, queryset):
     for kyc in queryset:
         user = kyc.user
+
+        # 🔥 承認済みは削除禁止
+        if user.verification_status == "verified":
+            messages.warning(request, f"{user} は認証済みのため削除できません")
+            continue
+
         kyc.delete()
 
         # 🔥 ここが今回のバグの核心
