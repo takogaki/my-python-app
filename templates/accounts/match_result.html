@@ -14,11 +14,7 @@
         <p class="match-sub">お互いにLIKEしました</p>
 
         <div class="match-user">
-            {% if user.profile_image %}
-            <img src="{{ user.profile_image.url }}" class="avatar">
-            {% else %}
-            <img src="{% static 'accounts/img/default.png' %}" class="avatar">
-            {% endif %}
+            <img src="{{ user.get_profile_image }}" class="avatar" alt="プロフィール画像">
             <span>{{ user.username }}</span>
         </div>
 

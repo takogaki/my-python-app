@@ -32,11 +32,7 @@
         <div class="card" data-user-id="{{ user.id }}">
 
             <a href="{% url 'accounts:user_detail' user.username %}">
-                {% if user.profile_image %}
-                <img src="{{ user.profile_image.url }}" class="card-img">
-                {% else %}
-                <img src="{% static 'accounts/img/default_avatar.png' %}" class="card-img">
-                {% endif %}
+                <img src="{{ user.get_profile_image }}" class="card-img" alt="プロフィール画像">
             </a>
 
             <div class="profile-card">

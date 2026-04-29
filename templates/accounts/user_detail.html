@@ -32,11 +32,7 @@
         {% endif %}
 
     <!-- プロフィール画像 -->
-            {% if user.profile_image %}
-            <img src="{{ user.profile_image.url }}" class="avatar avatar-clickable" alt="プロフィール画像">
-            {% else %}
-            <img src="{% static 'accounts/img/default_avatar.png' %}" class="avatar avatar-clickable" alt="プロフィール画像">
-            {% endif %}
+            <img src="{{ user.get_profile_image }}" class="avatar avatar-clickable" alt="プロフィール画像">
             
             <!-- モーダル -->
             <div id="image-modal" class="image-modal">

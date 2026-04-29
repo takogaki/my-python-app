@@ -52,12 +52,7 @@
 
         <!-- 画像 -->
         <div class="image-upload-wrapper">
-        
-            {% if user.profile.profile_image %}
-            <img id="preview" src="{{ user.profile.profile_image.url }}" class="avatar-large">
-            {% else %}
-            <img id="preview" src="{% static 'accounts/img/default_avatar.png' %}" class="avatar-large">
-            {% endif %}
+            <img id="preview" src="{{ user.get_profile_image }}" class="avatar-large" alt="プロフィール画像">
         
             <!-- 🔥 完全カスタム -->
             <label class="image-upload-btn">
