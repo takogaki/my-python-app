@@ -23,7 +23,7 @@ from blog.models import Post, Comment      # ブログ投稿
 from videos.models import PostVideo
 from accounts.models import SavedPost      # 保存した投稿
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 from .forms import ActivateProfileImageForm, CustomUserCreationForm, UserForm, ProfileForm, KYCForm
@@ -38,7 +38,6 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LoginView
-
 
 User = get_user_model()
 
@@ -966,6 +965,7 @@ def get_context_data(self, **kwargs):
 # ＝========================
 @login_required
 def like_user(request, user_id):
+    
     if request.method != "POST":
         return JsonResponse({"status": "error"})
 
@@ -989,7 +989,10 @@ def like_user(request, user_id):
     if existing_like:
         existing_like.delete()
 
-        # （任意）通知も消すならここ
+        CustomUser.objects.filter(id=to_user.id).update(
+            received_likes_count=F('received_likes_count') - 1
+        )
+
         Notification.objects.filter(
             recipient=to_user,
             actor=me,
@@ -998,12 +1001,17 @@ def like_user(request, user_id):
 
         return JsonResponse({"status": "unliked"})
 
+
     # =========================
     # ✅ 新規LIKE
     # =========================
     UserLike.objects.create(
         from_user=me,
         to_user=to_user
+    )
+
+    CustomUser.objects.filter(id=to_user.id).update(
+        received_likes_count=F('received_likes_count') + 1
     )
 
     # =========================

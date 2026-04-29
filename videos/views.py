@@ -16,7 +16,10 @@ def feed(request):
     posts = (
         PostVideo.objects
         .select_related("user")
-        .annotate(likes_total=Count("likes"))
+        .annotate(
+            likes_total=Count("likes", distinct=True),
+            user_likes=Count("user__received_likes", distinct=True)
+        )
         .order_by("-created_at")
     )
 

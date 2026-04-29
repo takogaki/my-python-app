@@ -52,6 +52,8 @@ class CustomUser(AbstractUser):
 
     verified_at = models.DateTimeField(null=True, blank=True)
 
+    received_likes_count = models.IntegerField(default=0)
+
     # =========================
     # 🔥 共通プロパティ（最重要）
     # =========================

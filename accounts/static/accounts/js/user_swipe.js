@@ -110,6 +110,22 @@ document.addEventListener("DOMContentLoaded", function () {
         isDragging = false;
     });
 
+    // 🔥 ハート演出（LIKE時）
+    function createHeart(card) {
+        const heart = document.createElement("div");
+        heart.className = "like-heart-pop";
+        heart.textContent = "❤️";
+
+        // ランダム位置（自然さUP）
+        heart.style.left = (40 + Math.random() * 20) + "%";
+
+        card.appendChild(heart);
+
+        setTimeout(() => {
+            heart.remove();
+        }, 800);
+    }
+
     /* =========================
        ❤ LIKE処理（最重要）
     ========================= */
@@ -164,6 +180,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 const card = btn.closest(".card");
                 if (card) {
                     card.classList.add("liked-effect");
+
+                    for (let i = 0; i < 6; i++) {
+                        setTimeout(() => createHeart(card), i * 120);
+                    }
+
                     setTimeout(() => {
                         card.classList.remove("liked-effect");
                     }, 300);
