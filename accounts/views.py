@@ -1105,12 +1105,12 @@ def match_result(request):
         return redirect("accounts:user_list")
 
     matched_user = get_object_or_404(CustomUser, username=username)
-    me = request.user  # ← 自分
+    me = request.user
 
     # =========================
-    # 🔥 遷移先を決定
+    # 🔥 ここが最重要（完全修正）
     # =========================
-    if not me.kyc or me.verification_status != "approved":
+    if not me.is_verified:
         redirect_url = reverse("accounts:kyc_submit")
     else:
         redirect_url = reverse(

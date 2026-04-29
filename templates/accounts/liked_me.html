@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'accounts/css/user_list.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/liked_me.css' %}">
 {% endblock %}
 
 {% block body %}
@@ -31,49 +32,66 @@
                 {% endif %}
             </a>
 
-            <div class="profile-card">
-
-                <!-- 名前 -->
-                <h2>
-                    {{ user.username }}
-
+            <div class="profile-card content-card">
+            
+                <!-- 👤 ヘッダー -->
+                <div class="profile-header">
+                    <div class="name">
+                        {{ user.username }}
+                        {% if user.get_age %}
+                        <span class="age">{{ user.get_age }}</span>
+                        {% endif %}
+                    </div>
+            
                     {% if user.verification_status == "verified" %}
-                    <span class="kyc-badge">✔</span>
+                    <span class="kyc-badge verified">✔ 認証済み</span>
                     {% else %}
                     <span class="kyc-badge gray">未認証</span>
                     {% endif %}
-
-                    {% if user.get_age %}, {{ user.get_age }}{% endif %}
-                </h2>
-
-                <!-- 🔥 ライク強度 -->
-                <p class="like-power">
-                    ❤️ あなたに興味あり（{{ user.like_count }}）
-                </p>
-
+                </div>
+            
+                <!-- ❤️ 興味度 -->
+                <div class="like-power">
+                    <span class="heart">❤️</span>
+                    <span class="text">
+                        あなたにかなり興味があります
+                    </span>
+                    <span class="count">{{ user.like_count }}</span>
+                </div>
+            
                 <!-- 🔥 アクション -->
-                {% if user.id not in match_user_ids %}
-
-                <!-- 返す＝即マッチ -->
-                <button type="button" class="likeBtn" data-user-id="{{ user.id }}">
-                    ❤ ライク返してマッチ
-                </button>
-
-                {% else %}
-
-                <!-- マッチ済み -->
-                {% if request.user.verification_status == "verified" %}
-                <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
-                    💬 話す
-                </a>
-                {% else %}
-                <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
-                    🔒
-                </a>
-                {% endif %}
-
-                {% endif %}
-
+                <div class="actions">
+            
+                    {% if user.id not in match_user_ids %}
+            
+                    <button type="button" class="likeBtn btn-primary" data-user-id="{{ user.id }}">
+                        <span class="btn-inner">
+                            ❤ マッチする
+                        </span>
+                    </button>
+            
+                    {% else %}
+            
+                    {% if request.user.verification_status == "verified" %}
+                    <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn primary">
+                        💬 メッセージ
+                    </a>
+                    {% else %}
+                    <a href="{% url 'accounts:kyc_submit' %}" class="verify-cta">
+                        <div class="cta-content">
+                            <span class="icon">🔓</span>
+                            <div class="text">
+                                <div class="main">チャットを解放する</div>
+                                <div class="sub">本人確認でメッセージ可能になります</div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+            
+                    {% endif %}
+            
+                </div>
+            
             </div>
 
         </div>

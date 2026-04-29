@@ -7,23 +7,23 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!container) return;
 
     function getCards() {
-        return container.querySelectorAll(".card");
+        return Array.from(container.querySelectorAll(".card"));
     }
 
     function updateTopCardState() {
         const cards = getCards();
 
         cards.forEach((card, index) => {
-            card.style.pointerEvents = index === 0 ? "auto" : "none";
-            card.style.zIndex = cards.length - index;
+            if (index === 0) {
+                card.style.pointerEvents = "auto";
+                card.style.zIndex = "100";
+            } else {
+                card.style.pointerEvents = "none";
+                card.style.zIndex = "0";
+            }
         });
-
-        if (cards.length > 0) {
-            cards[0].style.pointerEvents = "auto";
-            cards[0].style.zIndex = "10";
-        }
     }
-
+    
     function swipe(direction) {
         const cards = getCards();
         const topCard = cards[0];
@@ -38,7 +38,12 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
             container.appendChild(topCard);
             topCard.classList.remove(className);
-            updateTopCardState();
+
+            // 🔥 これが超重要
+            requestAnimationFrame(() => {
+                updateTopCardState();
+            });
+
         }, 400);
     }
 

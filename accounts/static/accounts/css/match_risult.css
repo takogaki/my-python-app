@@ -1,11 +1,18 @@
+body {
+    overflow: hidden !important;
+}
+
 /* 背景 */
 .match-wrapper {
-    height: 100vh;
+    position: fixed !important;
+    inset: 0;
+
     display: flex;
     justify-content: center;
     align-items: center;
 
     background: radial-gradient(circle at center, #1a1a1a, #000);
+    z-index: 9999;
 }
 
 /* カード */

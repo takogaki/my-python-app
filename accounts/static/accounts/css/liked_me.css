@@ -1,7 +1,187 @@
+/* ベース */
 .content-card {
     margin: 20px 0;
-    padding: 16px;
+    padding: 18px;
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.12); /* 半透明 */
+    backdrop-filter: blur(3px);           /* ガラス効果 */
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255, 255, 255, 0.2); /* 輪郭 */
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+/* ヘッダー */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #222;
+}
+
+.age {
+    font-size: 14px;
+    color: #888;
+    margin-left: 6px;
+}
+
+/* 認証バッジ */
+.kyc-badge {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+.kyc-badge.verified {
+    background: #e6f7ff;
+    color: #1890ff;
+}
+
+.kyc-badge.gray {
+    background: #eee;
+    color: #999;
+}
+
+/* LIKE強度 */
+.like-power {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.like-power .heart {
+    color: #ff4d6d;
+}
+
+.like-power .count {
+    margin-left: auto;
+    font-weight: bold;
+    color: #ff4d6d;
+}
+
+/* ボタン */
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.primary {
+    background: linear-gradient(45deg, #ff4d6d, #ff8fa3);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.primary:hover {
+    transform: scale(1.05);
+}
+
+.chat-btn.lock {
+    background: #ddd important;
+    color: #666 important;
+    text-align: center important;
+    padding: 12px important;
+    border-radius: 10px important;
+}
+
+.verify-cta {
+    display: block;
+    text-decoration: none;
     border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 14px;
+
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    color: #fff;
+
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    transition: 0.2s;
+}
+
+.verify-cta:hover {
+    transform: translateY(-2px);
+}
+
+.cta-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon {
+    font-size: 22px;
+}
+
+.text .main {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.text .sub {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* =========================
+   🎯 共通ボタンベース
+========================= */
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 48px;
+
+    border-radius: 12px;
+    border: none;
+
+    font-weight: bold;
+    font-size: 15px;
+
+    cursor: pointer;
+
+    background: linear-gradient(45deg, #ff4d6d, #ff8fa3);
+    color: #fff;
+
+    box-shadow: 0 6px 14px rgba(255, 77, 109, 0.3);
+
+    transition: all 0.2s ease;
+}
+
+/* 中身 */
+.btn-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ホバー */
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(255, 77, 109, 0.4);
+}
+
+/* クリック */
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* 無効状態（将来用） */
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

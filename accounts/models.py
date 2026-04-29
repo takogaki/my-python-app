@@ -3,35 +3,23 @@ from django.db import models
 from datetime import date
 import uuid
 from django.conf import settings
+from django.templatetags.static import static
 from blog.models import Post
 
 
+# =========================
+# 👤 ユーザー
+# =========================
 class CustomUser(AbstractUser):
+
     GENDER_CHOICES = [
         ('M', '男性'),
         ('F', '女性'),
         ('O', 'その他'),
     ]
 
-    birth_date = models.DateField(
-        blank=True,
-        null=True,
-        verbose_name="生年月日"
-    )
-
-    gender = models.CharField(
-        max_length=1,
-        choices=GENDER_CHOICES,
-        blank=True,
-        null=True,
-        verbose_name="性別"
-    )
-
-    profile_image = models.ImageField(
-        upload_to="profiles/",
-        blank=True,
-        null=True,
-    )
+    birth_date = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
 
     is_active = models.BooleanField(default=False)
 
@@ -47,9 +35,7 @@ class CustomUser(AbstractUser):
     agreed_terms_at = models.DateTimeField(null=True, blank=True)
     terms_version = models.CharField(max_length=10, default="1.0")
 
-    # =========================
-    # 🔥 年齢認証（完全版）
-    # =========================
+    # 🔥 認証状態（これを基準にする）
     verification_status = models.CharField(
         max_length=20,
         choices=[
@@ -64,13 +50,18 @@ class CustomUser(AbstractUser):
 
     verification_attempts = models.IntegerField(default=0)
 
-    verified_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="認証日時"
-    )
-    # =========================
+    verified_at = models.DateTimeField(null=True, blank=True)
 
+    # =========================
+    # 🔥 共通プロパティ（最重要）
+    # =========================
+    @property
+    def is_verified(self):
+        return self.verification_status == "verified"
+
+    # =========================
+    # 年齢
+    # =========================
     def get_age(self):
         if not self.birth_date:
             return None
@@ -80,18 +71,20 @@ class CustomUser(AbstractUser):
             age -= 1
         return age
 
+    # =========================
+    # プロフ画像（統一）
+    # =========================
     def get_profile_image(self):
-        if self.profile_image:
-            return self.profile_image.url
         if hasattr(self, "profile") and self.profile.profile_image:
             return self.profile.profile_image.url
-        return "/static/accounts/img/default_avatar.png"
+        return static("accounts/img/default_avatar.png")
 
     def __str__(self):
         return self.username
 
+
 # =========================
-# 🔥 タグ（趣味・性格・目的・ライフスタイル・価値観）
+# 🏷 タグ
 # =========================
 class TagCategory(models.Model):
     name = models.CharField(max_length=50)
@@ -99,6 +92,8 @@ class TagCategory(models.Model):
 
     def __str__(self):
         return self.name
+
+
 class Tag(models.Model):
     name = models.CharField(max_length=50)
     category = models.ForeignKey(
@@ -109,14 +104,32 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-    
-class ProfileTag(models.Model):
-    profile = models.ForeignKey(
-        "Profile",
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="profile_tags"
+        related_name="profile"
     )
 
+    profile_image = models.ImageField(upload_to="profiles/", blank=True, null=True)
+    tags = models.ManyToManyField("Tag", blank=True)
+
+    bio = models.TextField(blank=True)
+
+    drinking = models.CharField(max_length=20, blank=True)
+    smoking = models.CharField(max_length=20, blank=True)
+
+    job = models.CharField(max_length=100, blank=True)
+    income = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+
+class ProfileTag(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="profile_tags")
     tag = models.ForeignKey("Tag", on_delete=models.CASCADE)
 
     LEVEL_CHOICES = [
@@ -130,17 +143,18 @@ class ProfileTag(models.Model):
     class Meta:
         unique_together = ("profile", "tag")
 
+
 # =========================
-# 🔥 KYC申請（最重要）
+# 🔥 KYC
 # =========================
 class KYCSubmission(models.Model):
+
     STATUS_CHOICES = [
         ("pending", "確認中"),
         ("approved", "承認"),
         ("rejected", "却下"),
     ]
 
-    # 🔥 1ユーザー1件（超重要）
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -150,14 +164,8 @@ class KYCSubmission(models.Model):
     id_image = models.ImageField(upload_to="kyc/id/")
     selfie_image = models.ImageField(upload_to="kyc/selfie/")
 
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="pending",
-        db_index=True
-    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
 
-    # 任意：却下理由
     rejection_reason = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -166,79 +174,21 @@ class KYCSubmission(models.Model):
         return f"{self.user} - {self.status}"
 
 
-# =========================
-# 🔥 認証ログ
-# =========================
 class VerificationLog(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user} - {self.status}"
 
-
-class Profile(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="profile"
-    )
-
-    profile_image = models.ImageField(
-        upload_to="profiles/",
-        blank=True,
-        null=True
-    )
-
-    # 🔥 タグ（コア）
-    tags = models.ManyToManyField("Tag", blank=True)
-
-    # 🔥 自由記述
-    bio = models.TextField(blank=True)
-
-    # 🔥 ライフスタイル
-    drinking = models.CharField(max_length=20, blank=True)
-    smoking = models.CharField(max_length=20, blank=True)
-
-    # 🔥 スペック（任意）
-    job = models.CharField(max_length=100, blank=True)
-    income = models.CharField(max_length=50, blank=True)
-
-    def __str__(self):
-        return self.user.username
-
-
-class SavedPost(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
-
-    post = models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE
-    )
-
-    saved_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ("user", "post")
-
-    def __str__(self):
-        return f"{self.user.username} - {self.post.id}"
-
-
+# =========================
+# ❤️ LIKE
+# =========================
 class UserLike(models.Model):
     from_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="given_likes",
         on_delete=models.CASCADE
     )
-
     to_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="received_likes",
@@ -256,7 +206,7 @@ class UserLike(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.from_user.username} → {self.to_user.username}"
+        return f"{self.from_user} → {self.to_user}"
 
     def is_match(self):
         return UserLike.objects.filter(
@@ -264,67 +214,41 @@ class UserLike(models.Model):
             to_user=self.from_user
         ).exists()
 
-    def save(self, *args, **kwargs):
-        # 自分いいね禁止
-        if self.from_user == self.to_user:
-            return
 
-        super().save(*args, **kwargs)
-
-        # 🔥 相互いいねならMatch生成
-        if UserLike.objects.filter(
-            from_user=self.to_user,
-            to_user=self.from_user
-        ).exists():
-
-            # 順序固定（A↔B問題解決）
-            user1 = min(self.from_user, self.to_user, key=lambda u: u.id)
-            user2 = max(self.from_user, self.to_user, key=lambda u: u.id)
-
-            Match.objects.get_or_create(
-                user1=user1,
-                user2=user2
-            )
-
-
+# =========================
+# 💕 マッチ
+# =========================
 class Match(models.Model):
-    user1 = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="matches_as_user1"
-    )
-    user2 = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="matches_as_user2"
-    )
+    user1 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="matches_as_user1")
+    user2 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="matches_as_user2")
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ("user1", "user2")
-        indexes = [
-            models.Index(fields=["user1"]),
-            models.Index(fields=["user2"]),
-        ]
 
     def __str__(self):
         return f"{self.user1} ❤️ {self.user2}"
-    
-    
+
+    def get_partner(self, user):
+        return self.user2 if self.user1 == user else self.user1
+
+
 # =========================
-# 🔥 足跡（最重要）
+# 👣 足跡
 # =========================
 class Footprint(models.Model):
     from_user = models.ForeignKey(
-        CustomUser,
+        settings.AUTH_USER_MODEL,
         related_name="footprints_sent",
         on_delete=models.CASCADE
     )
     to_user = models.ForeignKey(
-        CustomUser,
+        settings.AUTH_USER_MODEL,
         related_name="footprints_received",
         on_delete=models.CASCADE
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -332,3 +256,19 @@ class Footprint(models.Model):
             models.Index(fields=["to_user"]),
             models.Index(fields=["-created_at"]),
         ]
+
+
+# =========================
+# 💾 保存
+# =========================
+class SavedPost(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "post")
+
+    def __str__(self):
+        return f"{self.user} - {self.post.id}"
