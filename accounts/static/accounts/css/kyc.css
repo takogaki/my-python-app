@@ -84,3 +84,17 @@
 .kyc-note {
     color: gray;
 }
+
+/* kycセキュリティ表示 */
+.kyc-security {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.kyc-security-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
