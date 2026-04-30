@@ -26,32 +26,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         self.user_group = f"user_{self.scope['user'].id}"
 
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-
-        await self.channel_layer.group_add(
-            self.user_group,
-            self.channel_name
-        )
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.channel_layer.group_add(self.user_group, self.channel_name)
 
         await self.accept()
 
     async def disconnect(self, close_code):
-
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
-
-        await self.channel_layer.group_discard(
-            self.user_group,
-            self.channel_name
-        )
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        await self.channel_layer.group_discard(self.user_group, self.channel_name)
 
     async def receive(self, text_data):
-
         data = json.loads(text_data)
         message_text = data["message"]
 
@@ -67,10 +51,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         image_url = await sync_to_async(self.get_image_url)(sender)
-
         user = await sync_to_async(User.objects.get)(pk=self.scope["user"].pk)
 
-        # チャット送信
+        # =====================
+        # 💬 チャット送信
+        # =====================
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -83,17 +68,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        # 通知送信
+        # =====================
+        # 🔔 通知送信（重要）
+        # =====================
         await self.channel_layer.group_send(
             f"user_{recipient.id}",
             {
                 "type": "chat_notification",
+                "event": "message",
                 "sender": sender.username,
+                "message": message_text,
+                "image_url": image_url,
             }
         )
 
         # =====================
-        # メール通知
+        # 📧 メール通知
         # =====================
         chat_url = settings.SITE_URL + reverse(
             "user_messages:send_message",
@@ -116,13 +106,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat_message(self, event):
-        # print("🔥 chat_message called")
         await self.send(text_data=json.dumps({
-            "id"       : event["id"],
-            "message"  : event["message"],
-            "sender"   : event["sender"],
+            "id": event["id"],
+            "message": event["message"],
+            "sender": event["sender"],
             "image_url": event["image_url"],
-            "sent_at"  : event["sent_at"],
+            "sent_at": event["sent_at"],
+        }))
+
+    async def chat_notification(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "notification",
+            "event": event.get("event"),
+            "sender": event.get("sender"),
+            "message": event.get("message"),
+            "image_url": event.get("image_url"),
         }))
 
     def get_image_url(self, user):
@@ -135,9 +133,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 pass
 
         return settings.STATIC_URL + "accounts/img/default_avatar.png"
-    
-    async def chat_notification(self, event):
-        await self.send(text_data=json.dumps({
-            "type": "notification",
-            "sender": event["sender"],
-        }))
