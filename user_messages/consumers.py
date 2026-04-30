@@ -127,14 +127,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def get_image_url(self, user):
         profile = getattr(user, "profile", None)
-        if not profile:
-            return ""
 
-        image = getattr(profile, "profile_image", None)
-        if image and hasattr(image, "url"):
-            return image.url
+        if profile and profile.profile_image:
+            try:
+                return profile.profile_image.url
+            except:
+                pass
 
-        return ""
+        return settings.STATIC_URL + "accounts/img/default_avatar.png"
     
     async def chat_notification(self, event):
         await self.send(text_data=json.dumps({

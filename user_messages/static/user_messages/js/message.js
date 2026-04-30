@@ -27,9 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // アバター
         const avatar = document.createElement("img");
-        avatar.src = data.image_url && data.image_url !== ""
-            ? data.image_url
-            : "/static/accounts/img/default_avatar.png";
+        avatar.src = data.image_url || "/static/accounts/img/default_avatar.png";
         avatar.classList.add("chat-avatar");
 
         // バブルラッパー
@@ -40,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const usernameEl = document.createElement("a");
         usernameEl.classList.add("chat-username");
         usernameEl.href = "/accounts/" + data.sender + "/";
+        usernameEl.textContent = data.sender;
 
         // メッセージバブル
         const bubble = document.createElement("div");

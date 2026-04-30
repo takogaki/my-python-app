@@ -19,11 +19,7 @@
         <div class="chat-row {% if message.sender == request.user %}my-row{% else %}other-row{% endif %}">
         
             <!-- プロフィール画像 -->
-            {% if message.sender.profile_image %}
-            <img src="{{ message.sender.profile_image.url }}" class="chat-avatar">
-            {% else %}
-            <img src="{% static 'accounts/img/default_avatar.png' %}" class="chat-avatar">
-            {% endif %}
+            <img src="{{ message.sender.get_profile_image }}" class="chat-avatar">
         
             <div class="chat-bubble-wrapper">
         
