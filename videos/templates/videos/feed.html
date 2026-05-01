@@ -18,14 +18,16 @@ Spirytus動画｜SPIRYTUS
 
         <div class="feed-inner">
 
-            {% for post in posts %}
+            {% for item in feed_items %}
+            
+            {% if item.type == "post" %}
+            {% with post=item.data %}
             <div class="video-card snap-item">
-
-                <!-- 💥 ダブルタップ用 -->
+            
                 <div class="double-heart">❤️</div>
             
                 <div class="actions">
-                
+            
                     <!-- 👤 ユーザー -->
                     {% if post.user.is_superuser %}
                     <div class="action-btn user-btn no-click">
@@ -46,20 +48,20 @@ Spirytus動画｜SPIRYTUS
                         <span class="count">{{ post.user_likes }}</span>
                     </a>
                     {% endif %}
-                
+            
                     <!-- ❤️ Like -->
                     <button class="action-btn like-btn" data-id="{{ post.id }}"
                         data-liked="{% if post.id in liked_ids %}1{% else %}0{% endif %}">
                         <span class="icon">❤️</span>
                         <span class="count">{{ post.likes_total }}</span>
                     </button>
-                
+            
                     <!-- 💬 コメント -->
                     <button class="action-btn comment-btn">
                         <span class="icon">💬</span>
                         <span class="count">{{ post.comment_count }}</span>
                     </button>
-                
+            
                 </div>
             
                 <!-- メディア -->
@@ -70,7 +72,7 @@ Spirytus動画｜SPIRYTUS
                 {% elif post.media_type == "image" %}
                 <img src="{{ post.image.url }}">
                 {% endif %}
-                
+            
                 {% if post.caption %}
                 <div class="caption">
                     <p class="caption-text">
@@ -79,8 +81,22 @@ Spirytus動画｜SPIRYTUS
                     <span class="more-btn">…もっと見る</span>
                 </div>
                 {% endif %}
-
+            
             </div>
+            {% endwith %}
+            {% endif %}
+            
+            
+            {% if item.type == "ad" %}
+            <div class="video-card snap-item ad-card">
+            
+                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXX" data-ad-slot="YYYYYYYYYY"
+                    data-ad-format="auto" data-full-width-responsive="true">
+                </ins>
+            
+            </div>
+            {% endif %}
+            
             {% endfor %}
 
         </div>
@@ -122,7 +138,7 @@ Spirytus動画｜SPIRYTUS
 
 {% block extra_js %}
 <script>
-    const startIndex = Number({{ start_index|default:"0" }});;
+    const startIndex = Number("{{ start_index|default:'0' }}");
 </script>
 
 <script src="{% static 'videos/js/feed.js' %}"></script>

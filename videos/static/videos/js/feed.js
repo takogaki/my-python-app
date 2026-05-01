@@ -231,4 +231,77 @@ document.addEventListener("DOMContentLoaded", () => {
             : "…もっと見る";
     });
 
+    /* =========================
+    🎬 動画制御（完全安定版）
+    ========================= */
+
+    const feed = document.querySelector(".video-feed");
+    if (!feed) return; // ← 超重要
+
+    const cards = document.querySelectorAll(".video-card:not(.ad-card)");
+    const videos = document.querySelectorAll(".video-card:not(.ad-card) video");
+
+    // 高さ（fallback付き）
+    const cardHeight = feed.clientHeight || window.innerHeight;
+
+    // =========================
+    // 🎯 IntersectionObserver
+    // =========================
+    const observer = new IntersectionObserver((entries) => {
+
+        entries.forEach(entry => {
+
+            const video = entry.target.querySelector("video");
+            if (!video) return;
+
+            if (entry.isIntersecting) {
+                video.play().catch(() => {});
+                video.muted = false;
+            } else {
+                video.pause();
+                video.currentTime = 0;
+                video.muted = true;
+            }
+
+        });
+
+    }, { threshold: 0.6 });
+
+    cards.forEach(card => observer.observe(card));
+
+
+    // =========================
+    // 🚀 スクロール制御
+    // =========================
+    feed.addEventListener("scroll", () => {
+
+        const index = Math.round(feed.scrollTop / cardHeight);
+
+        const next = videos[index + 1];
+        const prev = videos[index - 1];
+
+        // 🔥 次動画
+        if (next && next.preload !== "auto") {
+            next.preload = "auto";
+            next.load();
+        }
+
+        // 🔥 前動画
+        if (prev && prev.preload !== "auto") {
+            prev.preload = "auto";
+            prev.load();
+        }
+
+        // 🔥 広告ロード
+        if (window.adsbygoogle) {
+            document.querySelectorAll(".adsbygoogle").forEach(ad => {
+                if (!ad.classList.contains("ads-loaded")) {
+                    try {
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                        ad.classList.add("ads-loaded");
+                    } catch (e) {}
+                }
+            });
+        }
+    });
 });

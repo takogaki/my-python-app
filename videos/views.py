@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # =========================
-# 🎬 フィード
+# 🎬 フィード（広告混ぜ込み版）
 # =========================
 def feed(request):
     posts = (
@@ -23,6 +23,7 @@ def feed(request):
         .order_by("-created_at")
     )
 
+    # 👍 いいね済み
     if request.user.is_authenticated:
         liked_ids = set(
             PostVideoLike.objects.filter(user=request.user)
@@ -31,10 +32,28 @@ def feed(request):
     else:
         liked_ids = set()
 
-    return render(request, "videos/feed.html", {
-        "posts": posts,
-        "liked_ids": liked_ids,
+    # =========================
+    # 🔥 フィード生成（ここが核心）
+    # =========================
+    feed_items = []
 
+    for i, post in enumerate(posts):
+        # 通常投稿
+        feed_items.append({
+            "type": "post",
+            "data": post
+        })
+
+        # 5件に1回広告（調整可能）
+        if (i + 1) % 5 == 0:
+            feed_items.append({
+                "type": "ad",
+                "ad_type": "adsense"
+            })
+
+    return render(request, "videos/feed.html", {
+        "feed_items": feed_items,
+        "liked_ids": liked_ids,
         "is_feed": True,
     })
 
