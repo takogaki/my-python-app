@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let isLocked = false;
 
     const feed = document.querySelector(".video-feed");
+    if (!feed) return; // ← ここに統合
     const modal = document.getElementById("commentModal");
     const commentList = document.querySelector(".comment-list");
 
@@ -234,10 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
     /* =========================
     🎬 動画制御（完全安定版）
     ========================= */
-
-    const feed = document.querySelector(".video-feed");
-    if (!feed) return; // ← 超重要
-
     const cards = document.querySelectorAll(".video-card:not(.ad-card)");
     const videos = document.querySelectorAll(".video-card:not(.ad-card) video");
 
@@ -295,11 +292,24 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🔥 広告ロード
         if (window.adsbygoogle) {
             document.querySelectorAll(".adsbygoogle").forEach(ad => {
-                if (!ad.classList.contains("ads-loaded")) {
-                    try {
-                        (adsbygoogle = window.adsbygoogle || []).push({});
-                        ad.classList.add("ads-loaded");
-                    } catch (e) {}
+                try {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    ad.classList.add("ads-loaded");
+
+                    // 🔥 ここ追加
+                    setTimeout(() => {
+                        if (ad.innerHTML.trim() === "") {
+
+                            const wrapper = ad.closest(".ad-card");
+                            if (wrapper) {
+                                const loading = wrapper.querySelector(".ad-loading");
+                                if (loading) loading.textContent = "広告を表示できませんでした";
+                            }
+                        }
+                    }, 1500);
+
+                } catch (e) {
+                    console.log("ad error", e);
                 }
             });
         }

@@ -406,3 +406,10 @@ html, body {
     box-shadow:
         0 3px 10px rgba(255, 45, 85, 0.25);
 }
+
+/* 広告の高さ固定 */
+.ad-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
