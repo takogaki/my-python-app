@@ -107,8 +107,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         commentList.innerHTML = data.comments.map(c => `
             <div class="comment">
-                <b>${c.user}</b>
+
+                <a href="${c.profile_url}" class="comment-user">
+                    <img src="${c.icon}" class="comment-avatar">
+                    <b>${c.user}</b>
+                </a>
+
                 <p>${c.text}</p>
+
             </div>
         `).join("");
     }
@@ -144,8 +150,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             commentList.insertAdjacentHTML("afterbegin", `
                 <div class="comment">
-                    <b>${data.user}</b>
+
+                    <a href="${data.profile_url}" class="comment-user">
+                        <img src="${data.icon}" class="comment-avatar">
+                        <b>${data.user}</b>
+                    </a>
+
                     <p>${data.text}</p>
+
                 </div>
             `);
 
@@ -209,7 +221,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = e.target.closest(".video-card");
         if (!card) return;
 
-        if (e.target.closest(".action-btn")) return;
+        if (
+            e.target.closest(".action-btn") ||
+            e.target.closest(".more-btn") ||
+            e.target.closest(".comment-user") // ← 追加
+        ) return;
 
         const url = card.dataset.url;
         if (url) location.href = url;

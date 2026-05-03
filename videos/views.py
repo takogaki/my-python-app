@@ -168,6 +168,11 @@ def get_comments(request, post_id):
             "user": c.user.username,
             "icon": c.user.get_profile_image(),
             "text": c.text,
+            "profile_url": (
+                "/accounts/mypage/"
+                if request.user.is_authenticated and c.user == request.user
+                else f"/accounts/users/{c.user.username}/"
+            ),
         }
         for c in comments
     ]
@@ -200,7 +205,8 @@ def add_comment(request, post_id):
         "user": request.user.username,
         "icon": request.user.get_profile_image(),
         "text": comment.text,
-        "count": count
+        "count": count,
+        "profile_url": "/accounts/mypage/",
     })
 
 # =========================
