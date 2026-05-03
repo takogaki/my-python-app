@@ -310,3 +310,27 @@ body {
         margin: 10px;
     }
 }
+
+/* =========================
+LIKEボタン
+========================= */
+.user-like-btn {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* 未LIKE（赤） */
+.user-like-btn {
+    background: #ff4d6d;
+    color: #fff;
+}
+
+/* LIKE済（グレー） */
+.user-like-btn.liked {
+    background: #ccc;
+    color: #333;
+}

@@ -46,6 +46,13 @@
         </div>
         {% endif %}
 
+        <div class="user-like-section">
+            <button class="user-like-btn {% if is_liked %}liked{% endif %}" data-user-id="{{ user.id }}">
+                ❤️ {% if is_liked %}ライク済み{% else %}LIKEする{% endif %}
+            </button>
+            <span class="user-like-count">{{ user.user_likes_count }}</span>
+        </div>
+
 
         <div class="profile-info">
             <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
@@ -189,4 +196,8 @@
     </a>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'accounts/js/user_detail.js' %}"></script>
 {% endblock %}

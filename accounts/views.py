@@ -176,6 +176,15 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 
         user = self.object
 
+        is_liked = False
+
+        if self.request.user.is_authenticated:
+            is_liked = UserLike.objects.filter(
+                from_user=self.request.user,
+                to_user=user
+            ).exists()
+        context["is_liked"] = is_liked
+
         # 🔥 プロフィール
         profile, _ = Profile.objects.get_or_create(user=user)
 
