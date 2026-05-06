@@ -28,16 +28,20 @@
         <div class="chat-row {% if message.sender == request.user %}my-row{% else %}other-row{% endif %}">
 
             <!-- アバター -->
-            <img src="{{ message.sender.get_profile_image }}" class="chat-avatar" data-sender="{{ message.sender.username }}">
+            <img src="{{ message.sender.get_profile_image }}" class="chat-avatar" data-url="{% if message.sender == request.user %}
+                            {% url 'accounts:mypage' %}
+                        {% else %}
+                            {% url 'accounts:user_detail' message.sender.username %}
+                        {% endif %}">
             
             <div class="chat-bubble-wrapper">
 
                 <!-- 名前 -->
-                <a class="chat-username" data-sender="{{ message.sender.username }}" href="{% if message.sender == request.user %}
-                    {% url 'accounts:mypage' %}
-                        {% else %}
-                    {% url 'accounts:user_detail' message.sender.username %}
-                        {% endif %}">
+                <a class="chat-username" data-url="{% if message.sender == request.user %}
+                                {% url 'accounts:mypage' %}
+                            {% else %}
+                                {% url 'accounts:user_detail' message.sender.username %}
+                            {% endif %}">
                     {{ message.sender.username }}
                 </a>
 

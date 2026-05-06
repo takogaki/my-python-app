@@ -14,13 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
     chatBox.addEventListener("click", function (e) {
         const target = e.target.closest(".chat-avatar, .chat-username");
         if (!target) return;
-        const sender = target.dataset.sender;
-        if (!sender) return;
-        if (sender === currentUser) {
-            window.location.href = "/accounts/mypage/";
-        } else {
-            window.location.href = `/accounts/user/${sender}/`;
-        }
+
+        const url = target.dataset.url;
+        if (!url) return;
+
+        window.location.href = url;
     });
 
     const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
@@ -182,4 +180,13 @@ document.addEventListener("DOMContentLoaded", function () {
         input.value = "";
     });
 
+});
+
+window.addEventListener("load", function () {
+    const chatBox = document.getElementById("chat-box");
+    if (!chatBox) return;
+
+    setTimeout(() => {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }, 100);
 });
