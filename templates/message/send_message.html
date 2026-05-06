@@ -1,5 +1,6 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
+{% load tz %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'user_messages/css/message.css' %}">
@@ -7,57 +8,78 @@
 
 {% block body %}
 
-<div class="card">
-    <h2 class="card-title">
-        {{ recipient.username }}さんとのチャット
-    </h2>
+<div class="chat-container">
 
-    <!-- チャット表示エリア -->
-    <div id="chat-box" data-username="{{ recipient.username }}" data-current-user="{{ request.user.username }}">
-    
-        {% for message in messages %}
+    <!-- チャット -->
+    <div id="chat-box" class="chat-box" data-username="{{ recipient.username }}"
+        data-current-user="{{ request.user.username }}">
+
+        {% regroup messages by sent_at.date as message_days %}
+
+        {% for day in message_days %}
+
+        <!-- ✅ 日付セパレーター（正解） -->
+        <div class="chat-time-separator">
+            {{ day.grouper|date:"Y/m/d" }}
+        </div>
+
+        {% for message in day.list %}
+
         <div class="chat-row {% if message.sender == request.user %}my-row{% else %}other-row{% endif %}">
-        
-            <!-- プロフィール画像 -->
-            <img src="{{ message.sender.get_profile_image }}" class="chat-avatar">
-        
+
+            <!-- アバター -->
+            <img src="{{ message.sender.get_profile_image }}" class="chat-avatar" data-sender="{{ message.sender.username }}">
+            
             <div class="chat-bubble-wrapper">
-        
+
                 <!-- 名前 -->
-                <a class="chat-username"
-                    href="{% if message.sender == request.user %}{% url 'accounts:mypage' %}{% else %}{% url 'accounts:user_detail' message.sender.username %}{% endif %}">
+                <a class="chat-username" data-sender="{{ message.sender.username }}" href="{% if message.sender == request.user %}
+                    {% url 'accounts:mypage' %}
+                        {% else %}
+                    {% url 'accounts:user_detail' message.sender.username %}
+                        {% endif %}">
                     {{ message.sender.username }}
                 </a>
-        
-                <!-- 吹き出し -->
-                <div class="chat-bubble {% if message.sender == request.user %}my-bubble{% else %}other-bubble{% endif %}">
+
+
+                <!-- バブル -->
+                <div
+                    class="chat-bubble {% if message.sender == request.user %}my-bubble{% else %}other-bubble{% endif %}">
                     {{ message.content }}
                 </div>
-        
+
+                <!-- 🔥 時間＋既読（LINE核心） -->
+                <div class="chat-meta">
+
+                    <span class="chat-time">
+                        {{ message.sent_at|localtime|date:"H:i" }}
+                    </span>
+
+                    {% if message.sender == request.user %}
+                        {% if message == last_read_message %}
+                        <span class="read-status read">既読</span>
+                        {% else %}
+                        <span class="read-status unread">未読</span>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
+
             </div>
+
         </div>
+
         {% endfor %}
-    
+        {% endfor %}
+
     </div>
 
-    <!-- フォーム（POSTは使わない） -->
-    <form id="chat-form" class="message-form">
-        <div class="form-group">
-            <textarea id="message-input" class="form-textarea" placeholder="メッセージを入力" rows="3" required></textarea>
-        </div>
-
-        <div class="card-actions">
-            <button type="submit" class="btn primary">
-                送信
-            </button>
-        </div>
+    <!-- 入力バー -->
+    <form id="chat-form" class="chat-input-bar">
+        <input id="message-input" class="chat-input" placeholder="メッセージ..." required>
+        <button type="submit" class="send-btn">➤</button>
     </form>
 
-    <div class="card-footer">
-        <a href="{% url 'accounts:user_detail' recipient.username %}">
-            ← 戻る
-        </a>
-    </div>
 </div>
 
 {% endblock %}

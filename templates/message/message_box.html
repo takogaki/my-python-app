@@ -6,68 +6,72 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'user_messages/css/message.css' %}">
+<link rel="stylesheet" href="{% static 'user_messages/css/message_box.css' %}">
 {% endblock %}
 
 {% block body %}
 
 <div class="page-container">
 
-    <div class="intro-card">
-        <h2 class="page-title">メッセージボックス</h2>
-        <p class="page-description">
-            やり取り中のユーザー一覧です。
-        </p>
-    </div>
+    {% if conversations %}
+    <div class="dm-card-list">
 
-    {% if messages %}
-    {% for message in messages %}
+        {% for convo in conversations %}
 
-    <div class="post block {% if message.recipient == request.user and not message.is_read %}unread{% endif %}">
-
-        <p class="post-author">
+        <div class="dm-card {% if convo.unread_count > 0 %}unread{% endif %}">
         
-            {% if message.sender == request.user %}
-            <a href="{% url 'accounts:user_detail' message.recipient.username %}">
-                {{ message.recipient.username }}
+            <!-- 左：アイコン（ユーザープロフィールへ） -->
+            <a href="{% url 'accounts:user_detail' convo.user.username %}" class="dm-avatar-link">
+                <div class="dm-avatar">
+                    <img src="{{ convo.user.get_profile_image }}">
+                </div>
             </a>
-            {% else %}
-            <a href="{% url 'accounts:user_detail' message.sender.username %}">
-                {{ message.sender.username }}
-            </a>
-            {% endif %}
         
-            {% if message.recipient == request.user and not message.is_read %}
-            <span class="badge unread">未読</span>
-            {% endif %}
+            <!-- 中央：情報 -->
+            <div class="dm-main">
         
-        </p>
-
-        <p class="post-body">
-            {{ message.content|truncatechars:40 }}
-        </p>
-
-        <small class="post-date">
-            {{ message.sent_at|date:"Y/m/d H:i" }}
-        </small>
-
-        <div style="margin-top: 12px; text-align: center;">
-            {% if message.sender == request.user %}
-            <a href="{% url 'user_messages:send_message' message.recipient.username %}" class="btn primary">
-                トークを見る
-            </a>
-            {% else %}
-            <a href="{% url 'user_messages:send_message' message.sender.username %}" class="btn primary">
-                トークを見る
-            </a>
-            {% endif %}
+                <div class="dm-top">
+                    <span class="dm-name">
+                        {{ convo.user.username }}
+                    </span>
+        
+                    <span class="dm-time">
+                        {{ convo.last_message.sent_at|date:"H:i" }}
+                    </span>
+                </div>
+        
+                <div class="dm-message">
+                    {% if convo.last_message.sender == request.user %}
+                    <span class="you-label">あなた:</span>
+                    {% endif %}
+                    {{ convo.last_message.content|truncatechars:28 }}
+                </div>
+        
+            </div>
+        
+            <!-- 右：アクション -->
+            <div class="dm-action">
+        
+                {% if convo.unread_count > 0 %}
+                <div class="dm-badge">
+                    {{ convo.unread_count }}
+                </div>
+                {% endif %}
+        
+                <a href="{% url 'user_messages:send_message' convo.user.username %}" class="reply-btn">
+                    返信
+                </a>
+        
+            </div>
+        
         </div>
 
+        {% endfor %}
+
     </div>
 
-    {% endfor %}
     {% else %}
-    <div class="post block">
+    <div class="empty-box">
         <p>まだメッセージはありません。</p>
     </div>
     {% endif %}

@@ -23,7 +23,7 @@ from blog.models import Post, Comment      # ブログ投稿
 from videos.models import PostVideo
 from accounts.models import SavedPost      # 保存した投稿
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, Exists, OuterRef
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 from .forms import ActivateProfileImageForm, CustomUserCreationForm, UserForm, ProfileForm, KYCForm
@@ -949,26 +949,45 @@ class UserListView(ListView):
     context_object_name = "users"
 
     def get_queryset(self):
-        # 自分以外のユーザーを表示
-        return User.objects.exclude(id=self.request.user.id)
+
+        # マッチ判定
+        match_qs = Match.objects.filter(
+            Q(user1=self.request.user, user2=OuterRef("pk")) |
+            Q(user2=self.request.user, user1=OuterRef("pk"))
+        )
+
+        # LIKE判定
+        like_qs = UserLike.objects.filter(
+            from_user=self.request.user,
+            to_user=OuterRef("pk")
+        )
+
+        return User.objects.exclude(
+            id=self.request.user.id
+        ).annotate(
+            is_match=Exists(match_qs),
+            is_liked=Exists(like_qs)
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        matches = Match.objects.filter(
+            Q(user1=self.request.user) | Q(user2=self.request.user)
+        )
+
+        matched_user_ids = set()
+
+        for match in matches:
+            if match.user1 == self.request.user:
+                matched_user_ids.add(match.user2.id)
+            else:
+                matched_user_ids.add(match.user1.id)
+
+        context["matched_user_ids"] = matched_user_ids
+
+        return context
     
-def get_context_data(self, **kwargs):
-    context = super().get_context_data(**kwargs)
-
-    matches = Match.objects.filter(
-        Q(user1=self.request.user) | Q(user2=self.request.user)
-    )
-
-    match_users = []
-    for match in matches:
-        if match.user1 == self.request.user:
-            match_users.append(match.user2)
-        else:
-            match_users.append(match.user1)
-
-    context["match_users"] = match_users
-    return context
-
 # =========================
 # ★ LIKE機能（重要）
 # ＝========================
@@ -1001,6 +1020,11 @@ def like_user(request, user_id):
         CustomUser.objects.filter(id=to_user.id).update(
             received_likes_count=F('received_likes_count') - 1
         )
+
+        Match.objects.filter(
+            Q(user1=me, user2=to_user) |
+            Q(user1=to_user, user2=me)
+        ).delete()
 
         Notification.objects.filter(
             recipient=to_user,

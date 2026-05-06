@@ -7,44 +7,48 @@ from .models import Message
 from accounts.models import CustomUser, Match
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
-from django.db.models import Max, Q
+from django.db.models import Max, Q, Count
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from notifications.models import Notification
 from datetime import timedelta
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
-
+from django.utils.timezone import now
 
 User = get_user_model()
+
 
 @login_required
 def message_box(request):
     user = request.user
 
-    # 自分が関わっているメッセージを新しい順に取得
     all_messages = Message.objects.filter(
         Q(sender=user) | Q(recipient=user)
     ).order_by("-sent_at")
 
-    conversation_dict = {}
+    conversations = {}
 
     for msg in all_messages:
-        # 相手を特定
         partner = msg.recipient if msg.sender == user else msg.sender
 
-        # まだその相手が登録されていなければ登録（＝最新メッセージ）
-        if partner.id not in conversation_dict:
-            conversation_dict[partner.id] = msg
+        if partner.id not in conversations:
+            conversations[partner.id] = {
+                "user": partner,
+                "last_message": msg,
+                "unread_count": 0,
+            }
 
-    # 最新メッセージだけのリスト
-    messages = list(conversation_dict.values())
+        # 未読カウント（相手→自分のみ）
+        if msg.recipient == user and not msg.is_read:
+            conversations[partner.id]["unread_count"] += 1
 
-    return render(
-        request,
-        "message/message_box.html",
-        {"messages": messages}
-    )
+    context = {
+        "conversations": conversations.values()
+    }
+
+    return render(request, "message/message_box.html", context)
+
 
 @never_cache
 @login_required
@@ -52,7 +56,7 @@ def send_message(request, username):
 
     sender = request.user
 
-    # 🔥 年齢認証チェック（最初にやる）
+    # 🔥 年齢認証チェック
     if sender.verification_status != "verified":
         messages.warning(request, "メッセージ機能は年齢確認後に利用できます")
         return redirect("accounts:kyc_submit")
@@ -70,58 +74,52 @@ def send_message(request, username):
             "target_user": recipient
         }, status=403)
 
-    # ✅ 未読 → 既読
+    # =========================
+    # 🔥 POST（送信処理）
+    # =========================
+    if request.method == "POST":
+        content = request.POST.get("message", "").strip()
+
+        if content:
+            Message.objects.create(
+                sender=sender,
+                recipient=recipient,
+                content=content
+            )
+
+    # =========================
+    # 🔥 未読 → 既読
+    # =========================
     Message.objects.filter(
         sender=recipient,
         recipient=sender,
         is_read=False
-    ).update(is_read=True)
+    ).update(
+        is_read=True,
+        read_at=now()
+    )
 
     # =========================
-    # 🔥 POST処理
+    # 🔥 チャット履歴取得（重要）
     # =========================
-    if request.method == "POST":
-
-        # 🔥 二重防御（API直叩き対策）
-        if sender.verification_status != "verified":
-            return JsonResponse({"error": "KYC required"}, status=403)
-
-        content = request.POST.get("message")
-
-        if content and content.strip():
-            Message.objects.create(
-                sender=sender,
-                recipient=recipient,
-                content=content.strip()
-            )
-
-            # =========================
-            # 🔥 通知追加（ここ）
-            # =========================
-            recent = Notification.objects.filter(
-                recipient=recipient,
-                actor=sender,
-                type="message",
-                created_at__gte=timezone.now() - timedelta(minutes=5)
-            ).exists()
-
-            if not recent:
-                Notification.objects.create(
-                    recipient=recipient,
-                    actor=sender,
-                    type="message",
-                    verb="さんからメッセージが届きました"
-                )
-
-    # 🔥 履歴取得
     chat_messages = Message.objects.filter(
         Q(sender=sender, recipient=recipient) |
         Q(sender=recipient, recipient=sender)
-    ).order_by("sent_at")
+    ).order_by("sent_at")  # ← 昇順にするのがポイント
+
+    # =========================
+    # 🔥 最後の既読メッセージ
+    # =========================
+    last_read_message = Message.objects.filter(
+        sender=sender,
+        recipient=recipient,
+        is_read=True
+    ).order_by("-sent_at").first()
 
     return render(request, "message/send_message.html", {
         "recipient": recipient,
-        "messages": chat_messages
+        "messages": chat_messages,
+        "last_read_message": last_read_message,
     })
 
 

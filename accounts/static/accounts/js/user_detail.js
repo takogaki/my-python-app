@@ -10,29 +10,32 @@ document.addEventListener("click", async (e) => {
             ?.split("=")[1];
     }
 
-    // 🔥 読み込み確認（1回だけ）
-    console.log("user_detail.js loaded");
-
+    // =========================
+    // 🔥 戻る対策（bfcache）
+    // =========================
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
 
     // =========================
-    // ❤️ ユーザーLIKE処理
+    // ❤️ LIKE処理（最強安定版）
     // =========================
     document.addEventListener("click", async (e) => {
 
         const btn = e.target.closest(".user-like-btn");
         if (!btn) return;
 
+        e.preventDefault();
         e.stopPropagation();
 
         const userId = btn.dataset.userId;
+        if (!userId) return;
 
-        if (!userId) {
-            console.error("userIdが取得できていません");
-            return;
-        }
-
-        const container = btn.closest(".user-like-section");
-        const countEl = container?.querySelector(".user-like-count");
+        // 🔥 二重クリック防止
+        if (btn.dataset.loading === "true") return;
+        btn.dataset.loading = "true";
 
         try {
             const res = await fetch(`/accounts/like/${userId}/`, {
@@ -42,18 +45,12 @@ document.addEventListener("click", async (e) => {
                 }
             });
 
-            console.log("status:", res.status);
-
-            if (!res.ok) {
-                console.error("HTTPエラー", res.status);
-                return;
-            }
+            if (!res.ok) return;
 
             const data = await res.json();
-            console.log("LIKEレスポンス:", data);
 
             // =========================
-            // 🔥 状態反映
+            // 状態反映
             // =========================
             if (data.status === "match") {
                 window.location.href = "/accounts/match-result/";
@@ -70,32 +67,10 @@ document.addEventListener("click", async (e) => {
                 btn.innerHTML = "❤️ LIKEする";
             }
 
-            if (countEl && data.count !== undefined) {
-                countEl.textContent = data.count;
-            }
-
         } catch (err) {
-            console.error("通信エラー", err);
+            console.error("LIKE error:", err);
+        } finally {
+            btn.dataset.loading = "false";
         }
-
-    });
-
-
-    // =========================
-    // 🧠 外側クリック制御（バグ修正版）
-    // =========================
-    document.addEventListener("click", (e) => {
-
-        const card = e.target.closest(".video-card");
-        if (!card) return;
-
-        // 🔥 これがないとLIKEが無反応になる
-        if (
-            e.target.closest(".action-btn") ||
-            e.target.closest(".user-like-btn")
-        ) return;
-
-        const url = card.dataset.url;
-        if (url) location.href = url;
     });
 });

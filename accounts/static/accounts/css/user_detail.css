@@ -321,7 +321,11 @@ LIKEボタン
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto;
 }
+    
 
 /* 未LIKE（赤） */
 .user-like-btn {

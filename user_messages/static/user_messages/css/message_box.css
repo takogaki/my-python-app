@@ -1,0 +1,176 @@
+/* =========================
+ ページ幅制御（これないと終わる）
+========================= */
+.page-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* =========================
+ カードを“ちゃんとカードにする”
+========================= */
+.dm-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 16px;
+    border-radius: 16px;
+
+    background: #111; /* ←ここ重要 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); /* ←影でカード化 */
+
+    margin-bottom: 10px; /* ←カード間の余白 */
+}
+
+/* ホバー */
+.dm-card:hover {
+    transform: translateY(-2px);
+}
+
+/* 未読はさらに強調 */
+.dm-card.unread {
+    border-left: 4px solid #00c853;
+    background: #151515;
+}
+
+/* =========================
+ カードリスト
+========================= */
+.dm-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+}
+
+/* =========================
+ カード本体
+========================= */
+.dm-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 14px;
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+
+    transition: all 0.2s;
+}
+
+.dm-card:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+/* 未読強調 */
+.dm-card.unread {
+    border-left: 3px solid #00c853;
+}
+
+/* =========================
+ アイコン
+========================= */
+.dm-avatar img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* アイコンリンク */
+.dm-avatar-link {
+    display: block;
+    text-decoration: none;
+}
+
+/* アイコンクリック時の変な青枠防止 */
+.dm-avatar-link:focus {
+    outline: none;
+}
+
+/* =========================
+ 中央
+========================= */
+.dm-main {
+    flex: 1;
+}
+
+.dm-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dm-name {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.dm-time {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.dm-message {
+    font-size: 13px;
+    color: #ccc;
+    margin-top: 4px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* あなたラベル */
+.you-label {
+    font-size: 12px;
+    color: #aaa;
+    margin-right: 4px;
+}
+
+/* =========================
+ 右側
+========================= */
+.dm-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+/* 未読バッジ */
+.dm-badge {
+    background: #00c853;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+/* 返信ボタン */
+.reply-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+
+    background: #1e88e5;
+    color: white;
+    text-decoration: none;
+
+    transition: 0.2s;
+}
+
+.reply-btn:hover {
+    background: #1565c0;
+}
+
+/* 空状態 */
+.empty-box {
+    text-align: center;
+    padding: 40px;
+    color: #aaa;
+}

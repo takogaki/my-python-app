@@ -244,14 +244,23 @@ USE_TZ = True
 # ==============================
 REDIS_URL = os.environ.get("REDIS_URL")
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [REDIS_URL],
+if REDIS_URL:
+    # 本番（Redisあり）
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [REDIS_URL],
+            },
         },
-    },
-}
+    }
+else:
+    # 🔥 開発（Redisなし）
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 
 # ==============================
 # ⚡ キャッシュ・セッション
@@ -295,11 +304,21 @@ CONTENT_SECURITY_POLICY = {
             "'self'", "'unsafe-inline'",
             "https://www.youtube.com",
             "https://www.tiktok.com",
+            "https://pagead2.googlesyndication.com",  # 広告用（必要なら）
         ),
         "style-src": ("'self'", "'unsafe-inline'"),
         "img-src": (
             "'self'", "data:",
             "https://res.cloudinary.com",
+        ),
+
+        # 🔥🔥🔥 これが最重要 🔥🔥🔥
+        "connect-src": (
+            "'self'",
+            "ws://127.0.0.1:8000",
+            "ws://localhost:8000",
+            "wss://my-python-app-0t2k.onrender.com",
+            "https://ep1.adtrafficquality.google",
         ),
     }
 }
