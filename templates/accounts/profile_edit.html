@@ -62,6 +62,166 @@
         
         </div>
 
+        <!-- =========================
+        🔥 アプリ起動設定
+        ========================= -->
+        <div class="home-screen-setting">
+        
+            <h3 class="setting-title">
+                アプリ起動時の画面
+            </h3>
+        
+            <p class="setting-subtitle">
+                アプリを開いた時に最初に表示する画面を選べます。
+            </p>
+        
+            <div class="home-options">
+                <!-- ホーム -->
+                <label class="home-card">
+                
+                    <input type="radio" name="home_screen" value="index" {% if request.user.home_screen == "index" %}checked{% endif %}>
+                
+                    <div class="card-content">
+                
+                        <div class="card-icon">
+                            🏠
+                        </div>
+                
+                        <div class="card-text">
+                            <div class="card-title">
+                                ホーム
+                            </div>
+                
+                            <div class="card-desc">
+                                お知らせや全体画面を確認したい人向け
+                            </div>
+                        </div>
+                
+                    </div>
+                </label>
+
+                <!-- マイページ -->
+                <label class="home-card">
+                
+                    <input type="radio" name="home_screen" value="mypage" {% if request.user.home_screen == "mypage" %}checked{% endif %}>
+                
+                    <div class="card-content">
+                
+                        <div class="card-icon">
+                            👤
+                        </div>
+                
+                        <div class="card-text">
+                            <div class="card-title">
+                                マイページ
+                            </div>
+                
+                            <div class="card-desc">
+                                自分のプロフィールや投稿を確認したい人向け
+                            </div>
+                        </div>
+                
+                    </div>
+                </label>
+        
+                <!-- フィード -->
+                <label class="home-card">
+        
+                    <input type="radio" name="home_screen" value="feed" {% if request.user.home_screen == "feed" %}checked{% endif %}>
+        
+                    <div class="card-content">
+        
+                        <div class="card-icon">
+                            🎬
+                        </div>
+        
+                        <div class="card-text">
+                            <div class="card-title">
+                                フィード
+                            </div>
+        
+                            <div class="card-desc">
+                                動画や投稿をすぐ見たい人向け
+                            </div>
+                        </div>
+        
+                    </div>
+                </label>
+        
+                <!-- メッセージ -->
+                <label class="home-card">
+        
+                    <input type="radio" name="home_screen" value="messages" {% if request.user.home_screen == "messages" %}checked{% endif %}>
+        
+                    <div class="card-content">
+        
+                        <div class="card-icon">
+                            💬
+                        </div>
+        
+                        <div class="card-text">
+                            <div class="card-title">
+                                メッセージ
+                            </div>
+        
+                            <div class="card-desc">
+                                DMや会話をすぐ開きたい人向け
+                            </div>
+                        </div>
+        
+                    </div>
+                </label>
+
+                <!-- 掲示板 -->
+                <label class="home-card">
+                
+                    <input type="radio" name="home_screen" value="frontpage" {% if request.user.home_screen == "frontpage" %}checked{% endif %}>
+                
+                    <div class="card-content">
+                
+                        <div class="card-icon">
+                            📢
+                        </div>
+                
+                        <div class="card-text">
+                            <div class="card-title">
+                                掲示板
+                            </div>
+                
+                            <div class="card-desc">
+                                みんなの投稿や雑談をすぐ見たい人向け
+                            </div>
+                        </div>
+                
+                    </div>
+                </label>
+
+                <!-- ビデオチャット -->
+                <label class="home-card">
+                
+                    <input type="radio" name="home_screen" value="roomlist" {% if request.user.home_screen == "roomlist" %}checked{% endif %}>
+                
+                    <div class="card-content">
+                
+                        <div class="card-icon">
+                            📹
+                        </div>
+                
+                        <div class="card-text">
+                            <div class="card-title">
+                                ビデオチャット
+                            </div>
+                
+                            <div class="card-desc">
+                                通話ルームをすぐ探したい人向け
+                            </div>
+                        </div>
+                
+                    </div>
+                </label>
+            </div>
+        </div>
+
         <!-- 一言 -->
         <div class="form-group">
             <label>ひとこと</label>

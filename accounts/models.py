@@ -12,6 +12,25 @@ from blog.models import Post
 # =========================
 class CustomUser(AbstractUser):
 
+    HOME_CHOICES = [
+        ("feed", "フィード"),
+        ("messages", "メッセージ"),
+        ("index", "ホーム"),
+        ("mypage", "マイページ"),
+        ("frontpage", "掲示板"),
+        ("roomlist", "ビデオチャット"),
+    ]
+
+    # ユーザーが自分で選ぶ
+    home_screen = models.CharField(
+        max_length=20,
+        choices=HOME_CHOICES,
+        default="feed"
+    )
+
+    # 自動最適化を使うか
+    auto_home_screen = models.BooleanField(default=False)
+
     GENDER_CHOICES = [
         ('M', '男性'),
         ('F', '女性'),
@@ -83,7 +102,19 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+# ========================
+# 👣 ユーザーログ
+# =========================
+class UserPageLog(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE
+    )
 
+    page_name = models.CharField(max_length=30)
+
+    viewed_at = models.DateTimeField(auto_now_add=True)
 
 # =========================
 # 🏷 タグ

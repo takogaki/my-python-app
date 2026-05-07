@@ -28,11 +28,11 @@ from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 from .forms import ActivateProfileImageForm, CustomUserCreationForm, UserForm, ProfileForm, KYCForm
 from notifications.models import Notification
-from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint, Profile, TagCategory, ProfileTag, Tag, TagCategory # タグ関連
+from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint, Profile, TagCategory, ProfileTag, Tag, TagCategory, UserPageLog
 from django.views.decorators.csrf import csrf_exempt
 from accounts.utils import compatibility, profile_completion
 from collections import defaultdict
-from .utils import compatibility
+from .utils import compatibility, save_page_log
 from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -346,6 +346,55 @@ class CustomLoginView(LoginView):
 
         return "/accounts/mypage/"
 
+# =========================
+# ★ ログイン後リダイレクト
+# =========================
+def after_login_redirect(request):
+
+    user = request.user
+
+    # 自動最適化ON
+    if user.auto_home_screen:
+        screen = get_most_used_page(user)
+
+    # 手動設定
+    else:
+        screen = user.home_screen
+    if screen == "messages":
+        return redirect("message_box")
+    elif screen == "index":
+        return redirect("index")
+    elif screen == "mypage":
+        return redirect("accounts:mypage")
+    elif screen == "frontpage":
+        return redirect("frontpage")
+    elif screen == "roomlist":
+        return redirect("room_list")
+    return redirect("feed")
+
+# =========================
+# ★ 最も使われているページ取得
+# =========================
+def get_most_used_page(user):
+
+    seven_days_ago = timezone.now() - timedelta(days=7)
+
+    result = (
+        UserPageLog.objects
+        .filter(
+            user=user,
+            viewed_at__gte=seven_days_ago
+        )
+        .values("page_name")
+        .annotate(total=Count("id"))
+        .order_by("-total")
+        .first()
+    )
+
+    if result:
+        return result["page_name"]
+
+    return "feed"
 
 # ========================
 # ★ KYC申請（超重要）

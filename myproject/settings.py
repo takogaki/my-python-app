@@ -228,7 +228,7 @@ else:
 AUTH_USER_MODEL = "accounts.CustomUser"
 
 LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/after-login/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 # ==============================

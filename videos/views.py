@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Count
 from django.contrib.auth import get_user_model
+from accounts.utils import save_page_log
 
 User = get_user_model()
 
@@ -13,6 +14,12 @@ User = get_user_model()
 # 🎬 フィード（広告混ぜ込み版）
 # =========================
 def feed(request):
+    # =========================
+    # ページログ保存
+    # =========================
+    if request.user.is_authenticated:
+        save_page_log(request, "feed")
+
     posts = (
         PostVideo.objects
         .select_related("user")

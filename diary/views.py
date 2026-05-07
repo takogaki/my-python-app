@@ -11,11 +11,18 @@ from zoneinfo import ZoneInfo
 from accounts.models import CustomUser
 from django.http import JsonResponse
 from django.db.models import F
+from accounts.utils import save_page_log
 
 User = get_user_model()
 
 
 def index(request):
+    # =========================
+    # ページログ保存
+    # =========================
+    if request.user.is_authenticated:
+        save_page_log(request, "index")
+    
     return render(request, "diary/index.html")
 
 

@@ -1,3 +1,23 @@
+from datetime import timedelta
+from django.utils import timezone
+
+from .models import UserPageLog
+
+
+def save_page_log(request, page_name):
+
+    recent = UserPageLog.objects.filter(
+        user=request.user,
+        page_name=page_name,
+        viewed_at__gte=timezone.now() - timedelta(minutes=30)
+    ).exists()
+
+    if not recent:
+        UserPageLog.objects.create(
+            user=request.user,
+            page_name=page_name
+        )
+
 def profile_completion(profile):
     score = 0
 

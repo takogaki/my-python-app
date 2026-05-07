@@ -94,21 +94,36 @@
 画像・動画投稿一覧
 ===================== -->
 <div class="card">
-    <h2 class="card-title">{{ user.username }}さんの動画・画像</h2>
+    <h2 class="card-title">
+        {{ user.username }}さんの動画・画像
+    </h2>
+
+    {% if video_posts %}
 
     <div class="post-grid">
+
         {% for post in video_posts %}
-        <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 }}">
+        <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 %}">
+
             {% if post.media_type == "video" and post.video %}
             <video src="{{ post.video.url }}" muted preload="metadata"></video>
+
             {% elif post.image %}
             <img src="{{ post.image.url }}">
             {% endif %}
+
         </a>
-        {% empty %}
-        <p class="empty-text">投稿はまだありません</p>
         {% endfor %}
+
     </div>
+
+    {% else %}
+
+    <p class="empty-text center-empty">
+        まだ投稿はありません。
+    </p>
+
+    {% endif %}
 </div>
 
 <!-- =====================

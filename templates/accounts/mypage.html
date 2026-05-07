@@ -190,21 +190,36 @@
 
     <!-- 投稿グリッド -->
     <section class="content-card">
-        <h3 class="section-title">📹画像・動画の投稿一覧</h3>
-        
+        <h3 class="section-title">
+            📹画像・動画の投稿一覧
+        </h3>
+    
+        {% if video_posts %}
+    
         <div class="post-grid">
+    
             {% for post in video_posts %}
-            <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 }}">
+            <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 %}">
+    
                 {% if post.media_type == "video" and post.video %}
                 <video src="{{ post.video.url }}" muted preload="metadata"></video>
+    
                 {% elif post.image %}
                 <img src="{{ post.image.url }}">
                 {% endif %}
+    
             </a>
-            {% empty %}
-            <p class="empty-text">投稿はまだありません</p>
             {% endfor %}
+    
         </div>
+    
+        {% else %}
+    
+        <p class="empty-text center-empty">
+            投稿はまだありません
+        </p>
+    
+        {% endif %}
     </section>
 
     <!-- 日記 -->
@@ -227,51 +242,90 @@
 
     <!-- ブログ -->
     <section class="content-card">
-        <h3 class="section-title">📝 ブログ投稿</h3>
+    
+        <h3 class="section-title">
+            📝 ブログ投稿
+        </h3>
+    
+        {% if blog_posts %}
     
         {% for post in blog_posts %}
         <div class="list-item">
+    
             <a href="{% url 'blog:post_detail' post.slug %}" class="item-title">
                 {{ post.title }}
             </a>
     
             <div class="meta-row">
+    
                 <span class="meta-date">
                     投稿日：{{ post.posted_date|date:"Y年m月d日" }}
                 </span>
     
                 {% if not post.live_ended %}
-                    {% if post.video_type == "live" or post.is_live_only_service %}
-                    <form action="{% url 'blog:end_live' post.slug %}" method="post" class="inline-form"
-                        onsubmit="return confirm('本当にライブ配信を終了しますか？');">
-                        {% csrf_token %}
-                        <button class="meta-link danger">配信終了</button>
-                    </form>
-                    {% endif %}
+                {% if post.video_type == "live" or post.is_live_only_service %}
+    
+                <form action="{% url 'blog:end_live' post.slug %}" method="post" class="inline-form"
+                    onsubmit="return confirm('本当にライブ配信を終了しますか？');">
+    
+                    {% csrf_token %}
+    
+                    <button class="meta-link danger">
+                        配信終了
+                    </button>
+    
+                </form>
+    
+                {% endif %}
                 {% endif %}
     
                 <form action="{% url 'blog:delete_post' post.slug %}" method="post" class="inline-form"
                     onsubmit="return confirm('本当にこの投稿を削除しますか？');">
+    
                     {% csrf_token %}
-                    <button class="meta-link danger">削除</button>
+    
+                    <button class="meta-link danger">
+                        削除
+                    </button>
+    
                 </form>
+    
             </div>
     
-            {# 🔔 コメント通知一覧 #}
+            <!-- 🔔 コメント通知一覧 -->
             <div class="notification-list">
+    
                 {% for n in post_notifications %}
                 {% if n.post == post %}
+    
                 <div class="notification-item">
                     <a href="{% url 'notifications:open_notification' n.id %}">
                         {{ n.verb }}
                     </a>
                 </div>
+    
                 {% endif %}
                 {% empty %}
-                <p>通知はありません</p>
+    
+                <p class="empty-text">
+                    通知はありません
+                </p>
+    
                 {% endfor %}
+    
             </div>
+    
+        </div>
         {% endfor %}
+    
+        {% else %}
+    
+        <p class="empty-text center-empty">
+            投稿はまだありません
+        </p>
+    
+        {% endif %}
+    
     </section>
 
     <!-- 保存した他ユーザーのブログ -->

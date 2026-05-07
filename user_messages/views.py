@@ -15,12 +15,19 @@ from datetime import timedelta
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.utils.timezone import now
+from accounts.utils import save_page_log
 
 User = get_user_model()
 
 
 @login_required
 def message_box(request):
+    # =========================
+    # ページログ保存
+    # =========================
+    if request.user.is_authenticated:
+        save_page_log(request, "message_box")
+
     user = request.user
 
     all_messages = Message.objects.filter(

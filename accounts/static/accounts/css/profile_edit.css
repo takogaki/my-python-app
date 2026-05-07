@@ -204,3 +204,75 @@ textarea {
     text-align: center;
     margin-top: 10px;
 }
+
+/* =========================
+🔥 ホーム画面設定
+========================= */
+
+.home-screen-setting{
+    margin: 35px 0;
+}
+
+.setting-title{
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.setting-subtitle{
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 18px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.home-options{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.home-card{
+    cursor: pointer;
+}
+
+.home-card input{
+    display: none;
+}
+
+.card-content{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    background: #111;
+    border: 1px solid #2a2a2a;
+
+    padding: 18px;
+    border-radius: 18px;
+
+    transition: 0.25s;
+}
+
+.home-card input:checked + .card-content{
+    border: 1px solid #ff2d55;
+    background: rgba(255,45,85,0.08);
+}
+
+.card-icon{
+    font-size: 28px;
+}
+
+.card-title{
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.card-desc{
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.5;
+}

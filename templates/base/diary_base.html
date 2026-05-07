@@ -139,9 +139,35 @@
 
     <footer class="feed-footer">
     
+        <!-- 左側 -->
+        <div class="footer-side left-tools">
+    
+            <!-- 日記 -->
+            <a href="{% url 'diary:page_create' %}" class="footer-tool">
+                📔
+            </a>
+    
+            <!-- ブログ -->
+            <a href="{% url 'blog:frontpage' %}" class="footer-tool">
+                ✍️
+            </a>
+    
+        </div>
+    
+        <!-- 中央投稿 -->
         <a href="{% url 'video_upload' %}" class="fab">
-            +
+            ＋
         </a>
+    
+        <!-- 右側 -->
+        <div class="footer-side right-tools">
+    
+            <!-- ビデオチャット -->
+            <a href="{% url 'videochat:start' %}" class="footer-tool live-btn">
+                📹
+            </a>
+    
+        </div>
     
     </footer>
 
