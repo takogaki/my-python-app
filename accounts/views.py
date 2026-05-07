@@ -713,11 +713,19 @@ def profile_edit(request):
             )
 
             if profile_form.is_valid() and user_form.is_valid():
-
                 # =========================
                 # user保存
                 # =========================
-                user = user_form.save()
+                user = user_form.save(commit=False)
+
+                # =========================
+                # 🔥 ホーム画面設定保存
+                # =========================
+                home_screen = request.POST.get("home_screen")
+
+                if home_screen:
+                    user.home_screen = home_screen
+                    user.save()
 
                 # =========================
                 # profile保存（完全固定）
