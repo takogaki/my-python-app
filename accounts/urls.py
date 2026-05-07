@@ -17,6 +17,7 @@ urlpatterns = [
 
     # ログイン後のリダイレクト先（★これが唯一の after-login）
     path("after-login/", views.after_login_redirect, name="after_login"),
+    path("app/", views.app_entry, name="app_entry"),
 
     # 利用規約
     path('terms/', views.terms, name='terms'),

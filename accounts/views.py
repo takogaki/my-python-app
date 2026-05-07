@@ -396,6 +396,29 @@ def get_most_used_page(user):
 
     return "feed"
 
+
+@login_required
+def app_entry(request):
+
+    screen = request.user.home_screen
+
+    if screen == "messages":
+        return redirect("user_messages:message_box")
+
+    elif screen == "index":
+        return redirect("index")
+
+    elif screen == "mypage":
+        return redirect("accounts:mypage")
+
+    elif screen == "frontpage":
+        return redirect("blog:frontpage")
+
+    elif screen == "roomlist":
+        return redirect("videochat:room_list")
+
+    return redirect("feed")
+
 # ========================
 # ★ KYC申請（超重要）
 # ========================

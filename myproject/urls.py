@@ -7,6 +7,7 @@ from videos.views import feed
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import StaticViewSitemap
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 
 sitemaps = {
     'static': StaticViewSitemap,
@@ -17,7 +18,8 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),
 
     # 🔥 トップをfeedにする
-    path("", feed, name="root_feed"),
+    path("", RedirectView.as_view(url="/accounts/app/")),
+    path("feed/", feed, name="feed"),
 
     # 🔥 indexは別URLに逃がす
     path("index/", index, name="index"),
