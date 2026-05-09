@@ -17,6 +17,14 @@ urlpatterns = [
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),
 
+    path(
+        "service-worker.js",
+        TemplateView.as_view(
+            template_name="service-worker.js",
+            content_type="application/javascript"
+        ),
+    ),
+
     # 🔥 トップをfeedにする
     path("", RedirectView.as_view(url="/accounts/app/")),
     path("feed/", feed, name="feed"),

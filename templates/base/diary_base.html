@@ -7,7 +7,16 @@
     <meta http-equiv="Cache-Control" content="no-store">
 
     <!-- Viewport -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <!-- pwa -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#000000">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SPIRYTUS">
 
     <!-- CSRF -->
     <!-- <meta name="csrf-token" content="{{ csrf_token }}"> -->
@@ -238,6 +247,121 @@
 
 
     {% block extra_js %}{% endblock %}
+
+    <script>
+        if ("serviceWorker" in navigator) {
+
+            window.addEventListener("load", () => {
+
+                navigator.serviceWorker
+                    .register("/service-worker.js")
+                    .then(reg => {
+                        console.log("SW registered", reg);
+                    })
+                    .catch(err => {
+                        console.log("SW error", err);
+                    });
+
+            });
+        }
+    </script>
+
+    <!-- =========================
+    📲 PWA Install Popup
+    ========================= -->
+    <div id="pwa-install-popup" class="pwa-popup">
+    
+        <div class="pwa-popup-content">
+    
+            <h3>SPIRYTUSをアプリ化</h3>
+    
+            <p>
+                インストールすると<br>
+                全画面で快適に使えます
+            </p>
+    
+            <div class="pwa-buttons">
+                <button id="pwa-install-btn">
+                    インストール
+                </button>
+    
+                <button id="pwa-close-btn">
+                    あとで
+                </button>
+            </div>
+    
+        </div>
+    
+    </div>
+
+    <script>
+
+        let deferredPrompt = null;
+
+        const popup =
+            document.getElementById("pwa-install-popup");
+
+        const installBtn =
+            document.getElementById("pwa-install-btn");
+
+        const closeBtn =
+            document.getElementById("pwa-close-btn");
+
+        /* =========================
+        📲 install可能検知
+        ========================= */
+        window.addEventListener(
+            "beforeinstallprompt",
+            (e) => {
+
+                e.preventDefault();
+
+                deferredPrompt = e;
+
+                /* 3秒後表示 */
+                setTimeout(() => {
+
+                    popup.classList.add("show");
+
+                }, 3000);
+            }
+        );
+
+        /* =========================
+        📲 インストール
+        ========================= */
+        installBtn.addEventListener(
+            "click",
+            async () => {
+
+                if (!deferredPrompt) return;
+
+                deferredPrompt.prompt();
+
+                const choice =
+                    await deferredPrompt.userChoice;
+
+                console.log(choice);
+
+                deferredPrompt = null;
+
+                popup.classList.remove("show");
+            }
+        );
+
+        /* =========================
+        ❌ 閉じる
+        ========================= */
+        closeBtn.addEventListener(
+            "click",
+            () => {
+
+                popup.classList.remove("show");
+
+            }
+        );
+
+    </script>
 
 </body>
 

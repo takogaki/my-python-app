@@ -853,3 +853,116 @@ section h3 {
     font-size: 0.85rem;
     text-align: center;
 }
+
+/* PWA */
+/* =========================
+📲 PWA Install Popup
+========================= */
+
+.pwa-popup {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+
+    z-index: 99999;
+}
+
+/* 表示 */
+.pwa-popup.show {
+    display: flex;
+}
+
+/* 本体 */
+.pwa-popup-content {
+    width: 85%;
+    max-width: 340px;
+
+    padding: 24px 20px;
+
+    border-radius: 24px;
+
+    background: rgba(20,20,20,0.95);
+
+    text-align: center;
+
+    color: white;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.5);
+
+    animation: popupFade 0.25s ease;
+}
+
+/* タイトル */
+.pwa-popup-content h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+
+    font-size: 22px;
+}
+
+/* 説明 */
+.pwa-popup-content p {
+    margin-bottom: 20px;
+
+    color: rgba(255,255,255,0.75);
+    line-height: 1.6;
+}
+
+/* ボタン群 */
+.pwa-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* ボタン共通 */
+.pwa-buttons button {
+    flex: 1;
+
+    border: none;
+    border-radius: 999px;
+
+    padding: 12px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+/* インストール */
+#pwa-install-btn {
+    background: linear-gradient(
+        135deg,
+        #ff2d55,
+        #ff5e62
+    );
+
+    color: white;
+}
+
+/* 閉じる */
+#pwa-close-btn {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.85);
+}
+
+/* アニメ */
+@keyframes popupFade {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
