@@ -736,25 +736,21 @@ def profile_edit(request):
             )
 
             if profile_form.is_valid() and user_form.is_valid():
+
                 # =========================
                 # user保存
                 # =========================
-                user = user_form.save(commit=False)
+                user = user_form.save()
 
                 # =========================
-                # 🔥 ホーム画面設定保存
-                # =========================
-                home_screen = request.POST.get("home_screen")
-
-                if home_screen:
-                    user.home_screen = home_screen
-                    user.save()
-
-                # =========================
-                # profile保存（完全固定）
+                # profile保存
                 # =========================
                 profile.bio = profile_form.cleaned_data.get("bio")
-                profile.profile_image = profile_form.cleaned_data.get("profile_image")
+
+                image = profile_form.cleaned_data.get("profile_image")
+
+                if image:
+                    profile.profile_image = image
 
                 # 🔥 絶対に他ユーザーへ紐付かない保証
                 profile.user_id = request.user.id

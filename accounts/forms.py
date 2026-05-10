@@ -152,12 +152,17 @@ class CustomUserCreationForm(UserCreationForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["username"]
+        fields = [
+            "username",
+            "home_screen",
+            ]
+        
         widgets = {
             "username": forms.TextInput(attrs={
                 "placeholder": "ユーザー名を入力",
                 "class": "form-input"
-            })
+            }),
+            "home_screen": forms.HiddenInput(),
         }
 
 # =========================
