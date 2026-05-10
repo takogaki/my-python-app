@@ -102,7 +102,7 @@ if DJANGO_ENV == "production":
     SESSION_COOKIE_HTTPONLY = True
 
     SESSION_COOKIE_SAMESITE = "Lax"
-    CSRF_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "Lax"
 
     CSRF_TRUSTED_ORIGINS = [
         "https://my-python-app-0t2k.onrender.com",
