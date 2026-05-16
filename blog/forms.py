@@ -83,17 +83,6 @@ class PostForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
-    def clean_video_url(self):
-        video_url = self.cleaned_data.get("video_url")
-
-        if not video_url:
-            return None
-
-        if not self.user or not self.user.is_authenticated:
-            raise ValidationError("動画の投稿にはログインが必要です。")
-
-        return validate_video_url(video_url)
-    
 
 # =======================
 # コメントフォーム
@@ -122,13 +111,3 @@ class CommentForm(forms.ModelForm):
                 f"{parent_name} さんに返信する"
             )
 
-    def clean_video_url(self):
-        video_url = self.cleaned_data.get("video_url")
-
-        if not video_url:
-            return None
-
-        if not self.user or not self.user.is_authenticated:
-            raise ValidationError("動画の投稿にはログインが必要です。")
-
-        return validate_video_url(video_url)

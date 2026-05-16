@@ -18,31 +18,24 @@
         <h2 class="page-title">新規登録</h2>
         <p class="page-description">
             アカウントを作成すると、<br>
-            日記・動画投稿・メッセージ機能が利用できます。
+            日記・DM機能が利用できます。
         </p>
     </div>
 
     <!-- フォーム -->
     <div class="post-form-card">
-        <form method="POST" novalidate>
+        <form method="POST" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-
-            <!-- 🔴 エラー表示 -->
-            {% if form.errors %}
-            <div class="error-box">
-                {% for field in form %}
-                {% for error in field.errors %}
-                <p>{{ error }}</p>
-                {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                <p>{{ error }}</p>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <!-- 🔥 利用規約同意 -->
+        
+            <!-- 利用規約 -->
             <div class="terms-box">
+        
+                {% if form.agree.errors %}
+                <div class="field-error">
+                    {{ form.agree.errors }}
+                </div>
+                {% endif %}
+        
                 <label class="terms-label">
                     {{ form.agree }}
                     <span>
@@ -53,43 +46,109 @@
                     </span>
                 </label>
             </div>
-
-            <!-- 各フィールド -->
-            <div class="form-group">
+        
+            <!-- ユーザー名 -->
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+        
+                {% if form.username.errors %}
+                <div class="field-error">
+                    {{ form.username.errors }}
+                </div>
+                {% endif %}
+        
                 <label>ユーザー名</label>
                 {{ form.username }}
             </div>
-
-            <div class="form-group">
+        
+            <!-- メール -->
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+        
+                {% if form.email.errors %}
+                <div class="field-error">
+                    {{ form.email.errors }}
+                </div>
+                {% endif %}
+        
                 <label>メールアドレス</label>
                 {{ form.email }}
             </div>
-
-            <div class="form-group">
+        
+            <!-- パスワード -->
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+        
+                {% if form.password1.errors %}
+                <div class="field-error">
+                    {{ form.password1.errors }}
+                </div>
+                {% endif %}
+        
                 <label>パスワード</label>
                 {{ form.password1 }}
             </div>
-
-            <div class="form-group">
+        
+            <!-- パスワード確認 -->
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+        
+                {% if form.password2.errors %}
+                <div class="field-error">
+                    {{ form.password2.errors }}
+                </div>
+                {% endif %}
+        
                 <label>パスワード（確認）</label>
                 {{ form.password2 }}
             </div>
+        
+            <!-- 性別 -->
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
 
-            <div class="form-group">
+                {% if form.gender.errors %}
+                <div class="field-error">
+                    {{ form.gender.errors }}
+                </div>
+                {% endif %}
+        
                 <label>性別</label>
                 {{ form.gender }}
             </div>
-
-            <div class="form-group">
+        
+            <!-- 生年月日 -->
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+        
+                {% if form.birth_date_input.errors %}
+                <div class="field-error">
+                    {{ form.birth_date_input.errors }}
+                </div>
+                {% endif %}
+        
                 <label>生年月日（8桁）</label>
                 {{ form.birth_date_input }}
             </div>
-
-            <!-- 登録ボタン -->
+        
+            <!-- 🔥 プロフィール画像 -->
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+        
+                {% if form.profile_image.errors %}
+                <div class="field-error">
+                    {{ form.profile_image.errors }}
+                </div>
+                {% endif %}
+        
+                <label>プロフィール画像</label>
+                {{ form.profile_image }}
+            </div>
+        
+            <!-- non_field_errors -->
+            {% if form.non_field_errors %}
+            <div class="field-error">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+        
             <button type="submit" id="submitBtn" class="submit-btn" disabled>
                 仮登録する
             </button>
-
+        
         </form>
 
         <p class="form-note">

@@ -200,3 +200,36 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error:", error));
     });
 });
+
+/* =========================
+   Guest Like
+========================= */
+
+document.querySelectorAll(".guestLikeBtn").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        // ボタンぷにっ
+        btn.classList.add("pop");
+
+        // ❤️生成
+        const heart = document.createElement("div");
+        heart.className = "guest-heart-pop";
+        heart.innerHTML = "❤";
+
+        btn.parentElement.appendChild(heart);
+
+        // 0.4秒後に登録画面へ
+        setTimeout(() => {
+            window.location.href = "/accounts/signup/";
+        }, 1000);
+
+        // 後処理
+        setTimeout(() => {
+            btn.classList.remove("pop");
+            heart.remove();
+        }, 800);
+
+    });
+
+});

@@ -45,29 +45,36 @@ User = get_user_model()
 # =========================
 # 既存機能（そのまま）
 # =========================
-@login_required
 def user_list(request):
+
     users = CustomUser.objects.filter(
         is_active=True,
         is_superuser=False
-    ).exclude(pk=request.user.pk)
-
-    # ✅ マッチ済み
-    matches = Match.objects.filter(
-        Q(user1=request.user) | Q(user2=request.user)
     )
 
-    matched_user_ids = []
-    for match in matches:
-        if match.user1 == request.user:
-            matched_user_ids.append(match.user2.id)
-        else:
-            matched_user_ids.append(match.user1.id)
+    # ログイン中だけ自分を除外
+    if request.user.is_authenticated:
+        users = users.exclude(pk=request.user.pk)
 
-    # ✅ LIKE済み（修正版）
-    liked_user_ids = UserLike.objects.filter(
-        from_user=request.user
-    ).values_list("to_user_id", flat=True)
+    matched_user_ids = []
+    liked_user_ids = []
+
+    # ログイン中だけ取得
+    if request.user.is_authenticated:
+
+        matches = Match.objects.filter(
+            Q(user1=request.user) | Q(user2=request.user)
+        )
+
+        for match in matches:
+            if match.user1 == request.user:
+                matched_user_ids.append(match.user2.id)
+            else:
+                matched_user_ids.append(match.user1.id)
+
+        liked_user_ids = UserLike.objects.filter(
+            from_user=request.user
+        ).values_list("to_user_id", flat=True)
 
     return render(request, "accounts/user_list.html", {
         "users": users,

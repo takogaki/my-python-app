@@ -59,6 +59,12 @@
             {% endif %}
             {% endwith %}
 
+            {% if user.profile.bio %}
+            <div class="profile-bio">
+                {{ user.profile.bio|linebreaksbr }}
+            </div>
+            {% endif %}
+
             <div class="profile-tags">
             
                 {% regroup profile_tags by tag.category as category_list %}

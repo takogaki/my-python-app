@@ -1,26 +1,19 @@
 {% if obj.video_url %}
 
-    {% if not user.is_authenticated %}
-    <!-- 🔒 未ログイン用 -->
-    <div class="video-placeholder locked">
-        <a href="{% url 'login' %}?next={{ request.path }}" class="video-label">
-            ログインすると動画を視聴できます
-        </a>
-    </div>
-
-    {% else %}
-    <!-- ✅ ログイン済 -->
-
+        {% if obj.video_url %}
+        
         {% if obj.is_effective_live %}
+        
         <div class="video-placeholder ended">
             <span class="video-label ended">
                 🔴 この動画は配信終了しています
             </span>
         </div>
+        
         {% else %}
-        <!-- ▶ 再生可能 -->
+        
         <a href="{{ obj.video_url }}" target="_blank" rel="noopener" class="video-placeholder clickable">
-
+        
             <!-- ===============================
             Facebook
             =============================== -->
@@ -121,8 +114,11 @@
                 {% endif %}
             {% endif %}
 
+        <!-- 動画ラベル -->
+        
         </a>
+        
         {% endif %}
-
-    {% endif %}
+        
+        {% endif %}
 {% endif %}

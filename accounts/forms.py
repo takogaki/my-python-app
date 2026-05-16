@@ -15,6 +15,7 @@ User = get_user_model()
 # 🔥 共通バリデーション
 # =========================
 def validate_profile_image(image):
+
     if not image:
         return image
 
@@ -25,11 +26,17 @@ def validate_profile_image(image):
     ]
 
     if image.content_type not in allowed_types:
-        raise ValidationError("画像形式は PNG / JPG / WEBP のみ対応しています。")
+        raise ValidationError(
+            "画像形式は PNG / JPG / WEBP のみ対応しています。"
+        )
 
-    max_size = 2 * 1024 * 1024  # 2MB
+    # 🔥 10MB
+    max_size = 10 * 1024 * 1024
+
     if image.size > max_size:
-        raise ValidationError("画像サイズは2MB以内にしてください。")
+        raise ValidationError(
+            "画像サイズは10MB以内にしてください。"
+        )
 
     return image
 
@@ -65,8 +72,17 @@ def validate_username_ascii(value):
 class CustomUserCreationForm(UserCreationForm):
 
     agree = forms.BooleanField(
+    required=True,
+    label="利用規約に同意する"
+)
+
+    profile_image = forms.ImageField(
         required=True,
-        label="利用規約に同意する"
+        validators=[validate_profile_image],
+        widget=forms.FileInput(attrs={
+            "accept": "image/png,image/jpeg,image/webp"
+        }),
+        label="プロフィール画像"
     )
 
     def clean(self):
@@ -80,6 +96,28 @@ class CustomUserCreationForm(UserCreationForm):
     username = forms.CharField(
         label="ユーザー名",
         validators=[validate_username_ascii],
+    )
+
+    email = forms.EmailField(
+        required=True,
+        label="メールアドレス",
+        widget=forms.EmailInput(attrs={
+            "placeholder": "example@gmail.com",
+            "autocomplete": "email",
+        }),
+        error_messages={
+            "required": "メールアドレスを入力してください",
+            "invalid": "正しいメールアドレスを入力してください",
+        }
+    )
+
+    gender = forms.ChoiceField(
+        required=True,
+        choices=CustomUser.GENDER_CHOICES,
+        label="性別",
+        error_messages={
+            "required": "性別を選択してください",
+        }
     )
 
     birth_date_input = forms.CharField(
@@ -102,6 +140,7 @@ class CustomUserCreationForm(UserCreationForm):
             "gender",
             "email",
             "birth_date_input",
+            "profile_image",
             "agree",
         ]
 
@@ -118,6 +157,19 @@ class CustomUserCreationForm(UserCreationForm):
             raise ValidationError("このユーザー名はすでに使われています")
 
         return username
+    
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        if not email:
+            raise ValidationError("メールアドレスを入力してください")
+
+        email = email.lower().strip()
+
+        if CustomUser.objects.filter(email=email).exists():
+            raise ValidationError("このメールアドレスは既に登録されています")
+
+        return email
 
     def clean_birth_date_input(self):
         value = self.cleaned_data["birth_date_input"]
@@ -144,6 +196,14 @@ class CustomUserCreationForm(UserCreationForm):
 
         if commit:
             user.save()
+
+            profile, created = Profile.objects.get_or_create(
+                user=user
+            )
+
+            profile.profile_image = self.cleaned_data["profile_image"]
+            profile.save()
+
         return user
     
 # =========================

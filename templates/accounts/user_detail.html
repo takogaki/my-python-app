@@ -56,13 +56,20 @@
 
         <div class="profile-info">
             <p><strong>性別：</strong>{{ user.get_gender_display }}</p>
-
+        
             {% with age=user.get_age %}
             {% if age %}
             <p><strong>年齢：</strong>{{ age }}歳</p>
             {% endif %}
             {% endwith %}
         </div>
+        
+        <!-- 🔥 一言 -->
+        {% if user.profile.bio %}
+        <div class="profile-bio">
+            {{ user.profile.bio|linebreaksbr }}
+        </div>
+        {% endif %}
 
         <div class="profile-tags">
         

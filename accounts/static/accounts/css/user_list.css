@@ -135,6 +135,107 @@ body {
 }
 
 /* =========================
+   USER BIO PREVIEW
+========================= */
+.user-bio {
+    position: relative;
+
+    margin-top: 10px;
+
+    font-size: 13px;
+    line-height: 1.7;
+
+    color: rgba(255,255,255,0.92);
+
+    overflow: hidden;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    word-break: break-word;
+
+    white-space: normal;
+}
+
+.user-bio-preview {
+    position: relative;
+
+    margin-top: 10px;
+    padding-right: 8px;
+
+    font-size: 13px;
+    line-height: 1.75;
+    letter-spacing: 0.2px;
+
+    color: rgba(255,255,255,0.92);
+
+    overflow: hidden;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    word-break: break-word;
+
+    text-shadow:
+        0 1px 2px rgba(0,0,0,0.45);
+
+    opacity: 0.96;
+
+    max-width: 92%;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* 下側を自然にフェード */
+.user-bio-preview::after {
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+
+    width: 42%;
+    height: 22px;
+
+    pointer-events: none;
+
+    background: linear-gradient(
+        to right,
+        rgba(0,0,0,0),
+        rgba(0,0,0,0.78)
+    );
+}
+
+/* カードhover時 */
+.card:hover .user-bio-preview {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+/* モバイル最適化 */
+@media (max-width: 768px) {
+
+    .user-bio-preview {
+        font-size: 12.5px;
+        line-height: 1.7;
+
+        max-width: 95%;
+
+        margin-top: 8px;
+    }
+
+    .user-bio-preview::after {
+        width: 48%;
+        height: 20px;
+    }
+}
+
+/* =========================
    Animation
 ========================= */
 .card.swipe-right,
@@ -179,34 +280,172 @@ body {
     .nav-arrow { display: none; }
 }
 
-
-/* ライクボタン */
+/* =========================
+   LIKE ICON SYSTEM
+========================= */
 .likeBtn {
-    width: 60px;
-    height: 60px;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 64px;
+    height: 64px;
+
     border-radius: 50%;
     border: none;
-    font-size: 26px;
+
+    background: rgba(255,255,255,0.92);
+
+    color: #607d8b;
+
     cursor: pointer;
+
+    transition: all 0.25s ease;
 
     background: white;
     color: #ff4d6d;
 
-    box-shadow: 0 8px 25px rgba(255,77,109,0.35);
-    transition: all 0.2s ease;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.18),
+        0 4px 12px rgba(255,255,255,0.08);
 }
 
 .likeBtn:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .likeBtn:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
+}
+
+.like-icon {
+    position: absolute;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: opacity 0.25s ease,
+                transform 0.25s ease;
+}
+
+/* 初期状態 */
+.default-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.liked-icon,
+.matched-icon {
+    opacity: 0;
+    transform: scale(0.7);
+}
+
+/* LIKE済み */
+.likeBtn.liked .default-icon {
+    opacity: 0;
+    transform: scale(0.7);
+}
+
+.likeBtn.liked .liked-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* MATCH状態 */
+.likeBtn.matched .default-icon,
+.likeBtn.matched .liked-icon {
+    opacity: 0;
+    transform: scale(0.7);
+}
+
+.likeBtn.matched .matched-icon {
+    opacity: 1;
+    transform: scale(1);
 }
 
 .likeBtn.liked {
     background: #ff4d6d;
     color: white;
+}
+
+/* =========================
+   ゲスト用LIKEボタン
+========================= */
+.guest-like-btn {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+    text-decoration: none;
+
+    background: rgba(255,255,255,0.92);
+    color: #ff4d6d;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.18),
+        0 4px 12px rgba(255,255,255,0.08);
+
+    transition: all 0.25s ease;
+}
+
+.guest-like-btn:hover {
+    transform: scale(1.08);
+}
+
+.guest-like-btn:active {
+    transform: scale(0.96);
+}
+
+/* =========================
+   Guest Like Pop
+========================= */
+
+.guest-like-btn.pop {
+    transform: scale(1.15);
+}
+
+.guest-heart-pop {
+    position: absolute;
+
+    bottom: 90px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: 34px;
+    color: #ff4d6d;
+
+    pointer-events: none;
+    z-index: 999;
+
+    animation: guestFloatHeart 0.8s ease forwards;
+}
+
+@keyframes guestFloatHeart {
+
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(0.5);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -20px) scale(1.3);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100px) scale(1);
+    }
 }
 
 /* =========================
@@ -240,6 +479,140 @@ body {
         opacity: 0;
         transform: translate(-50%, -80px) scale(1);
     }
+}
+
+/* =========================
+   CHAT BUTTON
+========================= */
+
+.chat-btn {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    text-decoration: none;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.95),
+            rgba(255,255,255,0.82)
+        );
+
+    backdrop-filter: blur(14px);
+
+    box-shadow:
+        0 10px 30px rgba(79,195,247,0.22),
+        inset 0 1px 1px rgba(255,255,255,0.5);
+
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
+}
+
+/* =========================
+   CHAT HEART BEAT
+========================= */
+
+.chat-btn {
+    animation: heartBeatDM 2.2s ease-in-out infinite;
+}
+
+/* hover中は停止 */
+.chat-btn:hover {
+    animation-play-state: paused;
+}
+
+@keyframes heartBeatDM {
+
+    0% {
+        transform: scale(1);
+    }
+
+    8% {
+        transform: scale(1.08);
+    }
+
+    14% {
+        transform: scale(0.98);
+    }
+
+    20% {
+        transform: scale(1.12);
+    }
+
+    28% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* SVG */
+.chat-btn svg {
+    width: 30px;
+    height: 30px;
+
+    stroke: #4fc3f7;
+
+    transition:
+        transform 0.25s ease,
+        stroke 0.25s ease;
+}
+
+/* hover */
+.chat-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+
+    box-shadow:
+        0 16px 40px rgba(79,195,247,0.35),
+        inset 0 1px 1px rgba(255,255,255,0.6);
+}
+
+.chat-btn:hover svg {
+    transform: scale(1.08);
+}
+
+/* tap */
+.chat-btn:active {
+    transform: scale(0.96);
+}
+
+/* 🔒 lock */
+.chat-btn.lock {
+    background:
+        rgba(255,255,255,0.12);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(10px);
+}
+
+.chat-btn.lock svg,
+.chat-btn.lock {
+    color: white;
+    stroke: white;
+}
+
+/* 🔒ロック版 */
+.chat-btn.lock {
+    background: rgba(255,255,255,0.15);
+    color: white;
+
+    backdrop-filter: blur(10px);
+
+    box-shadow: none;
 }
 
 
