@@ -294,74 +294,95 @@
     
     </div>
 
-    <script>
+   <script>
 
-        let deferredPrompt = null;
+    let deferredPrompt = null;
 
-        const popup =
-            document.getElementById("pwa-install-popup");
+    const popup = document.getElementById("pwa-install-popup");
+    const installBtn = document.getElementById("pwa-install-btn");
+    const closeBtn = document.getElementById("pwa-close-btn");
 
-        const installBtn =
-            document.getElementById("pwa-install-btn");
+    /* =========================
+    🧠 インストール済み判定
+    ========================= */
+    function isInstalled() {
+        return (
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true
+        );
+    }
 
-        const closeBtn =
-            document.getElementById("pwa-close-btn");
+    /* =========================
+    🧠 非表示期間チェック
+    ========================= */
+    function getHiddenUntil() {
+        return Number(localStorage.getItem("pwa-popup-hidden-until") || 0);
+    }
 
-        /* =========================
-        📲 install可能検知
-        ========================= */
-        window.addEventListener(
-            "beforeinstallprompt",
-            (e) => {
+    /* =========================
+    📲 install候補検知
+    ========================= */
+    window.addEventListener("beforeinstallprompt", (e) => {
 
-                e.preventDefault();
+        // ブラウザ標準バナー抑制
+        e.preventDefault();
 
-                deferredPrompt = e;
+        // インストール済みなら何もしない
+        if (isInstalled()) return;
 
-                /* 3秒後表示 */
-                setTimeout(() => {
+        const now = Date.now();
 
-                    popup.classList.add("show");
+        // 非表示期間中なら出さない
+        if (now < getHiddenUntil()) return;
 
-                }, 3000);
-            }
+        deferredPrompt = e;
+
+        // 少し遅延して自然に表示
+        setTimeout(() => {
+            popup.classList.add("show");
+        }, 3000);
+
+    });
+
+    /* =========================
+    📲 インストール実行
+    ========================= */
+    installBtn.addEventListener("click", async () => {
+
+        if (!deferredPrompt) return;
+
+        deferredPrompt.prompt();
+
+        await deferredPrompt.userChoice;
+
+        deferredPrompt = null;
+
+        popup.classList.remove("show");
+
+        // 30日間非表示
+        localStorage.setItem(
+            "pwa-popup-hidden-until",
+            Date.now() + (1000 * 60 * 60 * 24 * 30)
         );
 
-        /* =========================
-        📲 インストール
-        ========================= */
-        installBtn.addEventListener(
-            "click",
-            async () => {
+    });
 
-                if (!deferredPrompt) return;
+    /* =========================
+    ❌ 閉じる（あとで）
+    ========================= */
+    closeBtn.addEventListener("click", () => {
 
-                deferredPrompt.prompt();
+        popup.classList.remove("show");
 
-                const choice =
-                    await deferredPrompt.userChoice;
-
-                console.log(choice);
-
-                deferredPrompt = null;
-
-                popup.classList.remove("show");
-            }
+        // 7日間非表示
+        localStorage.setItem(
+            "pwa-popup-hidden-until",
+            Date.now() + (1000 * 60 * 60 * 24 * 7)
         );
 
-        /* =========================
-        ❌ 閉じる
-        ========================= */
-        closeBtn.addEventListener(
-            "click",
-            () => {
+    });
 
-                popup.classList.remove("show");
-
-            }
-        );
-
-    </script>
+</script>
 
 </body>
 
