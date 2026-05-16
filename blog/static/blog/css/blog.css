@@ -782,3 +782,46 @@
 .subtle-report {
     background: transparent !important;
 }
+
+.ad-style {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+
+    display: block; /* ←ズレ防止の核心 */
+}
+
+.ad-label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+.ad-title {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+}
+
+.ad-meta {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.ad-text {
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 12px;
+}
+
+.ad-body {
+    width: 100%;
+}
+
+/* adsbygoogleのズレ対策 */
+.ad-body ins {
+    display: block !important;
+    margin: 0 auto;
+    width: 100% !important;
+}

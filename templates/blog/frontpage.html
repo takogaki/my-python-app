@@ -93,29 +93,75 @@
     <h2 class="subtitle">{{ post.title }}</h2>
     <small>Posted at {{ post.posted_date }}</small>
 
-    <!-- ✅ 改行を反映させる本文表示 -->
-        <p class="post-content">
-            {{ post.body|truncatechars:120|linebreaksbr }}
-        </p>
+    <p class="post-content">
+        {{ post.body|truncatechars:120|linebreaksbr }}
+    </p>
 
-    <!-- 🔽 画像サムネ -->
     {% if post.image %}
     <img src="{{ post.image.url }}" class="comment-media-thumb">
     {% endif %}
 
-    <!-- 🔽 動画サムネ -->
-    <!-- {% include "blog/video_embed.html" with video_url=post.video_url %} -->
     {% include "blog/video_embed.html" with obj=post %}
-    
+
     {% if post.slug %}
-        <a href="{% url 'blog:post_detail' slug=post.slug %}">
-            もっと読む
-            <span class="comment-count">
-                💬 {{ post.comment_count }}
-            </span>
-        </a>
+    <a href="{% url 'blog:post_detail' slug=post.slug %}">
+        もっと読む
+        <span class="comment-count">
+            💬 {{ post.comment_count }}
+        </span>
+    </a>
     {% endif %}
 </div>
+
+{# ========================= #}
+{# 🔥 広告ロジックここから #}
+{# ========================= #}
+
+{# ① 最初の広告：4投稿目 #}
+{% if forloop.counter == 4 %}
+<div class="post block ad-style">
+
+    <p class="post-author ad-label">
+        スポンサー
+    </p>
+
+    <h2 class="subtitle ad-title">
+        おすすめコンテンツ
+    </h2>
+
+    <p class="post-content ad-text">
+        あなたに合った広告を表示しています
+    </p>
+
+    <div class="ad-loading">広告読み込み中...</div>
+
+    <ins class="adsbygoogle ad-ins" style="display:block" data-ad-client="ca-pub-3868051569482312"
+        data-ad-slot="8684380813" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+</div>
+{% endif %}
+
+{# ② 5投稿ごとに広告 #}
+{% if forloop.counter > 5 and forloop.counter|add:"-5"|divisibleby:5 %}
+<div class="post block ad-style">
+
+    <p class="post-author ad-label">
+        スポンサー
+    </p>
+
+    <h2 class="subtitle ad-title">
+        おすすめコンテンツ
+    </h2>
+
+    <p class="post-content ad-text">
+        あなたに合った広告を表示しています
+    </p>
+
+    <ins class="adsbygoogle ad-ins" style="display:block" data-ad-client="ca-pub-3868051569482312"
+        data-ad-slot="8684380813" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+</div>
+{% endif %}
 
 {% endfor %}
 
