@@ -449,3 +449,8 @@ html, body {
     color: #888;
     cursor: pointer;
 }
+
+.ad-media-placeholder {
+    height: 60vh;
+    background: #f2f2f2;
+}
