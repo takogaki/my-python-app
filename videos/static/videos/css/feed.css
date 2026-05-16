@@ -421,21 +421,31 @@ html, body {
 /* 広告の高さ固定 */
 .ad-card {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
 }
 
-.comment-user {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: inherit;
+/* 動画っぽい空白領域（重要） */
+.ad-media-placeholder {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background: linear-gradient(180deg, #111, #222);
 }
 
-.comment-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    object-fit: cover;
+/* captionを完全同化 */
+.ad-caption {
+    padding: 12px 14px;
+}
+
+/* captionテキスト */
+.ad-caption .caption-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #ddd;
+}
+
+/* もっと見るボタンも統一 */
+.ad-caption .more-btn {
+    font-size: 0.8rem;
+    color: #888;
+    cursor: pointer;
 }
