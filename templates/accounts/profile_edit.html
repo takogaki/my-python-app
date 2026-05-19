@@ -42,6 +42,31 @@
                 {{ user_form.errors }}
             </div>
             {% endif %}
+
+        {% if force_profile_image %}
+        <div class="force-profile-alert">
+        
+            <div class="force-icon">
+                📸
+            </div>
+        
+            <div class="force-text">
+        
+                <strong>
+                    プロフィール画像を設定してください
+                </strong>
+        
+                安全性向上のため、
+                プロフィール画像の設定が必要です。
+        
+                <div class="force-sub">
+                    画像を設定するまで他の機能は利用できません。
+                </div>
+        
+            </div>
+        
+        </div>
+        {% endif %}
             
             {% if profile_form.errors %}
             <div class="error-box">

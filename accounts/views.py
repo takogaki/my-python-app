@@ -756,6 +756,44 @@ def profile_edit(request):
 
                 image = profile_form.cleaned_data.get("profile_image")
 
+                # =========================
+                # 🔥 default画像判定
+                # =========================
+                image_url = ""
+
+                if profile.profile_image:
+                    image_url = str(profile.profile_image)
+
+                force_profile_image = (
+                    not profile.profile_image
+                    or "default" in image_url
+                )
+
+                # =========================
+                # 🔥 未画像ユーザーは画像必須
+                # =========================
+                if force_profile_image and not image:
+
+                    messages.error(
+                        request,
+                        "プロフィール画像を設定してください。"
+                    )
+
+                    return render(request, "accounts/profile_edit.html", {
+                        "profile_form": profile_form,
+                        "user_form": user_form,
+                        "categories": TagCategory.objects.prefetch_related("tags").order_by("order"),
+                        "completion": profile_completion(profile),
+                        "selected_tags": {
+                            pt.tag_id: pt.level
+                            for pt in ProfileTag.objects.filter(profile=profile)
+                        },
+                        "force_profile_image": True,
+                    })
+
+                # =========================
+                # 🔥 新画像保存
+                # =========================
                 if image:
                     profile.profile_image = image
 
@@ -800,12 +838,26 @@ def profile_edit(request):
 
     completion = profile_completion(profile)
 
+    # =========================
+    # 🔥 未画像ユーザー判定
+    # =========================
+    image_url = ""
+
+    if profile.profile_image:
+        image_url = str(profile.profile_image)
+
+    force_profile_image = (
+        not profile.profile_image
+        or "default" in image_url
+    )
+
     return render(request, "accounts/profile_edit.html", {
         "profile_form": profile_form,
         "user_form": user_form,
         "categories": categories,
         "completion": completion,
         "selected_tags": selected_tags,
+        "force_profile_image": force_profile_image,
     })
 
 # =========================

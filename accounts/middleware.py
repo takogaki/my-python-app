@@ -1,7 +1,9 @@
 # accounts/middleware.py
+
 from django.shortcuts import redirect
 from django.urls import reverse
 from .models import Profile
+
 
 class TermsAgreementMiddleware:
 
@@ -10,28 +12,31 @@ class TermsAgreementMiddleware:
 
     def __call__(self, request):
 
-        # =========================
-        # 🔥 絶対許可
-        # =========================
-
-        always_allowed_paths = [
-            "/favicon.ico",
-            "/robots.txt",
-        ]
-
-        if request.path in always_allowed_paths:
-            return self.get_response(request)
+        current_path = request.path.rstrip("/")
 
         # =========================
-        # 🔥 static / media許可
+        # 🔥 static/media許可
         # =========================
 
         if request.path.startswith((
             "/static/",
             "/media/",
+        )):
+            return self.get_response(request)
+
+        # =========================
+        # 🔥 favicon等
+        # =========================
+
+        allowed_public_paths = [
             "/favicon.ico",
             "/robots.txt",
-        )):
+        ]
+
+        if current_path in [
+            p.rstrip("/")
+            for p in allowed_public_paths
+        ]:
             return self.get_response(request)
 
         # =========================
@@ -40,50 +45,55 @@ class TermsAgreementMiddleware:
 
         if request.user.is_authenticated:
 
-            # 管理者除外
-            if request.user.is_superuser:
+            # =========================
+            # 🔥 admin除外
+            # =========================
+
+            if (
+                request.user.is_superuser
+                or request.path.startswith("/admin/")
+            ):
                 return self.get_response(request)
 
             # =========================
-            # 🔥 利用規約未同意
+            # 🔥 共通許可ページ
+            # =========================
+
+            common_allowed_paths = [
+                reverse("accounts:logout").rstrip("/"),
+                reverse("accounts:profile_edit").rstrip("/"),
+                reverse("accounts:terms").rstrip("/"),
+            ]
+
+            # POSTは絶対許可
+            if request.method == "POST":
+                return self.get_response(request)
+
+            # =========================
+            # 🔥 利用規約チェック
             # =========================
 
             if not request.user.agreed_terms_at:
 
-                allowed_paths = [
-                    reverse("accounts:terms"),
-                    reverse("accounts:logout"),
-                    reverse("accounts:signup"),
-                ]
-
-                if request.method == "POST":
-                    return self.get_response(request)
-
-                if request.path not in allowed_paths:
+                if current_path not in common_allowed_paths:
                     return redirect("accounts:terms")
 
             # =========================
-            # 🔥 プロフィール画像強制
+            # 🔥 画像チェック
             # =========================
 
-            allowed_profile_paths = [
-                reverse("accounts:profile_edit"),
-                reverse("accounts:logout"),
-            ]
-
-            # admin許可
-            if request.path.startswith("/admin/"):
-                return self.get_response(request)
-
-            # profile取得
             profile, created = Profile.objects.get_or_create(
                 user=request.user
             )
 
-            # 🔥 画像未設定
-            if not profile.profile_image:
+            has_real_image = (
+                profile.profile_image
+                and "default" not in str(profile.profile_image)
+            )
 
-                if request.path not in allowed_profile_paths:
+            if not has_real_image:
+
+                if current_path not in common_allowed_paths:
                     return redirect("accounts:profile_edit")
 
         return self.get_response(request)

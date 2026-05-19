@@ -276,3 +276,141 @@ textarea {
     color: #aaa;
     line-height: 1.5;
 }
+
+/* =========================
+🔥 強制プロフィール画像通知
+========================= */
+
+.force-profile-alert {
+
+    position: relative;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+
+    margin: 0 0 28px;
+    padding: 18px 18px 18px 16px;
+
+    border-radius: 20px;
+
+    /* 🔥 背景を濃く */
+    background:
+        linear-gradient(
+            135deg,
+            rgba(35,10,12,0.96),
+            rgba(55,20,10,0.94)
+        );
+
+    border:
+        1px solid rgba(255,120,120,0.28);
+
+    box-shadow:
+        0 12px 34px rgba(0,0,0,0.38),
+        0 0 24px rgba(255,69,58,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+
+    backdrop-filter: blur(18px);
+
+    overflow: hidden;
+}
+
+/* 左ライン */
+.force-profile-alert::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 5px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #ff453a,
+            #ff9f0a
+        );
+}
+
+/* アイコン */
+.force-icon {
+
+    flex-shrink: 0;
+
+    width: 56px;
+    height: 56px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background:
+        rgba(255,255,255,0.05);
+
+    font-size: 28px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05);
+
+    animation:
+        profilePulse 1.5s infinite;
+}
+
+/* テキスト */
+.force-text {
+
+    color: rgba(255,255,255,0.96);
+
+    font-size: 14px;
+    line-height: 1.9;
+
+    letter-spacing: 0.2px;
+}
+
+/* タイトル */
+.force-text strong {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    color: #fff;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.12);
+}
+
+/* サブ文 */
+.force-sub {
+
+    margin-top: 8px;
+
+    color: rgba(255,255,255,0.68);
+
+    font-size: 13px;
+}
+
+/* pulse */
+@keyframes profilePulse {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
