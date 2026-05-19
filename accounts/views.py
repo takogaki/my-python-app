@@ -39,6 +39,7 @@ from django.db import transaction
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LoginView
 
+
 User = get_user_model()
 
 
@@ -879,6 +880,32 @@ def profile_image_delete(request):
 @login_required
 def withdraw_confirm(request):
     return render(request, "accounts/withdraw_confirm.html")
+
+# =========================
+# ★ ログアウト
+# =========================
+@never_cache
+def logout_view(request):
+
+    # 🔥 完全ログアウト
+    logout(request)
+
+    # 🔥 session完全破棄
+    request.session.flush()
+
+    response = redirect("accounts:login")
+
+    # 🔥 キャッシュ禁止
+    response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+
+    # 🔥 Cookie削除
+    response.delete_cookie("sessionid")
+    response.delete_cookie("csrftoken")
+
+    return response
+
 
 # 退会処理（POSTのみ）
 @login_required

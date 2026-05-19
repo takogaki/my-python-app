@@ -293,10 +293,38 @@
 
         </div>
 
-        <!-- 保存ボタン -->
-        <button type="submit" class="btn btn-primary">
-            保存
-        </button>
+        <!-- ボタンエリア -->
+        <div class="profile-action-buttons">
+        
+            <!-- 保存 -->
+            <button type="submit" class="btn btn-primary">
+                保存
+            </button>
+        
+            {% if force_profile_image %}
+        
+            <!-- 補足 -->
+            <div class="force-profile-note">
+        
+                プロフィール画像は
+                本人確認・安全性向上のため必須です。
+        
+            </div>
+        
+            <!-- ログアウト -->
+            <form method="POST" action="{% url 'accounts:logout' %}">
+            
+                {% csrf_token %}
+            
+                <button type="button" class="force-logout-btn" onclick="location.href='{% url "accounts:logout" %}'">
+                    ログアウト
+                </button>
+            
+            </form>
+        
+            {% endif %}
+        
+        </div>
 
         <div class="back-link">
             <a href="{% url 'accounts:mypage' %}">← マイページに戻る</a>

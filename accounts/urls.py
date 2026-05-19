@@ -13,7 +13,7 @@ urlpatterns = [
     path("signup/done/", views.signup_done, name="signup_done"),
 
     path("login/", CustomLoginView.as_view(), name="login"),
-    path("logout/", LogoutView.as_view(), name="logout"),
+    path("logout/", views.logout_view, name="logout"),
 
     # ログイン後のリダイレクト先（★これが唯一の after-login）
     path("after-login/", views.after_login_redirect, name="after_login"),
