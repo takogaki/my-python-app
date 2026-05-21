@@ -4,14 +4,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .forms import PageForm 
-from .models import Page, LikeRecord
+from .models import Page, LikeRecord, GuestLikeRecord
 from django.contrib.auth import get_user_model
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from accounts.models import CustomUser
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.db.models import F
 from accounts.utils import save_page_log
+import uuid
 
 User = get_user_model()
 
@@ -60,10 +61,27 @@ class PageListView(LoginRequiredMixin, ListView):
         )
 
 
-class PageDetailView(LoginRequiredMixin, DetailView):
+class PageDetailView(DetailView):
     model = Page
     template_name = "diary/page_detail.html"
     context_object_name = "page"
+
+    def get_object(self):
+
+        page = get_object_or_404(
+            Page,
+            pk=self.kwargs["pk"]
+        )
+
+        # 公開日記
+        if page.is_public:
+            return page
+
+        # 非公開日記は本人だけ
+        if self.request.user.is_authenticated and page.author == self.request.user:
+            return page
+
+        raise Http404()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,7 +155,7 @@ class UserDetailView(DetailView):
         return context
 
 
-@login_required
+
 def like_diary(request, pk):
 
     if request.method != "POST":
@@ -145,33 +163,90 @@ def like_diary(request, pk):
 
     page = get_object_or_404(Page, pk=pk)
 
-    # likesをDBで直接増加
-    Page.objects.filter(pk=pk).update(likes=F("likes") + 1)
+    # =========================
+    # 👍 総数加算
+    # =========================
+    Page.objects.filter(pk=pk).update(
+        likes=F("likes") + 1
+    )
 
-    # 最新取得
     page.refresh_from_db()
 
-    # LikeRecord取得 or 作成
-    like_record, created = LikeRecord.objects.get_or_create(
-        user=request.user,
-        page=page
-    )
+    # =========================
+    # ログインユーザー
+    # =========================
+    if request.user.is_authenticated:
 
-    # ユーザーのいいね回数更新（race condition防止）
-    LikeRecord.objects.filter(pk=like_record.pk).update(
-        like_count=F("like_count") + 1
-    )
+        like_record, created = LikeRecord.objects.get_or_create(
+            user=request.user,
+            page=page
+        )
 
-    like_record.refresh_from_db()
+        LikeRecord.objects.filter(
+            pk=like_record.pk
+        ).update(
+            like_count=F("like_count") + 1
+        )
 
-    # ManyToMany（重複防止はDB側）
-    page.liked_users.add(request.user)
+        like_record.refresh_from_db()
 
+        page.liked_users.add(request.user)
+
+        user_like_count = like_record.like_count
+
+    # =========================
+    # ゲストユーザー
+    # =========================
+    else:
+
+        guest_id = request.session.get("guest_id")
+
+        if not guest_id:
+            guest_id = str(uuid.uuid4())
+            request.session["guest_id"] = guest_id
+
+        guest_record, created = GuestLikeRecord.objects.get_or_create(
+            guest_id=guest_id,
+            page=page
+        )
+
+        GuestLikeRecord.objects.filter(
+            pk=guest_record.pk
+        ).update(
+            like_count=F("like_count") + 1
+        )
+
+        guest_record.refresh_from_db()
+
+        user_like_count = guest_record.like_count
+
+    # =========================
+    # 返却
+    # =========================
     return JsonResponse({
         "likes": page.likes,
         "unique_users": page.unique_likes_count(),
-        "user_like_count": like_record.like_count
+        "user_like_count": user_like_count
     })
+
+class PublicDiaryListView(ListView):
+
+    model = Page
+
+    template_name = "diary/public_diary_list.html"
+
+    context_object_name = "page_list"
+
+    paginate_by = 20
+
+    def get_queryset(self):
+
+        return Page.objects.filter(
+            is_public=True,
+            author__is_active=True
+        ).select_related(
+            "author"
+        ).order_by("-created_at")
 
 index = IndexView.as_view()
 page_create = PageCreateView.as_view()
@@ -179,3 +254,4 @@ page_list = PageListView.as_view()
 page_detail = PageDetailView.as_view()
 page_update = PageUpdateView.as_view()
 page_delete = PageDeleteView.as_view()
+public_diary_list = PublicDiaryListView.as_view()

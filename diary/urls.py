@@ -13,6 +13,7 @@ urlpatterns = [
     path('user/<int:user_id>/diaries/', views.user_diary_list, name='user_diary_list'),
     # path('diary/<int:diary_id>/edit/', views.page_update, name='page_update'),
     path('like/<uuid:pk>/', views.like_diary, name='like_diary'),  # いいねAPI
+    path("public/", views.public_diary_list, name="public_diary_list"),
 ]
 
 

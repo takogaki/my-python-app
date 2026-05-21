@@ -31,13 +31,9 @@
         {% for user in users %}
         <div class="card" data-user-id="{{ user.id }}">
 
-            {% if request.user.is_authenticated %}
             <a href="{% url 'accounts:user_detail' user.username %}">
-                {% else %}
-                <a href="{% url 'accounts:signup' %}">
-                    {% endif %}
-                    <img src="{{ user.get_profile_image }}" class="card-img" alt="プロフィール画像">
-                </a>
+                <img src="{{ user.get_profile_image }}" class="card-img" alt="プロフィール画像">
+            </a>
 
             <div class="profile-card">
                 <h2>

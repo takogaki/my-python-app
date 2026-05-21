@@ -1,0 +1,72 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+みんなの日記｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diary/css/public_diary_list.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="public-diary-container">
+
+    <h1 class="page-title">
+        みんなの日記
+    </h1>
+
+    {% for page in page_list %}
+
+    <div class="diary-card">
+
+        <div class="diary-header">
+
+            <a href="{% url 'accounts:user_detail' page.author.username %}" class="author-link">
+
+                {{ page.author.username }}
+
+            </a>
+
+            <span class="diary-date">
+                {{ page.page_date }}
+            </span>
+
+        </div>
+
+        <a href="{% url 'diary:page_detail' page.pk %}" class="diary-title">
+
+            {{ page.title }}
+
+        </a>
+
+        <p class="diary-body">
+            {{ page.body|truncatechars:140 }}
+        </p>
+
+        <div class="diary-footer">
+
+            <span>
+                👍 {{ page.likes }}
+            </span>
+
+            <span>
+                👥 {{ page.unique_likes_count }}
+            </span>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="empty-state">
+        まだ公開日記はありません。
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

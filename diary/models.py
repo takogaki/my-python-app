@@ -51,7 +51,14 @@ class Page(models.Model):
     )
 
     def unique_likes_count(self):
-        return self.liked_users.count()
+
+        user_count = self.liked_users.count()
+
+        guest_count = GuestLikeRecord.objects.filter(
+            page=self
+        ).count()
+
+        return user_count + guest_count
 
     def __str__(self):
         return self.title
@@ -108,3 +115,20 @@ class LikeRecord(models.Model):
         モデルの文字列表現
         """
         return f"{self.user.username} - {self.page.title} ({self.like_count}回)"
+    
+
+class GuestLikeRecord(models.Model):
+
+    guest_id = models.CharField(max_length=100)
+
+    page = models.ForeignKey(
+        Page,
+        on_delete=models.CASCADE
+    )
+
+    like_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("guest_id", "page")

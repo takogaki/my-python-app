@@ -128,14 +128,16 @@ def footprint_list(request):
     })
 
 # =========================
-# ★ ユーザープロフィール詳細ビュー（タグ表示＆足跡処理完成版）
+# ★ ユーザープロフィール詳細ビュー
+# （未ログイン閲覧対応版）
 # =========================
-class UserDetailView(LoginRequiredMixin, DetailView):
+class UserDetailView(DetailView):
     model = User
     template_name = "accounts/user_detail.html"
     context_object_name = "user"
 
     def get_object(self):
+
         user = get_object_or_404(
             User,
             username=self.kwargs["username"],
@@ -144,78 +146,130 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         )
 
         # =========================
-        # 🔥 足あと処理（最適化版）
+        # 🔥 足あと処理
+        # （ログイン時のみ）
         # =========================
-        if self.request.user != user:
+        if self.request.user.is_authenticated:
 
-            recent = Footprint.objects.filter(
-                from_user=self.request.user,
-                to_user=user,
-                created_at__gte=timezone.now() - timedelta(minutes=10)
-            ).exists()
+            if self.request.user != user:
 
-            if not recent:
-                Footprint.objects.update_or_create(
+                recent = Footprint.objects.filter(
                     from_user=self.request.user,
                     to_user=user,
-                    defaults={"created_at": timezone.now()}
-                )
+                    created_at__gte=timezone.now() - timedelta(minutes=10)
+                ).exists()
 
-            # 🔥 通知（6時間制限）
-            recent_notify = Notification.objects.filter(
-                recipient=user,
-                actor=self.request.user,
-                type="footprint",
-                created_at__gte=timezone.now() - timedelta(hours=6)
-            ).exists()
+                if not recent:
+                    Footprint.objects.update_or_create(
+                        from_user=self.request.user,
+                        to_user=user,
+                        defaults={
+                            "created_at": timezone.now()
+                        }
+                    )
 
-            if not recent_notify:
-                Notification.objects.create(
+                # =========================
+                # 🔥 通知（6時間制限）
+                # =========================
+                recent_notify = Notification.objects.filter(
                     recipient=user,
                     actor=self.request.user,
                     type="footprint",
-                    verb="さんがプロフィールを見ました"
-                )
+                    created_at__gte=timezone.now() - timedelta(hours=6)
+                ).exists()
+
+                if not recent_notify:
+
+                    Notification.objects.create(
+                        recipient=user,
+                        actor=self.request.user,
+                        type="footprint",
+                        verb="さんがプロフィールを見ました"
+                    )
 
         return user
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
 
         user = self.object
 
+        # =========================
+        # ❤️ LIKE済み判定
+        # =========================
         is_liked = False
 
         if self.request.user.is_authenticated:
+
             is_liked = UserLike.objects.filter(
                 from_user=self.request.user,
                 to_user=user
             ).exists()
+
         context["is_liked"] = is_liked
 
+        # =========================
         # 🔥 プロフィール
-        profile, _ = Profile.objects.get_or_create(user=user)
-
-        context["profile_tags"] = ProfileTag.objects.filter(
-            profile=profile
-        ).select_related("tag__category")
-
-        # 🔥 相性スコア
-        context["score"] = compatibility(self.request.user, user)
-
-        # 🔥 投稿
-        context["public_pages"] = Page.objects.filter(
-            author=user,
-            is_public=True
-        ).order_by("-page_date")
-
-        context["blog_posts"] = Post.objects.filter(
-            author=user
-        ).order_by("-posted_date")
-
-        context["video_posts"] = PostVideo.objects.filter(
+        # =========================
+        profile, _ = Profile.objects.get_or_create(
             user=user
-        ).order_by("-created_at")
+        )
+
+        context["profile_tags"] = (
+            ProfileTag.objects
+            .filter(profile=profile)
+            .select_related("tag__category")
+        )
+
+        # =========================
+        # 💘 相性スコア
+        # （ログイン時のみ）
+        # =========================
+        score = None
+
+        if self.request.user.is_authenticated:
+
+            try:
+                score = compatibility(
+                    self.request.user,
+                    user
+                )
+            except:
+                score = None
+
+        context["score"] = score
+
+        # =========================
+        # 📝 公開日記
+        # =========================
+        context["public_pages"] = (
+            Page.objects.filter(
+                author=user,
+                is_public=True
+            )
+            .order_by("-page_date")
+        )
+
+        # =========================
+        # 📰 ブログ
+        # =========================
+        context["blog_posts"] = (
+            Post.objects.filter(
+                author=user
+            )
+            .order_by("-posted_date")
+        )
+
+        # =========================
+        # 🎥 動画
+        # =========================
+        context["video_posts"] = (
+            PostVideo.objects.filter(
+                user=user
+            )
+            .order_by("-created_at")
+        )
 
         return context
 

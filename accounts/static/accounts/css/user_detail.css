@@ -174,7 +174,8 @@ body {
     margin-top: 16px;
 }
 
-.btn {
+.card-actions .btn,
+.card-footer .btn {
     display: inline-block;
     padding: 10px 14px;
     border-radius: 999px;
@@ -183,12 +184,13 @@ body {
     transition: 0.2s;
 }
 
-.btn.primary {
+.card-actions .btn.primary {
     background: linear-gradient(135deg, #ff7a7a, #ff4d6d);
     color: #fff;
 }
 
-.btn.outline {
+.card-actions .btn.outline,
+.card-footer .btn.outline {
     border: 1px solid #ddd;
     color: #333;
     background: #fff;
@@ -404,4 +406,12 @@ LIKEボタン
 .user-like-btn.liked {
     background: #ccc;
     color: #333;
+}
+
+/* 未ログインlikeボタン */
+.guest-like-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
 }

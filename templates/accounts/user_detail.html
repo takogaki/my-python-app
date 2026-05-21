@@ -47,10 +47,27 @@
         {% endif %}
 
         <div class="user-like-section">
+        
+            {% if request.user.is_authenticated %}
+        
             <button class="user-like-btn {% if is_liked %}liked{% endif %}" data-user-id="{{ user.id }}">
+        
                 ❤️ {% if is_liked %}ライク済み{% else %}LIKEする{% endif %}
+        
             </button>
-            <span class="user-like-count">{{ user.user_likes_count }}</span>
+        
+            {% else %}
+        
+            <a href="{% url 'accounts:signup' %}" class="user-like-btn guest-like-btn">
+                ❤️ ログインしてLIKE
+            </a>
+        
+            {% endif %}
+        
+            <span class="user-like-count">
+                {{ user.user_likes_count }}
+            </span>
+        
         </div>
 
 
@@ -90,9 +107,15 @@
         </div>
 
         <div class="card-actions">
+            {% if request.user.is_authenticated %}
             <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
                 メッセージを送る
             </a>
+            {% else %}
+            <a href="{% url 'accounts:signup' %}" class="btn primary">
+                ログインしてメッセージ
+            </a>
+            {% endif %}
         </div>
     </div>
 </section>
