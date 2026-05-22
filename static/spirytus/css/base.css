@@ -8,7 +8,7 @@
 
 body{
     background:#f5f6f8;
-    padding-top: calc(60px + env(safe-area-inset-top));
+    padding-top: calc(var(--header-height) + env(safe-area-inset-top) + 10px);
 }
 
 main.container {
@@ -137,9 +137,9 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(60px + env(safe-area-inset-top));
+    height: calc(var(--header-height) + env(safe-area-inset-top));
     padding-top: env(safe-area-inset-top);
-    background: #ffffff;
+    background: #fff;
     border-bottom: 1px solid #ddd;
     z-index: 1000;
 }
