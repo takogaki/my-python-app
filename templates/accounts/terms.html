@@ -126,24 +126,6 @@
     <p>
         本規約の解釈には日本法を準拠法とし、本サービスに関して紛争が生じた場合は、運営者所在地を管轄する裁判所を専属的合意管轄とします。
     </p>
-
-    {% if is_authenticated %}
-    
-    <!-- 🔵 既存ユーザー -->
-    <div class="terms-agree-wrapper">
-    
-        <form method="POST">
-            {% csrf_token %}
-    
-            <button type="submit" class="agree-btn">
-                利用規約に同意する
-            </button>
-    
-        </form>
-    
-    </div>
-    
-    {% else %}
     
     {% if show_signup_button %}
     
@@ -161,7 +143,7 @@
     <!-- 🔙 通常閲覧 -->
     <div class="terms-actions">
     
-        <button onclick="history.back()" class="btn-back" type="button">
+        <button type="button" onclick="history.back()" class="btn-back">
             ← 戻る
         </button>
     
@@ -169,10 +151,6 @@
     
     {% endif %}
     
-    {% endif %}
-
-</div>
-
-
-
-{% endblock %}
+    </div>
+    
+    {% endblock %}

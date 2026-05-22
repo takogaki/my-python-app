@@ -66,3 +66,40 @@
     transform: scale(1.08);
     box-shadow: 0 8px 30px rgba(255,45,85,0.6);
 }
+
+/* =========================
+   フッターリンク
+========================= */
+
+.site-footer{
+    margin-top: 60px;
+    padding: 30px 20px 120px;
+
+    text-align: center;
+}
+
+.footer-links{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    font-size: 0.9rem;
+}
+
+.footer-links a{
+    color: #666;
+    text-decoration: none;
+}
+
+.footer-links a:hover{
+    color: #111;
+}
+
+.copyright{
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: #999;
+}

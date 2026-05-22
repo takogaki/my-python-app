@@ -315,9 +315,11 @@ class SignUpView(generic.CreateView):
 def terms(request):
 
     # signup=1 が付いているか
-    show_signup_button = request.GET.get("signup") == "1"
+    show_signup_button = (
+        request.GET.get("signup") == "1"
+    )
 
-    # 🔵 既存ユーザーが同意ボタン押したとき
+    # 🔵 同意
     if request.method == "POST" and request.user.is_authenticated:
 
         request.user.agreed_terms_at = timezone.now()
@@ -328,12 +330,10 @@ def terms(request):
 
         return redirect("/")
 
-    # 🟢 表示
     return render(
         request,
-        'accounts/terms.html',
+        "accounts/terms.html",
         {
-            "is_authenticated": request.user.is_authenticated,
             "show_signup_button": show_signup_button,
         }
     )
