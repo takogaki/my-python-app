@@ -21,6 +21,10 @@ urlpatterns = [
 
     # 利用規約
     path('terms/', views.terms, name='terms'),
+    # プライバシーポリシー
+    path("privacy/", views.privacy, name="privacy"),
+    # ガイドライン
+    path("guideline/", views.guideline, name="guideline"),
 
     # =========================
     # 他人閲覧（プロフィール）

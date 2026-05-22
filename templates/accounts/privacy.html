@@ -1,0 +1,42 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/terms.css' %}">
+{% endblock %}
+
+{% block title %}
+プライバシーポリシー
+{% endblock %}
+
+{% block body %}
+
+<div class="content-container">
+
+    <div class="card">
+
+        <h1>プライバシーポリシー</h1>
+
+        <p>
+            当サービスでは、サービス向上および安全性確保のため、
+            必要最小限の情報を取得する場合があります。
+        </p>
+
+        <p>
+            取得した情報は適切に管理し、
+            法令に基づく場合を除き第三者へ提供しません。
+        </p>
+
+        <div class="terms-actions">
+        
+            <button onclick="history.back()" class="btn-back" type="button">
+                ← 戻る
+            </button>
+        
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

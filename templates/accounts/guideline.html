@@ -1,0 +1,37 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/terms.css' %}">
+{% endblock %}
+
+{% block title %}ガイドライン{% endblock %}
+
+{% block body %}
+
+<div class="content-container">
+    <div class="card">
+
+        <h1>ガイドライン</h1>
+
+        <p>
+            誹謗中傷・脅迫・違法行為は禁止です。
+        </p>
+
+        <p>
+            他ユーザーが安心して利用できる環境作りに
+            ご協力ください。
+        </p>
+
+        <div class="terms-actions">
+        
+            <button onclick="history.back()" class="btn-back" type="button">
+                ← 戻る
+            </button>
+        
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

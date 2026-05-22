@@ -314,16 +314,39 @@ class SignUpView(generic.CreateView):
 # =========================
 def terms(request):
 
+    # signup=1 が付いているか
+    show_signup_button = request.GET.get("signup") == "1"
+
     # 🔵 既存ユーザーが同意ボタン押したとき
     if request.method == "POST" and request.user.is_authenticated:
+
         request.user.agreed_terms_at = timezone.now()
-        request.user.save(update_fields=["agreed_terms_at"])
+
+        request.user.save(
+            update_fields=["agreed_terms_at"]
+        )
+
         return redirect("/")
 
-    # 🟢 表示（未ログイン or 未同意ユーザー）
-    return render(request, 'accounts/terms.html', {
-        "is_authenticated": request.user.is_authenticated
-    })
+    # 🟢 表示
+    return render(
+        request,
+        'accounts/terms.html',
+        {
+            "is_authenticated": request.user.is_authenticated,
+            "show_signup_button": show_signup_button,
+        }
+    )
+# =========================
+# プライバシーポリシー
+# =========================
+def privacy(request):
+    return render(request, "accounts/privacy.html")
+# =========================
+# ガイドライン
+# =========================
+def guideline(request):
+    return render(request, "accounts/guideline.html")
 
 # =========================
 # 仮登録完了画面

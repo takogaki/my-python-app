@@ -1,146 +1,100 @@
 /* =========================
+   フッター高さ変数
+========================= */
+:root{
+    --footer-height: 70px;
+}
+
+/* =========================
+   本文がフッターに隠れないように
+========================= */
+body{
+    padding-bottom:
+        calc(
+            var(--footer-height)
+            + env(safe-area-inset-bottom)
+            + 20px
+        );
+}
+
+/* =========================
    📌 フッター本体
 ========================= */
 .feed-footer{
     position: fixed;
 
-    bottom: 14px;
-
     left: 0;
     right: 0;
-
-    margin: auto;
+    bottom: 0;
 
     width: 100%;
-    border-radius: 0;
-    height: 78px;
+
+    height:
+        calc(
+            var(--footer-height)
+            + env(safe-area-inset-bottom)
+        );
+
+    padding-bottom: env(safe-area-inset-bottom);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    background: rgba(20,20,28,0.72);
+    background: rgba(15,15,22,0.82);
 
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
 
-    border: 1px solid rgba(255,255,255,0.08);
+    border-top:
+        1px solid rgba(255,255,255,0.08);
 
     box-shadow:
-        0 10px 40px rgba(0,0,0,0.45),
-        inset 0 1px 0 rgba(255,255,255,0.06);
+        0 -6px 30px rgba(0,0,0,0.35);
 
     z-index: 99999;
-
-    pointer-events: none;
-}
-
-.feed-footer a{
-    pointer-events: auto;
-}
-
-.footer-tool,
-.fab{
-    position: relative;
-    z-index: 100000;
 }
 
 /* =========================
-   ➕ 中央FAB
+   左右エリア
 ========================= */
-.feed-footer .fab {
-    border: 2px solid rgba(255,255,255,0.9);
-    pointer-events: auto; /* ボタンだけ有効 */
-
-    width: 64px;
-    height: 64px;
-
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff2d55, #ff5f7a);
-
-    color: white;
-    font-size: 36px;
-    text-decoration: none;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    transform: translateY(-20px); /* ← 上に浮かせるのが重要 */
-
-    box-shadow: 0 8px 24px rgba(255, 45, 85, 0.4);
-
-    transition: all 0.15s ease;
-}
-
-/* 押下 */
-.feed-footer .fab:active {
-    transform: translateY(-20px) scale(0.92);
-}
-
-/* =========================
-   フッター拡張
-========================= */
-
-.feed-footer{
-    position: fixed;
-    bottom: 0;
-    left: 0;
-
-    width: 100%;
-    height: 80px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(0,0,0,0.82);
-    backdrop-filter: blur(10px);
-
-    z-index: 9999;
-}
-
-/* 左右 */
-.footer-side{
-    position: absolute;
-    display: flex;
-    gap: 18px;
-}
-
 .left-tools,
 .right-tools{
     position: absolute;
 
+    top: 50%;
+    transform: translateY(-50%);
+
     display: flex;
     align-items: center;
 
-    gap: 16px;
-
-    top: 50%;
-    transform: translateY(-50%);
+    gap: 14px;
 }
 
 .left-tools{
-    left: 30px;
+    left: 18px;
 }
 
 .right-tools{
-    right: 30px;
+    right: 18px;
 }
-/* アイコンボタン */
+
+/* =========================
+   アイコンボタン
+========================= */
 .footer-tool{
-    width: 54px;
-    height: 54px;
+    width: 52px;
+    height: 52px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 20px;
+    border-radius: 18px;
 
     text-decoration: none;
 
-    color: rgba(255,255,255,0.92);
+    color: rgba(255,255,255,0.94);
 
     background:
         linear-gradient(
@@ -152,41 +106,25 @@
     border:
         1px solid rgba(255,255,255,0.08);
 
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
     box-shadow:
-        0 6px 20px rgba(0,0,0,0.28),
-        inset 0 1px 0 rgba(255,255,255,0.06);
+        0 4px 18px rgba(0,0,0,0.25);
 
     transition:
-        transform .18s ease,
-        background .18s ease,
-        box-shadow .18s ease,
-        opacity .18s ease;
-
-    pointer-events: auto;
-
-    overflow: hidden;
+        transform .15s ease,
+        background .15s ease;
 }
 
 /* SVG */
 .footer-tool svg{
-    width: 25px;
-    height: 25px;
+    width: 24px;
+    height: 24px;
 
     stroke: currentColor;
-
-    opacity: 0.95;
-
-    transition:
-        transform .18s ease,
-        opacity .18s ease;
 }
 
 /* hover */
 .footer-tool:hover{
-    transform: translateY(-3px);
+    transform: translateY(-2px);
 
     background:
         linear-gradient(
@@ -194,35 +132,36 @@
             rgba(255,255,255,0.18),
             rgba(255,255,255,0.08)
         );
-
-    box-shadow:
-        0 10px 26px rgba(0,0,0,0.35),
-        0 0 0 1px rgba(255,255,255,0.06);
 }
 
-/* hover時アイコン */
-.footer-tool:hover svg{
-    transform: scale(1.08);
-    opacity: 1;
-}
-
-/* 押した瞬間 */
+/* active */
 .footer-tool:active{
     transform: scale(0.92);
 }
 
-/* 配信だけ強調 */
+/* =========================
+   LIVEボタン
+========================= */
 .live-btn{
-    background: rgba(255,0,80,0.18);
-    box-shadow: 0 0 12px rgba(255,0,80,0.35);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,0,90,0.25),
+            rgba(255,0,90,0.10)
+        );
+
+    box-shadow:
+        0 0 20px rgba(255,0,90,0.25);
 }
 
-/* 中央投稿 */
+/* =========================
+   中央FAB
+========================= */
 .fab{
-    width: 70px;
-    height: 70px;
+    width: 68px;
+    height: 68px;
 
-    border-radius: 24px;
+    border-radius: 22px;
 
     display: flex;
     align-items: center;
@@ -232,7 +171,6 @@
 
     color: white;
     font-size: 38px;
-    font-weight: 300;
 
     background:
         linear-gradient(
@@ -241,47 +179,61 @@
             #ff6b81
         );
 
+    border:
+        2px solid rgba(255,255,255,0.9);
+
     box-shadow:
-        0 10px 30px rgba(255,45,117,0.35),
-        0 0 18px rgba(255,45,117,0.25);
+        0 10px 28px rgba(255,45,117,0.35);
 
-    transform: translateY(-18px);
+    transform: translateY(-20px);
 
-    transition: 0.25s ease;
-
-    pointer-events: auto;
+    transition: 0.18s ease;
 
     z-index: 100000;
 }
 
+/* hover */
 .fab:hover{
-    transform: translateY(-22px) scale(1.03);
+    transform:
+        translateY(-24px)
+        scale(1.03);
 }
 
+/* active */
 .fab:active{
-    transform: translateY(-18px) scale(0.94);
+    transform:
+        translateY(-20px)
+        scale(0.92);
 }
 
-.live-btn{
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,0,80,0.22),
-            rgba(255,0,80,0.08)
-        );
+/* =========================
+   スマホ最適化
+========================= */
+@media (max-width: 480px){
 
-    box-shadow:
-        0 0 20px rgba(255,0,80,0.24);
-}
+    .footer-tool{
+        width: 48px;
+        height: 48px;
+    }
 
-@keyframes pulseLive{
-    0%{
-        box-shadow: 0 0 0 rgba(255,0,80,0.4);
+    .footer-tool svg{
+        width: 22px;
+        height: 22px;
     }
-    50%{
-        box-shadow: 0 0 24px rgba(255,0,80,0.8);
+
+    .fab{
+        width: 64px;
+        height: 64px;
+        font-size: 34px;
     }
-    100%{
-        box-shadow: 0 0 0 rgba(255,0,80,0.4);
+
+    .left-tools{
+        left: 12px;
+        gap: 10px;
+    }
+
+    .right-tools{
+        right: 12px;
+        gap: 10px;
     }
 }

@@ -145,12 +145,29 @@
     
     {% else %}
     
-    <!-- 🟢 未登録ユーザー -->
+    {% if show_signup_button %}
+    
+    <!-- 🟢 登録導線 -->
     <div class="terms-actions">
+    
         <a href="{% url 'accounts:signup' %}" class="btn-back">
             仮登録へ進む
         </a>
+    
     </div>
+    
+    {% else %}
+    
+    <!-- 🔙 通常閲覧 -->
+    <div class="terms-actions">
+    
+        <button onclick="history.back()" class="btn-back" type="button">
+            ← 戻る
+        </button>
+    
+    </div>
+    
+    {% endif %}
     
     {% endif %}
 
