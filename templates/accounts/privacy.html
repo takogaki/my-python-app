@@ -27,10 +27,26 @@
             法令に基づく場合を除き第三者へ提供しません。
         </p>
 
+        <!-- 🔙 通常閲覧 -->
         <div class="terms-actions">
         
-            <button onclick="history.back()" class="btn-back" type="button">
-                ← 戻る
+            <button type="button" class="btn-back" onclick="
+                        if(history.length > 1){
+                            history.back();
+                        }else{
+                            window.location.href='/';
+                        }
+                    ">
+        
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#607d8b"
+                    stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        
+                    <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
+        
+                </svg>
+        
+                戻る
+        
             </button>
         
         </div>
