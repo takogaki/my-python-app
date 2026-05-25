@@ -141,3 +141,36 @@
     font-size: 15px;
   }
 }
+
+/* プライバシーポリシー */
+.policy-card h2{
+    margin-top: 40px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.policy-card h3{
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.policy-card p{
+    line-height: 1.9;
+}
+
+.policy-card ul{
+    padding-left: 20px;
+    line-height: 1.9;
+}
+
+.policy-card hr{
+    margin: 35px 0;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+}
+
+.policy-date{
+    margin-top: 40px;
+    color: #777;
+    font-size: 14px;
+}
