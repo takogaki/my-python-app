@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.db.models.deletion import Collector
 from django.db import router
-from .models import CustomUser, KYCSubmission, TagCategory, Tag, ProfileTag
+from .models import CustomUser, KYCSubmission, TagCategory, Profile, Tag, ProfileTag
 from django.utils import timezone
 
 
@@ -131,3 +131,51 @@ class KYCSubmissionAdmin(admin.ModelAdmin):
         if obj.selfie_image:
             return format_html('<img src="{}" width="200" />', obj.selfie_image.url)
         return "-"
+    
+# =========================
+# 🖼 Profile管理
+# =========================
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "user",
+        "has_profile_image",
+        "warning_mail_sent",
+        "warning_sent_at",
+        "delete_scheduled_at",
+    )
+
+    list_filter = (
+        "warning_mail_sent",
+    )
+
+    search_fields = (
+        "user__username",
+        "user__email",
+    )
+
+    # 🔥 追加
+    ordering = ("warning_sent_at", "user")
+
+    # =========================
+    # 画像有無
+    # =========================
+    def has_profile_image(self, obj):
+        return bool(obj.profile_image)
+
+    has_profile_image.boolean = True
+    has_profile_image.short_description = "画像あり"
+
+    # =========================
+    # 削除予定日
+    # =========================
+    def delete_scheduled_at(self, obj):
+
+        if obj.warning_sent_at:
+            from datetime import timedelta
+            return obj.warning_sent_at + timedelta(days=7)
+
+        return "-"
+
+    delete_scheduled_at.short_description = "削除予定日"

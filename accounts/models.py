@@ -147,6 +147,13 @@ class Profile(models.Model):
     )
 
     profile_image = models.ImageField(upload_to="profiles/", blank=True, null=True)
+    warning_mail_sent = models.BooleanField(default=False)
+
+    warning_sent_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     tags = models.ManyToManyField("Tag", blank=True)
 
     bio = models.TextField(blank=True)
