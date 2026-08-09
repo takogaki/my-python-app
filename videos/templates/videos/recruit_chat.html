@@ -264,206 +264,718 @@
 
 {% block extra_js %}
 
-<!-- ==================================================
-     Recruit Chat WebSocket
-================================================== -->
-
 <script>
 
-console.log("🔥 RECRUIT CHAT JS START");
+    console.log("🔥 RECRUIT CHAT JS START");
 
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
 
-        console.log(
-            "🔥 RECRUIT CHAT DOM LOADED"
-        );
-
-
-        const recruitId =
-            "{{ recruit.id }}";
+            console.log(
+                "🔥 RECRUIT CHAT DOM LOADED"
+            );
 
 
-        console.log(
-            "🔥 recruitId =",
-            recruitId
-        );
+            // ==================================================
+            // 基本情報
+            // ==================================================
+
+            const recruitId =
+                "{{ recruit.id }}";
+
+            const currentUserId =
+                "{{ request.user.id }}";
+
+            const currentUsername =
+                "{{ request.user.username|escapejs }}";
 
 
-        const protocol =
-            window.location.protocol === "https:"
-                ? "wss"
-                : "ws";
+            const currentUserProfileImage =
+                "{% if request.user.get_profile_image %}{{ request.user.get_profile_image|escapejs }}{% endif %}";
 
 
-        const socketUrl =
-            `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`;
+            console.log(
+                "🔥 recruitId =",
+                recruitId
+            );
 
 
-        console.log(
-            "🔥 WebSocket URL =",
-            socketUrl
-        );
+            // ==================================================
+            // DOM
+            // ==================================================
+
+            const messageContainer =
+                document.getElementById(
+                    "recruit-chat-messages"
+                );
 
 
-        const socket =
-            new WebSocket(
+            const form =
+                document.getElementById(
+                    "recruit-chat-form"
+                );
+
+
+            const input =
+                document.getElementById(
+                    "recruit-chat-input"
+                );
+
+
+            const status =
+                document.getElementById(
+                    "recruit-chat-status"
+                );
+
+
+            const emptyMessage =
+                document.getElementById(
+                    "recruit-chat-empty"
+                );
+
+
+            if (!messageContainer) {
+
+                console.error(
+                    "❌ recruit-chat-messages が見つかりません"
+                );
+
+                return;
+            }
+
+
+            if (!form) {
+
+                console.error(
+                    "❌ recruit-chat-form が見つかりません"
+                );
+
+                return;
+            }
+
+
+            if (!input) {
+
+                console.error(
+                    "❌ recruit-chat-input が見つかりません"
+                );
+
+                return;
+            }
+
+
+            // ==================================================
+            // user_detail URL
+            // ==================================================
+
+            function getUserDetailUrl(username) {
+
+                if (!username) {
+
+                    return "#";
+
+                }
+
+                return (
+                    "/accounts/users/" +
+                    encodeURIComponent(username) +
+                    "/"
+                );
+
+            }
+
+
+            // ==================================================
+            // WebSocket
+            // ==================================================
+
+            const protocol =
+                window.location.protocol === "https:"
+                    ? "wss"
+                    : "ws";
+
+
+            const socketUrl =
+                `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`;
+
+
+            console.log(
+                "🔥 WebSocket URL =",
                 socketUrl
             );
 
 
-        socket.onopen =
-            function () {
-
-                console.log(
-                    "🟢 RECRUIT CHAT WEBSOCKET CONNECTED"
+            const socket =
+                new WebSocket(
+                    socketUrl
                 );
 
-                const status =
-                    document.getElementById(
-                        "recruit-chat-status"
+
+            // ==================================================
+            // 接続成功
+            // ==================================================
+
+            socket.onopen =
+                function () {
+
+                    console.log(
+                        "🟢 RECRUIT CHAT WEBSOCKET CONNECTED"
                     );
 
-                if (status) {
 
-                    status.textContent =
-                        "🟢 接続済み";
+                    if (status) {
 
-                }
+                        status.textContent =
+                            "🟢 接続済み";
 
-            };
+                    }
 
-
-        socket.onmessage =
-            function (event) {
-
-                console.log(
-                    "📩 Recruit chat message:",
-                    event.data
-                );
-
-            };
+                };
 
 
-        socket.onerror =
-            function (error) {
+            // ==================================================
+            // メッセージ受信
+            // ==================================================
 
-                console.error(
-                    "🔴 RECRUIT CHAT WEBSOCKET ERROR:",
-                    error
-                );
+            socket.onmessage =
+                function (event) {
 
-                const status =
-                    document.getElementById(
-                        "recruit-chat-status"
+                    console.log(
+                        "📩 Recruit chat message:",
+                        event.data
                     );
 
-                if (status) {
 
-                    status.textContent =
-                        "🔴 接続エラー";
-
-                }
-
-            };
+                    let data;
 
 
-        socket.onclose =
-            function (event) {
+                    try {
 
-                console.log(
-                    "🔴 RECRUIT CHAT WEBSOCKET CLOSED:",
-                    event
-                );
+                        data =
+                            JSON.parse(
+                                event.data
+                            );
 
-                const status =
-                    document.getElementById(
-                        "recruit-chat-status"
+                    } catch (error) {
+
+                        console.error(
+                            "❌ JSON解析エラー:",
+                            error
+                        );
+
+                        return;
+                    }
+
+
+                    // ==================================================
+                    // 空メッセージ表示を削除
+                    // ==================================================
+
+                    const currentEmptyMessage =
+                        document.getElementById(
+                            "recruit-chat-empty"
+                        );
+
+
+                    if (currentEmptyMessage) {
+
+                        currentEmptyMessage.remove();
+
+                    }
+
+
+                    // ==================================================
+                    // 自分のメッセージか判定
+                    // ==================================================
+
+                    const mine =
+                        String(data.user_id) ===
+                        String(currentUserId);
+
+
+                    // ==================================================
+                    // 行
+                    // ==================================================
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    row.className =
+                        "recruit-chat-row " +
+                        (
+                            mine
+                                ? "my-row"
+                                : "other-row"
+                        );
+
+
+                    // ==================================================
+                    // アバター生成
+                    // ==================================================
+
+                    let avatar;
+
+
+                    if (data.profile_image) {
+
+                        avatar =
+                            document.createElement(
+                                "img"
+                            );
+
+
+                        avatar.src =
+                            data.profile_image;
+
+
+                        avatar.alt =
+                            data.username ||
+                            "ユーザー";
+
+
+                        avatar.className =
+                            "recruit-chat-avatar";
+
+                    } else {
+
+                        avatar =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        avatar.className =
+                            "recruit-chat-avatar " +
+                            "recruit-chat-avatar-default";
+
+
+                        avatar.textContent =
+                            "👤";
+
+                    }
+
+
+                    // ==================================================
+                    // 相手側アバター
+                    // ==================================================
+
+                    if (!mine) {
+
+
+                        if (data.is_superuser) {
+
+                            const avatarContainer =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            avatarContainer.className =
+                                "recruit-chat-avatar-link";
+
+
+                            avatarContainer.appendChild(
+                                avatar
+                            );
+
+
+                            row.appendChild(
+                                avatarContainer
+                            );
+
+
+                        } else {
+
+                            const avatarLink =
+                                document.createElement(
+                                    "a"
+                                );
+
+
+                            avatarLink.className =
+                                "recruit-chat-avatar-link";
+
+
+                            avatarLink.href =
+                                getUserDetailUrl(
+                                    data.username
+                                );
+
+
+                            avatarLink.appendChild(
+                                avatar
+                            );
+
+
+                            row.appendChild(
+                                avatarLink
+                            );
+
+                        }
+
+                    }
+
+
+                    // ==================================================
+                    // 吹き出しラッパー
+                    // ==================================================
+
+                    const bubbleWrapper =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    bubbleWrapper.className =
+                        "recruit-chat-bubble-wrapper";
+
+
+                    // ==================================================
+                    // ユーザー名
+                    // ==================================================
+
+                    if (!mine) {
+
+
+                        let usernameElement;
+
+
+                        if (data.is_superuser) {
+
+                            usernameElement =
+                                document.createElement(
+                                    "span"
+                                );
+
+                        } else {
+
+                            usernameElement =
+                                document.createElement(
+                                    "a"
+                                );
+
+
+                            usernameElement.href =
+                                getUserDetailUrl(
+                                    data.username
+                                );
+
+                        }
+
+
+                        usernameElement.className =
+                            "recruit-chat-username";
+
+
+                        usernameElement.textContent =
+                            data.username ||
+                            "ユーザー";
+
+
+                        bubbleWrapper.appendChild(
+                            usernameElement
+                        );
+
+                    }
+
+
+                    // ==================================================
+                    // 吹き出し
+                    // ==================================================
+
+                    const bubble =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    bubble.className =
+                        "recruit-chat-bubble " +
+                        (
+                            mine
+                                ? "my-bubble"
+                                : "other-bubble"
+                        );
+
+
+                    bubble.textContent =
+                        data.text ||
+                        "";
+
+
+                    bubbleWrapper.appendChild(
+                        bubble
                     );
 
-                if (status) {
 
-                    status.textContent =
-                        "🔴 接続が切断されました";
+                    // ==================================================
+                    // 時刻
+                    // ==================================================
+
+                    const meta =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    meta.className =
+                        "recruit-chat-meta";
+
+
+                    const time =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    time.className =
+                        "recruit-chat-time";
+
+
+                    time.textContent =
+                        data.created_at ||
+                        "";
+
+
+                    meta.appendChild(
+                        time
+                    );
+
+
+                    bubbleWrapper.appendChild(
+                        meta
+                    );
+
+
+                    // ==================================================
+                    // 吹き出しを行へ追加
+                    // ==================================================
+
+                    row.appendChild(
+                        bubbleWrapper
+                    );
+
+
+                    // ==================================================
+                    // 自分側アバター
+                    // ==================================================
+
+                    if (mine) {
+
+
+                        let myAvatar;
+
+
+                        if (currentUserProfileImage) {
+
+                            myAvatar =
+                                document.createElement(
+                                    "img"
+                                );
+
+
+                            myAvatar.src =
+                                currentUserProfileImage;
+
+
+                            myAvatar.alt =
+                                currentUsername;
+
+
+                            myAvatar.className =
+                                "recruit-chat-avatar";
+
+                        } else {
+
+                            myAvatar =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            myAvatar.className =
+                                "recruit-chat-avatar " +
+                                "recruit-chat-avatar-default";
+
+
+                            myAvatar.textContent =
+                                "👤";
+
+                        }
+
+
+                        /*
+                         * 自分のアイコン
+                         *
+                         * スーパーユーザーでも
+                         * 自分ならマイページへ
+                         */
+
+                        const myAvatarLink =
+                            document.createElement(
+                                "a"
+                            );
+
+
+                        myAvatarLink.className =
+                            "recruit-chat-avatar-link";
+
+
+                        myAvatarLink.href =
+                            "{% url 'accounts:mypage' %}";
+
+
+                        myAvatarLink.appendChild(
+                            myAvatar
+                        );
+
+
+                        row.appendChild(
+                            myAvatarLink
+                        );
+
+                    }
+
+
+                    // ==================================================
+                    // チャット欄へ追加
+                    // ==================================================
+
+                    messageContainer.appendChild(
+                        row
+                    );
+
+
+                    // ==================================================
+                    // 最下部へスクロール
+                    // ==================================================
+
+                    messageContainer.scrollTop =
+                        messageContainer.scrollHeight;
+
+                };
+
+
+            // ==================================================
+            // WebSocketエラー
+            // ==================================================
+
+            socket.onerror =
+                function (error) {
+
+                    console.error(
+                        "🔴 RECRUIT CHAT WEBSOCKET ERROR:",
+                        error
+                    );
+
+
+                    if (status) {
+
+                        status.textContent =
+                            "🔴 接続エラー";
+
+                    }
+
+                };
+
+
+            // ==================================================
+            // WebSocket切断
+            // ==================================================
+
+            socket.onclose =
+                function (event) {
+
+                    console.log(
+                        "🔴 RECRUIT CHAT WEBSOCKET CLOSED:",
+                        event
+                    );
+
+
+                    if (status) {
+
+                        status.textContent =
+                            "🔴 接続が切断されました";
+
+                    }
+
+                };
+
+
+            // ==================================================
+            // メッセージ送信
+            // ==================================================
+
+            form.addEventListener(
+                "submit",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    const text =
+                        input.value.trim();
+
+
+                    if (!text) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        socket.readyState !==
+                        WebSocket.OPEN
+                    ) {
+
+                        alert(
+                            "チャットサーバーに接続されていません。"
+                        );
+
+                        return;
+
+                    }
+
+
+                    console.log(
+                        "📤 Recruit chat send:",
+                        text
+                    );
+
+
+                    socket.send(
+                        JSON.stringify({
+                            text: text
+                        })
+                    );
+
+
+                    input.value =
+                        "";
+
+
+                    input.focus();
 
                 }
-
-            };
-
-
-        const form =
-            document.getElementById(
-                "recruit-chat-form"
             );
 
 
-        const input =
-            document.getElementById(
-                "recruit-chat-input"
-            );
+            // ==================================================
+            // 初期スクロール
+            // ==================================================
 
-
-        if (!form || !input) {
-
-            console.error(
-                "❌ Recruit chat form/input not found"
-            );
-
-            return;
+            messageContainer.scrollTop =
+                messageContainer.scrollHeight;
 
         }
 
-
-        form.addEventListener(
-            "submit",
-            function (event) {
-
-                event.preventDefault();
-
-
-                const text =
-                    input.value.trim();
-
-
-                if (!text) {
-
-                    return;
-
-                }
-
-
-                if (
-                    socket.readyState !==
-                    WebSocket.OPEN
-                ) {
-
-                    alert(
-                        "チャットサーバーに接続されていません。"
-                    );
-
-                    return;
-
-                }
-
-
-                socket.send(
-                    JSON.stringify({
-                        text: text
-                    })
-                );
-
-
-                input.value = "";
-
-                input.focus();
-
-            }
-        );
-
-    }
-);
+    );
 
 </script>
 
