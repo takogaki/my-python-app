@@ -265,6 +265,65 @@
 <!-- ==================================================
      WebSocket
 ================================================== -->
+<script>
+    console.log("🔥 RECRUIT CHAT JS START");
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        console.log("🔥 RECRUIT CHAT DOM LOADED");
+
+        const recruitId = "{{ recruit.id }}";
+
+        console.log(
+            "🔥 recruitId =",
+            recruitId
+        );
+
+        const protocol =
+            window.location.protocol === "https:"
+                ? "wss"
+                : "ws";
+
+        const socketUrl =
+            `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`;
+
+        console.log(
+            "🔥 WebSocket URL =",
+            socketUrl
+        );
+
+        const socket =
+            new WebSocket(socketUrl);
+
+        socket.onopen = function () {
+
+            console.log(
+                "🟢 RECRUIT CHAT WEBSOCKET CONNECTED"
+            );
+
+        };
+
+        socket.onerror = function (error) {
+
+            console.error(
+                "🔴 RECRUIT CHAT WEBSOCKET ERROR",
+                error
+            );
+
+        };
+
+        socket.onclose = function (event) {
+
+            console.error(
+                "🔴 RECRUIT CHAT WEBSOCKET CLOSED",
+                event
+            );
+
+        };
+
+    });
+</script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
