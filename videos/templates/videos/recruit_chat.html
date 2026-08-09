@@ -1,24 +1,28 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
 
+
 {% block title %}
 {{ recruit.title }}｜募集チャット
 {% endblock %}
 
+
 {% block extra_css %}
 
 <link rel="stylesheet" href="{% static 'videos/css/recruit_chat.css' %}">
+
 {% endblock %}
+
+
 
 {% block body %}
 
-<!-- =========================
+<!-- ==================================================
      ヘッダー
-========================== -->
+================================================== -->
 
 <div class="recruit-chat-header">
 
-    ```
     <div class="recruit-chat-header-info">
 
         <h2>
@@ -35,24 +39,23 @@
     <a href="{% url 'recruit_detail' recruit.id %}" class="recruit-chat-back">
         ← 募集詳細へ
     </a>
-    ```
 
 </div>
 
-<!-- =========================
-     メッセージエリア
-========================== -->
+
+<!-- ==================================================
+     メッセージ
+================================================== -->
 
 <div id="recruit-chat-messages" class="recruit-chat-messages">
 
-    ```
     {% for message in chat_messages %}
 
     {% if message.user == request.user %}
 
     <!-- =========================
-             自分
-        ========================== -->
+                 自分
+            ========================== -->
 
     <div class="recruit-chat-row my-row">
 
@@ -73,9 +76,7 @@
         </div>
 
 
-        <!-- =========================
-                 自分のアイコン
-            ========================== -->
+        <!-- 自分のアイコン -->
 
         <a href="{% url 'accounts:mypage' %}" class="recruit-chat-avatar-link">
 
@@ -100,22 +101,15 @@
     {% else %}
 
     <!-- =========================
-             相手
-        ========================== -->
+                 相手
+            ========================== -->
 
     <div class="recruit-chat-row other-row">
 
 
-        <!-- =========================
-                 相手のアイコン
-            ========================== -->
+        <!-- 相手アイコン -->
 
         {% if message.user.is_superuser %}
-
-        <!--
-                    スーパーユーザー
-                    → プロフィールへのリンクなし
-                -->
 
         <div class="recruit-chat-avatar-link">
 
@@ -135,11 +129,6 @@
         </div>
 
         {% else %}
-
-        <!--
-                    通常ユーザー
-                    → DjangoのURL nameを使用
-                -->
 
         <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-avatar-link">
 
@@ -161,28 +150,19 @@
         {% endif %}
 
 
-        <!-- =========================
-                 吹き出し
-            ========================== -->
+        <!-- 吹き出し -->
 
         <div class="recruit-chat-bubble-wrapper">
 
-
-            <!-- =========================
-                     ユーザー名
-                ========================== -->
+            <!-- ユーザー名 -->
 
             {% if message.user.is_superuser %}
-
-            <!-- スーパーユーザーは名前もリンクなし -->
 
             <span class="recruit-chat-username">
                 {{ message.user.username }}
             </span>
 
             {% else %}
-
-            <!-- 通常ユーザーはプロフィールへ -->
 
             <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-username">
                 {{ message.user.username }}
@@ -191,18 +171,14 @@
             {% endif %}
 
 
-            <!-- =========================
-                     メッセージ
-                ========================== -->
+            <!-- メッセージ -->
 
             <div class="recruit-chat-bubble other-bubble">
                 {{ message.text|linebreaksbr }}
             </div>
 
 
-            <!-- =========================
-                     時刻
-                ========================== -->
+            <!-- 時刻 -->
 
             <div class="recruit-chat-meta">
 
@@ -226,33 +202,33 @@
     </div>
 
     {% endfor %}
-    ```
 
 </div>
 
-<!-- =========================
-     入力エリア
-========================== -->
-<div class="recruit-chat-input-fixed">
 
-    <form id="recruit-chat-form" class="recruit-chat-form">
 
-        {% csrf_token %}
+<!-- ==================================================
+     入力フォーム
+================================================== -->
 
-        <input type="text" id="recruit-chat-input" class="recruit-chat-input" placeholder="メッセージを入力..."
-            autocomplete="off" maxlength="2000">
+<form id="recruit-chat-form" class="recruit-chat-form">
 
-        <button type="submit" class="recruit-chat-send">
-            ➤
-        </button>
+    {% csrf_token %}
 
-    </form>
+    <input type="text" id="recruit-chat-input" class="recruit-chat-input" placeholder="メッセージを入力..." autocomplete="off"
+        maxlength="2000">
 
-</div>
+    <button type="submit" class="recruit-chat-send">
+        ➤
+    </button>
 
-<!-- =========================
+</form>
+
+
+
+<!-- ==================================================
      接続状態
-========================== -->
+================================================== -->
 
 <div id="recruit-chat-status" class="recruit-chat-status">
     接続中...
@@ -262,803 +238,209 @@
 
 
 
+{% block extra_js %}
+
 <!-- ==================================================
-     WebSocket
+     Recruit Chat WebSocket
 ================================================== -->
+
 <script>
+
     console.log("🔥 RECRUIT CHAT JS START");
 
-    document.addEventListener("DOMContentLoaded", function () {
 
-        console.log("🔥 RECRUIT CHAT DOM LOADED");
-
-        const recruitId = "{{ recruit.id }}";
-
-        console.log(
-            "🔥 recruitId =",
-            recruitId
-        );
-
-        const protocol =
-            window.location.protocol === "https:"
-                ? "wss"
-                : "ws";
-
-        const socketUrl =
-            `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`;
-
-        console.log(
-            "🔥 WebSocket URL =",
-            socketUrl
-        );
-
-        const socket =
-            new WebSocket(socketUrl);
-
-        socket.onopen = function () {
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
 
             console.log(
-                "🟢 RECRUIT CHAT WEBSOCKET CONNECTED"
+                "🔥 RECRUIT CHAT DOM LOADED"
             );
 
-        };
 
-        socket.onerror = function (error) {
+            const recruitId =
+                "{{ recruit.id }}";
 
-            console.error(
-                "🔴 RECRUIT CHAT WEBSOCKET ERROR",
-                error
-            );
-
-        };
-
-        socket.onclose = function (event) {
-
-            console.error(
-                "🔴 RECRUIT CHAT WEBSOCKET CLOSED",
-                event
-            );
-
-        };
-
-    });
-</script>
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        /* ==================================================
-           基本情報
-        ================================================== */
-
-        const recruitId =
-            "{{ recruit.id }}";
-
-        const currentUserId =
-            "{{ request.user.id }}";
-
-        const currentUsername =
-            "{{ request.user.username|escapejs }}";
-
-        const currentUserProfileImage =
-            "{% if request.user.get_profile_image %}{{ request.user.get_profile_image|escapejs }}{% endif %}";
-
-
-        /* ==================================================
-           DOM
-        ================================================== */
-
-        const messageContainer =
-            document.getElementById("recruit-chat-messages");
-
-        const form =
-            document.getElementById("recruit-chat-form");
-
-        const input =
-            document.getElementById("recruit-chat-input");
-
-        const status =
-            document.getElementById("recruit-chat-status");
-
-        const emptyMessage =
-            document.getElementById("recruit-chat-empty");
-
-
-        /* ==================================================
-           DOM確認
-        ================================================== */
-
-        if (!messageContainer) {
-            console.error(
-                "recruit-chat-messages が見つかりません。"
-            );
-            return;
-        }
-
-        if (!form) {
-            console.error(
-                "recruit-chat-form が見つかりません。"
-            );
-            return;
-        }
-
-        if (!input) {
-            console.error(
-                "recruit-chat-input が見つかりません。"
-            );
-            return;
-        }
-
-
-        /* ==================================================
-           プロフィールURL
-           
-           相手ユーザー
-           → user_detail
-           
-           URL:
-           /accounts/users/<username>/
-        ================================================== */
-
-        function getUserDetailUrl(username) {
-
-            if (!username) {
-                return "#";
-            }
-
-            return (
-                "/accounts/users/" +
-                encodeURIComponent(username) +
-                "/"
-            );
-        }
-
-
-        /* ==================================================
-           自分のプロフィール
-           
-           自分
-           → mypage
-           
-           ★ここは既存のaccounts側のmypage URLに合わせる
-           現在のプロジェクトでは /accounts/app/ を使用
-        ================================================== */
-
-        function getMyPageUrl() {
-
-            return "/accounts/app/";
-        }
-
-
-        /* ==================================================
-           WebSocket URL
-        ================================================== */
-
-        const protocol =
-            window.location.protocol === "https:"
-                ? "wss"
-                : "ws";
-
-        const socketUrl =
-            `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`;
-
-        console.log(
-            "Recruit Chat WebSocket:",
-            socketUrl
-        );
-
-
-        /* ==================================================
-           WebSocket接続
-        ================================================== */
-
-        const socket =
-            new WebSocket(socketUrl);
-
-
-        /* ==================================================
-           接続開始
-        ================================================== */
-
-        if (status) {
-
-            status.textContent =
-                "🟡 接続中...";
-
-        }
-
-
-        /* ==================================================
-           WebSocket接続成功
-        ================================================== */
-
-        socket.onopen = function () {
 
             console.log(
-                "Recruit chat connected."
+                "🔥 recruitId =",
+                recruitId
             );
 
-            if (status) {
 
-                status.textContent =
-                    "🟢 接続済み";
-
-            }
-
-            input.disabled = false;
-
-            input.focus();
-        };
+            const protocol =
+                window.location.protocol === "https:"
+                    ? "wss"
+                    : "ws";
 
 
-        /* ==================================================
-           WebSocketメッセージ受信
-        ================================================== */
+            const socketUrl =
+                `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`;
 
-        socket.onmessage = function (event) {
 
             console.log(
-                "Recruit chat received:",
-                event.data
+                "🔥 WebSocket URL =",
+                socketUrl
             );
 
 
-            /* ----------------------------------------------
-               JSON解析
-            ---------------------------------------------- */
-
-            let data;
-
-            try {
-
-                data =
-                    JSON.parse(event.data);
-
-            } catch (error) {
-
-                console.error(
-                    "WebSocket JSON parse error:",
-                    error
-                );
-
-                return;
-            }
-
-
-            /* ----------------------------------------------
-               必須データ確認
-            ---------------------------------------------- */
-
-            if (
-                typeof data.text !== "string"
-            ) {
-
-                console.warn(
-                    "不正なメッセージ:",
-                    data
-                );
-
-                return;
-            }
-
-
-            /* ----------------------------------------------
-               空メッセージ削除
-            ---------------------------------------------- */
-
-            if (emptyMessage) {
-
-                emptyMessage.remove();
-
-            }
-
-
-            /* ----------------------------------------------
-               自分のメッセージか判定
-            ---------------------------------------------- */
-
-            const mine =
-                String(data.user_id) ===
-                String(currentUserId);
-
-
-            /* ==================================================
-               メッセージ行
-            ================================================== */
-
-            const row =
-                document.createElement("div");
-
-            row.className =
-                "recruit-chat-row " +
-                (
-                    mine
-                        ? "my-row"
-                        : "other-row"
+            const socket =
+                new WebSocket(
+                    socketUrl
                 );
 
 
-            /* ==================================================
-               アバター生成関数
-            ================================================== */
+            socket.onopen =
+                function () {
 
-            function createAvatar(
-                imageUrl,
-                username
-            ) {
-
-                let avatar;
-
-                if (imageUrl) {
-
-                    avatar =
-                        document.createElement("img");
-
-                    avatar.src =
-                        imageUrl;
-
-                    avatar.alt =
-                        username || "ユーザー";
-
-                    avatar.className =
-                        "recruit-chat-avatar";
-
-                } else {
-
-                    avatar =
-                        document.createElement("div");
-
-                    avatar.className =
-                        "recruit-chat-avatar " +
-                        "recruit-chat-avatar-default";
-
-                    avatar.textContent =
-                        "👤";
-                }
-
-                return avatar;
-            }
-
-
-            /* ==================================================
-               相手のアバター
-            ================================================== */
-
-            if (!mine) {
-
-                const avatar =
-                    createAvatar(
-                        data.profile_image,
-                        data.username
+                    console.log(
+                        "🟢 RECRUIT CHAT WEBSOCKET CONNECTED"
                     );
 
-
-                /* ----------------------------------------------
-                   スーパーユーザー
-                   → クリック不可
-                ---------------------------------------------- */
-
-                if (data.is_superuser) {
-
-                    const container =
-                        document.createElement("div");
-
-                    container.className =
-                        "recruit-chat-avatar-link";
-
-                    container.appendChild(
-                        avatar
-                    );
-
-                    row.appendChild(
-                        container
-                    );
-
-                }
-
-
-                /* ----------------------------------------------
-                   通常ユーザー
-                   → user_detail
-                ---------------------------------------------- */
-
-                else {
-
-                    const link =
-                        document.createElement("a");
-
-                    link.className =
-                        "recruit-chat-avatar-link";
-
-                    link.href =
-                        getUserDetailUrl(
-                            data.username
+                    const status =
+                        document.getElementById(
+                            "recruit-chat-status"
                         );
-
-                    link.appendChild(
-                        avatar
-                    );
-
-                    row.appendChild(
-                        link
-                    );
-                }
-            }
-
-
-            /* ==================================================
-               吹き出しラッパー
-            ================================================== */
-
-            const bubbleWrapper =
-                document.createElement("div");
-
-            bubbleWrapper.className =
-                "recruit-chat-bubble-wrapper";
-
-
-            /* ==================================================
-               相手のユーザー名
-            ================================================== */
-
-            if (!mine) {
-
-                let usernameElement;
-
-
-                /* ----------------------------------------------
-                   スーパーユーザー
-                ---------------------------------------------- */
-
-                if (data.is_superuser) {
-
-                    usernameElement =
-                        document.createElement("span");
-
-                }
-
-
-                /* ----------------------------------------------
-                   通常ユーザー
-                   → user_detail
-                ---------------------------------------------- */
-
-                else {
-
-                    usernameElement =
-                        document.createElement("a");
-
-                    usernameElement.href =
-                        getUserDetailUrl(
-                            data.username
-                        );
-                }
-
-
-                usernameElement.className =
-                    "recruit-chat-username";
-
-                usernameElement.textContent =
-                    data.username || "ユーザー";
-
-                bubbleWrapper.appendChild(
-                    usernameElement
-                );
-            }
-
-
-            /* ==================================================
-               メッセージ本文
-            ================================================== */
-
-            const bubble =
-                document.createElement("div");
-
-            bubble.className =
-                "recruit-chat-bubble " +
-                (
-                    mine
-                        ? "my-bubble"
-                        : "other-bubble"
-                );
-
-            /*
-             * textContentを使用
-             *
-             * innerHTMLではないので
-             * HTML / script の挿入を防止
-             */
-
-            bubble.textContent =
-                data.text;
-
-            bubbleWrapper.appendChild(
-                bubble
-            );
-
-
-            /* ==================================================
-               時刻
-            ================================================== */
-
-            const meta =
-                document.createElement("div");
-
-            meta.className =
-                "recruit-chat-meta";
-
-
-            const time =
-                document.createElement("span");
-
-            time.className =
-                "recruit-chat-time";
-
-            time.textContent =
-                data.created_at || "";
-
-            meta.appendChild(
-                time
-            );
-
-            bubbleWrapper.appendChild(
-                meta
-            );
-
-
-            /* ==================================================
-               吹き出しを行へ追加
-            ================================================== */
-
-            row.appendChild(
-                bubbleWrapper
-            );
-
-
-            /* ==================================================
-               自分のアバター
-               
-               ★自分はmypageへ
-            ================================================== */
-
-            if (mine) {
-
-                const myAvatar =
-                    createAvatar(
-                        currentUserProfileImage,
-                        currentUsername
-                    );
-
-
-                const myAvatarLink =
-                    document.createElement("a");
-
-                myAvatarLink.className =
-                    "recruit-chat-avatar-link";
-
-                /*
-                 * ★重要
-                 *
-                 * 自分のアイコン
-                 * → user_detailではなくmypage
-                 */
-
-                myAvatarLink.href =
-                    getMyPageUrl();
-
-                myAvatarLink.appendChild(
-                    myAvatar
-                );
-
-                row.appendChild(
-                    myAvatarLink
-                );
-            }
-
-
-            /* ==================================================
-               メッセージ追加
-            ================================================== */
-
-            messageContainer.appendChild(
-                row
-            );
-
-
-            /* ==================================================
-               最下部へスクロール
-            ================================================== */
-
-            requestAnimationFrame(function () {
-
-                messageContainer.scrollTop =
-                    messageContainer.scrollHeight;
-
-            });
-        };
-
-
-        /* ==================================================
-           WebSocket切断
-        ================================================== */
-
-        socket.onclose = function (event) {
-
-            console.log(
-                "Recruit chat disconnected.",
-                event.code,
-                event.reason
-            );
-
-            if (status) {
-
-                status.textContent =
-                    "🔴 接続が切断されました";
-
-            }
-
-            input.disabled = true;
-        };
-
-
-        /* ==================================================
-           WebSocketエラー
-        ================================================== */
-
-        socket.onerror = function (error) {
-
-            console.error(
-                "Recruit chat WebSocket error:",
-                error
-            );
-
-            if (status) {
-
-                status.textContent =
-                    "⚠️ 接続エラー";
-
-            }
-        };
-
-
-        /* ==================================================
-           メッセージ送信
-        ================================================== */
-
-        form.addEventListener(
-            "submit",
-            function (event) {
-
-                event.preventDefault();
-
-
-                /* ----------------------------------------------
-                   入力取得
-                ---------------------------------------------- */
-
-                const text =
-                    input.value.trim();
-
-
-                /* ----------------------------------------------
-                   空メッセージ
-                ---------------------------------------------- */
-
-                if (!text) {
-
-                    return;
-                }
-
-
-                /* ----------------------------------------------
-                   最大2000文字
-                ---------------------------------------------- */
-
-                const message =
-                    text.slice(0, 2000);
-
-
-                /* ----------------------------------------------
-                   WebSocket接続確認
-                ---------------------------------------------- */
-
-                if (
-                    socket.readyState !==
-                    WebSocket.OPEN
-                ) {
-
-                    console.error(
-                        "WebSocket is not open.",
-                        socket.readyState
-                    );
 
                     if (status) {
 
                         status.textContent =
-                            "⚠️ チャットに接続されていません";
+                            "🟢 接続済み";
 
                     }
 
-                    return;
-                }
+                };
 
 
-                /* ----------------------------------------------
-                   送信
-                ---------------------------------------------- */
+            socket.onmessage =
+                function (event) {
 
-                console.log(
-                    "Recruit chat sending:",
-                    message
+                    console.log(
+                        "📩 Recruit chat message:",
+                        event.data
+                    );
+
+                };
+
+
+            socket.onerror =
+                function (error) {
+
+                    console.error(
+                        "🔴 RECRUIT CHAT WEBSOCKET ERROR:",
+                        error
+                    );
+
+                    const status =
+                        document.getElementById(
+                            "recruit-chat-status"
+                        );
+
+                    if (status) {
+
+                        status.textContent =
+                            "🔴 接続エラー";
+
+                    }
+
+                };
+
+
+            socket.onclose =
+                function (event) {
+
+                    console.log(
+                        "🔴 RECRUIT CHAT WEBSOCKET CLOSED:",
+                        event
+                    );
+
+                    const status =
+                        document.getElementById(
+                            "recruit-chat-status"
+                        );
+
+                    if (status) {
+
+                        status.textContent =
+                            "🔴 接続が切断されました";
+
+                    }
+
+                };
+
+
+            const form =
+                document.getElementById(
+                    "recruit-chat-form"
                 );
 
 
-                socket.send(
-                    JSON.stringify({
-                        text: message
-                    })
+            const input =
+                document.getElementById(
+                    "recruit-chat-input"
                 );
 
 
-                /* ----------------------------------------------
-                   入力欄クリア
-                ---------------------------------------------- */
+            if (!form || !input) {
 
-                input.value = "";
+                console.error(
+                    "❌ Recruit chat form/input not found"
+                );
 
-                input.focus();
+                return;
+
             }
-        );
 
 
-        /* ==================================================
-           Enter送信
-           
-           Shift + Enter
-           → 改行
-           
-           Enter
-           → 送信
-           
-           input type=textなので基本的には
-           Enter送信になるが明示的に処理
-        ================================================== */
-
-        input.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (
-                    event.key === "Enter" &&
-                    !event.shiftKey
-                ) {
+            form.addEventListener(
+                "submit",
+                function (event) {
 
                     event.preventDefault();
 
-                    form.requestSubmit();
+
+                    const text =
+                        input.value.trim();
+
+
+                    if (!text) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        socket.readyState !==
+                        WebSocket.OPEN
+                    ) {
+
+                        alert(
+                            "チャットサーバーに接続されていません。"
+                        );
+
+                        return;
+
+                    }
+
+
+                    socket.send(
+                        JSON.stringify({
+                            text: text
+                        })
+                    );
+
+
+                    input.value = "";
+
+                    input.focus();
+
                 }
-            }
-        );
+            );
 
+        }
+    );
 
-        /* ==================================================
-           初期状態
-        ================================================== */
-
-        input.disabled = true;
-
-
-        /* ==================================================
-           初期スクロール
-        ================================================== */
-
-        requestAnimationFrame(function () {
-
-            messageContainer.scrollTop =
-                messageContainer.scrollHeight;
-
-        });
-
-    });
 </script>
+
+{% endblock %}
