@@ -256,29 +256,45 @@
 ================================================== -->
 
 <script>
-
     document.addEventListener("DOMContentLoaded", function () {
 
-        // =========================
+        // ==================================================
         // 基本情報
-        // =========================
+        // ==================================================
 
-        const recruitId =
-            "{{ recruit.id }}";
-
-        const currentUserId =
-            "{{ request.user.id }}";
-
-        const currentUsername =
-            "{{ request.user.username|escapejs }}";
+        const recruitId = "{{ recruit.id }}";
+        const currentUserId = "{{ request.user.id }}";
+        const currentUsername = "{{ request.user.username|escapejs }}";
 
         const currentUserProfileImage =
             "{% if request.user.get_profile_image %}{{ request.user.get_profile_image|escapejs }}{% endif %}";
 
 
-        // =========================
-        // DOM
-        // =========================
+        // ==================================================
+        // ユーザープロフィールURL
+        //
+        // Djangoのurls.py
+        // path("users/<str:username>/", ...)
+        // に対応
+        // ==================================================
+
+        const userDetailUrlTemplate =
+            "{% url 'user_detail' username='__USERNAME__' %}";
+
+
+        function getUserDetailUrl(username) {
+
+            return userDetailUrlTemplate.replace(
+                "__USERNAME__",
+                encodeURIComponent(username)
+            );
+
+        }
+
+
+        // ==================================================
+        // DOM取得
+        // ==================================================
 
         const messageContainer =
             document.getElementById(
@@ -306,14 +322,35 @@
             );
 
 
-        // =========================
-        // WebSocket
-        // =========================
+        // ==================================================
+        // DOM存在確認
+        // ==================================================
+
+        if (
+            !messageContainer ||
+            !form ||
+            !input ||
+            !status
+        ) {
+
+            console.error(
+                "Recruit chat DOM elements are missing."
+            );
+
+            return;
+
+        }
+
+
+        // ==================================================
+        // WebSocket接続
+        // ==================================================
 
         const protocol =
             window.location.protocol === "https:"
                 ? "wss"
                 : "ws";
+
 
         const socket =
             new WebSocket(
@@ -321,9 +358,9 @@
             );
 
 
-        // =========================
-        // 接続成功
-        // =========================
+        // ==================================================
+        // 🟢 WebSocket接続成功
+        // ==================================================
 
         socket.onopen = function () {
 
@@ -337,43 +374,59 @@
         };
 
 
-        // =========================
-        // メッセージ受信
-        // =========================
+        // ==================================================
+        // 📩 メッセージ受信
+        // ==================================================
 
         socket.onmessage = function (event) {
 
-            const data =
-                JSON.parse(event.data);
+            let data;
 
+            try {
 
-            // 空メッセージを削除
-
-            const empty =
-                document.getElementById(
-                    "recruit-chat-empty"
+                data = JSON.parse(
+                    event.data
                 );
 
-            if (empty) {
-                empty.remove();
+            } catch (error) {
+
+                console.error(
+                    "Invalid WebSocket data:",
+                    error
+                );
+
+                return;
+
             }
 
 
-            // =========================
-            // 自分かどうか
-            // =========================
+            // ==================================================
+            // 空メッセージ表示を削除
+            // ==================================================
+
+            if (emptyMessage) {
+
+                emptyMessage.remove();
+
+            }
+
+
+            // ==================================================
+            // 自分のメッセージか判定
+            // ==================================================
 
             const mine =
                 String(data.user_id) ===
                 String(currentUserId);
 
 
-            // =========================
-            // 行
-            // =========================
+            // ==================================================
+            // メッセージ行
+            // ==================================================
 
             const row =
                 document.createElement("div");
+
 
             row.className =
                 "recruit-chat-row " +
@@ -384,140 +437,186 @@
                 );
 
 
-            // =========================
-            // 相手のアイコン
-            // =========================
+            // ==================================================
+            // アバター生成
+            // ==================================================
 
-            if (!mine) {
-
-                const avatarElement =
-                    document.createElement(
-                        "div"
-                    );
-
-                avatarElement.className =
-                    "recruit-chat-avatar-link";
+            const avatarElement =
+                document.createElement(
+                    data.profile_image
+                        ? "img"
+                        : "div"
+                );
 
 
-                if (data.profile_image) {
-
-                    const avatar =
-                        document.createElement(
-                            "img"
-                        );
-
-                    avatar.className =
-                        "recruit-chat-avatar";
-
-                    avatar.src =
-                        data.profile_image;
-
-                    avatar.alt =
-                        data.username || "ユーザー";
-
-                    avatarElement.appendChild(
-                        avatar
-                    );
-
-                } else {
-
-                    const avatar =
-                        document.createElement(
-                            "div"
-                        );
-
-                    avatar.className =
-                        "recruit-chat-avatar recruit-chat-avatar-default";
-
-                    avatar.textContent =
-                        "👤";
-
-                    avatarElement.appendChild(
-                        avatar
-                    );
-
-                }
+            avatarElement.className =
+                data.profile_image
+                    ? "recruit-chat-avatar"
+                    : "recruit-chat-avatar recruit-chat-avatar-default";
 
 
-                // =========================
-                // スーパーユーザー
-                // =========================
+            if (data.profile_image) {
 
-                if (data.is_superuser) {
+                avatarElement.src =
+                    data.profile_image;
 
-                    row.appendChild(
-                        avatarElement
-                    );
+                avatarElement.alt =
+                    data.username || "ユーザー";
 
-                } else {
+            } else {
 
-                    const avatarLink =
-                        document.createElement(
-                            "a"
-                        );
-
-                    avatarLink.className =
-                        "recruit-chat-avatar-link";
-
-                    avatarLink.href =
-                        `/accounts/user/${encodeURIComponent(data.username)}/`;
-
-                    avatarLink.appendChild(
-                        avatarElement.firstChild
-                    );
-
-                    row.appendChild(
-                        avatarLink
-                    );
-
-                }
+                avatarElement.textContent =
+                    "👤";
 
             }
 
 
-            // =========================
+            // ==================================================
+            // アバターをリンク化するか
+            //
+            // スーパーユーザー
+            // → リンクなし
+            //
+            // 一般ユーザー
+            // → プロフィールへ
+            // ==================================================
+
+            if (data.is_superuser) {
+
+                // ------------------------------------------
+                // スーパーユーザー
+                // ------------------------------------------
+
+                const avatarContainer =
+                    document.createElement("div");
+
+
+                avatarContainer.className =
+                    "recruit-chat-avatar-link";
+
+
+                avatarContainer.appendChild(
+                    avatarElement
+                );
+
+
+                row.appendChild(
+                    avatarContainer
+                );
+
+
+            } else {
+
+                // ------------------------------------------
+                // 一般ユーザー
+                // ------------------------------------------
+
+                const avatarLink =
+                    document.createElement("a");
+
+
+                avatarLink.className =
+                    "recruit-chat-avatar-link";
+
+
+                if (data.username) {
+
+                    avatarLink.href =
+                        getUserDetailUrl(
+                            data.username
+                        );
+
+                }
+
+
+                avatarLink.appendChild(
+                    avatarElement
+                );
+
+
+                row.appendChild(
+                    avatarLink
+                );
+
+            }
+
+
+            // ==================================================
             // 吹き出しラッパー
-            // =========================
+            // ==================================================
 
             const bubbleWrapper =
                 document.createElement("div");
+
 
             bubbleWrapper.className =
                 "recruit-chat-bubble-wrapper";
 
 
-            // =========================
-            // ユーザー名
-            // =========================
+            // ==================================================
+            // 👤 ユーザー名
+            //
+            // 自分の名前は表示しない
+            //
+            // 相手がスーパーユーザー
+            // → クリック不可
+            //
+            // 一般ユーザー
+            // → プロフィールへ
+            // ==================================================
 
             if (!mine) {
 
                 let usernameElement;
 
+
                 if (data.is_superuser) {
+
+                    // ------------------------------------------
+                    // スーパーユーザー
+                    // ------------------------------------------
 
                     usernameElement =
                         document.createElement(
                             "span"
                         );
 
+
+                    usernameElement.className =
+                        "recruit-chat-username";
+
+
                 } else {
+
+                    // ------------------------------------------
+                    // 一般ユーザー
+                    // ------------------------------------------
 
                     usernameElement =
                         document.createElement(
                             "a"
                         );
 
-                    usernameElement.href =
-                        `/accounts/user/${encodeURIComponent(data.username)}/`;
+
+                    usernameElement.className =
+                        "recruit-chat-username";
+
+
+                    if (data.username) {
+
+                        usernameElement.href =
+                            getUserDetailUrl(
+                                data.username
+                            );
+
+                    }
 
                 }
 
-                usernameElement.className =
-                    "recruit-chat-username";
 
                 usernameElement.textContent =
-                    data.username;
+                    data.username || "ユーザー";
+
 
                 bubbleWrapper.appendChild(
                     usernameElement
@@ -526,14 +625,13 @@
             }
 
 
-            // =========================
-            // 吹き出し
-            // =========================
+            // ==================================================
+            // 💬 吹き出し
+            // ==================================================
 
             const bubble =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
+
 
             bubble.className =
                 "recruit-chat-bubble " +
@@ -543,128 +641,174 @@
                         : "other-bubble"
                 );
 
+
             bubble.textContent =
-                data.text;
+                data.text || "";
+
 
             bubbleWrapper.appendChild(
                 bubble
             );
 
 
-            // =========================
-            // メタ
-            // =========================
+            // ==================================================
+            // 🕒 メタ情報
+            // ==================================================
 
             const meta =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
+
 
             meta.className =
                 "recruit-chat-meta";
 
 
             const time =
-                document.createElement(
-                    "span"
-                );
+                document.createElement("span");
+
 
             time.className =
                 "recruit-chat-time";
 
+
             time.textContent =
-                data.created_at;
+                data.created_at || "";
+
 
             meta.appendChild(
                 time
             );
+
 
             bubbleWrapper.appendChild(
                 meta
             );
 
 
+            // ==================================================
+            // 吹き出しを行へ追加
+            // ==================================================
+
             row.appendChild(
                 bubbleWrapper
             );
 
 
-            // =========================
-            // 自分のアイコン
-            // =========================
+            // ==================================================
+            // 👤 自分のアイコン
+            //
+            // 自分のアイコンもスーパーユーザーなら
+            // クリックできないようにする
+            // ==================================================
 
             if (mine) {
 
-                const avatarLink =
+                const myAvatarElement =
                     document.createElement(
-                        "a"
+                        currentUserProfileImage
+                            ? "img"
+                            : "div"
                     );
 
-                avatarLink.className =
-                    "recruit-chat-avatar-link";
 
-                avatarLink.href =
-                    `/accounts/user/${encodeURIComponent(currentUsername)}/`;
+                myAvatarElement.className =
+                    currentUserProfileImage
+                        ? "recruit-chat-avatar"
+                        : "recruit-chat-avatar recruit-chat-avatar-default";
 
 
                 if (currentUserProfileImage) {
 
-                    const avatar =
-                        document.createElement(
-                            "img"
-                        );
-
-                    avatar.className =
-                        "recruit-chat-avatar";
-
-                    avatar.src =
+                    myAvatarElement.src =
                         currentUserProfileImage;
 
-                    avatar.alt =
+                    myAvatarElement.alt =
                         currentUsername;
-
-                    avatarLink.appendChild(
-                        avatar
-                    );
 
                 } else {
 
-                    const avatar =
-                        document.createElement(
-                            "div"
-                        );
-
-                    avatar.className =
-                        "recruit-chat-avatar recruit-chat-avatar-default";
-
-                    avatar.textContent =
+                    myAvatarElement.textContent =
                         "👤";
 
-                    avatarLink.appendChild(
-                        avatar
+                }
+
+
+                // ------------------------------------------------
+                // 自分がスーパーユーザーかどうか
+                // ------------------------------------------------
+
+                if (data.is_superuser) {
+
+                    // --------------------------------------------
+                    // スーパーユーザー
+                    // → リンクなし
+                    // --------------------------------------------
+
+                    const myAvatarContainer =
+                        document.createElement("div");
+
+
+                    myAvatarContainer.className =
+                        "recruit-chat-avatar-link";
+
+
+                    myAvatarContainer.appendChild(
+                        myAvatarElement
+                    );
+
+
+                    row.appendChild(
+                        myAvatarContainer
+                    );
+
+
+                } else {
+
+                    // --------------------------------------------
+                    // 一般ユーザー
+                    // → プロフィールへ
+                    // --------------------------------------------
+
+                    const myAvatarLink =
+                        document.createElement("a");
+
+
+                    myAvatarLink.className =
+                        "recruit-chat-avatar-link";
+
+
+                    myAvatarLink.href =
+                        getUserDetailUrl(
+                            currentUsername
+                        );
+
+
+                    myAvatarLink.appendChild(
+                        myAvatarElement
+                    );
+
+
+                    row.appendChild(
+                        myAvatarLink
                     );
 
                 }
 
-                row.appendChild(
-                    avatarLink
-                );
-
             }
 
 
-            // =========================
+            // ==================================================
             // チャットへ追加
-            // =========================
+            // ==================================================
 
             messageContainer.appendChild(
                 row
             );
 
 
-            // =========================
-            // 最下部へ
-            // =========================
+            // ==================================================
+            // 最下部へスクロール
+            // ==================================================
 
             messageContainer.scrollTop =
                 messageContainer.scrollHeight;
@@ -672,15 +816,17 @@
         };
 
 
-        // =========================
-        // 切断
-        // =========================
+        // ==================================================
+        // 🔴 WebSocket切断
+        // ==================================================
 
-        socket.onclose = function () {
+        socket.onclose = function (event) {
 
             console.log(
-                "Recruit chat disconnected."
+                "Recruit chat disconnected.",
+                event
             );
+
 
             status.textContent =
                 "🔴 接続が切断されました";
@@ -688,9 +834,9 @@
         };
 
 
-        // =========================
-        // エラー
-        // =========================
+        // ==================================================
+        // ⚠️ WebSocketエラー
+        // ==================================================
 
         socket.onerror = function (error) {
 
@@ -699,15 +845,16 @@
                 error
             );
 
+
             status.textContent =
                 "⚠️ 接続エラー";
 
         };
 
 
-        // =========================
-        // メッセージ送信
-        // =========================
+        // ==================================================
+        // 📤 メッセージ送信
+        // ==================================================
 
         form.addEventListener(
             "submit",
@@ -715,13 +862,20 @@
 
                 event.preventDefault();
 
+
                 const text =
                     input.value.trim();
 
+
+                // 空メッセージ
                 if (!text) {
+
                     return;
+
                 }
 
+
+                // WebSocket未接続
                 if (
                     socket.readyState !==
                     WebSocket.OPEN
@@ -732,7 +886,13 @@
                     );
 
                     return;
+
                 }
+
+
+                // ==================================================
+                // メッセージ送信
+                // ==================================================
 
                 socket.send(
                     JSON.stringify({
@@ -740,7 +900,13 @@
                     })
                 );
 
+
+                // ==================================================
+                // 入力欄クリア
+                // ==================================================
+
                 input.value = "";
+
 
                 input.focus();
 
@@ -748,15 +914,13 @@
         );
 
 
-        // =========================
-        // 初期スクロール
-        // =========================
+        // ==================================================
+        // 📜 初期スクロール
+        // ==================================================
 
         messageContainer.scrollTop =
             messageContainer.scrollHeight;
 
+
     });
-
 </script>
-
-{% endblock %}
