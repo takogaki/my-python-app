@@ -1,0 +1,162 @@
+    .recruit-edit-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 30px 20px 60px;
+    }
+
+    .recruit-edit-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, .08);
+    }
+
+    .recruit-edit-title {
+        margin-bottom: 25px;
+    }
+
+    .recruit-edit-title h2 {
+        margin: 0 0 8px;
+    }
+
+    .recruit-edit-title p {
+        margin: 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .recruit-edit-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .recruit-edit-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .recruit-edit-field label {
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .recruit-edit-field input,
+    .recruit-edit-field select,
+    .recruit-edit-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 12px 14px;
+
+        border: 1px solid #ddd;
+        border-radius: 10px;
+
+        font-size: 15px;
+
+        background: #fff;
+    }
+
+    .recruit-edit-field textarea {
+        min-height: 140px;
+        resize: vertical;
+        line-height: 1.7;
+    }
+
+    .recruit-edit-field input:focus,
+    .recruit-edit-field select:focus,
+    .recruit-edit-field textarea:focus {
+        outline: none;
+        border-color: #999;
+    }
+
+    .recruit-edit-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .recruit-edit-note {
+        background: #f7f7f7;
+        border-radius: 12px;
+        padding: 14px;
+
+        font-size: 13px;
+        line-height: 1.7;
+        color: #666;
+    }
+
+    .recruit-edit-current {
+        background: #f0f7ff;
+        border-radius: 12px;
+        padding: 14px;
+
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .recruit-edit-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .recruit-edit-submit,
+    .recruit-edit-cancel {
+        flex: 1;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 13px;
+
+        border-radius: 10px;
+
+        text-decoration: none;
+
+        font-weight: bold;
+
+        cursor: pointer;
+    }
+
+    .recruit-edit-submit {
+        border: none;
+        background: #222;
+        color: #fff;
+    }
+
+    .recruit-edit-submit:hover {
+        opacity: .85;
+    }
+
+    .recruit-edit-cancel {
+        background: #eee;
+        color: #333;
+    }
+
+    .recruit-edit-cancel:hover {
+        background: #ddd;
+    }
+
+
+    @media (max-width: 600px) {
+
+        .recruit-edit-container {
+            padding: 20px 15px 50px;
+        }
+
+        .recruit-edit-card {
+            padding: 20px;
+        }
+
+        .recruit-edit-row {
+            grid-template-columns: 1fr;
+        }
+
+        .recruit-edit-actions {
+            flex-direction: column;
+        }
+
+    }

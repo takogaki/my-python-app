@@ -93,3 +93,28 @@ textarea {
     text-align: center;
     font-size: 14px;
 }
+
+
+/* 募集 */
+.recruit-card {
+    margin-bottom:25px;
+    padding:15px;
+    background:#f7f7f7;
+    border-radius:14px;
+}
+
+.recruit-text {
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+.recruit-url {
+    display:inline-block;
+    padding:10px 15px;
+    border-radius:10px;
+    background:#222;
+    color:#fff;
+    text-decoration:none;
+    font-weight:bold;
+}
+

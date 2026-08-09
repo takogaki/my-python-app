@@ -1,0 +1,463 @@
+/* ==================================================
+   募集チャット
+================================================== */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #0f0f0f;
+}
+
+
+/* ==================================================
+   全体
+================================================== */
+
+.recruit-chat-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100dvh - 0px);
+    background: #0f0f0f;
+    color: #fff;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+}
+
+
+/* ==================================================
+   ヘッダー
+================================================== */
+
+.recruit-chat-header {
+    flex-shrink: 0;
+    padding: 16px 18px;
+    background: #111;
+    border-bottom: 1px solid #252525;
+}
+
+.recruit-chat-header h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.recruit-chat-header p {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: #888;
+}
+
+.recruit-chat-header a {
+    display: inline-block;
+    color: #aaa;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.recruit-chat-header a:hover {
+    color: #fff;
+}
+
+
+/* ==================================================
+   メッセージエリア
+================================================== */
+
+.recruit-chat-messages {
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 18px 12px 20px;
+
+    background: #0f0f0f;
+
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+
+/* ==================================================
+   メッセージ
+================================================== */
+
+.recruit-chat-message {
+    display: flex;
+    flex-direction: column;
+
+    width: fit-content;
+    max-width: 72%;
+
+    margin-bottom: 14px;
+
+    padding: 9px 13px;
+
+    border-radius: 18px;
+
+    font-size: 14px;
+    line-height: 1.45;
+
+    word-break: break-word;
+
+    animation: recruitChatFadeIn .2s ease;
+}
+
+
+/* 自分 */
+
+.recruit-chat-message.mine {
+    margin-left: auto;
+
+    background: linear-gradient(
+        135deg,
+        #ff4d6d,
+        #ff7a8f
+    );
+
+    color: #fff;
+
+    border-bottom-right-radius: 5px;
+}
+
+
+/* 相手 */
+
+.recruit-chat-message.other {
+    margin-right: auto;
+
+    background: #2a2a2a;
+
+    color: #fff;
+
+    border-bottom-left-radius: 5px;
+}
+
+
+/* ==================================================
+   ユーザー名
+================================================== */
+
+.recruit-chat-user {
+    margin-bottom: 3px;
+
+    font-size: 10px;
+    color: rgba(255, 255, 255, .65);
+}
+
+
+/* 自分の名前 */
+
+.recruit-chat-message.mine .recruit-chat-user {
+    color: rgba(255, 255, 255, .75);
+}
+
+
+/* ==================================================
+   本文
+================================================== */
+
+.recruit-chat-text {
+    white-space: normal;
+    word-break: break-word;
+}
+
+
+/* ==================================================
+   時刻
+================================================== */
+
+.recruit-chat-time {
+    margin-top: 4px;
+
+    text-align: right;
+
+    font-size: 9px;
+
+    color: rgba(255, 255, 255, .55);
+}
+
+
+/* ==================================================
+   空状態
+================================================== */
+
+.recruit-chat-empty {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 200px;
+
+    color: #666;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* ==================================================
+   入力フォーム
+================================================== */
+
+.recruit-chat-form {
+    position: relative;
+
+    display: flex;
+
+    flex-shrink: 0;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 10px;
+
+    background: #111;
+
+    border-top: 1px solid #252525;
+
+    /*
+     * iPhone / PWA の下部安全領域
+     */
+    padding-bottom:
+        calc(
+            10px + env(safe-area-inset-bottom)
+        );
+
+    z-index: 20;
+}
+
+
+/* ==================================================
+   入力欄
+================================================== */
+
+#recruit-chat-input {
+    display: block;
+
+    flex: 1;
+
+    width: 100%;
+    min-width: 0;
+
+    height: 42px;
+
+    box-sizing: border-box;
+
+    padding: 0 16px;
+
+    border: none;
+    outline: none;
+
+    border-radius: 22px;
+
+    background: #2a2a2a;
+
+    color: #fff;
+
+    font-size: 14px;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    opacity: 1;
+
+    visibility: visible;
+}
+
+#recruit-chat-input:focus {
+    background: #333;
+}
+
+#recruit-chat-input::placeholder {
+    color: #777;
+}
+
+
+/* ==================================================
+   送信ボタン
+================================================== */
+
+.recruit-chat-form button {
+    display: flex;
+
+    flex-shrink: 0;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    margin: 0;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #ff4d6d,
+        #ff7a8f
+    );
+
+    color: #fff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        opacity .2s ease;
+}
+
+.recruit-chat-form button:hover {
+    transform: scale(1.08);
+
+    box-shadow:
+        0 0 12px rgba(
+            255,
+            77,
+            109,
+            .35
+        );
+}
+
+.recruit-chat-form button:active {
+    transform: scale(.94);
+}
+
+.recruit-chat-form button:disabled {
+    opacity: .5;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* ==================================================
+   接続状態
+================================================== */
+
+.recruit-chat-status {
+    flex-shrink: 0;
+
+    padding: 4px 10px;
+
+    background: #111;
+
+    color: #666;
+
+    font-size: 10px;
+
+    text-align: center;
+
+    border-top: 1px solid #181818;
+}
+
+
+/* ==================================================
+   アニメーション
+================================================== */
+
+@keyframes recruitChatFadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* ==================================================
+   スクロールバー
+================================================== */
+
+.recruit-chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.recruit-chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.recruit-chat-messages::-webkit-scrollbar-thumb {
+    background: #333;
+
+    border-radius: 10px;
+}
+
+
+/* ==================================================
+   スマホ
+================================================== */
+
+@media (max-width: 600px) {
+
+    .recruit-chat-header {
+        padding: 13px 14px;
+    }
+
+    .recruit-chat-header h2 {
+        font-size: 16px;
+    }
+
+    .recruit-chat-messages {
+        padding: 14px 9px 16px;
+    }
+
+    .recruit-chat-message {
+        max-width: 78%;
+
+        padding: 9px 12px;
+
+        font-size: 14px;
+    }
+
+    .recruit-chat-form {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    #recruit-chat-input {
+        height: 42px;
+
+        font-size: 16px;
+        /*
+         * iOSで勝手にズームされるのを防止
+         */
+    }
+
+}
+
+
+/* ==================================================
+   全要素
+================================================== */
+
+* {
+    min-width: 0;
+}

@@ -6,290 +6,12 @@
 {% endblock %}
 
 {% block extra_css %}
-
-<style>
-    .recruit-management-container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 30px 20px 60px;
-    }
-
-    .recruit-management-header {
-        margin-bottom: 30px;
-    }
-
-    .recruit-management-header h2 {
-        margin-bottom: 8px;
-    }
-
-    .recruit-management-header p {
-        color: #777;
-        margin: 0;
-    }
-
-
-    /* =========================
-       募集カード
-    ========================= */
-
-    .management-recruit-card {
-        background: #fff;
-        border-radius: 18px;
-        padding: 20px;
-        margin-bottom: 18px;
-
-        box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
-    }
-
-
-    /* =========================
-       ヘッダー
-    ========================= */
-
-    .management-recruit-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .management-recruit-title {
-        margin: 0;
-        font-size: 19px;
-        font-weight: bold;
-    }
-
-    .management-recruit-category {
-        margin-top: 6px;
-        color: #777;
-        font-size: 13px;
-    }
-
-
-    /* =========================
-       ステータス
-    ========================= */
-
-    .management-status {
-        display: inline-block;
-        flex-shrink: 0;
-
-        padding: 6px 11px;
-        border-radius: 20px;
-
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .management-status-open {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .management-status-full {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-    .management-status-cancel {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .management-status-closed {
-        background: #e2e3e5;
-        color: #383d41;
-    }
-
-
-    /* =========================
-       募集情報
-    ========================= */
-
-    .management-recruit-info {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-
-        margin-top: 18px;
-        padding: 15px;
-
-        background: #f7f7f7;
-        border-radius: 12px;
-    }
-
-    .management-info-item {
-        font-size: 14px;
-    }
-
-    .management-info-label {
-        display: block;
-        color: #888;
-        font-size: 12px;
-        margin-bottom: 3px;
-    }
-
-    .management-info-value {
-        font-weight: bold;
-    }
-
-
-    /* =========================
-       ボタン
-    ========================= */
-
-    .management-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-
-        margin-top: 18px;
-    }
-
-    .management-action {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-
-        min-height: 42px;
-        padding: 0 15px;
-
-        border-radius: 10px;
-
-        text-decoration: none;
-        border: none;
-
-        font-size: 14px;
-        font-weight: bold;
-
-        cursor: pointer;
-        box-sizing: border-box;
-    }
-
-    .management-detail {
-        background: #eee;
-        color: #333;
-    }
-
-    .management-participants {
-        background: #607d8b;
-        color: #fff;
-    }
-
-    .management-chat {
-        background: #2196f3;
-        color: #fff;
-    }
-
-    .management-reopen {
-        background: #27ae60;
-        color: #fff;
-    }
-
-    .management-action:hover {
-        opacity: .85;
-    }
-
-
-    /* =========================
-       中止・終了メッセージ
-    ========================= */
-
-    .management-closed-message {
-        margin-top: 15px;
-        padding: 12px 14px;
-
-        border-radius: 10px;
-
-        background: #f5f5f5;
-        color: #777;
-
-        font-size: 13px;
-    }
-
-
-    /* =========================
-       応募した募集
-    ========================= */
-
-    .management-section {
-        margin-top: 45px;
-    }
-
-    .management-section-title {
-        margin-bottom: 18px;
-    }
-
-    .management-application-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 18px;
-        margin-bottom: 12px;
-
-        box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
-    }
-
-    .management-application-title {
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-
-    .management-application-info {
-        color: #777;
-        font-size: 13px;
-    }
-
-
-    /* =========================
-       空状態
-    ========================= */
-
-    .management-empty {
-        padding: 40px 20px;
-        text-align: center;
-
-        color: #777;
-
-        background: #f7f7f7;
-        border-radius: 16px;
-    }
-
-
-    /* =========================
-       スマホ
-    ========================= */
-
-    @media (max-width: 600px) {
-
-        .recruit-management-container {
-            padding: 20px 15px 50px;
-        }
-
-        .management-recruit-header {
-            flex-direction: column;
-        }
-
-        .management-recruit-info {
-            grid-template-columns: 1fr;
-        }
-
-        .management-actions {
-            flex-direction: column;
-        }
-
-        .management-action {
-            width: 100%;
-        }
-    }
-</style>
-
+<link rel="stylesheet" href="{% static 'videos/css/recruit_management.css' %}">
 {% endblock %}
 
 {% block body %}
 
 <div class="recruit-management-container">
-
-    ```
     <!-- =========================
      ヘッダー
 ========================== -->
@@ -537,43 +259,100 @@
         </h3>
 
 
-        {% for participation in my_applications %}
-
-        <div class="management-application-card">
-
-            <div class="management-application-title">
-                {{ participation.recruit.title }}
+        {% for application in my_applications %}
+        
+        <a href="{% url 'recruit_detail' application.recruit.id %}" class="application-card-link">
+        
+            <div class="application-card">
+        
+                <div class="application-card-header">
+        
+                    <h3>
+                        {{ application.recruit.title }}
+                    </h3>
+        
+                    {% if application.status == "pending" %}
+        
+                    <span class="application-status pending">
+                        ⏳ 応募中
+                    </span>
+        
+                    {% elif application.status == "approved" %}
+        
+                    <span class="application-status approved">
+                        ✅ 参加確定
+                    </span>
+        
+                    {% elif application.status == "rejected" %}
+        
+                    <span class="application-status rejected">
+                        ❌ 拒否
+                    </span>
+        
+                    {% elif application.status == "cancelled" %}
+        
+                    <span class="application-status cancelled">
+                        🚫 キャンセル
+                    </span>
+        
+                    {% endif %}
+        
+                </div>
+        
+        
+                <div class="application-card-info">
+        
+                    <div>
+                        👤 募集主：
+                        {{ application.recruit.user.username }}
+                    </div>
+        
+                    {% if application.recruit.place %}
+        
+                    <div>
+                        📍 {{ application.recruit.place }}
+                    </div>
+        
+                    {% endif %}
+        
+                    {% if application.recruit.start_time %}
+        
+                    <div>
+                        🕒
+                        {{ application.recruit.start_time|date:"Y/m/d H:i" }}
+                    </div>
+        
+                    {% endif %}
+        
+                </div>
+        
+        
+                <div class="application-card-footer">
+        
+                    <span>
+                        応募日時：
+                        {{ application.created_at|date:"Y/m/d H:i" }}
+                    </span>
+        
+                    <span class="application-detail-arrow">
+                        詳細を見る →
+                    </span>
+        
+                </div>
+        
             </div>
-
-            <div class="management-application-info">
-
-                募集主：
-                {{ participation.recruit.user.username }}
-
-                <br>
-
-                応募日時：
-                {{ participation.created_at|date:"Y/m/d H:i" }}
-
-            </div>
-
-        </div>
-
-
+        
+        </a>
+        
         {% empty %}
-
-        <div class="management-empty">
-
-            <p>
-                まだ応募した募集はありません。
-            </p>
-
+        
+        <div class="empty-message">
+            <p>まだ応募した募集はありません。</p>
         </div>
-
+        
         {% endfor %}
 
     </section>
-    ```
 
 </div>
 
