@@ -1,28 +1,24 @@
 {% extends "base/diary_base.html" %}
 {% load static %}
 
-
 {% block title %}
 {{ recruit.title }}｜募集チャット
 {% endblock %}
 
-
 {% block extra_css %}
 
 <link rel="stylesheet" href="{% static 'videos/css/recruit_chat.css' %}">
-
 {% endblock %}
-
-
 
 {% block body %}
 
-<!-- ==================================================
+<!-- =========================
      ヘッダー
-================================================== -->
+========================== -->
 
 <div class="recruit-chat-header">
 
+    ```
     <div class="recruit-chat-header-info">
 
         <h2>
@@ -39,23 +35,24 @@
     <a href="{% url 'recruit_detail' recruit.id %}" class="recruit-chat-back">
         ← 募集詳細へ
     </a>
+    ```
 
 </div>
 
-
-<!-- ==================================================
-     メッセージ
-================================================== -->
+<!-- =========================
+     メッセージエリア
+========================== -->
 
 <div id="recruit-chat-messages" class="recruit-chat-messages">
 
+    ```
     {% for message in chat_messages %}
 
     {% if message.user == request.user %}
 
     <!-- =========================
-                 自分
-            ========================== -->
+             自分
+        ========================== -->
 
     <div class="recruit-chat-row my-row">
 
@@ -76,7 +73,9 @@
         </div>
 
 
-        <!-- 自分のアイコン -->
+        <!-- =========================
+                 自分のアイコン
+            ========================== -->
 
         <a href="{% url 'accounts:mypage' %}" class="recruit-chat-avatar-link">
 
@@ -101,15 +100,22 @@
     {% else %}
 
     <!-- =========================
-                 相手
-            ========================== -->
+             相手
+        ========================== -->
 
     <div class="recruit-chat-row other-row">
 
 
-        <!-- 相手アイコン -->
+        <!-- =========================
+                 相手のアイコン
+            ========================== -->
 
         {% if message.user.is_superuser %}
+
+        <!--
+                    スーパーユーザー
+                    → プロフィールへのリンクなし
+                -->
 
         <div class="recruit-chat-avatar-link">
 
@@ -129,6 +135,11 @@
         </div>
 
         {% else %}
+
+        <!--
+                    通常ユーザー
+                    → DjangoのURL nameを使用
+                -->
 
         <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-avatar-link">
 
@@ -150,19 +161,28 @@
         {% endif %}
 
 
-        <!-- 吹き出し -->
+        <!-- =========================
+                 吹き出し
+            ========================== -->
 
         <div class="recruit-chat-bubble-wrapper">
 
-            <!-- ユーザー名 -->
+
+            <!-- =========================
+                     ユーザー名
+                ========================== -->
 
             {% if message.user.is_superuser %}
+
+            <!-- スーパーユーザーは名前もリンクなし -->
 
             <span class="recruit-chat-username">
                 {{ message.user.username }}
             </span>
 
             {% else %}
+
+            <!-- 通常ユーザーはプロフィールへ -->
 
             <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-username">
                 {{ message.user.username }}
@@ -171,14 +191,18 @@
             {% endif %}
 
 
-            <!-- メッセージ -->
+            <!-- =========================
+                     メッセージ
+                ========================== -->
 
             <div class="recruit-chat-bubble other-bubble">
                 {{ message.text|linebreaksbr }}
             </div>
 
 
-            <!-- 時刻 -->
+            <!-- =========================
+                     時刻
+                ========================== -->
 
             <div class="recruit-chat-meta">
 
@@ -202,33 +226,33 @@
     </div>
 
     {% endfor %}
+    ```
 
 </div>
 
+<!-- =========================
+     入力エリア
+========================== -->
+<div class="recruit-chat-input-fixed">
 
+    <form id="recruit-chat-form" class="recruit-chat-form">
 
-<!-- ==================================================
-     入力フォーム
-================================================== -->
+        {% csrf_token %}
 
-<form id="recruit-chat-form" class="recruit-chat-form">
+        <input type="text" id="recruit-chat-input" class="recruit-chat-input" placeholder="メッセージを入力..."
+            autocomplete="off" maxlength="2000">
 
-    {% csrf_token %}
+        <button type="submit" class="recruit-chat-send">
+            ➤
+        </button>
 
-    <input type="text" id="recruit-chat-input" class="recruit-chat-input" placeholder="メッセージを入力..." autocomplete="off"
-        maxlength="2000">
+    </form>
 
-    <button type="submit" class="recruit-chat-send">
-        ➤
-    </button>
+</div>
 
-</form>
-
-
-
-<!-- ==================================================
+<!-- =========================
      接続状態
-================================================== -->
+========================== -->
 
 <div id="recruit-chat-status" class="recruit-chat-status">
     接続中...
@@ -246,388 +270,200 @@
 
 <script>
 
-    socket.onmessage = function (event) {
+console.log("🔥 RECRUIT CHAT JS START");
 
-            console.log(
-                "📩 Recruit chat message:",
-                event.data
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        console.log(
+            "🔥 RECRUIT CHAT DOM LOADED"
+        );
+
+
+        const recruitId =
+            "{{ recruit.id }}";
+
+
+        console.log(
+            "🔥 recruitId =",
+            recruitId
+        );
+
+
+        const protocol =
+            window.location.protocol === "https:"
+                ? "wss"
+                : "ws";
+
+
+        const socketUrl =
+            `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`;
+
+
+        console.log(
+            "🔥 WebSocket URL =",
+            socketUrl
+        );
+
+
+        const socket =
+            new WebSocket(
+                socketUrl
             );
 
-            let data;
 
-            try {
+        socket.onopen =
+            function () {
 
-                data = JSON.parse(event.data);
+                console.log(
+                    "🟢 RECRUIT CHAT WEBSOCKET CONNECTED"
+                );
 
-            } catch (error) {
+                const status =
+                    document.getElementById(
+                        "recruit-chat-status"
+                    );
+
+                if (status) {
+
+                    status.textContent =
+                        "🟢 接続済み";
+
+                }
+
+            };
+
+
+        socket.onmessage =
+            function (event) {
+
+                console.log(
+                    "📩 Recruit chat message:",
+                    event.data
+                );
+
+            };
+
+
+        socket.onerror =
+            function (error) {
 
                 console.error(
-                    "WebSocket JSON error:",
+                    "🔴 RECRUIT CHAT WEBSOCKET ERROR:",
                     error
                 );
 
-                return;
-            }
-
-
-            // ==================================================
-            // DOM
-            // ==================================================
-
-            const messageContainer =
-                document.getElementById(
-                    "recruit-chat-messages"
-                );
-
-            if (!messageContainer) {
-
-                console.error(
-                    "recruit-chat-messages が見つかりません。"
-                );
-
-                return;
-            }
-
-
-            // ==================================================
-            // 空メッセージ表示を削除
-            // ==================================================
-
-            const emptyMessage =
-                document.getElementById(
-                    "recruit-chat-empty"
-                );
-
-            if (emptyMessage) {
-
-                emptyMessage.remove();
-
-            }
-
-
-            // ==================================================
-            // 自分のメッセージか
-            // ==================================================
-
-            const mine =
-                String(data.user_id) ===
-                String(currentUserId);
-
-
-            // ==================================================
-            // メッセージ行
-            // ==================================================
-
-            const row =
-                document.createElement("div");
-
-            row.className =
-                "recruit-chat-row " +
-                (
-                    mine
-                        ? "my-row"
-                        : "other-row"
-                );
-
-
-            // ==================================================
-            // アバター作成
-            // ==================================================
-
-            let avatar;
-
-            if (data.profile_image) {
-
-                avatar =
-                    document.createElement("img");
-
-                avatar.src =
-                    data.profile_image;
-
-                avatar.alt =
-                    data.username || "ユーザー";
-
-                avatar.className =
-                    "recruit-chat-avatar";
-
-            } else {
-
-                avatar =
-                    document.createElement("div");
-
-                avatar.className =
-                    "recruit-chat-avatar " +
-                    "recruit-chat-avatar-default";
-
-                avatar.textContent =
-                    "👤";
-
-            }
-
-
-            // ==================================================
-            // 相手のアバター
-            // ==================================================
-
-            if (!mine) {
-
-                if (data.is_superuser) {
-
-                    const avatarContainer =
-                        document.createElement("div");
-
-                    avatarContainer.className =
-                        "recruit-chat-avatar-link";
-
-                    avatarContainer.appendChild(
-                        avatar
+                const status =
+                    document.getElementById(
+                        "recruit-chat-status"
                     );
 
-                    row.appendChild(
-                        avatarContainer
-                    );
+                if (status) {
 
-                } else {
+                    status.textContent =
+                        "🔴 接続エラー";
 
-                    const avatarLink =
-                        document.createElement("a");
-
-                    avatarLink.className =
-                        "recruit-chat-avatar-link";
-
-                    avatarLink.href =
-                        getUserDetailUrl(
-                            data.username
-                        );
-
-                    avatarLink.appendChild(
-                        avatar
-                    );
-
-                    row.appendChild(
-                        avatarLink
-                    );
                 }
 
-            }
+            };
 
 
-            // ==================================================
-            // 吹き出しラッパー
-            // ==================================================
+        socket.onclose =
+            function (event) {
 
-            const bubbleWrapper =
-                document.createElement("div");
-
-            bubbleWrapper.className =
-                "recruit-chat-bubble-wrapper";
-
-
-            // ==================================================
-            // 相手のユーザー名
-            // ==================================================
-
-            if (!mine) {
-
-                let usernameElement;
-
-                if (data.is_superuser) {
-
-                    usernameElement =
-                        document.createElement("span");
-
-                } else {
-
-                    usernameElement =
-                        document.createElement("a");
-
-                    usernameElement.href =
-                        getUserDetailUrl(
-                            data.username
-                        );
-                }
-
-                usernameElement.className =
-                    "recruit-chat-username";
-
-                usernameElement.textContent =
-                    data.username || "ユーザー";
-
-                bubbleWrapper.appendChild(
-                    usernameElement
-                );
-            }
-
-
-            // ==================================================
-            // 吹き出し
-            // ==================================================
-
-            const bubble =
-                document.createElement("div");
-
-            bubble.className =
-                "recruit-chat-bubble " +
-                (
-                    mine
-                        ? "my-bubble"
-                        : "other-bubble"
+                console.log(
+                    "🔴 RECRUIT CHAT WEBSOCKET CLOSED:",
+                    event
                 );
 
-            bubble.textContent =
-                data.text || "";
+                const status =
+                    document.getElementById(
+                        "recruit-chat-status"
+                    );
 
-            bubbleWrapper.appendChild(
-                bubble
-            );
+                if (status) {
 
+                    status.textContent =
+                        "🔴 接続が切断されました";
 
-            // ==================================================
-            // 時刻
-            // ==================================================
-
-            const meta =
-                document.createElement("div");
-
-            meta.className =
-                "recruit-chat-meta";
-
-
-            const time =
-                document.createElement("span");
-
-            time.className =
-                "recruit-chat-time";
-
-            time.textContent =
-                data.created_at || "";
-
-            meta.appendChild(
-                time
-            );
-
-            bubbleWrapper.appendChild(
-                meta
-            );
-
-
-            // ==================================================
-            // 吹き出しを行に追加
-            // ==================================================
-
-            row.appendChild(
-                bubbleWrapper
-            );
-
-
-            // ==================================================
-            // 自分のアバター
-            // ==================================================
-
-            if (mine) {
-
-                let myAvatar;
-
-                if (currentUserProfileImage) {
-
-                    myAvatar =
-                        document.createElement("img");
-
-                    myAvatar.src =
-                        currentUserProfileImage;
-
-                    myAvatar.alt =
-                        currentUsername;
-
-                    myAvatar.className =
-                        "recruit-chat-avatar";
-
-                } else {
-
-                    myAvatar =
-                        document.createElement("div");
-
-                    myAvatar.className =
-                        "recruit-chat-avatar " +
-                        "recruit-chat-avatar-default";
-
-                    myAvatar.textContent =
-                        "👤";
                 }
 
+            };
 
-                /*
-                 * 自分がスーパーユーザー
-                 */
 
-                if (data.is_superuser) {
+        const form =
+            document.getElementById(
+                "recruit-chat-form"
+            );
 
-                    const avatarContainer =
-                        document.createElement("div");
 
-                    avatarContainer.className =
-                        "recruit-chat-avatar-link";
+        const input =
+            document.getElementById(
+                "recruit-chat-input"
+            );
 
-                    avatarContainer.appendChild(
-                        myAvatar
-                    );
 
-                    row.appendChild(
-                        avatarContainer
-                    );
+        if (!form || !input) {
+
+            console.error(
+                "❌ Recruit chat form/input not found"
+            );
+
+            return;
+
+        }
+
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                event.preventDefault();
+
+
+                const text =
+                    input.value.trim();
+
+
+                if (!text) {
+
+                    return;
 
                 }
 
 
-                /*
-                 * 一般ユーザー
-                 * → マイページ
-                 */
+                if (
+                    socket.readyState !==
+                    WebSocket.OPEN
+                ) {
 
-                else {
-
-                    const myAvatarLink =
-                        document.createElement("a");
-
-                    myAvatarLink.className =
-                        "recruit-chat-avatar-link";
-
-                    /*
-                     * ここが重要
-                     * 自分は user_detail ではなく mypage
-                     */
-
-                    myAvatarLink.href =
-                        "{% url 'accounts:mypage' %}";
-
-                    myAvatarLink.appendChild(
-                        myAvatar
+                    alert(
+                        "チャットサーバーに接続されていません。"
                     );
 
-                    row.appendChild(
-                        myAvatarLink
-                    );
+                    return;
+
                 }
+
+
+                socket.send(
+                    JSON.stringify({
+                        text: text
+                    })
+                );
+
+
+                input.value = "";
+
+                input.focus();
+
             }
+        );
 
-
-            // ==================================================
-            // メッセージ追加
-            // ==================================================
-
-            messageContainer.appendChild(
-                row
-            );
-
-
-            // ==================================================
-            // 最下部へスクロール
-            // ==================================================
-
-            messageContainer.scrollTop =
-                messageContainer.scrollHeight;
-
-        };
+    }
+);
 
 </script>
 
