@@ -35,26 +35,96 @@
         {% for message in chat_messages %}
 
         <div class="
-                recruit-chat-message
-                {% if message.user == request.user %}
-                    mine
+            recruit-chat-row
+            {% if message.user == request.user %}
+                my-row
+            {% else %}
+                other-row
+            {% endif %}
+        ">
+        
+            {% if message.user != request.user %}
+        
+            <!-- 相手のアイコン -->
+            <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-avatar-link">
+        
+                {% if message.user.get_profile_image %}
+        
+                <img src="{{ message.user.get_profile_image }}" class="recruit-chat-avatar" alt="{{ message.user.username }}">
+        
                 {% else %}
-                    other
+        
+                <div class="recruit-chat-avatar recruit-chat-avatar-default">
+                    👤
+                </div>
+        
                 {% endif %}
-            ">
-
-            <div class="recruit-chat-user">
-                {{ message.user.username }}
+        
+            </a>
+        
+            {% endif %}
+        
+        
+            <!-- メッセージ本体 -->
+        
+            <div class="recruit-chat-bubble-wrapper">
+        
+                <!-- 相手の名前 -->
+                {% if message.user != request.user %}
+        
+                <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-username">
+                    {{ message.user.username }}
+                </a>
+        
+                {% endif %}
+        
+        
+                <div class="
+                    recruit-chat-bubble
+                    {% if message.user == request.user %}
+                        my-bubble
+                    {% else %}
+                        other-bubble
+                    {% endif %}
+                ">
+        
+                    {{ message.text|linebreaksbr }}
+        
+                </div>
+        
+        
+                <div class="recruit-chat-meta">
+        
+                    <span class="recruit-chat-time">
+                        {{ message.created_at|date:"m/d H:i" }}
+                    </span>
+        
+                </div>
+        
             </div>
-
-            <div class="recruit-chat-text">
-                {{ message.text|linebreaksbr }}
-            </div>
-
-            <div class="recruit-chat-time">
-                {{ message.created_at|date:"m/d H:i" }}
-            </div>
-
+        
+        
+            {% if message.user == request.user %}
+        
+            <!-- 自分のアイコン -->
+            <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-avatar-link">
+        
+                {% if message.user.get_profile_image %}
+        
+                <img src="{{ message.user.get_profile_image }}" class="recruit-chat-avatar" alt="{{ message.user.username }}">
+        
+                {% else %}
+        
+                <div class="recruit-chat-avatar recruit-chat-avatar-default">
+                    👤
+                </div>
+        
+                {% endif %}
+        
+            </a>
+        
+            {% endif %}
+        
         </div>
 
         {% empty %}

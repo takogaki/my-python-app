@@ -180,6 +180,116 @@
         opacity: .85;
     }
 
+    /* =========================
+    新規募集作成
+    ========================= */
+
+    .recruit-create-area {
+        margin-bottom: 25px;
+    }
+
+    .recruit-create-button {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 16px 18px;
+
+        border-radius: 16px;
+
+        background: linear-gradient(
+            135deg,
+            #ff4d6d,
+            #ff7a8f
+        );
+
+        color: #fff;
+
+        text-decoration: none;
+
+        box-shadow:
+            0 6px 20px rgba(255, 77, 109, .20);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .recruit-create-button:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 10px 28px rgba(255, 77, 109, .28);
+    }
+
+    .recruit-create-button:active {
+        transform: scale(.98);
+    }
+
+
+    /* ＋アイコン */
+
+    .recruit-create-icon {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, .20);
+
+        font-size: 26px;
+        font-weight: 300;
+
+        line-height: 1;
+    }
+
+
+    /* テキスト */
+
+    .recruit-create-button span:last-child {
+        display: flex;
+        flex-direction: column;
+
+        gap: 3px;
+    }
+
+    .recruit-create-button strong {
+        font-size: 15px;
+    }
+
+    .recruit-create-button small {
+        font-size: 11px;
+
+        color: rgba(255, 255, 255, .80);
+    }
+
+
+    /* =========================
+    スマホ
+    ========================= */
+
+    @media (max-width: 600px) {
+
+        .recruit-create-button {
+            padding: 14px 16px;
+        }
+
+        .recruit-create-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+    }
 
     /* =========================
        中止・終了メッセージ
