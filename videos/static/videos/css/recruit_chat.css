@@ -460,11 +460,7 @@ body {
 .recruit-chat-row {
     display: flex;
     align-items: flex-start;
-    gap: 7px;
-
     margin-bottom: 14px;
-
-    animation: recruitChatFadeIn .2s ease;
 }
 
 .recruit-chat-row.my-row {
@@ -477,35 +473,40 @@ body {
 
 
 /* =========================
-   アバター
+   👤 アイコン
+   吹き出しの先頭と高さを合わせる
 ========================= */
 
 .recruit-chat-avatar-link {
+    display: flex;
+    align-items: flex-start;
     flex-shrink: 0;
 
-    width: 36px;
-    height: 36px;
-
-    margin-top: 18px;
+    margin: 18px 8px 0 0;
 
     text-decoration: none;
 }
+
 
 .recruit-chat-avatar {
     width: 36px;
     height: 36px;
 
+    flex-shrink: 0;
+
     border-radius: 50%;
+
+    margin: 0;
 
     object-fit: cover;
 
-    display: block;
-
-    background: #2a2a2a;
-
-    box-shadow:
-        0 0 6px rgba(255, 255, 255, .06);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
 }
+
+
+/* =========================
+   👤 デフォルトアイコン
+========================= */
 
 .recruit-chat-avatar-default {
     display: flex;
@@ -513,25 +514,32 @@ body {
     align-items: center;
     justify-content: center;
 
-    font-size: 17px;
+    width: 36px;
+    height: 36px;
+
+    border-radius: 50%;
+
+    background: #2a2a2a;
 
     color: #aaa;
 
-    background: #252525;
+    font-size: 18px;
+
+    box-sizing: border-box;
 }
 
 
 /* =========================
-   吹き出し全体
+   💬 吹き出しラッパー
 ========================= */
 
 .recruit-chat-bubble-wrapper {
+    max-width: 72%;
+
     display: flex;
     flex-direction: column;
 
-    max-width: 72%;
-
-    min-width: 0;
+    align-self: flex-start;
 }
 
 
