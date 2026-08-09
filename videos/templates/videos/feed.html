@@ -85,7 +85,58 @@ Spirytus動画｜SPIRYTUS
             </div>
             {% endwith %}
             {% endif %}
-            
+
+            {% if item.type == "recruit" %}
+            {% with recruit=item.data %}
+
+            <div class="video-card snap-item recruit-card">
+
+                <div class="caption recruit-caption">
+
+                    <h2>🎉 {{ recruit.title }}</h2>
+
+                    <p>
+                        👤 {{ recruit.user.username }}
+                    </p>
+
+                    {% if recruit.place %}
+                    <p>
+                        📍 {{ recruit.place }}
+                    </p>
+                    {% endif %}
+
+                    {% if recruit.start_time %}
+                    <p>
+                        🕒 {{ recruit.start_time|date:"m月d日 H:i" }}
+                    </p>
+                    {% endif %}
+
+                    <p>
+                        👥 あと {{ recruit.remaining_count }} 人
+                    </p>
+
+                    {% if recruit.industry %}
+                    <p>
+                        🏗 {{ recruit.industry }}
+                    </p>
+                    {% endif %}
+
+                    {% if recruit.description %}
+                    <p class="caption-text">
+                        {{ recruit.description|linebreaksbr }}
+                    </p>
+                    {% endif %}
+
+                    <a href="{% url 'recruit_detail' recruit.id %}" class="join-btn">
+                        詳細を見る
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endwith %}
+            {% endif %}
             
             {% if item.type == "ad" %}
             <div class="video-card snap-item ad-card">

@@ -1,5 +1,5 @@
 import uuid
-from .models import PostVideo, PostVideoLike, PostVideoComment
+from .models import PostVideo, PostVideoLike, PostVideoComment, Recruit, RecruitParticipant, RecruitChatRoom, RecruitChatMessage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from accounts.utils import save_page_log
+from django.contrib import messages
 
 User = get_user_model()
 
@@ -30,6 +31,16 @@ def feed(request):
         .order_by("-created_at")
     )
 
+    recruits = (
+        Recruit.objects
+        .select_related("user")
+        .filter(
+            is_active=True,
+            status="open"
+        )
+        .order_by("-created_at")
+    )
+
     # 👍 いいね済み
     if request.user.is_authenticated:
         liked_ids = set(
@@ -44,18 +55,34 @@ def feed(request):
     # =========================
     feed_items = []
 
+    recruit_index = 0
+    recruits = list(recruits)
+
     for i, post in enumerate(posts):
-        # 通常投稿
+
+        # 動画投稿
         feed_items.append({
             "type": "post",
-            "data": post
+            "data": post,
         })
 
-        # 5件に1回広告（調整可能）
+        # 3投稿ごとに募集を挿入
+        if (
+            (i + 1) % 3 == 0
+            and recruit_index < len(recruits)
+        ):
+            feed_items.append({
+                "type": "recruit",
+                "data": recruits[recruit_index],
+            })
+
+            recruit_index += 1
+
+        # 5投稿ごとに広告
         if (i + 1) % 5 == 0:
             feed_items.append({
                 "type": "ad",
-                "ad_type": "adsense"
+                "ad_type": "adsense",
             })
 
     return render(request, "videos/feed.html", {
@@ -230,3 +257,310 @@ def user_video_feed(request, username):
         "posts": posts,
         "start_index": start
     })
+
+# =========================
+# 🤝 募集詳細
+# =========================
+@login_required
+def recruit_detail(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        is_active=True,
+    )
+
+    my_participation = None
+
+    if request.user.is_authenticated:
+
+        my_participation = RecruitParticipant.objects.filter(
+            recruit=recruit,
+            user=request.user
+        ).first()
+
+    return render(
+        request,
+        "videos/recruit_detail.html",
+        {
+            "recruit": recruit,
+            "my_participation": my_participation,
+        },
+    )
+
+# =========================
+# 🤝 募集応募
+# =========================
+@login_required
+@require_POST
+def apply_recruit(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        is_active=True,
+        status="open",
+    )
+
+    # 自分の募集には応募できない
+    if recruit.user == request.user:
+        messages.error(
+            request,
+            "自分の募集には応募できません。"
+        )
+        return redirect("recruit_detail", pk=recruit.pk)
+
+    # すでに応募済み
+    if RecruitParticipant.objects.filter(
+        recruit=recruit,
+        user=request.user
+    ).exists():
+        messages.warning(
+            request,
+            "すでに応募済みです。"
+        )
+        return redirect("recruit_detail", pk=recruit.pk)
+
+    RecruitParticipant.objects.create(
+        recruit=recruit,
+        user=request.user,
+        status="pending",
+    )
+
+    messages.success(
+        request,
+        "応募しました！"
+    )
+
+    return redirect("recruit_detail", pk=recruit.pk)
+
+# =========================
+# 👥 募集応募者一覧
+# =========================
+@login_required
+def recruit_participants(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        user=request.user,
+    )
+
+    participants = (
+        RecruitParticipant.objects
+        .filter(recruit=recruit)
+        .select_related("user")
+        .order_by("created_at")
+    )
+
+    return render(
+        request,
+        "videos/recruit_participants.html",
+        {
+            "recruit": recruit,
+            "participants": participants,
+        },
+    )
+
+
+# =========================
+# ✅ 応募者承認
+# =========================
+@login_required
+@require_POST
+def approve_recruit_participant(request, pk):
+
+    participant = get_object_or_404(
+        RecruitParticipant.objects.select_related(
+            "recruit",
+            "user",
+        ),
+        pk=pk,
+        recruit__user=request.user,
+    )
+
+    recruit = participant.recruit
+
+    # すでに承認済み
+    if participant.status == "approved":
+        messages.warning(
+            request,
+            "この応募者はすでに承認されています。"
+        )
+        return redirect(
+            "recruit_participants",
+            pk=recruit.pk,
+        )
+
+    # 募集が終了・中止の場合
+    if recruit.status != "open":
+        messages.error(
+            request,
+            "現在、この募集は承認できません。"
+        )
+        return redirect(
+            "recruit_participants",
+            pk=recruit.pk,
+        )
+
+    # 現在の承認人数
+    approved_count = RecruitParticipant.objects.filter(
+        recruit=recruit,
+        status="approved",
+    ).count()
+
+    # 最大人数チェック
+    if approved_count >= recruit.max_people:
+        recruit.status = "full"
+        recruit.save(update_fields=["status"])
+
+        messages.error(
+            request,
+            "募集人数がすでに満員です。"
+        )
+
+        return redirect(
+            "recruit_participants",
+            pk=recruit.pk,
+        )
+
+    # 承認
+    participant.status = "approved"
+    participant.save(update_fields=["status", "updated_at"])
+
+    # 承認後に満員になった場合
+    new_approved_count = approved_count + 1
+
+    if new_approved_count >= recruit.max_people:
+        recruit.status = "full"
+        recruit.save(update_fields=["status"])
+
+    messages.success(
+        request,
+        f"{participant.user.username} さんを承認しました！"
+    )
+
+    return redirect(
+        "recruit_participants",
+        pk=recruit.pk,
+    )
+
+
+# =========================
+# ❌ 応募者拒否
+# =========================
+@login_required
+@require_POST
+def reject_recruit_participant(request, pk):
+
+    participant = get_object_or_404(
+        RecruitParticipant.objects.select_related(
+            "recruit",
+            "user",
+        ),
+        pk=pk,
+        recruit__user=request.user,
+    )
+
+    recruit = participant.recruit
+
+    # すでに拒否済み
+    if participant.status == "rejected":
+        messages.warning(
+            request,
+            "この応募者はすでに拒否されています。"
+        )
+        return redirect(
+            "recruit_participants",
+            pk=recruit.pk,
+        )
+
+    participant.status = "rejected"
+    participant.save(update_fields=["status", "updated_at"])
+
+    messages.success(
+        request,
+        f"{participant.user.username} さんの応募を拒否しました。"
+    )
+
+    return redirect(
+        "recruit_participants",
+        pk=recruit.pk,
+    )
+
+# =========================
+# 💬 募集チャット
+# =========================
+@login_required
+def recruit_chat(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        is_active=True,
+    )
+
+    # 募集主
+    is_owner = recruit.user == request.user
+
+    # 承認済み参加者
+    is_participant = RecruitParticipant.objects.filter(
+        recruit=recruit,
+        user=request.user,
+        status="approved",
+    ).exists()
+
+    # 権限チェック
+    if not is_owner and not is_participant:
+
+        messages.error(
+            request,
+            "この募集チャットに参加する権限がありません。"
+        )
+
+        return redirect(
+            "recruit_detail",
+            pk=recruit.pk
+        )
+
+    # チャットルーム取得・作成
+    room, created = RecruitChatRoom.objects.get_or_create(
+        recruit=recruit
+    )
+
+    # =========================
+    # 💬 メッセージ送信
+    # =========================
+    if request.method == "POST":
+
+        text = request.POST.get("text", "").strip()
+
+        if text:
+
+            RecruitChatMessage.objects.create(
+                room=room,
+                user=request.user,
+                text=text,
+            )
+
+        return redirect(
+            "recruit_chat",
+            pk=recruit.pk
+        )
+
+    # =========================
+    # 💬 メッセージ取得
+    # =========================
+    chat_messages = room.messages.select_related(
+        "user"
+    ).all()
+
+    return render(
+        request,
+        "videos/recruit_chat.html",
+        {
+            "recruit": recruit,
+            "room": room,
+            "chat_messages": chat_messages,
+        }
+    )

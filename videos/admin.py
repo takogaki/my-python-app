@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PostVideo, PostVideoLike, PostVideoComment, PostVideoSave
+from .models import PostVideo, PostVideoLike, PostVideoComment, PostVideoSave, Recruit, RecruitParticipant
 
 
 # =========================
@@ -48,3 +48,69 @@ class PostVideoCommentAdmin(admin.ModelAdmin):
 class PostVideoSaveAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "post", "created_at")
     search_fields = ("user__username",)
+
+# =========================
+# 🤝 募集
+# =========================
+@admin.register(Recruit)
+class RecruitAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "user",
+        "title",
+        "category",
+        "place",
+        "start_time",
+        "max_people",
+        "status",
+        "is_active",
+        "created_at",
+    )
+
+    list_filter = (
+        "category",
+        "status",
+        "is_active",
+        "created_at",
+    )
+
+    search_fields = (
+        "title",
+        "description",
+        "user__username",
+        "place",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+
+# =========================
+# 🙋 募集参加者
+# =========================
+@admin.register(RecruitParticipant)
+class RecruitParticipantAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "recruit",
+        "user",
+        "status",
+        "created_at",
+    )
+
+    list_filter = (
+        "status",
+        "created_at",
+    )
+
+    search_fields = (
+        "user__username",
+        "recruit__title",
+    )
+
+    ordering = (
+        "-created_at",
+    )

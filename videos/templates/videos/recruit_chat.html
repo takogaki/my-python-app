@@ -1,0 +1,313 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+{{ recruit.title }}｜募集チャット
+{% endblock %}
+
+{% block body %}
+
+<div class="recruit-chat-container">
+
+    <div class="recruit-chat-header">
+
+        <h2>
+            💬 {{ recruit.title }}
+        </h2>
+
+        <p>
+            募集主：{{ recruit.user.username }}
+        </p>
+
+        <a href="{% url 'recruit_detail' recruit.id %}">
+            ← 募集詳細へ戻る
+        </a>
+
+    </div>
+
+
+    <div id="recruit-chat-messages" class="recruit-chat-messages">
+
+        {% for message in chat_messages %}
+
+        <div class="
+                recruit-chat-message
+                {% if message.user == request.user %}
+                    mine
+                {% else %}
+                    other
+                {% endif %}
+            ">
+
+            <div class="recruit-chat-user">
+                {{ message.user.username }}
+            </div>
+
+            <div class="recruit-chat-text">
+                {{ message.text|linebreaksbr }}
+            </div>
+
+            <div class="recruit-chat-time">
+                {{ message.created_at|date:"m/d H:i" }}
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div id="recruit-chat-empty" class="recruit-chat-empty">
+            まだメッセージはありません。
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <form id="recruit-chat-form" class="recruit-chat-form">
+
+        {% csrf_token %}
+
+        <input type="text" id="recruit-chat-input" placeholder="メッセージを入力..." autocomplete="off" maxlength="2000">
+
+        <button type="submit">
+            送信
+        </button>
+
+    </form>
+
+    <div id="recruit-chat-status" class="recruit-chat-status">
+        接続中...
+    </div>
+
+</div>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const recruitId = "{{ recruit.id }}";
+        const currentUserId = "{{ request.user.id }}";
+
+        const messageContainer =
+            document.getElementById(
+                "recruit-chat-messages"
+            );
+
+        const form =
+            document.getElementById(
+                "recruit-chat-form"
+            );
+
+        const input =
+            document.getElementById(
+                "recruit-chat-input"
+            );
+
+        const status =
+            document.getElementById(
+                "recruit-chat-status"
+            );
+
+        const emptyMessage =
+            document.getElementById(
+                "recruit-chat-empty"
+            );
+
+
+        // =========================
+        // 🔌 WebSocket接続
+        // =========================
+
+        const protocol =
+            window.location.protocol === "https:"
+                ? "wss"
+                : "ws";
+
+        const socket = new WebSocket(
+            `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`
+        );
+
+
+        // =========================
+        // 🟢 接続成功
+        // =========================
+
+        socket.onopen = function () {
+
+            console.log(
+                "Recruit chat connected."
+            );
+
+            status.textContent =
+                "🟢 接続中";
+
+        };
+
+
+        // =========================
+        // 📩 メッセージ受信
+        // =========================
+
+        socket.onmessage = function (event) {
+
+            const data =
+                JSON.parse(event.data);
+
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+
+
+            const message =
+                document.createElement("div");
+
+            const mine =
+                String(data.user_id) ===
+                String(currentUserId);
+
+
+            message.className =
+                "recruit-chat-message " +
+                (mine ? "mine" : "other");
+
+
+            const user =
+                document.createElement("div");
+
+            user.className =
+                "recruit-chat-user";
+
+            user.textContent =
+                data.username;
+
+
+            const text =
+                document.createElement("div");
+
+            text.className =
+                "recruit-chat-text";
+
+            text.textContent =
+                data.text;
+
+
+            const time =
+                document.createElement("div");
+
+            time.className =
+                "recruit-chat-time";
+
+            time.textContent =
+                data.created_at;
+
+
+            message.appendChild(user);
+            message.appendChild(text);
+            message.appendChild(time);
+
+
+            messageContainer.appendChild(
+                message
+            );
+
+
+            // 最下部へスクロール
+            messageContainer.scrollTop =
+                messageContainer.scrollHeight;
+        };
+
+
+        // =========================
+        // 🔴 接続終了
+        // =========================
+
+        socket.onclose = function () {
+
+            console.log(
+                "Recruit chat disconnected."
+            );
+
+            status.textContent =
+                "🔴 接続が切断されました";
+
+        };
+
+
+        // =========================
+        // ⚠️ エラー
+        // =========================
+
+        socket.onerror = function (error) {
+
+            console.error(
+                "Recruit chat error:",
+                error
+            );
+
+            status.textContent =
+                "⚠️ 接続エラー";
+
+        };
+
+
+        // =========================
+        // 📤 メッセージ送信
+        // =========================
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                event.preventDefault();
+
+                const text =
+                    input.value.trim();
+
+
+                if (!text) {
+                    return;
+                }
+
+
+                if (
+                    socket.readyState !==
+                    WebSocket.OPEN
+                ) {
+
+                    alert(
+                        "チャットサーバーに接続されていません。"
+                    );
+
+                    return;
+                }
+
+
+                socket.send(
+                    JSON.stringify({
+                        text: text
+                    })
+                );
+
+
+                input.value = "";
+
+                input.focus();
+
+            }
+        );
+
+
+        // =========================
+        // 📜 初期スクロール
+        // =========================
+
+        messageContainer.scrollTop =
+            messageContainer.scrollHeight;
+
+    });
+
+</script>
+
+{% endblock %}

@@ -165,3 +165,265 @@ class PostVideoSave(models.Model):
 
     def __str__(self):
         return f"{self.user} 🔖 {self.post.id}"
+    
+# =========================
+# 🤝 募集
+# =========================
+class Recruit(models.Model):
+
+    CATEGORY_CHOICES = [
+        ("drink", "飲み"),
+        ("food", "ご飯"),
+        ("karaoke", "カラオケ"),
+        ("cafe", "カフェ"),
+        ("sports", "スポーツ"),
+        ("game", "ゲーム"),
+        ("drive", "ドライブ"),
+        ("study", "勉強"),
+        ("other", "その他"),
+    ]
+
+    STATUS_CHOICES = [
+        ("open", "募集中"),
+        ("full", "満員"),
+        ("closed", "終了"),
+        ("cancel", "中止"),
+    ]
+
+    GENDER_CHOICES = [
+        ("all", "誰でも"),
+        ("male", "男性のみ"),
+        ("female", "女性のみ"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="recruits"
+    )
+
+    # 募集カテゴリ
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES
+    )
+
+    # タイトル
+    title = models.CharField(
+        max_length=100
+    )
+
+    # 詳細
+    description = models.TextField(
+        blank=True
+    )
+
+    # 開催場所
+    place = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    # 都道府県
+    prefecture = models.CharField(
+        max_length=30,
+        blank=True
+    )
+
+    # 開始時間
+    start_time = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    # 終了時間
+    end_time = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    # 募集終了期限
+    expires_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    # 最大人数
+    max_people = models.PositiveIntegerField(
+        default=2
+    )
+
+    # 対象性別
+    target_gender = models.CharField(
+        max_length=20,
+        choices=GENDER_CHOICES,
+        default="all"
+    )
+
+    # 業界（例：建設業、看護師など）
+    industry = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    # 募集状態
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="open"
+    )
+
+    # 公開中か
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} - {self.title}"
+
+
+    @property
+    def approved_count(self):
+        return self.participants.filter(
+            status="approved"
+        ).count()
+
+
+    @property
+    def pending_count(self):
+        return self.participants.filter(
+            status="pending"
+        ).count()
+
+
+    @property
+    def remaining_count(self):
+        return max(
+            self.max_people - self.approved_count,
+            0
+        )
+            
+
+# =========================
+# 🙋 募集参加者
+# =========================
+class RecruitParticipant(models.Model):
+
+    STATUS_CHOICES = [
+        ("pending", "承認待ち"),
+        ("approved", "参加確定"),
+        ("rejected", "拒否"),
+        ("cancelled", "キャンセル"),
+    ]
+
+    recruit = models.ForeignKey(
+        Recruit,
+        on_delete=models.CASCADE,
+        related_name="participants"
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="joined_recruits"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    message = models.CharField(
+        max_length=200,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ["created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recruit", "user"],
+                name="unique_recruit_participant"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} → {self.recruit.title} ({self.status})"
+
+
+# =========================
+# 💬 募集チャットルーム
+# =========================
+class RecruitChatRoom(models.Model):
+
+    recruit = models.OneToOneField(
+        Recruit,
+        on_delete=models.CASCADE,
+        related_name="chat_room"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return f"Chat: {self.recruit.title}"
+
+
+# =========================
+# 💬 募集チャットメッセージ
+# =========================
+class RecruitChatMessage(models.Model):
+
+    room = models.ForeignKey(
+        RecruitChatRoom,
+        on_delete=models.CASCADE,
+        related_name="messages"
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="recruit_chat_messages"
+    )
+
+    text = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ["created_at"]
+        indexes = [
+            models.Index(
+                fields=["room", "created_at"]
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:30]}"

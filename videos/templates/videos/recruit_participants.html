@@ -1,0 +1,118 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+応募者一覧｜{{ recruit.title }}
+{% endblock %}
+
+{% block body %}
+
+<div class="container" style="padding:30px;">
+
+    <h2>👥 応募者一覧</h2>
+
+    <h3>{{ recruit.title }}</h3>
+
+    <hr>
+
+    <p>
+        現在の参加人数：
+        <strong>
+            {{ recruit.participants.all|length }}
+        </strong>
+        /
+        {{ recruit.max_people }}
+    </p>
+
+    {% if participants %}
+
+    {% for participant in participants %}
+
+    <div class="participant-card" style="
+                padding:20px;
+                margin-bottom:15px;
+                border-radius:12px;
+                background:#f5f5f5;
+             ">
+
+        <div style="margin-bottom:10px;">
+
+            <strong>
+                👤 {{ participant.user.username }}
+            </strong>
+
+        </div>
+
+        {% if participant.message %}
+        <p>
+            💬 {{ participant.message }}
+        </p>
+        {% endif %}
+
+        <p>
+            状態：
+
+            {% if participant.status == "pending" %}
+            🟡 承認待ち
+
+            {% elif participant.status == "approved" %}
+            🟢 参加確定
+
+            {% elif participant.status == "rejected" %}
+            🔴 拒否
+
+            {% elif participant.status == "cancelled" %}
+            ⚪ キャンセル
+            {% endif %}
+        </p>
+
+        {% if participant.status == "pending" %}
+
+        <div style="display:flex; gap:10px;">
+
+            <!-- 承認 -->
+            <form method="post" action="{% url 'approve_recruit_participant' participant.id %}">
+
+                {% csrf_token %}
+
+                <button type="submit" class="join-btn">
+
+                    ✅ 承認
+
+                </button>
+
+            </form>
+
+
+            <!-- 拒否 -->
+            <form method="post" action="{% url 'reject_recruit_participant' participant.id %}">
+
+                {% csrf_token %}
+
+                <button type="submit" class="reject-btn">
+
+                    ❌ 拒否
+
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    {% endfor %}
+
+    {% else %}
+
+    <p>
+        まだ応募者はいません。
+    </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

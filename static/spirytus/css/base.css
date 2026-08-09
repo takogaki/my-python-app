@@ -1041,3 +1041,76 @@ section h3 {
         background: #3a3a3a;
     }
 }
+
+/* ==========================
+   SPIRYTUS Toast
+========================== */
+
+.sp-toast-container {
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999999;
+    pointer-events: none;
+}
+
+.sp-toast {
+    min-width: 280px;
+    max-width: 420px;
+
+    padding: 15px 20px;
+    margin-bottom: 12px;
+
+    border-radius: 14px;
+
+    color: #fff;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    text-align: center;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+
+    animation: spToastIn .35s ease;
+}
+
+.sp-toast.success {
+    background: #27ae60;
+}
+
+.sp-toast.error {
+    background: #e74c3c;
+}
+
+.sp-toast.warning {
+    background: #f39c12;
+}
+
+.sp-toast.info {
+    background: #3498db;
+}
+
+@keyframes spToastIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sp-toast.hide {
+    animation: spToastOut .35s forwards;
+}
+
+@keyframes spToastOut {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}

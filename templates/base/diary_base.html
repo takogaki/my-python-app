@@ -85,6 +85,16 @@
 <body {% if post is not None %} data-post="{{ post.id }}" {% endif %}
     class="{% if unclosed_room %}has-warning{% endif %}">
 
+    {% if messages %}
+    <div class="sp-toast-container">
+        {% for message in messages %}
+        <div class="sp-toast {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <header class="site-header">
         <div class="header-inner">
 

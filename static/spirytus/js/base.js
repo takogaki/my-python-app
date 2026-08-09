@@ -78,4 +78,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    const toasts = document.querySelectorAll(".sp-toast");
+
+    toasts.forEach(function (toast) {
+
+        setTimeout(function () {
+            toast.classList.add("hide");
+        }, 2500);
+
+        setTimeout(function () {
+            toast.remove();
+        }, 3000);
+
+    });
+
 });

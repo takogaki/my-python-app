@@ -1,0 +1,726 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+{{ recruit.title }}｜SPIRYTUS
+{% endblock %}
+
+{% block body %}
+
+<div class="recruit-detail-container">
+
+    ```
+    <!-- =========================
+     募集タイトル
+========================== -->
+
+    <div class="recruit-header">
+
+        <span class="recruit-category">
+            {{ recruit.get_category_display }}
+        </span>
+
+        <h2>
+            {{ recruit.title }}
+        </h2>
+
+        <p class="recruit-owner">
+            👤 {{ recruit.user.username }}
+        </p>
+
+    </div>
+
+
+    <!-- =========================
+     募集情報
+========================== -->
+
+    <div class="recruit-info-card">
+
+        <h3>📋 募集情報</h3>
+
+        {% if recruit.place %}
+        <div class="recruit-info-row">
+            <span>📍 場所</span>
+            <strong>{{ recruit.place }}</strong>
+        </div>
+        {% endif %}
+
+        {% if recruit.prefecture %}
+        <div class="recruit-info-row">
+            <span>🗾 都道府県</span>
+            <strong>{{ recruit.prefecture }}</strong>
+        </div>
+        {% endif %}
+
+        {% if recruit.start_time %}
+        <div class="recruit-info-row">
+            <span>🕒 開始日時</span>
+            <strong>
+                {{ recruit.start_time|date:"Y/m/d H:i" }}
+            </strong>
+        </div>
+        {% endif %}
+
+        {% if recruit.end_time %}
+        <div class="recruit-info-row">
+            <span>🕘 終了日時</span>
+            <strong>
+                {{ recruit.end_time|date:"Y/m/d H:i" }}
+            </strong>
+        </div>
+        {% endif %}
+
+        {% if recruit.industry %}
+        <div class="recruit-info-row">
+            <span>🏗 業界</span>
+            <strong>{{ recruit.industry }}</strong>
+        </div>
+        {% endif %}
+
+    </div>
+
+
+    <!-- =========================
+     募集状況
+========================== -->
+
+    <div class="recruit-status-card">
+
+        <h3>👥 募集状況</h3>
+
+        <div class="recruit-status-main">
+
+            <div class="status-number">
+                <span class="status-current">
+                    {{ recruit.approved_count }}
+                </span>
+
+                <span class="status-separator">
+                    /
+                </span>
+
+                <span class="status-total">
+                    {{ recruit.max_people }}
+                </span>
+
+                <span class="status-unit">
+                    人
+                </span>
+            </div>
+
+            <div class="status-label">
+                承認済み
+            </div>
+
+        </div>
+
+        <div class="recruit-status-details">
+
+            <div>
+                <span>⏳ 応募中</span>
+                <strong>
+                    {{ recruit.pending_count }}人
+                </strong>
+            </div>
+
+            <div>
+                <span>🙋 残り</span>
+                <strong>
+                    {{ recruit.remaining_count }}人
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+     募集内容
+========================== -->
+
+    {% if recruit.description %}
+
+    <div class="recruit-description-card">
+
+        <h3>📝 募集内容</h3>
+
+        <div class="recruit-description">
+            {{ recruit.description|linebreaksbr }}
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ==================================================
+     募集主
+================================================== -->
+
+    {% if request.user == recruit.user %}
+
+    <div class="recruit-owner-card">
+
+        <h3>👑 募集主メニュー</h3>
+
+        <a href="{% url 'recruit_chat' recruit.id %}" class="recruit-chat-button">
+            💬 募集チャットを開く
+        </a>
+
+    </div>
+
+
+    <!-- =========================
+     応募者一覧
+========================== -->
+
+    <div class="applicant-card">
+
+        <h3>
+            🙋 応募者一覧
+            <span class="applicant-count">
+                {{ recruit.pending_count }}人応募中
+            </span>
+        </h3>
+
+
+        {% for participant in recruit.participants.all %}
+
+        <div class="applicant-row">
+
+            <div class="applicant-user">
+
+                {% if participant.user.get_profile_image %}
+                <img src="{{ participant.user.get_profile_image }}" class="applicant-avatar"
+                    alt="{{ participant.user.username }}">
+                {% endif %}
+
+                <div>
+                    <strong>
+                        {{ participant.user.username }}
+                    </strong>
+
+                    <small>
+                        {{ participant.created_at|date:"Y/m/d H:i" }}
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="applicant-status">
+
+                {% if participant.status == "pending" %}
+
+                <span class="status pending">
+                    ⏳ 承認待ち
+                </span>
+
+                {% elif participant.status == "approved" %}
+
+                <span class="status approved">
+                    ✅ 承認済み
+                </span>
+
+                {% elif participant.status == "rejected" %}
+
+                <span class="status rejected">
+                    ❌ 拒否
+                </span>
+
+                {% elif participant.status == "cancelled" %}
+
+                <span class="status cancelled">
+                    🚫 キャンセル
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="no-applicants">
+            <p>まだ応募者はいません。</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- ==================================================
+     応募者
+================================================== -->
+
+    {% else %}
+
+    <div class="participant-action-card">
+
+        {% if my_participation %}
+
+        {% if my_participation.status == "approved" %}
+
+        <div class="participation-message approved-message">
+            <span>✅</span>
+
+            <div>
+                <strong>参加が承認されています</strong>
+                <p>募集チャットに参加できます。</p>
+            </div>
+        </div>
+
+        <a href="{% url 'recruit_chat' recruit.id %}" class="recruit-chat-button">
+            💬 募集チャットに入る
+        </a>
+
+
+        {% elif my_participation.status == "pending" %}
+
+        <div class="participation-message pending-message">
+
+            <span>⏳</span>
+
+            <div>
+                <strong>応募中です</strong>
+                <p>
+                    募集主の承認をお待ちください。
+                </p>
+            </div>
+
+        </div>
+
+
+        {% elif my_participation.status == "rejected" %}
+
+        <div class="participation-message rejected-message">
+
+            <span>❌</span>
+
+            <div>
+                <strong>応募が拒否されています</strong>
+                <p>
+                    この募集には参加できません。
+                </p>
+            </div>
+
+        </div>
+
+
+        {% elif my_participation.status == "cancelled" %}
+
+        <div class="participation-message cancelled-message">
+
+            <span>🚫</span>
+
+            <div>
+                <strong>キャンセル済みです</strong>
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% else %}
+
+
+        {% if recruit.status == "open" and recruit.remaining_count > 0 %}
+
+        <div class="apply-area">
+
+            <p>
+                現在、参加者を募集しています。
+            </p>
+
+            <form id="apply-form" method="post" action="{% url 'apply_recruit' recruit.id %}">
+
+                {% csrf_token %}
+
+                <button type="submit" class="apply-button">
+                    🙋 応募する
+                </button>
+
+            </form>
+
+        </div>
+
+        {% else %}
+
+        <div class="closed-message">
+
+            <span>❌</span>
+
+            <div>
+                <strong>
+                    この募集は受付終了しています。
+                </strong>
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+    ```
+
+</div>
+
+<style>
+    /* =========================
+   全体
+========================= */
+
+    .recruit-detail-container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 30px 20px 80px;
+    }
+
+
+    /* =========================
+   ヘッダー
+========================= */
+
+    .recruit-header {
+        margin-bottom: 25px;
+    }
+
+    .recruit-category {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        background: #eeeeee;
+        font-size: 13px;
+    }
+
+    .recruit-header h2 {
+        margin: 12px 0 8px;
+        font-size: 28px;
+    }
+
+    .recruit-owner {
+        color: #777;
+        margin: 0;
+    }
+
+
+    /* =========================
+   共通カード
+========================= */
+
+    .recruit-info-card,
+    .recruit-status-card,
+    .recruit-description-card,
+    .recruit-owner-card,
+    .applicant-card,
+    .participant-action-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 18px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+    }
+
+    .recruit-info-card h3,
+    .recruit-status-card h3,
+    .recruit-description-card h3,
+    .recruit-owner-card h3,
+    .applicant-card h3 {
+        margin-top: 0;
+    }
+
+
+    /* =========================
+   募集情報
+========================= */
+
+    .recruit-info-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .recruit-info-row:last-child {
+        border-bottom: none;
+    }
+
+    .recruit-info-row span {
+        color: #777;
+    }
+
+    .recruit-info-row strong {
+        text-align: right;
+    }
+
+
+    /* =========================
+   募集状況
+========================= */
+
+    .recruit-status-card {
+        text-align: center;
+    }
+
+    .recruit-status-main {
+        margin: 15px 0;
+    }
+
+    .status-number {
+        font-size: 38px;
+        font-weight: bold;
+    }
+
+    .status-current {
+        color: #27ae60;
+    }
+
+    .status-separator {
+        color: #999;
+    }
+
+    .status-total {
+        color: #333;
+    }
+
+    .status-unit {
+        font-size: 18px;
+    }
+
+    .status-label {
+        color: #777;
+        font-size: 13px;
+    }
+
+    .recruit-status-details {
+        display: flex;
+        justify-content: center;
+        gap: 35px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .recruit-status-details div {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+
+    /* =========================
+   募集内容
+========================= */
+
+    .recruit-description {
+        line-height: 1.8;
+        color: #444;
+    }
+
+
+    /* =========================
+   チャットボタン
+========================= */
+
+    .recruit-chat-button,
+    .apply-button {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: #222;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .recruit-chat-button:hover,
+    .apply-button:hover {
+        opacity: .85;
+    }
+
+
+    /* =========================
+   応募者
+========================= */
+
+    .applicant-count {
+        float: right;
+        font-size: 13px;
+        color: #777;
+        font-weight: normal;
+    }
+
+    .applicant-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .applicant-row:last-child {
+        border-bottom: none;
+    }
+
+    .applicant-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .applicant-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .applicant-user div {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .applicant-user small {
+        color: #999;
+    }
+
+
+    /* =========================
+   ステータス
+========================= */
+
+    .status {
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .status.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status.approved {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status.rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status.cancelled {
+        background: #eeeeee;
+        color: #666;
+    }
+
+
+    /* =========================
+   参加状態
+========================= */
+
+    .participation-message,
+    .closed-message {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+
+    .participation-message p {
+        margin: 5px 0 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .approved-message {
+        background: #eaf7ee;
+    }
+
+    .pending-message {
+        background: #fff8e5;
+    }
+
+    .rejected-message {
+        background: #fdeeee;
+    }
+
+    .cancelled-message,
+    .closed-message {
+        background: #f1f1f1;
+    }
+
+    .apply-area {
+        text-align: center;
+    }
+
+    .apply-area p {
+        color: #777;
+    }
+
+    .no-applicants {
+        text-align: center;
+        color: #999;
+        padding: 20px 0;
+    }
+
+
+    /* =========================
+   スマホ
+========================= */
+
+    @media (max-width: 600px) {
+
+        .recruit-detail-container {
+            padding: 20px 12px 60px;
+        }
+
+        .recruit-header h2 {
+            font-size: 23px;
+        }
+
+        .recruit-info-row {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .recruit-info-row strong {
+            text-align: left;
+        }
+
+        .recruit-status-details {
+            gap: 20px;
+        }
+
+        .applicant-row {
+            align-items: flex-start;
+        }
+
+        .applicant-status {
+            flex-shrink: 0;
+        }
+
+    }
+</style>
+
+{% endblock %}

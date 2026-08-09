@@ -15,4 +15,24 @@ urlpatterns = [
 
     # 🔥 ユーザーフィード
     path("user/<str:username>/", views.user_video_feed, name="video_feed_user"),
+
+    # 🤝 募集詳細
+    path("recruit/<int:pk>/", views.recruit_detail, name="recruit_detail"),
+
+    # 🤝 募集応募
+    path("recruit/<int:pk>/apply/", views.apply_recruit, name="apply_recruit"),
+
+    # =========================
+    # 🤝 募集応募者管理
+    # =========================
+    path("recruit/<int:pk>/participants/", views.recruit_participants, name="recruit_participants"),
+
+    path("recruit/participant/<int:pk>/approve/", views.approve_recruit_participant, name="approve_recruit_participant"),
+
+    path("recruit/participant/<int:pk>/reject/", views.reject_recruit_participant, name="reject_recruit_participant"),
+
+    #=========================
+    # 🤝 募集チャット
+    #=========================
+    path("recruit/<int:pk>/chat/", views.recruit_chat, name="recruit_chat"),
 ]
