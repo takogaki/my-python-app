@@ -201,6 +201,7 @@ TEMPLATES = [
                 "accounts.context_processors.user_count",
                 "accounts.context_processors.visitor_counts",
                 "videochat.context_processors.unclosed_room_warning",
+                "videos.context_processors.recruit_unread_count",
             ],
         },
     },

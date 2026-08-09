@@ -434,3 +434,43 @@ class RecruitChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.text[:30]}"
+    
+class RecruitChatRead(models.Model):
+
+    room = models.ForeignKey(
+        RecruitChatRoom,
+        on_delete=models.CASCADE,
+        related_name="read_states",
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="recruit_chat_read_states",
+    )
+
+    last_read_message = models.ForeignKey(
+        RecruitChatMessage,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["room", "user"],
+                name="unique_recruit_chat_read_state",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.user.username} - "
+            f"{self.room.recruit.title}"
+        )

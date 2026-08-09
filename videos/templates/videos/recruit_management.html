@@ -211,7 +211,15 @@
                 <!-- チャット -->
 
                 <a href="{% url 'recruit_chat' recruit.id %}" class="management-action management-chat">
+                
                     💬 チャット
+                
+                    {% if recruit.unread_count %}
+                    <span class="chat-unread-badge">
+                        {{ recruit.unread_count }}
+                    </span>
+                    {% endif %}
+                
                 </a>
 
 
@@ -298,6 +306,12 @@
                     <span class="application-status approved">
                         ✅ 参加確定
                     </span>
+
+                    {% if application.unread_count %}
+                    <span class="chat-unread-badge">
+                        {{ application.unread_count }}
+                    </span>
+                    {% endif %}
         
                     {% elif application.status == "rejected" %}
         

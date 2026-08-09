@@ -207,7 +207,15 @@
         {% if recruit.status == "open" %}
 
         <a href="{% url 'recruit_chat' recruit.id %}" class="recruit-chat-button">
+        
             💬 募集チャットを開く
+        
+            {% if unread_count %}
+            <span class="chat-unread-badge">
+                {{ unread_count }}
+            </span>
+            {% endif %}
+        
         </a>
 
 

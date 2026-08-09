@@ -1,5 +1,5 @@
 import uuid
-from .models import PostVideo, PostVideoLike, PostVideoComment, Recruit, RecruitParticipant, RecruitChatRoom, RecruitChatMessage
+from .models import PostVideo, PostVideoLike, PostVideoComment, Recruit, RecruitParticipant, RecruitChatRoom, RecruitChatMessage, RecruitChatRead
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, Http404
@@ -931,6 +931,7 @@ def reject_recruit_participant(request, pk):
 # =========================
 # 💬 募集チャット
 # =========================
+
 @login_required
 def recruit_chat(request, pk):
 
@@ -940,17 +941,26 @@ def recruit_chat(request, pk):
         is_active=True,
     )
 
+    # =========================
     # 募集主
+    # =========================
+
     is_owner = recruit.user == request.user
 
+    # =========================
     # 承認済み参加者
+    # =========================
+
     is_participant = RecruitParticipant.objects.filter(
         recruit=recruit,
         user=request.user,
         status="approved",
     ).exists()
 
+    # =========================
     # 権限チェック
+    # =========================
+
     if not is_owner and not is_participant:
 
         messages.error(
@@ -963,9 +973,57 @@ def recruit_chat(request, pk):
             pk=recruit.pk
         )
 
+    # =========================
     # チャットルーム取得・作成
+    # =========================
+
     room, created = RecruitChatRoom.objects.get_or_create(
         recruit=recruit
+    )
+
+    # ==================================================
+    # 👁 チャットを開いたので既読にする
+    # ==================================================
+
+    latest_message = (
+        RecruitChatMessage.objects
+        .filter(room=room)
+        .order_by("-created_at", "-id")
+        .first()
+    )
+
+    if latest_message:
+
+        RecruitChatRead.objects.update_or_create(
+            room=room,
+            user=request.user,
+            defaults={
+                "last_read_message": latest_message,
+            },
+        )
+
+    # =========================
+    # メッセージ取得
+    # =========================
+
+    chat_messages = (
+        RecruitChatMessage.objects
+        .filter(room=room)
+        .select_related("user")
+        .order_by("created_at", "id")
+    )
+
+    # =========================
+    # 表示
+    # =========================
+
+    return render(
+        request,
+        "videos/recruit_chat.html",
+        {
+            "recruit": recruit,
+            "chat_messages": chat_messages,
+        }
     )
 
     # =========================
@@ -1045,3 +1103,35 @@ def recruit_management(request):
             "my_applications": my_applications,
         },
     )
+
+def get_recruit_unread_count(recruit, user):
+
+    if not user.is_authenticated:
+        return 0
+
+    try:
+        room = RecruitChatRoom.objects.get(
+            recruit=recruit
+        )
+    except RecruitChatRoom.DoesNotExist:
+        return 0
+
+    read_state = RecruitChatRead.objects.filter(
+        room=room,
+        user=user,
+    ).first()
+
+    queryset = RecruitChatMessage.objects.filter(
+        room=room,
+    ).exclude(
+        user=user,
+    )
+
+    if read_state and read_state.last_read_message_id:
+
+        queryset = queryset.filter(
+            created_at__gt=
+            read_state.last_read_message.created_at
+        )
+
+    return queryset.count()
