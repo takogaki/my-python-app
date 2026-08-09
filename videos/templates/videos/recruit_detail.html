@@ -156,8 +156,8 @@
 
 
     <!-- ==================================================
-     募集主
-================================================== -->
+    募集主
+    ================================================== -->
 
     {% if request.user == recruit.user %}
 
@@ -165,9 +165,15 @@
 
         <h3>👑 募集主メニュー</h3>
 
+        <a href="{% url 'recruit_participants' recruit.id %}" class="recruit-chat-button">
+            👥 応募者を確認する
+        </a>
+        
+        {% if recruit.status == "open" or recruit.status == "full" %}
         <a href="{% url 'recruit_chat' recruit.id %}" class="recruit-chat-button">
             💬 募集チャットを開く
         </a>
+        {% endif %}
 
     </div>
 
