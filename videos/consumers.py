@@ -178,6 +178,8 @@ class RecruitChatConsumer(AsyncWebsocketConsumer):
 
                 "profile_image": profile_image,
 
+                "is_superuser": user.is_superuser,
+
                 "text": message.text,
 
                 "created_at": message.created_at.strftime(
@@ -208,6 +210,11 @@ class RecruitChatConsumer(AsyncWebsocketConsumer):
                     "profile_image": event.get(
                         "profile_image",
                         ""
+                    ),
+
+                    "is_superuser": event.get(
+                        "is_superuser",
+                        False
                     ),
 
                     "text": event["text"],

@@ -226,7 +226,6 @@
         const currentUsername =
             "{{ request.user.username|escapejs }}";
 
-
         const currentUserProfileImage =
             "{% if request.user.get_profile_image %}{{ request.user.get_profile_image|escapejs }}{% endif %}";
 
@@ -270,7 +269,6 @@
                 ? "wss"
                 : "ws";
 
-
         const socket =
             new WebSocket(
                 `${protocol}://${window.location.host}/ws/recruit/${recruitId}/`
@@ -303,7 +301,9 @@
                 JSON.parse(event.data);
 
 
-            // 空メッセージを削除
+            // =========================
+            // 空メッセージ削除
+            // =========================
 
             if (emptyMessage) {
 
@@ -313,7 +313,7 @@
 
 
             // =========================
-            // 自分かどうか
+            // 自分のメッセージか
             // =========================
 
             const mine =
@@ -322,12 +322,11 @@
 
 
             // =========================
-            // 行
+            // メッセージ行
             // =========================
 
             const row =
                 document.createElement("div");
-
 
             row.className =
                 "recruit-chat-row " +
@@ -339,73 +338,88 @@
 
 
             // =========================
+            // アイコン要素を作成
+            // =========================
+
+            let avatarElement;
+
+
+            if (data.profile_image) {
+
+                avatarElement =
+                    document.createElement("img");
+
+                avatarElement.className =
+                    "recruit-chat-avatar";
+
+                avatarElement.src =
+                    data.profile_image;
+
+                avatarElement.alt =
+                    data.username || "ユーザー";
+
+            } else {
+
+                avatarElement =
+                    document.createElement("div");
+
+                avatarElement.className =
+                    "recruit-chat-avatar recruit-chat-avatar-default";
+
+                avatarElement.textContent =
+                    "👤";
+
+            }
+
+
+            // =========================
             // 相手のアイコン
             // =========================
 
             if (!mine) {
 
-                const avatarLink =
-                    document.createElement("a");
+                if (data.is_superuser) {
 
+                    /*
+                     * スーパーユーザー
+                     * → アイコンをクリック不可
+                     */
 
-                avatarLink.className =
-                    "recruit-chat-avatar-link";
-
-
-                if (data.username) {
-
-                    avatarLink.href =
-                        `/accounts/user/${encodeURIComponent(data.username)}/`;
-
-                }
-
-
-                if (data.profile_image) {
-
-                    const avatar =
-                        document.createElement("img");
-
-
-                    avatar.className =
-                        "recruit-chat-avatar";
-
-
-                    avatar.src =
-                        data.profile_image;
-
-
-                    avatar.alt =
-                        data.username || "ユーザー";
-
-
-                    avatarLink.appendChild(
-                        avatar
+                    row.appendChild(
+                        avatarElement
                     );
 
                 } else {
 
-                    const avatar =
-                        document.createElement("div");
+                    /*
+                     * 一般ユーザー
+                     * → プロフィールへ移動可能
+                     */
 
+                    const avatarLink =
+                        document.createElement("a");
 
-                    avatar.className =
-                        "recruit-chat-avatar recruit-chat-avatar-default";
+                    avatarLink.className =
+                        "recruit-chat-avatar-link";
 
+                    if (data.username) {
 
-                    avatar.textContent =
-                        "👤";
+                        avatarLink.href =
+                            `/accounts/user/${encodeURIComponent(
+                                data.username
+                            )}/`;
 
+                    }
 
                     avatarLink.appendChild(
-                        avatar
+                        avatarElement
+                    );
+
+                    row.appendChild(
+                        avatarLink
                     );
 
                 }
-
-
-                row.appendChild(
-                    avatarLink
-                );
 
             }
 
@@ -417,7 +431,6 @@
             const bubbleWrapper =
                 document.createElement("div");
 
-
             bubbleWrapper.className =
                 "recruit-chat-bubble-wrapper";
 
@@ -428,28 +441,53 @@
 
             if (!mine) {
 
-                const username =
-                    document.createElement("a");
+                let usernameElement;
 
 
-                username.className =
-                    "recruit-chat-username";
+                if (data.is_superuser) {
 
+                    /*
+                     * スーパーユーザー
+                     * → ユーザー名もクリック不可
+                     */
 
-                username.textContent =
-                    data.username || "ユーザー";
+                    usernameElement =
+                        document.createElement("span");
 
+                    usernameElement.className =
+                        "recruit-chat-username";
 
-                if (data.username) {
+                } else {
 
-                    username.href =
-                        `/accounts/user/${encodeURIComponent(data.username)}/`;
+                    /*
+                     * 一般ユーザー
+                     * → ユーザーページへ移動可能
+                     */
+
+                    usernameElement =
+                        document.createElement("a");
+
+                    usernameElement.className =
+                        "recruit-chat-username";
+
+                    if (data.username) {
+
+                        usernameElement.href =
+                            `/accounts/user/${encodeURIComponent(
+                                data.username
+                            )}/`;
+
+                    }
 
                 }
 
 
+                usernameElement.textContent =
+                    data.username || "ユーザー";
+
+
                 bubbleWrapper.appendChild(
-                    username
+                    usernameElement
                 );
 
             }
@@ -462,7 +500,6 @@
             const bubble =
                 document.createElement("div");
 
-
             bubble.className =
                 "recruit-chat-bubble " +
                 (
@@ -470,7 +507,6 @@
                         ? "my-bubble"
                         : "other-bubble"
                 );
-
 
             bubble.textContent =
                 data.text;
@@ -488,7 +524,6 @@
             const meta =
                 document.createElement("div");
 
-
             meta.className =
                 "recruit-chat-meta";
 
@@ -496,10 +531,8 @@
             const time =
                 document.createElement("span");
 
-
             time.className =
                 "recruit-chat-time";
-
 
             time.textContent =
                 data.created_at;
@@ -516,7 +549,7 @@
 
 
             // =========================
-            // 行へ追加
+            // 吹き出しを行へ追加
             // =========================
 
             row.appendChild(
@@ -530,63 +563,56 @@
 
             if (mine) {
 
-                const avatarLink =
+                const myAvatarLink =
                     document.createElement("a");
 
-
-                avatarLink.className =
+                myAvatarLink.className =
                     "recruit-chat-avatar-link";
 
+                myAvatarLink.href =
+                    `/accounts/user/${encodeURIComponent(
+                        currentUsername
+                    )}/`;
 
-                avatarLink.href =
-                    `/accounts/user/${encodeURIComponent(currentUsername)}/`;
+
+                let myAvatar;
 
 
                 if (currentUserProfileImage) {
 
-                    const avatar =
+                    myAvatar =
                         document.createElement("img");
 
-
-                    avatar.className =
+                    myAvatar.className =
                         "recruit-chat-avatar";
 
-
-                    avatar.src =
+                    myAvatar.src =
                         currentUserProfileImage;
 
-
-                    avatar.alt =
+                    myAvatar.alt =
                         currentUsername;
-
-
-                    avatarLink.appendChild(
-                        avatar
-                    );
 
                 } else {
 
-                    const avatar =
+                    myAvatar =
                         document.createElement("div");
 
-
-                    avatar.className =
+                    myAvatar.className =
                         "recruit-chat-avatar recruit-chat-avatar-default";
 
-
-                    avatar.textContent =
+                    myAvatar.textContent =
                         "👤";
-
-
-                    avatarLink.appendChild(
-                        avatar
-                    );
 
                 }
 
 
+                myAvatarLink.appendChild(
+                    myAvatar
+                );
+
+
                 row.appendChild(
-                    avatarLink
+                    myAvatarLink
                 );
 
             }
@@ -602,7 +628,7 @@
 
 
             // =========================
-            // 最下部へ
+            // 最下部へスクロール
             // =========================
 
             messageContainer.scrollTop =
@@ -612,7 +638,7 @@
 
 
         // =========================
-        // 切断
+        // 接続終了
         // =========================
 
         socket.onclose = function () {
@@ -628,7 +654,7 @@
 
 
         // =========================
-        // エラー
+        // WebSocketエラー
         // =========================
 
         socket.onerror = function (error) {
@@ -689,7 +715,6 @@
 
                 input.value = "";
 
-
                 input.focus();
 
             }
@@ -706,5 +731,3 @@
     });
 
 </script>
-
-{% endblock %}
