@@ -1,0 +1,318 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+新規募集を作成｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .recruit-create-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 30px 20px 60px;
+    }
+
+    .recruit-create-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, .08);
+    }
+
+    .recruit-create-title {
+        margin-bottom: 8px;
+    }
+
+    .recruit-create-description {
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+    .recruit-field {
+        margin-bottom: 20px;
+    }
+
+    .recruit-field label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .recruit-field input,
+    .recruit-field select,
+    .recruit-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 15px;
+        background: #fff;
+    }
+
+    .recruit-field textarea {
+        min-height: 130px;
+        resize: vertical;
+    }
+
+    .recruit-field small {
+        display: block;
+        margin-top: 5px;
+        color: #888;
+        font-size: 12px;
+    }
+
+    .recruit-submit {
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        background: #222;
+        color: #fff;
+    }
+
+    .recruit-submit:hover {
+        opacity: .85;
+    }
+
+    .recruit-cancel {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #777;
+        text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+
+        .recruit-create-container {
+            padding: 20px 15px 50px;
+        }
+
+        .recruit-create-card {
+            padding: 20px;
+        }
+    }
+</style>
+
+{% endblock %}
+
+
+{% block body %}
+
+<div class="recruit-create-container">
+
+    <div class="recruit-create-card">
+
+        <h2 class="recruit-create-title">
+            🤝 新しい募集を作成
+        </h2>
+
+        <p class="recruit-create-description">
+            一緒に遊ぶ人・食事する人・趣味仲間などを募集できます。
+        </p>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            <!-- タイトル -->
+
+            <div class="recruit-field">
+
+                <label for="title">
+                    募集タイトル
+                </label>
+
+                <input type="text" id="title" name="title" maxlength="100" placeholder="例：今日一緒に飲める人募集！" required>
+
+            </div>
+
+
+            <!-- カテゴリ -->
+
+            <div class="recruit-field">
+
+                <label for="category">
+                    カテゴリ
+                </label>
+
+                <select id="category" name="category" required>
+
+                    <option value="">
+                        選択してください
+                    </option>
+
+                    {% for value, label in category_choices %}
+
+                    <option value="{{ value }}">
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- 募集内容 -->
+
+            <div class="recruit-field">
+
+                <label for="description">
+                    募集内容
+                </label>
+
+                <textarea id="description" name="description" placeholder="どんな人を募集しているか、自由に書いてください。"></textarea>
+
+            </div>
+
+
+            <!-- 都道府県 -->
+
+            <div class="recruit-field">
+
+                <label for="prefecture">
+                    都道府県
+                </label>
+
+                <input type="text" id="prefecture" name="prefecture" maxlength="30" placeholder="例：東京都">
+
+            </div>
+
+
+            <!-- 場所 -->
+
+            <div class="recruit-field">
+
+                <label for="place">
+                    場所
+                </label>
+
+                <input type="text" id="place" name="place" maxlength="100" placeholder="例：新宿駅周辺">
+
+            </div>
+
+
+            <!-- 開始 -->
+
+            <div class="recruit-field">
+
+                <label for="start_time">
+                    開始日時
+                </label>
+
+                <input type="datetime-local" id="start_time" name="start_time">
+
+            </div>
+
+
+            <!-- 終了 -->
+
+            <div class="recruit-field">
+
+                <label for="end_time">
+                    終了日時
+                </label>
+
+                <input type="datetime-local" id="end_time" name="end_time">
+
+            </div>
+
+
+            <!-- 募集期限 -->
+
+            <div class="recruit-field">
+
+                <label for="expires_at">
+                    募集受付期限
+                </label>
+
+                <input type="datetime-local" id="expires_at" name="expires_at">
+
+                <small>
+                    この日時を過ぎても自動終了処理は別途実装できます。
+                </small>
+
+            </div>
+
+
+            <!-- 人数 -->
+
+            <div class="recruit-field">
+
+                <label for="max_people">
+                    募集人数
+                </label>
+
+                <input type="number" id="max_people" name="max_people" min="1" max="100" value="2" required>
+
+            </div>
+
+
+            <!-- 性別 -->
+
+            <div class="recruit-field">
+
+                <label for="target_gender">
+                    募集対象
+                </label>
+
+                <select id="target_gender" name="target_gender">
+
+                    {% for value, label in gender_choices %}
+
+                    <option value="{{ value }}">
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- 業界 -->
+
+            <div class="recruit-field">
+
+                <label for="industry">
+                    業界
+                </label>
+
+                <input type="text" id="industry" name="industry" maxlength="50" placeholder="例：建設業">
+
+                <small>
+                    特定の業界・職種の人を募集する場合に入力してください。
+                </small>
+
+            </div>
+
+
+            <!-- 作成 -->
+
+            <button type="submit" class="recruit-submit">
+                🤝 募集を作成する
+            </button>
+
+
+            <a href="{% url 'feed' %}" class="recruit-cancel">
+                キャンセル
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

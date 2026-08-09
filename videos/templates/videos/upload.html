@@ -11,6 +11,34 @@
 
     <div class="upload-card">
 
+        <div style="
+            margin-bottom:25px;
+            padding:15px;
+            background:#f7f7f7;
+            border-radius:14px;
+        ">
+        
+            <div style="
+                font-weight:bold;
+                margin-bottom:8px;
+            ">
+                🤝 一緒に遊ぶ人を募集しませんか？
+            </div>
+        
+            <a href="{% url 'recruit_create' %}" style="
+                    display:inline-block;
+                    padding:10px 15px;
+                    border-radius:10px;
+                    background:#222;
+                    color:#fff;
+                    text-decoration:none;
+                    font-weight:bold;
+                ">
+                新しい募集を作成
+            </a>
+        
+        </div>
+
         <h1 class="title">投稿する</h1>
 
         {% if error %}

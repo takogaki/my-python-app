@@ -1,0 +1,451 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+募集を編集｜{{ recruit.title }}｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .recruit-edit-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 30px 20px 60px;
+    }
+
+    .recruit-edit-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, .08);
+    }
+
+    .recruit-edit-title {
+        margin-bottom: 25px;
+    }
+
+    .recruit-edit-title h2 {
+        margin: 0 0 8px;
+    }
+
+    .recruit-edit-title p {
+        margin: 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .recruit-edit-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .recruit-edit-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .recruit-edit-field label {
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .recruit-edit-field input,
+    .recruit-edit-field select,
+    .recruit-edit-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 12px 14px;
+
+        border: 1px solid #ddd;
+        border-radius: 10px;
+
+        font-size: 15px;
+
+        background: #fff;
+    }
+
+    .recruit-edit-field textarea {
+        min-height: 140px;
+        resize: vertical;
+        line-height: 1.7;
+    }
+
+    .recruit-edit-field input:focus,
+    .recruit-edit-field select:focus,
+    .recruit-edit-field textarea:focus {
+        outline: none;
+        border-color: #999;
+    }
+
+    .recruit-edit-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .recruit-edit-note {
+        background: #f7f7f7;
+        border-radius: 12px;
+        padding: 14px;
+
+        font-size: 13px;
+        line-height: 1.7;
+        color: #666;
+    }
+
+    .recruit-edit-current {
+        background: #f0f7ff;
+        border-radius: 12px;
+        padding: 14px;
+
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .recruit-edit-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .recruit-edit-submit,
+    .recruit-edit-cancel {
+        flex: 1;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 13px;
+
+        border-radius: 10px;
+
+        text-decoration: none;
+
+        font-weight: bold;
+
+        cursor: pointer;
+    }
+
+    .recruit-edit-submit {
+        border: none;
+        background: #222;
+        color: #fff;
+    }
+
+    .recruit-edit-submit:hover {
+        opacity: .85;
+    }
+
+    .recruit-edit-cancel {
+        background: #eee;
+        color: #333;
+    }
+
+    .recruit-edit-cancel:hover {
+        background: #ddd;
+    }
+
+
+    @media (max-width: 600px) {
+
+        .recruit-edit-container {
+            padding: 20px 15px 50px;
+        }
+
+        .recruit-edit-card {
+            padding: 20px;
+        }
+
+        .recruit-edit-row {
+            grid-template-columns: 1fr;
+        }
+
+        .recruit-edit-actions {
+            flex-direction: column;
+        }
+
+    }
+</style>
+
+{% endblock %}
+
+
+{% block body %}
+
+<div class="recruit-edit-container">
+
+    <div class="recruit-edit-card">
+
+        <!-- =========================
+             ヘッダー
+        ========================== -->
+
+        <div class="recruit-edit-title">
+
+            <h2>
+                ✏️ 募集を編集
+            </h2>
+
+            <p>
+                {{ recruit.title }}
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             現在の参加人数
+        ========================== -->
+
+        <div class="recruit-edit-current">
+
+            <strong>
+                現在の参加状況
+            </strong>
+
+            <br>
+
+            参加確定：
+            {{ recruit.approved_count }}
+            /
+            {{ recruit.max_people }}
+            人
+
+            <br>
+
+            応募待ち：
+            {{ recruit.pending_count }}
+            人
+
+        </div>
+
+
+        <!-- =========================
+             編集フォーム
+        ========================== -->
+
+        <form method="post" class="recruit-edit-form">
+
+            {% csrf_token %}
+
+
+            <!-- カテゴリ -->
+
+            <div class="recruit-edit-field">
+
+                <label for="category">
+                    カテゴリ
+                </label>
+
+                <select id="category" name="category" required>
+
+                    {% for value, label in category_choices %}
+
+                    <option value="{{ value }}" {% if recruit.target_gender == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- タイトル -->
+
+            <div class="recruit-edit-field">
+
+                <label for="title">
+                    タイトル
+                </label>
+
+                <input type="text" id="title" name="title" maxlength="100" value="{{ recruit.title }}" required>
+
+            </div>
+
+
+            <!-- 募集内容 -->
+
+            <div class="recruit-edit-field">
+
+                <label for="description">
+                    募集内容
+                </label>
+
+                <textarea id="description" name="description"
+                    placeholder="募集内容を入力してください...">{{ recruit.description }}</textarea>
+
+            </div>
+
+
+            <!-- 都道府県・場所 -->
+
+            <div class="recruit-edit-row">
+
+                <div class="recruit-edit-field">
+
+                    <label for="prefecture">
+                        都道府県
+                    </label>
+
+                    <input type="text" id="prefecture" name="prefecture" value="{{ recruit.prefecture }}"
+                        placeholder="東京都">
+
+                </div>
+
+
+                <div class="recruit-edit-field">
+
+                    <label for="place">
+                        場所
+                    </label>
+
+                    <input type="text" id="place" name="place" value="{{ recruit.place }}" placeholder="新宿駅周辺">
+
+                </div>
+
+            </div>
+
+
+            <!-- 開始・終了 -->
+
+            <div class="recruit-edit-row">
+
+                <div class="recruit-edit-field">
+
+                    <label for="start_time">
+                        開始日時
+                    </label>
+
+                    <input type="datetime-local" id="start_time" name="start_time"
+                        value="{% if recruit.start_time %}{{ recruit.start_time|date:'Y-m-d\TH:i' }}{% endif %}">
+
+                </div>
+
+
+                <div class="recruit-edit-field">
+
+                    <label for="end_time">
+                        終了日時
+                    </label>
+
+                    <input type="datetime-local" id="end_time" name="end_time"
+                        value="{% if recruit.end_time %}{{ recruit.end_time|date:'Y-m-d\TH:i' }}{% endif %}">
+
+                </div>
+
+            </div>
+
+
+            <!-- 募集終了期限 -->
+
+            <div class="recruit-edit-field">
+
+                <label for="expires_at">
+                    募集終了期限
+                </label>
+
+                <input type="datetime-local" id="expires_at" name="expires_at"
+                    value="{% if recruit.expires_at %}{{ recruit.expires_at|date:'Y-m-d\TH:i' }}{% endif %}">
+
+            </div>
+
+
+            <!-- 人数・性別 -->
+
+            <div class="recruit-edit-row">
+
+                <div class="recruit-edit-field">
+
+                    <label for="max_people">
+                        募集人数
+                    </label>
+
+                    <input type="number" id="max_people" name="max_people" min="{{ recruit.approved_count|default:1 }}"
+                        value="{{ recruit.max_people }}" required>
+
+                </div>
+
+
+                <div class="recruit-edit-field">
+
+                    <label for="target_gender">
+                        対象
+                    </label>
+
+                    <select id="target_gender" name="target_gender" required>
+
+                        {% for value, label in gender_choices %}
+
+                        <option value="{{ value }}" {% if recruit.target_gender == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- 業界 -->
+
+            <div class="recruit-edit-field">
+
+                <label for="industry">
+                    業界
+                </label>
+
+                <input type="text" id="industry" name="industry" maxlength="50" value="{{ recruit.industry }}"
+                    placeholder="建設業、飲食業など">
+
+            </div>
+
+
+            <!-- 注意 -->
+
+            <div class="recruit-edit-note">
+
+                💡 <strong>募集人数について</strong><br>
+
+                すでに参加が確定している人数より、
+                募集人数を少なくすることはできません。
+
+                <br><br>
+
+                参加確定人数：
+                <strong>{{ recruit.approved_count }}人</strong>
+
+            </div>
+
+
+            <!-- ボタン -->
+
+            <div class="recruit-edit-actions">
+
+                <a href="{% url 'recruit_detail' recruit.id %}" class="recruit-edit-cancel">
+                    キャンセル
+                </a>
+
+
+                <button type="submit" class="recruit-edit-submit">
+                    💾 保存する
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

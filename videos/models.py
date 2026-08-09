@@ -278,10 +278,17 @@ class Recruit(models.Model):
         default=True
     )
 
+    # 中止時に応募者を保持したか
+    cancel_keep_participants = models.BooleanField(
+        default=False
+    )
+
+    # 作成日時・更新日時
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
+    # 更新日時
     updated_at = models.DateTimeField(
         auto_now=True
     )

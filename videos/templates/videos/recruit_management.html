@@ -1,9 +1,9 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
 
 {% block title %}
 募集管理｜SPIRYTUS
 {% endblock %}
-
 
 {% block extra_css %}
 
@@ -13,11 +13,6 @@
         margin: 0 auto;
         padding: 30px 20px 60px;
     }
-
-
-    /* =========================
-       ヘッダー
-    ========================== */
 
     .recruit-management-header {
         margin-bottom: 30px;
@@ -34,210 +29,235 @@
 
 
     /* =========================
-       セクション
-    ========================== */
-
-    .recruit-management-section {
-        margin-bottom: 40px;
-    }
-
-    .recruit-management-section h3 {
-        margin-bottom: 15px;
-    }
-
-
-    /* =========================
        募集カード
-    ========================== */
+    ========================= */
 
-    .recruit-management-card {
+    .management-recruit-card {
         background: #fff;
         border-radius: 18px;
         padding: 20px;
-        margin-bottom: 15px;
+        margin-bottom: 18px;
 
         box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
     }
 
 
-    .recruit-management-card-title {
-        font-size: 18px;
+    /* =========================
+       ヘッダー
+    ========================= */
+
+    .management-recruit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .management-recruit-title {
+        margin: 0;
+        font-size: 19px;
         font-weight: bold;
-        margin-bottom: 8px;
     }
 
-
-    .recruit-management-card-title a {
-        color: inherit;
-        text-decoration: none;
-    }
-
-
-    .recruit-management-meta {
+    .management-recruit-category {
+        margin-top: 6px;
         color: #777;
-        font-size: 14px;
-        line-height: 1.8;
+        font-size: 13px;
     }
 
 
     /* =========================
        ステータス
-    ========================== */
+    ========================= */
 
-    .recruit-management-status {
+    .management-status {
         display: inline-block;
+        flex-shrink: 0;
 
-        padding: 5px 10px;
-
+        padding: 6px 11px;
         border-radius: 20px;
 
         font-size: 12px;
         font-weight: bold;
-
-        margin-top: 10px;
     }
 
-
-    .status-open {
+    .management-status-open {
         background: #d4edda;
         color: #155724;
     }
 
-    .status-full {
+    .management-status-full {
         background: #fff3cd;
         color: #856404;
     }
 
-    .status-closed {
+    .management-status-cancel {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .management-status-closed {
         background: #e2e3e5;
         color: #383d41;
     }
 
-    .status-cancel {
-        background: #f8d7da;
-        color: #721c24;
+
+    /* =========================
+       募集情報
+    ========================= */
+
+    .management-recruit-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+
+        margin-top: 18px;
+        padding: 15px;
+
+        background: #f7f7f7;
+        border-radius: 12px;
+    }
+
+    .management-info-item {
+        font-size: 14px;
+    }
+
+    .management-info-label {
+        display: block;
+        color: #888;
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .management-info-value {
+        font-weight: bold;
     }
 
 
     /* =========================
        ボタン
-    ========================== */
+    ========================= */
 
-    .recruit-management-actions {
+    .management-actions {
         display: flex;
-        gap: 10px;
-        margin-top: 18px;
         flex-wrap: wrap;
+        gap: 10px;
+
+        margin-top: 18px;
     }
 
+    .management-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
 
-    .recruit-management-button {
-        display: inline-block;
-
-        padding: 10px 16px;
+        min-height: 42px;
+        padding: 0 15px;
 
         border-radius: 10px;
 
         text-decoration: none;
+        border: none;
 
+        font-size: 14px;
         font-weight: bold;
 
-        background: #f0f0f0;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
 
+    .management-detail {
+        background: #eee;
         color: #333;
     }
 
-
-    .recruit-management-button:hover {
-        background: #ddd;
-    }
-
-
-    .recruit-management-button.primary {
-        background: #333;
+    .management-participants {
+        background: #607d8b;
         color: #fff;
     }
 
-
-    .recruit-management-button.primary:hover {
-        background: #111;
-    }
-
-
-    .recruit-management-button.chat {
-        background: #3498db;
+    .management-chat {
+        background: #2196f3;
         color: #fff;
     }
 
+    .management-reopen {
+        background: #27ae60;
+        color: #fff;
+    }
 
-    .recruit-management-button.chat:hover {
-        background: #2980b9;
+    .management-action:hover {
+        opacity: .85;
+    }
+
+
+    /* =========================
+       中止・終了メッセージ
+    ========================= */
+
+    .management-closed-message {
+        margin-top: 15px;
+        padding: 12px 14px;
+
+        border-radius: 10px;
+
+        background: #f5f5f5;
+        color: #777;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================
+       応募した募集
+    ========================= */
+
+    .management-section {
+        margin-top: 45px;
+    }
+
+    .management-section-title {
+        margin-bottom: 18px;
+    }
+
+    .management-application-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 12px;
+
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
+    }
+
+    .management-application-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .management-application-info {
+        color: #777;
+        font-size: 13px;
     }
 
 
     /* =========================
        空状態
-    ========================== */
+    ========================= */
 
-    .recruit-management-empty {
-        background: #f7f7f7;
-
-        border-radius: 16px;
-
-        padding: 30px 20px;
-
+    .management-empty {
+        padding: 40px 20px;
         text-align: center;
 
         color: #777;
-    }
 
-
-    /* =========================
-       応募ステータス
-    ========================== */
-
-    .application-status {
-        display: inline-block;
-
-        padding: 5px 10px;
-
-        border-radius: 20px;
-
-        font-size: 12px;
-
-        font-weight: bold;
-
-        margin-top: 8px;
-    }
-
-
-    .application-pending {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-
-    .application-approved {
-        background: #d4edda;
-        color: #155724;
-    }
-
-
-    .application-rejected {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-
-    .application-cancelled {
-        background: #e2e3e5;
-        color: #383d41;
+        background: #f7f7f7;
+        border-radius: 16px;
     }
 
 
     /* =========================
        スマホ
-    ========================== */
+    ========================= */
 
     @media (max-width: 600px) {
 
@@ -245,28 +265,34 @@
             padding: 20px 15px 50px;
         }
 
-        .recruit-management-actions {
+        .management-recruit-header {
             flex-direction: column;
         }
 
-        .recruit-management-button {
-            text-align: center;
+        .management-recruit-info {
+            grid-template-columns: 1fr;
         }
 
+        .management-actions {
+            flex-direction: column;
+        }
+
+        .management-action {
+            width: 100%;
+        }
     }
 </style>
 
 {% endblock %}
 
-
 {% block body %}
 
 <div class="recruit-management-container">
 
-
+    ```
     <!-- =========================
-         ヘッダー
-    ========================== -->
+     ヘッダー
+========================== -->
 
     <div class="recruit-management-header">
 
@@ -275,118 +301,208 @@
         </h2>
 
         <p>
-            あなたの募集と応募状況を確認できます。
+            あなたが作成した募集と応募状況を管理できます。
         </p>
 
     </div>
 
 
     <!-- ==================================================
-         自分が作成した募集
-    ================================================== -->
+     自分が作成した募集
+================================================== -->
 
-    <div class="recruit-management-section">
+    <section>
 
         <h3>
-            👑 自分の募集
+            📋 自分の募集
         </h3>
 
 
         {% for recruit in my_recruits %}
 
-        <div class="recruit-management-card">
+        <div class="management-recruit-card">
 
-            <div class="recruit-management-card-title">
 
-                <a href="{% url 'recruit_detail' recruit.id %}">
-                    {{ recruit.title }}
-                </a>
+            <!-- =========================
+             タイトル・状態
+        ========================== -->
+
+            <div class="management-recruit-header">
+
+                <div>
+
+                    <h3 class="management-recruit-title">
+                        {{ recruit.title }}
+                    </h3>
+
+                    <div class="management-recruit-category">
+                        {{ recruit.get_category_display }}
+                    </div>
+
+                </div>
+
+
+                <!-- ステータス -->
+
+                {% if recruit.status == "open" %}
+
+                <span class="management-status management-status-open">
+                    🟢 募集中
+                </span>
+
+                {% elif recruit.status == "full" %}
+
+                <span class="management-status management-status-full">
+                    🟠 満員
+                </span>
+
+                {% elif recruit.status == "cancel" %}
+
+                <span class="management-status management-status-cancel">
+                    🔴 中止
+                </span>
+
+                {% elif recruit.status == "closed" %}
+
+                <span class="management-status management-status-closed">
+                    ⚫ 終了
+                </span>
+
+                {% endif %}
 
             </div>
 
 
-            <div class="recruit-management-meta">
+            <!-- =========================
+             募集情報
+        ========================== -->
 
-                {{ recruit.get_category_display }}
+            <div class="management-recruit-info">
 
-                {% if recruit.prefecture %}
-                ・{{ recruit.prefecture }}
+                <div class="management-info-item">
+
+                    <span class="management-info-label">
+                        参加確定
+                    </span>
+
+                    <span class="management-info-value">
+                        {{ recruit.approved_count }} /
+                        {{ recruit.max_people }} 人
+                    </span>
+
+                </div>
+
+
+                <div class="management-info-item">
+
+                    <span class="management-info-label">
+                        承認待ち
+                    </span>
+
+                    <span class="management-info-value">
+                        {{ recruit.pending_count }} 人
+                    </span>
+
+                </div>
+
+
+                {% if recruit.place %}
+
+                <div class="management-info-item">
+
+                    <span class="management-info-label">
+                        場所
+                    </span>
+
+                    <span class="management-info-value">
+                        {{ recruit.place }}
+                    </span>
+
+                </div>
+
                 {% endif %}
+
 
                 {% if recruit.start_time %}
-                <br>
-                {{ recruit.start_time|date:"Y/m/d H:i" }}
+
+                <div class="management-info-item">
+
+                    <span class="management-info-label">
+                        開始日時
+                    </span>
+
+                    <span class="management-info-value">
+                        {{ recruit.start_time|date:"Y/m/d H:i" }}
+                    </span>
+
+                </div>
+
                 {% endif %}
-
-                <br>
-
-                参加確定：
-                <strong>
-                    {{ recruit.approved_count }}
-                    /
-                    {{ recruit.max_people }}
-                </strong>
-                人
-
-                <br>
-
-                応募待ち：
-                <strong>
-                    {{ recruit.pending_count }}
-                </strong>
-                人
 
             </div>
 
 
-            <!-- ステータス -->
+            <!-- =========================
+             操作
+        ========================== -->
 
-            {% if recruit.status == "open" %}
-
-            <span class="recruit-management-status status-open">
-                🟢 募集中
-            </span>
-
-            {% elif recruit.status == "full" %}
-
-            <span class="recruit-management-status status-full">
-                🟡 満員
-            </span>
-
-            {% elif recruit.status == "closed" %}
-
-            <span class="recruit-management-status status-closed">
-                ⚪ 終了
-            </span>
-
-            {% elif recruit.status == "cancel" %}
-
-            <span class="recruit-management-status status-cancel">
-                🔴 中止
-            </span>
-
-            {% endif %}
+            <div class="management-actions">
 
 
-            <!-- 操作 -->
+                <!-- 詳細 -->
 
-            <div class="recruit-management-actions">
-
-                <a href="{% url 'recruit_detail' recruit.id %}" class="recruit-management-button">
-                    詳細
+                <a href="{% url 'recruit_detail' recruit.id %}" class="management-action management-detail">
+                    📄 詳細
                 </a>
 
 
-                <a href="{% url 'recruit_participants' recruit.id %}" class="recruit-management-button primary">
-                    👥 応募者を確認
-                </a>
-
+                <!-- =====================================
+                 募集中 / 満員
+            ====================================== -->
 
                 {% if recruit.status == "open" or recruit.status == "full" %}
 
-                <a href="{% url 'recruit_chat' recruit.id %}" class="recruit-management-button chat">
+
+                <!-- 応募者確認 -->
+
+                <a href="{% url 'recruit_participants' recruit.id %}" class="management-action management-participants">
+                    👥 応募者確認
+                </a>
+
+
+                <!-- チャット -->
+
+                <a href="{% url 'recruit_chat' recruit.id %}" class="management-action management-chat">
                     💬 チャット
                 </a>
+
+
+                <!-- =====================================
+                 中止
+            ====================================== -->
+
+                {% elif recruit.status == "cancel" %}
+
+                <form method="post" action="{% url 'reopen_recruit' recruit.id %}">
+
+                    {% csrf_token %}
+
+                    <button type="submit" class="management-action management-reopen">
+                        🔄 募集を再開
+                    </button>
+
+                </form>
+
+
+                <!-- =====================================
+                 終了
+            ====================================== -->
+
+                {% elif recruit.status == "closed" %}
+
+                <div class="management-closed-message">
+                    この募集は終了しています。
+                </div>
 
                 {% endif %}
 
@@ -394,9 +510,10 @@
 
         </div>
 
+
         {% empty %}
 
-        <div class="recruit-management-empty">
+        <div class="management-empty">
 
             <p>
                 まだ募集を作成していません。
@@ -406,34 +523,29 @@
 
         {% endfor %}
 
-    </div>
+    </section>
 
 
     <!-- ==================================================
-         自分が応募した募集
-    ================================================== -->
+     自分が応募した募集
+================================================== -->
 
-    <div class="recruit-management-section">
+    <section class="management-section">
 
-        <h3>
-            🙋 自分の応募
+        <h3 class="management-section-title">
+            📝 自分が応募した募集
         </h3>
 
 
         {% for participation in my_applications %}
 
-        <div class="recruit-management-card">
+        <div class="management-application-card">
 
-            <div class="recruit-management-card-title">
-
-                <a href="{% url 'recruit_detail' participation.recruit.id %}">
-                    {{ participation.recruit.title }}
-                </a>
-
+            <div class="management-application-title">
+                {{ participation.recruit.title }}
             </div>
 
-
-            <div class="recruit-management-meta">
+            <div class="management-application-info">
 
                 募集主：
                 {{ participation.recruit.user.username }}
@@ -445,60 +557,12 @@
 
             </div>
 
-
-            <!-- 応募ステータス -->
-
-            {% if participation.status == "pending" %}
-
-            <span class="application-status application-pending">
-                ⏳ 承認待ち
-            </span>
-
-            {% elif participation.status == "approved" %}
-
-            <span class="application-status application-approved">
-                ✅ 参加確定
-            </span>
-
-            {% elif participation.status == "rejected" %}
-
-            <span class="application-status application-rejected">
-                ❌ 拒否
-            </span>
-
-            {% elif participation.status == "cancelled" %}
-
-            <span class="application-status application-cancelled">
-                キャンセル
-            </span>
-
-            {% endif %}
-
-
-            <!-- 操作 -->
-
-            <div class="recruit-management-actions">
-
-                <a href="{% url 'recruit_detail' participation.recruit.id %}" class="recruit-management-button">
-                    募集を見る
-                </a>
-
-
-                {% if participation.status == "approved" %}
-
-                <a href="{% url 'recruit_chat' participation.recruit.id %}" class="recruit-management-button chat">
-                    💬 募集チャット
-                </a>
-
-                {% endif %}
-
-            </div>
-
         </div>
+
 
         {% empty %}
 
-        <div class="recruit-management-empty">
+        <div class="management-empty">
 
             <p>
                 まだ応募した募集はありません。
@@ -508,7 +572,8 @@
 
         {% endfor %}
 
-    </div>
+    </section>
+    ```
 
 </div>
 

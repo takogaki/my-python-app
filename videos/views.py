@@ -2,12 +2,13 @@ import uuid
 from .models import PostVideo, PostVideoLike, PostVideoComment, Recruit, RecruitParticipant, RecruitChatRoom, RecruitChatMessage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_POST
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from accounts.utils import save_page_log
 from django.contrib import messages
+
 
 User = get_user_model()
 
@@ -259,25 +260,464 @@ def user_video_feed(request, username):
     })
 
 # =========================
+# 🤝 新規募集作成
+# =========================
+@login_required
+def recruit_create(request):
+
+    if request.method == "POST":
+
+        title = request.POST.get("title", "").strip()
+        category = request.POST.get("category", "").strip()
+        description = request.POST.get("description", "").strip()
+        place = request.POST.get("place", "").strip()
+        prefecture = request.POST.get("prefecture", "").strip()
+        start_time = request.POST.get("start_time") or None
+        end_time = request.POST.get("end_time") or None
+        expires_at = request.POST.get("expires_at") or None
+        max_people = request.POST.get("max_people", "2")
+        target_gender = request.POST.get("target_gender", "all")
+        industry = request.POST.get("industry", "").strip()
+
+        # =========================
+        # 必須項目チェック
+        # =========================
+
+        if not title:
+            messages.error(
+                request,
+                "募集タイトルを入力してください。"
+            )
+            return redirect("recruit_create")
+
+        if not category:
+            messages.error(
+                request,
+                "カテゴリを選択してください。"
+            )
+            return redirect("recruit_create")
+
+        # =========================
+        # 最大人数チェック
+        # =========================
+
+        try:
+            max_people = int(max_people)
+
+            if max_people < 1:
+                raise ValueError
+
+        except (TypeError, ValueError):
+
+            messages.error(
+                request,
+                "募集人数は1人以上で設定してください。"
+            )
+
+            return redirect("recruit_create")
+
+        # =========================
+        # 募集作成
+        # =========================
+
+        recruit = Recruit.objects.create(
+            user=request.user,
+            category=category,
+            title=title,
+            description=description,
+            place=place,
+            prefecture=prefecture,
+            start_time=start_time,
+            end_time=end_time,
+            expires_at=expires_at,
+            max_people=max_people,
+            target_gender=target_gender,
+            industry=industry,
+            status="open",
+            is_active=True,
+        )
+
+        messages.success(
+            request,
+            "募集を作成しました！"
+        )
+
+        return redirect(
+            "recruit_detail",
+            pk=recruit.pk
+        )
+
+    return render(
+        request,
+        "videos/recruit_create.html",
+        {
+            "category_choices": Recruit.CATEGORY_CHOICES,
+            "gender_choices": Recruit.GENDER_CHOICES,
+        },
+    )
+
+# =========================
+# 🤝 募集編集
+# =========================
+@login_required
+def recruit_edit(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        user=request.user,
+    )
+
+    # 終了・中止した募集は編集不可
+    if recruit.status in ["closed", "cancel"]:
+        messages.error(
+            request,
+            "終了または中止した募集は編集できません。"
+        )
+        return redirect(
+            "recruit_detail",
+            pk=recruit.pk
+        )
+
+    if request.method == "POST":
+
+        title = request.POST.get("title", "").strip()
+        category = request.POST.get("category", "").strip()
+        description = request.POST.get("description", "").strip()
+        place = request.POST.get("place", "").strip()
+        prefecture = request.POST.get("prefecture", "").strip()
+        start_time = request.POST.get("start_time") or None
+        end_time = request.POST.get("end_time") or None
+        expires_at = request.POST.get("expires_at") or None
+        max_people = request.POST.get("max_people", "2")
+        target_gender = request.POST.get(
+            "target_gender",
+            "all"
+        )
+        industry = request.POST.get(
+            "industry",
+            ""
+        ).strip()
+
+        if not title:
+            messages.error(
+                request,
+                "募集タイトルを入力してください。"
+            )
+            return redirect(
+                "recruit_edit",
+                pk=recruit.pk
+            )
+
+        if not category:
+            messages.error(
+                request,
+                "カテゴリを選択してください。"
+            )
+            return redirect(
+                "recruit_edit",
+                pk=recruit.pk
+            )
+
+        try:
+            max_people = int(max_people)
+
+            if max_people < 1:
+                raise ValueError
+
+        except (TypeError, ValueError):
+
+            messages.error(
+                request,
+                "募集人数は1人以上で設定してください。"
+            )
+
+            return redirect(
+                "recruit_edit",
+                pk=recruit.pk
+            )
+
+        # 現在の承認人数より少ない人数には変更不可
+        if max_people < recruit.approved_count:
+
+            messages.error(
+                request,
+                f"現在すでに{recruit.approved_count}人が"
+                "参加確定しているため、"
+                "募集人数を減らせません。"
+            )
+
+            return redirect(
+                "recruit_edit",
+                pk=recruit.pk
+            )
+
+        recruit.title = title
+        recruit.category = category
+        recruit.description = description
+        recruit.place = place
+        recruit.prefecture = prefecture
+        recruit.start_time = start_time
+        recruit.end_time = end_time
+        recruit.expires_at = expires_at
+        recruit.max_people = max_people
+        recruit.target_gender = target_gender
+        recruit.industry = industry
+
+        # 人数変更による状態調整
+        if recruit.approved_count >= recruit.max_people:
+            recruit.status = "full"
+        else:
+            recruit.status = "open"
+
+        recruit.save()
+
+        messages.success(
+            request,
+            "募集内容を更新しました。"
+        )
+
+        return redirect(
+            "recruit_detail",
+            pk=recruit.pk
+        )
+
+    return render(
+        request,
+        "videos/recruit_edit.html",
+        {
+            "recruit": recruit,
+            "category_choices": Recruit.CATEGORY_CHOICES,
+            "gender_choices": Recruit.GENDER_CHOICES,
+        },
+    )
+
+
+# =========================
+# 🛑 募集終了
+# =========================
+@login_required
+@require_POST
+def close_recruit(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        user=request.user,
+    )
+
+    # すでに終了
+    if recruit.status == "closed":
+        messages.warning(
+            request,
+            "この募集はすでに終了しています。"
+        )
+        return redirect(
+            "recruit_management"
+        )
+
+    # 中止済み
+    if recruit.status == "cancel":
+        messages.warning(
+            request,
+            "中止された募集は「終了」に変更できません。"
+            "再開してから終了してください。"
+        )
+        return redirect(
+            "recruit_management"
+        )
+
+    recruit.status = "closed"
+    recruit.is_active = False
+
+    recruit.save(
+        update_fields=[
+            "status",
+            "is_active",
+            "updated_at",
+        ]
+    )
+
+    messages.success(
+        request,
+        "募集を終了しました。"
+    )
+
+    return redirect(
+        "recruit_management"
+    )
+
+# =========================
+# ❌ 募集中止
+# =========================
+@login_required
+@require_POST
+def cancel_recruit(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        user=request.user,
+    )
+
+    if recruit.status in ["closed", "cancel"]:
+
+        messages.warning(
+            request,
+            "この募集はすでに終了しています。"
+        )
+
+        return redirect(
+            "recruit_detail",
+            pk=recruit.pk
+        )
+
+    # =========================
+    # 応募者処理
+    # =========================
+    participant_action = request.POST.get(
+        "participant_action",
+        "keep",
+    )
+
+    if participant_action == "reset":
+
+        # 応募者をキャンセル扱い
+        RecruitParticipant.objects.filter(
+            recruit=recruit,
+        ).update(
+            status="cancelled"
+        )
+
+        recruit.cancel_keep_participants = False
+
+        message = (
+            "募集を中止しました。"
+            "応募者はリセットされました。"
+        )
+
+    else:
+
+        # 応募者をそのまま保持
+        recruit.cancel_keep_participants = True
+
+        message = (
+            "募集を中止しました。"
+            "応募者情報を保持しています。"
+        )
+
+    # =========================
+    # 募集を中止
+    # =========================
+    recruit.status = "cancel"
+    recruit.is_active = False
+
+    recruit.save(
+        update_fields=[
+            "status",
+            "is_active",
+            "cancel_keep_participants",
+            "updated_at",
+        ]
+    )
+
+    messages.success(
+        request,
+        message,
+    )
+
+    return redirect(
+        "recruit_detail",
+        pk=recruit.pk
+    )
+
+# =========================
+# 🔄 募集再開
+# =========================
+@login_required
+@require_POST
+def reopen_recruit(request, pk):
+
+    recruit = get_object_or_404(
+        Recruit,
+        pk=pk,
+        user=request.user,
+        status="cancel",
+    )
+
+    # =========================
+    # 応募者をリセットした中止だった場合
+    # =========================
+    if not recruit.cancel_keep_participants:
+
+        RecruitParticipant.objects.filter(
+            recruit=recruit,
+        ).update(
+            status="cancelled"
+        )
+
+    # =========================
+    # 募集再開
+    # =========================
+    recruit.status = "open"
+    recruit.is_active = True
+
+    recruit.save(
+        update_fields=[
+            "status",
+            "is_active",
+            "updated_at",
+        ]
+    )
+
+    # =========================
+    # メッセージ
+    # =========================
+    if recruit.cancel_keep_participants:
+
+        messages.success(
+            request,
+            "募集を再開しました。"
+            "以前の応募者情報を保持しています。"
+        )
+
+    else:
+
+        messages.success(
+            request,
+            "募集を再開しました。"
+            "以前の応募者はリセットされ、新たに応募を受け付けます。"
+        )
+
+    return redirect(
+        "recruit_management"
+    )
+
+# =========================
 # 🤝 募集詳細
 # =========================
 @login_required
 def recruit_detail(request, pk):
 
+    # まず募集そのものを取得
     recruit = get_object_or_404(
         Recruit,
         pk=pk,
-        is_active=True,
     )
 
-    my_participation = None
+    # =========================
+    # 他ユーザーは非公開募集を見られない
+    # =========================
+    if recruit.user != request.user and not recruit.is_active:
+        raise Http404
 
-    if request.user.is_authenticated:
-
-        my_participation = RecruitParticipant.objects.filter(
-            recruit=recruit,
-            user=request.user
-        ).first()
+    # =========================
+    # 自分の応募状況
+    # =========================
+    my_participation = RecruitParticipant.objects.filter(
+        recruit=recruit,
+        user=request.user
+    ).first()
 
     return render(
         request,
@@ -578,7 +1018,6 @@ def recruit_management(request):
         Recruit.objects
         .filter(
             user=request.user,
-            is_active=True,
         )
         .order_by("-created_at")
     )
