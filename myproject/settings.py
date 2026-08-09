@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEBUG = True
-
 # ==============================
 # 📁 パス設定
 # ==============================
@@ -39,7 +37,10 @@ RENDER_INTERNAL_HOSTNAME = os.environ.get("RENDER_INTERNAL_HOSTNAME")
 if RENDER_INTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_INTERNAL_HOSTNAME)
 
-SITE_URL = "https://my-python-app-0t2k.onrender.com"
+SITE_URL = os.environ.get(
+    "SITE_URL",
+    ""
+)
 
 # ==============================
 # 📦 静的ファイル（最重要）
