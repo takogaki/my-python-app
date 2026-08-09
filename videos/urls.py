@@ -25,6 +25,8 @@ urlpatterns = [
     # =========================
     # 🤝 募集応募者管理
     # =========================
+    path("recruit-management/", views.recruit_management, name="recruit_management"),
+
     path("recruit/<int:pk>/participants/", views.recruit_participants, name="recruit_participants"),
 
     path("recruit/participant/<int:pk>/approve/", views.approve_recruit_participant, name="approve_recruit_participant"),

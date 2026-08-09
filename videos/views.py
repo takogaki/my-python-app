@@ -564,3 +564,45 @@ def recruit_chat(request, pk):
             "chat_messages": chat_messages,
         }
     )
+
+# =========================
+# 🤝 募集管理
+# =========================
+@login_required
+def recruit_management(request):
+
+    # =========================
+    # 自分が作成した募集
+    # =========================
+    my_recruits = (
+        Recruit.objects
+        .filter(
+            user=request.user,
+            is_active=True,
+        )
+        .order_by("-created_at")
+    )
+
+    # =========================
+    # 自分が応募した募集
+    # =========================
+    my_applications = (
+        RecruitParticipant.objects
+        .filter(
+            user=request.user,
+        )
+        .select_related(
+            "recruit",
+            "recruit__user",
+        )
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "videos/recruit_management.html",
+        {
+            "my_recruits": my_recruits,
+            "my_applications": my_applications,
+        },
+    )

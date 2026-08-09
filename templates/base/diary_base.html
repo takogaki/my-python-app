@@ -109,11 +109,15 @@
             
                 {% if request.user.is_authenticated %}
             
+                <!-- 募集管理 -->
+                <a class="btn btn-outline recruit-management-header-button" href="{% url 'recruit_management' %}">
+                    🤝 募集
+                </a>
+            
+                <!-- マイページ -->
                 <span class="welcome">
                     <a class="btn btn-outline" href="{% url 'accounts:mypage' %}">
-            
                         {{ request.user.username }}
-            
                     </a>
                 </span>
             
