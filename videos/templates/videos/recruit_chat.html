@@ -77,7 +77,7 @@
                  自分のアイコン
             ========================== -->
 
-        <a href="{% url 'accounts:user_detail' request.user.username %}" class="recruit-chat-avatar-link">
+        <a href="{% url 'accounts:mypage' %}" class="recruit-chat-avatar-link">
 
             {% if request.user.get_profile_image %}
 
