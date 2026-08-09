@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block extra_css %}
+
 <link rel="stylesheet" href="{% static 'videos/css/recruit_chat.css' %}">
 {% endblock %}
 
@@ -17,6 +18,7 @@
 
 <div class="recruit-chat-header">
 
+    ```
     <div class="recruit-chat-header-info">
 
         <h2>
@@ -33,9 +35,9 @@
     <a href="{% url 'recruit_detail' recruit.id %}" class="recruit-chat-back">
         ← 募集詳細へ
     </a>
+    ```
 
 </div>
-
 
 <!-- =========================
      メッセージエリア
@@ -43,13 +45,14 @@
 
 <div id="recruit-chat-messages" class="recruit-chat-messages">
 
+    ```
     {% for message in chat_messages %}
 
     {% if message.user == request.user %}
 
     <!-- =========================
-                 自分
-            ========================== -->
+             自分
+        ========================== -->
 
     <div class="recruit-chat-row my-row">
 
@@ -70,9 +73,11 @@
         </div>
 
 
-        <!-- 自分のアイコン -->
+        <!-- =========================
+                 自分のアイコン
+            ========================== -->
 
-        <a href="/accounts/user/{{ request.user.username|urlencode }}/" class="recruit-chat-avatar-link">
+        <a href="{% url 'accounts:user_detail' request.user.username %}" class="recruit-chat-avatar-link">
 
             {% if request.user.get_profile_image %}
 
@@ -95,19 +100,22 @@
     {% else %}
 
     <!-- =========================
-                 相手
-            ========================== -->
+             相手
+        ========================== -->
 
     <div class="recruit-chat-row other-row">
 
 
         <!-- =========================
-                     相手のアイコン
-                ========================== -->
+                 相手のアイコン
+            ========================== -->
 
         {% if message.user.is_superuser %}
 
-        <!-- スーパーユーザーはクリック不可 -->
+        <!--
+                    スーパーユーザー
+                    → プロフィールへのリンクなし
+                -->
 
         <div class="recruit-chat-avatar-link">
 
@@ -128,9 +136,12 @@
 
         {% else %}
 
-        <!-- 通常ユーザーはプロフィールへ移動可能 -->
+        <!--
+                    通常ユーザー
+                    → DjangoのURL nameを使用
+                -->
 
-        <a href="/accounts/user/{{ message.user.username|urlencode }}/" class="recruit-chat-avatar-link">
+        <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-avatar-link">
 
             {% if message.user.get_profile_image %}
 
@@ -151,15 +162,19 @@
 
 
         <!-- =========================
-                     吹き出し
-                ========================== -->
+                 吹き出し
+            ========================== -->
 
         <div class="recruit-chat-bubble-wrapper">
 
 
-            <!-- ユーザー名 -->
+            <!-- =========================
+                     ユーザー名
+                ========================== -->
 
             {% if message.user.is_superuser %}
+
+            <!-- スーパーユーザーは名前もリンクなし -->
 
             <span class="recruit-chat-username">
                 {{ message.user.username }}
@@ -167,21 +182,27 @@
 
             {% else %}
 
-            <a href="/accounts/user/{{ message.user.username|urlencode }}/" class="recruit-chat-username">
+            <!-- 通常ユーザーはプロフィールへ -->
+
+            <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-username">
                 {{ message.user.username }}
             </a>
 
             {% endif %}
 
 
-            <!-- メッセージ -->
+            <!-- =========================
+                     メッセージ
+                ========================== -->
 
             <div class="recruit-chat-bubble other-bubble">
                 {{ message.text|linebreaksbr }}
             </div>
 
 
-            <!-- 時刻 -->
+            <!-- =========================
+                     時刻
+                ========================== -->
 
             <div class="recruit-chat-meta">
 
@@ -205,27 +226,29 @@
     </div>
 
     {% endfor %}
+    ```
 
 </div>
-
 
 <!-- =========================
      入力エリア
 ========================== -->
+<div class="recruit-chat-input-fixed">
 
-<form id="recruit-chat-form" class="recruit-chat-form">
+    <form id="recruit-chat-form" class="recruit-chat-form">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    <input type="text" id="recruit-chat-input" class="recruit-chat-input" placeholder="メッセージを入力..." autocomplete="off"
-        maxlength="2000">
+        <input type="text" id="recruit-chat-input" class="recruit-chat-input" placeholder="メッセージを入力..."
+            autocomplete="off" maxlength="2000">
 
-    <button type="submit" class="recruit-chat-send">
-        ➤
-    </button>
+        <button type="submit" class="recruit-chat-send">
+            ➤
+        </button>
 
-</form>
+    </form>
 
+</div>
 
 <!-- =========================
      接続状態
@@ -235,8 +258,8 @@
     接続中...
 </div>
 
-
 {% endblock %}
+
 
 
 <!-- ==================================================
