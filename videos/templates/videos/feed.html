@@ -91,46 +91,135 @@ Spirytus動画｜SPIRYTUS
 
             <div class="video-card snap-item recruit-card">
 
+                {% if recruit.image %}
+                <div class="recruit-background">
+                
+                    <img src="{{ recruit.image.url }}" alt="{{ recruit.title }}"
+                        class="recruit-background-image recruit-image-clickable">
+                
+                </div>
+                {% endif %}
+
                 <div class="caption recruit-caption">
 
-                    <h2>🎉 {{ recruit.title }}</h2>
-
-                    <p>
-                        👤 {{ recruit.user.username }}
-                    </p>
-
-                    {% if recruit.place %}
-                    <p>
-                        📍 {{ recruit.place }}
-                    </p>
-                    {% endif %}
-
-                    {% if recruit.start_time %}
-                    <p>
-                        🕒 {{ recruit.start_time|date:"m月d日 H:i" }}
-                    </p>
-                    {% endif %}
-
-                    <p>
-                        👥 あと {{ recruit.remaining_count }} 人
-                    </p>
-
-                    {% if recruit.industry %}
-                    <p>
-                        🏗 {{ recruit.industry }}
-                    </p>
-                    {% endif %}
-
-                    {% if recruit.description %}
-                    <p class="caption-text">
-                        {{ recruit.description|linebreaksbr }}
-                    </p>
-                    {% endif %}
-
-                    <a href="{% url 'recruit_detail' recruit.id %}" class="join-btn">
-                        詳細を見る
-                    </a>
-
+                    <!-- =========================
+                         ユーザー
+                    ========================== -->
+                
+                    {% if recruit.user.is_superuser %}
+                
+                    <div class="recruit-user">
+                
+                        <span class="recruit-user-icon">
+                            <img src="{{ recruit.user.get_profile_image }}" alt="{{ recruit.user.username }}">
+                        </span>
+                
+                        <span class="recruit-username">
+                            {{ recruit.user.username }}
+                        </span>
+                
+                    </div>
+                
+                    {% else %}
+                
+                    {% if request.user.id == recruit.user.id %}
+                
+                    <a href="{% url 'accounts:mypage' %}" class="recruit-user">
+                
+                        {% else %}
+                
+                        <a href="{% url 'accounts:user_detail' recruit.user.username %}" class="recruit-user">
+                
+                            {% endif %}
+                
+                            <span class="recruit-user-icon">
+                                <img src="{{ recruit.user.get_profile_image }}" alt="{{ recruit.user.username }}">
+                            </span>
+                
+                            <span class="recruit-username">
+                                {{ recruit.user.username }}
+                            </span>
+                
+                        </a>
+                
+                        {% endif %}
+                
+                
+                        <!-- =========================
+                         募集タイトル
+                    ========================== -->
+                
+                        <div class="recruit-title">
+                            🎉 {{ recruit.title }}
+                        </div>
+                
+                
+                        <!-- =========================
+                         募集情報
+                    ========================== -->
+                
+                        <div class="recruit-info">
+                
+                            {% if recruit.place %}
+                            <div class="recruit-info-item">
+                                <span>📍</span>
+                                <span>{{ recruit.place }}</span>
+                            </div>
+                            {% endif %}
+                
+                
+                            {% if recruit.start_time %}
+                            <div class="recruit-info-item">
+                                <span>🕒</span>
+                                <span>
+                                    {{ recruit.start_time|date:"m月d日 H:i" }}
+                                </span>
+                            </div>
+                            {% endif %}
+                
+                
+                            <div class="recruit-info-item">
+                                <span>👥</span>
+                                <span>
+                                    あと
+                                    <strong>{{ recruit.remaining_count }}</strong>
+                                    人
+                                </span>
+                            </div>
+                
+                
+                            {% if recruit.industry %}
+                            <div class="recruit-info-item">
+                                <span>🏗</span>
+                                <span>{{ recruit.industry }}</span>
+                            </div>
+                            {% endif %}
+                
+                        </div>
+                
+                
+                        <!-- =========================
+                         説明
+                    ========================== -->
+                
+                        {% if recruit.description %}
+                
+                        <div class="recruit-description">
+                            {{ recruit.description|linebreaksbr }}
+                        </div>
+                
+                        {% endif %}
+                
+                
+                        <!-- =========================
+                         詳細
+                    ========================== -->
+                
+                        <a href="{% url 'recruit_detail' recruit.id %}" class="join-btn recruit-join-btn">
+                            詳細を見る
+                            <span>›</span>
+                        </a>
+                
                 </div>
 
             </div>
@@ -164,6 +253,20 @@ Spirytus動画｜SPIRYTUS
 
         </div>
 
+    </div>
+
+    <!-- =========================================================
+         📷 募集写真 拡大表示
+    ========================================================= -->
+    
+    <div id="recruitImageModal" class="recruit-image-modal">
+    
+        <button type="button" class="recruit-image-close" id="recruitImageClose" aria-label="閉じる">
+            ×
+        </button>
+    
+        <img id="recruitImageModalImage" src="" alt="">
+    
     </div>
 
     <div id="commentModal" class="comment-modal">

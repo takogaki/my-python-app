@@ -25,7 +25,7 @@
         </p>
 
 
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
 
             {% csrf_token %}
 
@@ -204,6 +204,31 @@
 
             </div>
 
+            <!-- =========================
+                 📷 募集写真
+            ========================= -->
+            
+            <div class="recruit-field recruit-photo-field">
+            
+                <label for="recruit_image">
+                    📷 募集写真
+                </label>
+            
+                <p class="recruit-photo-help">
+                    今撮影した写真を1枚追加できます。
+                </p>
+            
+                <input type="file" id="recruit_image" name="image" accept="image/*" capture="environment">
+            
+                <small>
+                    写真を撮らなくても、そのまま募集を作成できます。
+                </small>
+            
+                <div id="recruit-photo-preview" class="recruit-photo-preview">
+                    <img id="recruit-photo-preview-image" src="" alt="撮影した写真">
+                </div>
+            
+            </div>
 
             <!-- 作成 -->
 

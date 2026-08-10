@@ -262,6 +262,7 @@ def user_video_feed(request, username):
 # =========================
 # 🤝 新規募集作成
 # =========================
+
 @login_required
 def recruit_create(request):
 
@@ -278,6 +279,12 @@ def recruit_create(request):
         max_people = request.POST.get("max_people", "2")
         target_gender = request.POST.get("target_gender", "all")
         industry = request.POST.get("industry", "").strip()
+
+        # =========================
+        # 📷 募集写真
+        # =========================
+
+        recruit_image = request.FILES.get("image")
 
         # =========================
         # 必須項目チェック
@@ -317,7 +324,7 @@ def recruit_create(request):
             return redirect("recruit_create")
 
         # =========================
-        # 募集作成
+        # 🤝 募集作成
         # =========================
 
         recruit = Recruit.objects.create(
@@ -333,6 +340,10 @@ def recruit_create(request):
             max_people=max_people,
             target_gender=target_gender,
             industry=industry,
+
+            # 📷 写真
+            image=recruit_image,
+
             status="open",
             is_active=True,
         )
@@ -931,7 +942,6 @@ def reject_recruit_participant(request, pk):
 # =========================
 # 💬 募集チャット
 # =========================
-
 @login_required
 def recruit_chat(request, pk):
 
@@ -941,26 +951,17 @@ def recruit_chat(request, pk):
         is_active=True,
     )
 
-    # =========================
     # 募集主
-    # =========================
-
     is_owner = recruit.user == request.user
 
-    # =========================
     # 承認済み参加者
-    # =========================
-
     is_participant = RecruitParticipant.objects.filter(
         recruit=recruit,
         user=request.user,
         status="approved",
     ).exists()
 
-    # =========================
     # 権限チェック
-    # =========================
-
     if not is_owner and not is_participant:
 
         messages.error(
@@ -973,57 +974,9 @@ def recruit_chat(request, pk):
             pk=recruit.pk
         )
 
-    # =========================
     # チャットルーム取得・作成
-    # =========================
-
     room, created = RecruitChatRoom.objects.get_or_create(
         recruit=recruit
-    )
-
-    # ==================================================
-    # 👁 チャットを開いたので既読にする
-    # ==================================================
-
-    latest_message = (
-        RecruitChatMessage.objects
-        .filter(room=room)
-        .order_by("-created_at", "-id")
-        .first()
-    )
-
-    if latest_message:
-
-        RecruitChatRead.objects.update_or_create(
-            room=room,
-            user=request.user,
-            defaults={
-                "last_read_message": latest_message,
-            },
-        )
-
-    # =========================
-    # メッセージ取得
-    # =========================
-
-    chat_messages = (
-        RecruitChatMessage.objects
-        .filter(room=room)
-        .select_related("user")
-        .order_by("created_at", "id")
-    )
-
-    # =========================
-    # 表示
-    # =========================
-
-    return render(
-        request,
-        "videos/recruit_chat.html",
-        {
-            "recruit": recruit,
-            "chat_messages": chat_messages,
-        }
     )
 
     # =========================

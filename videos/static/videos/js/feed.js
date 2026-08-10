@@ -224,7 +224,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (
             e.target.closest(".action-btn") ||
             e.target.closest(".more-btn") ||
-            e.target.closest(".comment-user") // ← 追加
+            e.target.closest(".comment-user") ||
+            e.target.closest(".recruit-image-clickable") ||
+            e.target.closest(".recruit-image-modal")
         ) return;
 
         const url = card.dataset.url;
@@ -246,6 +248,132 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.textContent = text.classList.contains("open")
             ? "閉じる"
             : "…もっと見る";
+    });
+
+    /* =========================
+    📷 募集写真 拡大表示
+    ========================= */
+
+    const recruitImageModal = document.getElementById("recruitImageModal");
+    const recruitImageModalImage = document.getElementById("recruitImageModalImage");
+    const recruitImageClose = document.getElementById("recruitImageClose");
+
+
+    document.addEventListener("click", (e) => {
+
+        const image = e.target.closest(".recruit-image-clickable");
+
+        if (!image) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!recruitImageModal || !recruitImageModalImage) {
+            return;
+        }
+
+        recruitImageModalImage.src = image.src;
+        recruitImageModalImage.alt = image.alt || "";
+
+        recruitImageModal.classList.add("show");
+
+        feed.style.overflowY = "hidden";
+    });
+
+
+    function closeRecruitImageModal() {
+
+        if (!recruitImageModal) return;
+
+        recruitImageModal.classList.remove("show");
+
+        if (recruitImageModalImage) {
+            recruitImageModalImage.src = "";
+        }
+
+        feed.style.overflowY = "scroll";
+    }
+
+
+    recruitImageClose?.addEventListener("click", (e) => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        closeRecruitImageModal();
+
+    });
+
+
+    recruitImageModal?.addEventListener("click", (e) => {
+
+        if (e.target === recruitImageModal) {
+            closeRecruitImageModal();
+        }
+
+    });
+
+
+    document.addEventListener("keydown", (e) => {
+
+        if (e.key === "Escape") {
+            closeRecruitImageModal();
+        }
+
+    });
+
+
+    /* ❌ 閉じる */
+
+    function closeRecruitImageModal() {
+
+        if (!recruitImageModal) return;
+
+        recruitImageModal.classList.remove("show");
+
+        if (recruitImageModalImage) {
+            recruitImageModalImage.src = "";
+        }
+
+        /*
+        * Feedのスクロールを戻す
+        */
+        feed.style.overflowY = "scroll";
+
+    }
+
+
+    /* × ボタン */
+
+    recruitImageClose?.addEventListener("click", (e) => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        closeRecruitImageModal();
+
+    });
+
+
+    /* 背景クリック */
+
+    recruitImageModal?.addEventListener("click", (e) => {
+
+        if (e.target === recruitImageModal) {
+            closeRecruitImageModal();
+        }
+
+    });
+
+
+    /* ESCキー */
+
+    document.addEventListener("keydown", (e) => {
+
+        if (e.key === "Escape") {
+            closeRecruitImageModal();
+        }
+
     });
 
     /* =========================

@@ -293,6 +293,13 @@ class Recruit(models.Model):
         auto_now=True
     )
 
+    # 画像（任意）
+    image = models.ImageField(
+        upload_to="recruits/",
+        blank=True,
+        null=True
+    )
+
     class Meta:
         ordering = ["-created_at"]
 

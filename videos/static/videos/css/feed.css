@@ -439,3 +439,491 @@ html, body {
     border-radius: 50%;
     object-fit: cover;
 }
+
+/* =========================================================
+   🎉 募集カード内部だけを装飾
+   ※ .video-card / .caption のレイアウトは変更しない
+========================================================= */
+
+
+/* ユーザー */
+
+.recruit-user {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    width: fit-content;
+
+    margin-bottom: 12px;
+
+    color: #fff;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: opacity 0.2s ease;
+}
+
+.recruit-user:hover {
+    opacity: 0.8;
+}
+
+
+/* ユーザーアイコン */
+
+.recruit-user-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    padding: 2px;
+
+    box-sizing: border-box;
+
+    background: linear-gradient(
+        135deg,
+        #ff2d55,
+        #ff5e62
+    );
+
+    overflow: hidden;
+}
+
+
+.recruit-user-icon img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: #222;
+}
+
+
+/* ユーザー名 */
+
+.recruit-username {
+    font-size: 14px;
+
+    font-weight: 700;
+
+    color: #fff;
+
+    text-shadow:
+        0 1px 3px rgba(0,0,0,0.8);
+}
+
+
+/* =========================================================
+   タイトル
+========================================================= */
+
+.recruit-caption .recruit-title {
+    margin: 8px 0 15px;
+
+    color: #fff;
+
+    font-size: 22px;
+
+    line-height: 1.35;
+
+    font-weight: 800;
+
+    text-shadow:
+        0 2px 5px rgba(0,0,0,0.9);
+}
+
+
+/* =========================================================
+   情報
+========================================================= */
+
+.recruit-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 13px;
+
+    padding: 11px 13px;
+
+    border-radius: 12px;
+
+    background: rgba(0,0,0,0.38);
+
+    border: 1px solid rgba(255,255,255,0.10);
+
+    backdrop-filter: blur(5px);
+}
+
+
+.recruit-info-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: rgba(255,255,255,0.94);
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+.recruit-info-item strong {
+    color: #ff5b78;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   説明
+========================================================= */
+
+.recruit-description {
+    margin-bottom: 13px;
+
+    padding: 10px 12px;
+
+    border-radius: 10px;
+
+    background: rgba(0,0,0,0.30);
+
+    color: rgba(255,255,255,0.90);
+
+    font-size: 13px;
+
+    line-height: 1.55;
+
+    border-left: 3px solid #ff2d55;
+
+    word-break: break-word;
+
+    max-height: 80px;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   詳細ボタン
+========================================================= */
+
+.recruit-join-btn {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    min-height: 44px;
+
+    box-sizing: border-box;
+
+    border-radius: 12px;
+
+    background: linear-gradient(
+        135deg,
+        #ff2d55,
+        #ff506c
+    );
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 5px 15px rgba(255,45,85,0.25);
+
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+
+.recruit-join-btn span {
+    margin-left: 7px;
+
+    font-size: 21px;
+
+    line-height: 1;
+}
+
+
+.recruit-join-btn:hover {
+    filter: brightness(1.08);
+
+    transform: translateY(-1px);
+}
+
+
+.recruit-join-btn:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================================================
+   スマホ
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .recruit-user-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .recruit-username {
+        font-size: 13px;
+    }
+
+    .recruit-caption .recruit-title {
+        font-size: 20px;
+    }
+
+    .recruit-info {
+        padding: 9px 11px;
+    }
+
+    .recruit-info-item {
+        font-size: 12px;
+    }
+
+    .recruit-description {
+        font-size: 12px;
+    }
+
+    .recruit-join-btn {
+        min-height: 42px;
+
+        font-size: 13px;
+    }
+
+}
+
+/* =========================================================
+   募集カードのプロフィール画像は
+   TikTokメディア用 img CSS の対象外にする
+========================================================= */
+
+.video-card.recruit-card .recruit-user-icon img {
+    position: static !important;
+    inset: auto !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+
+    border-radius: 50% !important;
+}
+
+/* =========================================================
+   🤝 募集カード
+========================================================= */
+
+.recruit-card {
+    position: relative;
+    overflow: hidden;
+    background: #111;
+}
+
+
+/* 📷 募集写真
+   通常のFeed画像・動画と同じ1画面サイズ */
+
+.recruit-background {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+    z-index: 0;
+}
+
+
+.recruit-background-image {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: contain !important;
+
+    border-radius: 0 !important;
+
+    filter: brightness(0.7);
+
+    /* 🔥 画像を最前面へ */
+    z-index: 2 !important;
+
+    /* 🔥 クリック可能 */
+    pointer-events: auto !important;
+
+    cursor: zoom-in;
+}
+
+
+/* 写真の上に薄い暗幕 */
+
+.recruit-background::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.05) 0%,
+        rgba(0,0,0,0.15) 45%,
+        rgba(0,0,0,0.85) 100%
+    );
+
+    z-index: 1;
+
+    /* 🔥 クリックを邪魔しない */
+    pointer-events: none;
+}
+
+
+/* 募集情報を写真より前 */
+
+.recruit-card .recruit-caption {
+    position: absolute;
+    z-index: 10;
+}
+
+/* =========================================================
+   📷 募集写真 拡大表示
+========================================================= */
+
+.recruit-image-clickable {
+    cursor: zoom-in;
+}
+
+
+/* モーダル */
+
+.recruit-image-modal {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.94);
+
+    z-index: 10000;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+}
+
+
+/* 表示状態 */
+
+.recruit-image-modal.show {
+    display: flex;
+}
+
+
+/* 拡大画像 */
+
+.recruit-image-modal img {
+    max-width: 95vw;
+    max-height: 92vh;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.6);
+
+    animation: recruitImageZoom 0.2s ease-out;
+}
+
+
+/* 閉じるボタン */
+
+.recruit-image-close {
+    position: absolute;
+
+    top: 18px;
+    right: 18px;
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.15);
+
+    color: #fff;
+
+    font-size: 32px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    z-index: 10001;
+
+    backdrop-filter: blur(8px);
+}
+
+
+/* 押したとき */
+
+.recruit-image-close:active {
+    transform: scale(0.92);
+}
+
+
+/* 拡大アニメーション */
+
+@keyframes recruitImageZoom {
+
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
