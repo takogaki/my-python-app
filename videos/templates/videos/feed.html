@@ -14,6 +14,16 @@ Spirytus動画｜SPIRYTUS
 
 <div id="tiktok-root">
 
+    <!-- =========================
+         🤝 募集フィルター
+    ========================== -->
+    <div class="recruit-filter-bar">
+        <button type="button" id="recruitFilterBtn" class="recruit-filter-btn">
+            🤝 募集だけ見る
+        </button>
+    </div>
+
+
     <div class="feed video-feed">
 
         <div class="feed-inner">
@@ -299,9 +309,58 @@ Spirytus動画｜SPIRYTUS
 {% endblock %}
 
 {% block extra_js %}
+
 <script>
     const startIndex = Number("{{ start_index|default:'0' }}");
 </script>
 
 <script src="{% static 'videos/js/feed.js' %}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const filterBtn =
+            document.getElementById("recruitFilterBtn");
+
+        const feed =
+            document.querySelector(".video-feed");
+
+        if (!filterBtn || !feed) {
+            return;
+        }
+
+
+        let recruitOnly = false;
+
+
+        filterBtn.addEventListener("click", function () {
+
+            recruitOnly = !recruitOnly;
+
+
+            if (recruitOnly) {
+
+                feed.classList.add("recruit-only");
+
+                filterBtn.classList.add("active");
+
+                filterBtn.textContent =
+                    "すべて見る";
+
+            } else {
+
+                feed.classList.remove("recruit-only");
+
+                filterBtn.classList.remove("active");
+
+                filterBtn.textContent =
+                    "募集だけ見る";
+
+            }
+
+        });
+
+    });
+</script>
+
 {% endblock %}
