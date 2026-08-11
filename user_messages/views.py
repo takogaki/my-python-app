@@ -75,6 +75,7 @@ def message_box(request):
         context
     )
 
+
 @never_cache
 @login_required
 def send_message(request, username):
@@ -93,29 +94,27 @@ def send_message(request, username):
     recipient_is_admin = recipient.is_superuser
 
     # =========================
-    # 👑 管理人 → 全ユーザー
+    # 🔐 DM送信権限
     # =========================
+
+    # 👑 管理人 → 誰にでも送信可能
     if sender_is_admin:
 
         can_send = True
 
-    # =========================
     # 👤 ユーザー → 管理人
-    # =========================
     elif recipient_is_admin:
 
         # 管理人から過去に1通でも
-        # このユーザーへ送信されているか
+        # メッセージを受け取っていれば返信可能
         admin_has_sent = Message.objects.filter(
             sender=recipient,
-            recipient=sender,
+            recipient=sender
         ).exists()
 
         can_send = admin_has_sent
 
-    # =========================
-    # 👤 ユーザー → ユーザー
-    # =========================
+    # 👤 ユーザー → 一般ユーザー
     else:
 
         is_matched = Match.objects.filter(
@@ -140,7 +139,7 @@ def send_message(request, username):
         )
 
     # =========================
-    # 🔥 POST（送信処理）
+    # 🔥 POST：メッセージ送信
     # =========================
     if request.method == "POST":
 
@@ -158,7 +157,19 @@ def send_message(request, username):
             )
 
     # =========================
-    # 🔥 未読 → 既読
+    # 🔔 メッセージ通知を既読化
+    # =========================
+    Notification.objects.filter(
+        recipient=sender,
+        type="message",
+        actor=recipient,
+        is_read=False
+    ).update(
+        is_read=True
+    )
+
+    # =========================
+    # 🔥 相手から自分への未読を既読化
     # =========================
     Message.objects.filter(
         sender=recipient,
@@ -170,11 +181,17 @@ def send_message(request, username):
     )
 
     # =========================
-    # 🔥 チャット履歴取得
+    # 🔥 チャット履歴
     # =========================
     chat_messages = Message.objects.filter(
-        Q(sender=sender, recipient=recipient) |
-        Q(sender=recipient, recipient=sender)
+        Q(
+            sender=sender,
+            recipient=recipient
+        ) |
+        Q(
+            sender=recipient,
+            recipient=sender
+        )
     ).order_by("sent_at")
 
     # =========================
@@ -195,6 +212,8 @@ def send_message(request, username):
             "last_read_message": last_read_message,
         }
     )
+
+
 
 
 @login_required
