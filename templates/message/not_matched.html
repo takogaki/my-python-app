@@ -1,37 +1,44 @@
+```html
 {% extends "base/diary_base.html" %}
 {% load static %}
 
-{% block title %}メッセージ｜SPIRYTUS{% endblock %}
+{% block title %}
+メッセージ｜SPIRYTUS
+{% endblock %}
+
 
 {% block extra_css %}
+
 <style>
     /* =========================================================
-   🚫 他CSSから完全独立
-   メッセージ利用不可画面
+   🚫 DM利用不可画面
+   ヘッダー・フッターを邪魔しない独立レイアウト
    ========================================================= */
-
-    /* body側のスクロール・余白を無効化 */
-    html:has(.message-unavailable),
-    body:has(.message-unavailable) {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        overflow: hidden !important;
-    }
 
 
     /* =========================================================
-   🌑 画面全体
+   🌑 メイン領域
    ========================================================= */
 
     .message-unavailable {
+
         position: fixed !important;
 
-        inset: 0 !important;
+        /*
+     * ヘッダーの下
+     */
+        top: var(--chat-header-height, 72px) !important;
 
-        width: 100vw !important;
-        height: 100dvh !important;
+        /*
+     * フッターの上
+     */
+        bottom: var(--footer-height, 70px) !important;
+
+        left: 0 !important;
+        right: 0 !important;
+
+        width: 100% !important;
+        height: auto !important;
 
         margin: 0 !important;
         padding: 20px !important;
@@ -39,12 +46,11 @@
         box-sizing: border-box !important;
 
         display: flex !important;
+
         align-items: center !important;
         justify-content: center !important;
 
         overflow: hidden !important;
-
-        z-index: 99999 !important;
 
         background:
             radial-gradient(circle at center,
@@ -53,6 +59,11 @@
             #080808 !important;
 
         color: #fff !important;
+
+        /*
+     * ヘッダー・フッターより下
+     */
+        z-index: 1000 !important;
     }
 
 
@@ -61,23 +72,29 @@
    ========================================================= */
 
     .message-unavailable-card {
+
         position: relative !important;
 
         width: min(420px, 100%) !important;
         max-width: 420px !important;
 
         margin: 0 !important;
-        padding: 42px 30px 34px !important;
+
+        padding:
+            42px 30px 34px !important;
 
         box-sizing: border-box !important;
 
         text-align: center !important;
 
-        background: linear-gradient(145deg,
+        background:
+            linear-gradient(145deg,
                 #171717,
                 #0d0d0d) !important;
 
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border:
+            1px solid rgba(255, 255, 255, 0.08) !important;
+
         border-radius: 24px !important;
 
         box-shadow:
@@ -93,13 +110,17 @@
    ========================================================= */
 
     .message-unavailable-icon {
+
         width: 68px !important;
         height: 68px !important;
 
-        margin: 0 auto 22px !important;
+        margin:
+            0 auto 22px !important;
+
         padding: 0 !important;
 
         display: flex !important;
+
         align-items: center !important;
         justify-content: center !important;
 
@@ -109,7 +130,8 @@
 
         background: #202020 !important;
 
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border:
+            1px solid rgba(255, 255, 255, 0.08) !important;
 
         font-size: 28px !important;
         line-height: 1 !important;
@@ -124,13 +146,18 @@
    ========================================================= */
 
     .message-unavailable-card h2 {
-        margin: 0 0 16px !important;
+
+        margin:
+            0 0 16px !important;
+
         padding: 0 !important;
 
         font-size: 20px !important;
+
         line-height: 1.5 !important;
 
         font-weight: 700 !important;
+
         letter-spacing: 0.03em !important;
 
         color: #fff !important;
@@ -142,21 +169,28 @@
    ========================================================= */
 
     .message-unavailable-card p {
-        margin: 0 auto !important;
+
+        margin:
+            0 auto !important;
+
         padding: 0 !important;
 
         max-width: 340px !important;
 
         font-size: 14px !important;
+
         line-height: 1.8 !important;
 
         color: #cfcfcf !important;
     }
 
+
     .message-unavailable-card .message-unavailable-sub {
+
         margin-top: 10px !important;
 
         font-size: 12px !important;
+
         line-height: 1.7 !important;
 
         color: #777 !important;
@@ -168,11 +202,14 @@
    ========================================================= */
 
     .message-unavailable-actions {
+
         display: flex !important;
 
         gap: 10px !important;
 
-        margin: 28px 0 0 !important;
+        margin:
+            28px 0 0 !important;
+
         padding: 0 !important;
 
         width: 100% !important;
@@ -186,15 +223,20 @@
    ========================================================= */
 
     .message-unavailable-actions .message-btn {
+
         flex: 1 1 0 !important;
 
         width: auto !important;
+
         min-height: 46px !important;
 
         margin: 0 !important;
-        padding: 0 16px !important;
+
+        padding:
+            0 16px !important;
 
         display: flex !important;
+
         align-items: center !important;
         justify-content: center !important;
 
@@ -205,7 +247,9 @@
         text-decoration: none !important;
 
         font-size: 13px !important;
+
         font-weight: 600 !important;
+
         line-height: 1 !important;
 
         transition:
@@ -214,8 +258,11 @@
             border-color 0.2s ease !important;
     }
 
+
     .message-unavailable-actions .message-btn:hover {
-        transform: translateY(-1px) !important;
+
+        transform:
+            translateY(-1px) !important;
     }
 
 
@@ -224,13 +271,18 @@
    ========================================================= */
 
     .message-unavailable-actions .message-btn.primary {
+
         background: #fff !important;
+
         color: #111 !important;
 
-        border: 1px solid #fff !important;
+        border:
+            1px solid #fff !important;
     }
 
+
     .message-unavailable-actions .message-btn.primary:hover {
+
         background: #e8e8e8 !important;
     }
 
@@ -240,69 +292,95 @@
    ========================================================= */
 
     .message-unavailable-actions .message-btn.secondary {
+
         background: #191919 !important;
+
         color: #ddd !important;
 
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border:
+            1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
+
     .message-unavailable-actions .message-btn.secondary:hover {
+
         background: #242424 !important;
 
-        border-color: rgba(255, 255, 255, 0.18) !important;
+        border-color:
+            rgba(255, 255, 255, 0.18) !important;
     }
 
 
     /* =========================================================
-   📱 スマホ
+   📱 スマートフォン
    ========================================================= */
 
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
 
         .message-unavailable {
-            padding: 16px !important;
 
-            width: 100vw !important;
-            height: 100dvh !important;
+            top:
+                var(--chat-header-height, 64px) !important;
+
+            bottom:
+                var(--footer-height, 70px) !important;
+
+            padding:
+                16px !important;
         }
 
+
         .message-unavailable-card {
+
             width: 100% !important;
 
-            padding: 36px 22px 28px !important;
+            padding:
+                36px 22px 28px !important;
 
             border-radius: 22px !important;
         }
 
+
         .message-unavailable-card h2 {
+
             font-size: 18px !important;
         }
 
+
         .message-unavailable-actions {
+
             flex-direction: column !important;
 
             gap: 9px !important;
         }
 
+
         .message-unavailable-actions .message-btn {
+
             width: 100% !important;
+
             flex: none !important;
         }
     }
 
 
     /* =========================================================
-   📱 iPhone Safari対策
+   📱 iPhone Safari
    ========================================================= */
 
     @supports (-webkit-touch-callout: none) {
 
         .message-unavailable {
-            height: -webkit-fill-available !important;
-        }
 
+            /*
+         * ヘッダー・フッターを残すため
+         * fill-available は使用しない
+         */
+            height: auto !important;
+        }
     }
 </style>
+
 {% endblock %}
 
 
@@ -316,23 +394,30 @@
             💬
         </div>
 
-        <h2>このメッセージは現在利用できません</h2>
+
+        <h2>
+            このメッセージは現在利用できません
+        </h2>
+
 
         <p>
             お互いのLIKEが成立している間のみ、
             メッセージをご利用いただけます。
         </p>
 
+
         <p class="message-unavailable-sub">
             相互LIKEが解除されたため、
             このチャットは一時的に利用できません。
         </p>
+
 
         <div class="message-unavailable-actions">
 
             <a href="{% url 'accounts:user_detail' username=target_user.username %}" class="message-btn primary">
                 プロフィールを見る
             </a>
+
 
             <a href="{% url 'accounts:user_list' %}" class="message-btn secondary">
                 ユーザー一覧へ
@@ -345,3 +430,4 @@
 </div>
 
 {% endblock %}
+```
