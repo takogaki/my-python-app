@@ -1,32 +1,45 @@
 {% extends "base/diary_base.html" %}
-{% load static %}
 
-{% block title %}
-not matching｜SPIRYTUS
-{% endblock %}
+{% block title %}メッセージ｜SPIRYTUS{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'user_messages/css/message.css' %}">
-{% endblock %}
+{% block body %}
 
-{% block content %}
-<div class="notmatch-wrapper">
-    <div class="notmatch-card">
+<div class="message-unavailable">
 
-        <div class="emoji">💔</div>
+    ```
+    <div class="message-unavailable-card">
 
-        <h2>まだマッチしていません</h2>
+        <div class="message-unavailable-icon">
+            💬
+        </div>
+
+        <h2>このメッセージは現在利用できません</h2>
 
         <p>
-            {{ target_user.username }} さんとは
-            まだマッチしていないため
-            メッセージを送ることができません。
+            お互いのLIKEが成立している間のみ、
+            メッセージをご利用いただけます。
         </p>
 
-        <a href="{% url 'accounts:user_list' %}" class="back-btn">
-            ユーザー一覧へ戻る
-        </a>
+        <p class="message-unavailable-sub">
+            プロフィールの確認や、ユーザー一覧から
+            またお相手を探すことができます。
+        </p>
+
+        <div class="message-unavailable-actions">
+
+            <a href="{% url 'accounts:user_detail' username=target_user.username %}" class="message-btn primary">
+                プロフィールを見る
+            </a>
+
+            <a href="{% url 'accounts:user_list' %}" class="message-btn secondary">
+                ユーザー一覧へ
+            </a>
+
+        </div>
 
     </div>
+    ```
+
 </div>
+
 {% endblock %}

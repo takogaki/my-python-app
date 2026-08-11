@@ -237,16 +237,17 @@ def message_reply(request, pk):
     ).exists()
 
     # =========================
-    # ❌ Match解除済みなら返信不可
+    # ❌ 相互LIKE解除済み
     # =========================
     if not is_matched:
         return render(
             request,
             "message/not_matched.html",
             {
-                "target_user": other_user
+                "target_user": recipient,
+                "reason": "unmatched",
             },
-            status=403
+            status=200
         )
 
     # =========================
