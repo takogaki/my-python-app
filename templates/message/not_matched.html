@@ -4,107 +4,155 @@
 
 {% block extra_css %}
 <style>
-    /* =========================
+    /* =========================================================
+   🚫 他CSSから完全独立
    メッセージ利用不可画面
-   ========================= */
+   ========================================================= */
+
+    /* body側のスクロール・余白を無効化 */
+    html:has(.message-unavailable),
+    body:has(.message-unavailable) {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+    }
+
+
+    /* =========================================================
+   🌑 画面全体
+   ========================================================= */
 
     .message-unavailable {
-        min-height: calc(100vh - 60px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        box-sizing: border-box;
+        position: fixed !important;
+
+        inset: 0 !important;
+
+        width: 100vw !important;
+        height: 100dvh !important;
+
+        margin: 0 !important;
+        padding: 20px !important;
+
+        box-sizing: border-box !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        overflow: hidden !important;
+
+        z-index: 99999 !important;
 
         background:
             radial-gradient(circle at center,
                 rgba(255, 255, 255, 0.045) 0%,
                 rgba(0, 0, 0, 0) 55%),
-            #080808;
+            #080808 !important;
 
-        color: #fff;
-        overflow: hidden;
+        color: #fff !important;
     }
 
-    /* =========================
-   カード
-   ========================= */
+
+    /* =========================================================
+   🖤 カード
+   ========================================================= */
 
     .message-unavailable-card {
-        width: min(420px, 100%);
-        padding: 42px 30px 34px;
+        position: relative !important;
 
-        text-align: center;
+        width: min(420px, 100%) !important;
+        max-width: 420px !important;
+
+        margin: 0 !important;
+        padding: 42px 30px 34px !important;
+
+        box-sizing: border-box !important;
+
+        text-align: center !important;
 
         background: linear-gradient(145deg,
                 #171717,
-                #0d0d0d);
+                #0d0d0d) !important;
 
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 24px !important;
 
         box-shadow:
             0 25px 70px rgba(0, 0, 0, 0.55),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 
-        box-sizing: border-box;
+        color: #fff !important;
     }
 
-    /* =========================
-   アイコン
-   ========================= */
+
+    /* =========================================================
+   💬 アイコン
+   ========================================================= */
 
     .message-unavailable-icon {
-        width: 68px;
-        height: 68px;
+        width: 68px !important;
+        height: 68px !important;
 
-        margin: 0 auto 22px;
+        margin: 0 auto 22px !important;
+        padding: 0 !important;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
 
-        border-radius: 50%;
+        box-sizing: border-box !important;
 
-        background: #202020;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 50% !important;
 
-        font-size: 28px;
+        background: #202020 !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+        font-size: 28px !important;
+        line-height: 1 !important;
 
         box-shadow:
-            0 8px 25px rgba(0, 0, 0, 0.35);
+            0 8px 25px rgba(0, 0, 0, 0.35) !important;
     }
 
-    /* =========================
-   タイトル
-   ========================= */
+
+    /* =========================================================
+   📝 タイトル
+   ========================================================= */
 
     .message-unavailable-card h2 {
-        margin: 0 0 16px;
+        margin: 0 0 16px !important;
+        padding: 0 !important;
 
-        font-size: 20px;
-        font-weight: 700;
-        letter-spacing: 0.03em;
+        font-size: 20px !important;
+        line-height: 1.5 !important;
 
-        color: #fff;
+        font-weight: 700 !important;
+        letter-spacing: 0.03em !important;
+
+        color: #fff !important;
     }
 
-    /* =========================
-   本文
-   ========================= */
+
+    /* =========================================================
+   📄 本文
+   ========================================================= */
 
     .message-unavailable-card p {
-        margin: 0 auto;
+        margin: 0 auto !important;
+        padding: 0 !important;
 
-        max-width: 340px;
+        max-width: 340px !important;
 
-        font-size: 14px;
-        line-height: 1.8;
+        font-size: 14px !important;
+        line-height: 1.8 !important;
 
-        color: #cfcfcf;
+        color: #cfcfcf !important;
     }
 
-    .message-unavailable-sub {
+    .message-unavailable-card .message-unavailable-sub {
         margin-top: 10px !important;
 
         font-size: 12px !important;
@@ -113,98 +161,149 @@
         color: #777 !important;
     }
 
-    /* =========================
-   ボタン
-   ========================= */
+
+    /* =========================================================
+   🔘 ボタンエリア
+   ========================================================= */
 
     .message-unavailable-actions {
-        display: flex;
-        gap: 10px;
+        display: flex !important;
 
-        margin-top: 28px;
+        gap: 10px !important;
+
+        margin: 28px 0 0 !important;
+        padding: 0 !important;
+
+        width: 100% !important;
+
+        box-sizing: border-box !important;
     }
 
-    .message-btn {
-        flex: 1;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* =========================================================
+   🔘 ボタン共通
+   ========================================================= */
 
-        min-height: 46px;
+    .message-unavailable-actions .message-btn {
+        flex: 1 1 0 !important;
 
-        padding: 0 16px;
+        width: auto !important;
+        min-height: 46px !important;
 
-        border-radius: 12px;
+        margin: 0 !important;
+        padding: 0 16px !important;
 
-        text-decoration: none;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
 
-        font-size: 13px;
-        font-weight: 600;
+        box-sizing: border-box !important;
+
+        border-radius: 12px !important;
+
+        text-decoration: none !important;
+
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
 
         transition:
             transform 0.2s ease,
             background 0.2s ease,
-            border-color 0.2s ease;
+            border-color 0.2s ease !important;
     }
 
-    .message-btn:hover {
-        transform: translateY(-1px);
+    .message-unavailable-actions .message-btn:hover {
+        transform: translateY(-1px) !important;
     }
 
-    /* メイン */
-    .message-btn.primary {
-        background: #fff;
-        color: #111;
+
+    /* =========================================================
+   ⚪ プライマリ
+   ========================================================= */
+
+    .message-unavailable-actions .message-btn.primary {
+        background: #fff !important;
+        color: #111 !important;
+
+        border: 1px solid #fff !important;
     }
 
-    .message-btn.primary:hover {
-        background: #e8e8e8;
+    .message-unavailable-actions .message-btn.primary:hover {
+        background: #e8e8e8 !important;
     }
 
-    /* サブ */
-    .message-btn.secondary {
-        background: #191919;
-        color: #ddd;
 
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    /* =========================================================
+   ⚫ セカンダリ
+   ========================================================= */
+
+    .message-unavailable-actions .message-btn.secondary {
+        background: #191919 !important;
+        color: #ddd !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
-    .message-btn.secondary:hover {
-        background: #242424;
-        border-color: rgba(255, 255, 255, 0.18);
+    .message-unavailable-actions .message-btn.secondary:hover {
+        background: #242424 !important;
+
+        border-color: rgba(255, 255, 255, 0.18) !important;
     }
 
-    /* =========================
-   スマホ
-   ========================= */
+
+    /* =========================================================
+   📱 スマホ
+   ========================================================= */
 
     @media (max-width: 480px) {
 
         .message-unavailable {
-            min-height: calc(100vh - 50px);
-            padding: 16px;
+            padding: 16px !important;
+
+            width: 100vw !important;
+            height: 100dvh !important;
         }
 
         .message-unavailable-card {
-            padding: 36px 22px 28px;
-            border-radius: 22px;
+            width: 100% !important;
+
+            padding: 36px 22px 28px !important;
+
+            border-radius: 22px !important;
         }
 
         .message-unavailable-card h2 {
-            font-size: 18px;
+            font-size: 18px !important;
         }
 
         .message-unavailable-actions {
-            flex-direction: column;
+            flex-direction: column !important;
+
+            gap: 9px !important;
         }
 
-        .message-btn {
-            width: 100%;
+        .message-unavailable-actions .message-btn {
+            width: 100% !important;
+            flex: none !important;
         }
+    }
+
+
+    /* =========================================================
+   📱 iPhone Safari対策
+   ========================================================= */
+
+    @supports (-webkit-touch-callout: none) {
+
+        .message-unavailable {
+            height: -webkit-fill-available !important;
+        }
+
     }
 </style>
 {% endblock %}
+
 
 {% block body %}
 
