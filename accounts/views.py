@@ -716,15 +716,17 @@ def mypage(request):
     )
 
     # =========================
-    # 🔔 通知
+    # 通知
     # 管理人（superuser）からの通知は表示しない
     # =========================
     notifications = Notification.objects.filter(
         recipient=user,
         is_read=False
-    ).exclude(
-        actor__is_superuser=True
+    ).filter(
+        Q(actor__isnull=True) | Q(actor__is_superuser=False)
     ).order_by("-created_at")
+
+    unread_count = notifications.count()
 
     # =========================
     # 管理者用 通報
@@ -1496,8 +1498,13 @@ def notification_read(request, id):
     # ユーザー系通知
     # =========================
     if n.type in ["like", "footprint", "match"]:
-        if n.actor:
-            return redirect("accounts:user_detail", username=n.actor.username)
+        if n.actor and not n.actor.is_superuser:
+            return redirect(
+                "accounts:user_detail",
+                username=n.actor.username
+            )
+
+        return redirect("accounts:mypage")
 
     # =========================
     # コメント通知
