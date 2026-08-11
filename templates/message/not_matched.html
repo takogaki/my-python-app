@@ -1,6 +1,227 @@
 {% extends "base/diary_base.html" %}
+{% load static %}
 
 {% block title %}メッセージ｜SPIRYTUS{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    /* =========================
+   メッセージ利用不可
+========================= */
+
+    .message-unavailable {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        box-sizing: border-box;
+    }
+
+    .message-unavailable-card {
+        width: min(440px, 100%);
+        padding: 42px 32px 36px;
+        text-align: center;
+
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, 0.07),
+                rgba(255, 255, 255, 0.025));
+
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 24px;
+
+        box-shadow:
+            0 24px 70px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+
+        animation: messageCardFade 0.5s ease;
+    }
+
+    .message-unavailable-icon {
+        width: 72px;
+        height: 72px;
+
+        margin: 0 auto 24px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 30px;
+
+        border-radius: 50%;
+
+        background:
+            radial-gradient(circle at 35% 30%,
+                rgba(255, 255, 255, 0.12),
+                rgba(255, 255, 255, 0.025));
+
+        border: 1px solid rgba(255, 255, 255, 0.10);
+
+        box-shadow:
+            0 10px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .message-unavailable-card h2 {
+        margin: 0 0 18px;
+
+        color: #fff;
+
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+
+        line-height: 1.5;
+    }
+
+    .message-unavailable-card p {
+        margin: 0 auto;
+
+        color: rgba(255, 255, 255, 0.72);
+
+        font-size: 14px;
+        line-height: 1.9;
+    }
+
+    .message-unavailable-sub {
+        margin-top: 12px !important;
+
+        color: rgba(255, 255, 255, 0.45) !important;
+
+        font-size: 12px !important;
+        line-height: 1.8 !important;
+    }
+
+    .message-unavailable-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+
+        margin-top: 30px;
+    }
+
+    .message-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        min-height: 48px;
+        padding: 0 20px;
+
+        box-sizing: border-box;
+
+        border-radius: 13px;
+
+        text-decoration: none;
+
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+
+        transition:
+            transform 0.2s ease,
+            opacity 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .message-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .message-btn:active {
+        transform: translateY(0);
+    }
+
+    /* メインボタン */
+    .message-btn.primary {
+        color: #111;
+
+        background: linear-gradient(135deg,
+                #ffffff,
+                #d9d9d9);
+
+        box-shadow:
+            0 8px 25px rgba(255, 255, 255, 0.10);
+    }
+
+    .message-btn.primary:hover {
+        opacity: 0.9;
+    }
+
+    /* サブボタン */
+    .message-btn.secondary {
+        color: rgba(255, 255, 255, 0.72);
+
+        background: rgba(255, 255, 255, 0.045);
+
+        border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .message-btn.secondary:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+    }
+
+    /* =========================
+   アニメーション
+========================= */
+
+    @keyframes messageCardFade {
+
+        from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* =========================
+   スマホ
+========================= */
+
+    @media (max-width: 480px) {
+
+        .message-unavailable {
+            min-height: calc(100vh - 60px);
+            padding: 24px 16px;
+        }
+
+        .message-unavailable-card {
+            padding: 34px 22px 28px;
+            border-radius: 20px;
+        }
+
+        .message-unavailable-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            font-size: 27px;
+        }
+
+        .message-unavailable-card h2 {
+            font-size: 19px;
+        }
+
+        .message-unavailable-card p {
+            font-size: 13px;
+        }
+
+        .message-btn {
+            min-height: 46px;
+        }
+    }
+</style>
+
+{% endblock %}
 
 {% block body %}
 
@@ -13,16 +234,16 @@
             💬
         </div>
 
-        <h2>このメッセージは現在利用できません</h2>
+        <h2>このメッセージは<br>現在利用できません</h2>
 
         <p>
-            お互いのLIKEが成立している間のみ、
+            お互いのLIKEが成立している間のみ、<br>
             メッセージをご利用いただけます。
         </p>
 
         <p class="message-unavailable-sub">
-            プロフィールの確認や、ユーザー一覧から
-            またお相手を探すことができます。
+            プロフィールを確認したり、<br>
+            ユーザー一覧から新しい出会いを探せます。
         </p>
 
         <div class="message-unavailable-actions">
