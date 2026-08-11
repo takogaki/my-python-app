@@ -1,249 +1,231 @@
 {% extends "base/diary_base.html" %}
-{% load static %}
 
 {% block title %}メッセージ｜SPIRYTUS{% endblock %}
 
 {% block extra_css %}
-
 <style>
     /* =========================
-   メッセージ利用不可
-========================= */
+   メッセージ利用不可画面
+   ========================= */
 
     .message-unavailable {
-        min-height: calc(100vh - 80px);
+        min-height: calc(100vh - 60px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 40px 20px;
+        padding: 20px;
         box-sizing: border-box;
-    }
-
-    .message-unavailable-card {
-        width: min(440px, 100%);
-        padding: 42px 32px 36px;
-        text-align: center;
 
         background:
-            linear-gradient(145deg,
-                rgba(255, 255, 255, 0.07),
-                rgba(255, 255, 255, 0.025));
+            radial-gradient(circle at center,
+                rgba(255, 255, 255, 0.045) 0%,
+                rgba(0, 0, 0, 0) 55%),
+            #080808;
 
-        border: 1px solid rgba(255, 255, 255, 0.10);
+        color: #fff;
+        overflow: hidden;
+    }
+
+    /* =========================
+   カード
+   ========================= */
+
+    .message-unavailable-card {
+        width: min(420px, 100%);
+        padding: 42px 30px 34px;
+
+        text-align: center;
+
+        background: linear-gradient(145deg,
+                #171717,
+                #0d0d0d);
+
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 24px;
 
         box-shadow:
-            0 24px 70px rgba(0, 0, 0, 0.45),
-            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            0 25px 70px rgba(0, 0, 0, 0.55),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-
-        animation: messageCardFade 0.5s ease;
+        box-sizing: border-box;
     }
 
-    .message-unavailable-icon {
-        width: 72px;
-        height: 72px;
+    /* =========================
+   アイコン
+   ========================= */
 
-        margin: 0 auto 24px;
+    .message-unavailable-icon {
+        width: 68px;
+        height: 68px;
+
+        margin: 0 auto 22px;
 
         display: flex;
         align-items: center;
         justify-content: center;
 
-        font-size: 30px;
-
         border-radius: 50%;
 
-        background:
-            radial-gradient(circle at 35% 30%,
-                rgba(255, 255, 255, 0.12),
-                rgba(255, 255, 255, 0.025));
+        background: #202020;
+        border: 1px solid rgba(255, 255, 255, 0.08);
 
-        border: 1px solid rgba(255, 255, 255, 0.10);
+        font-size: 28px;
 
         box-shadow:
-            0 10px 35px rgba(0, 0, 0, 0.25);
+            0 8px 25px rgba(0, 0, 0, 0.35);
     }
+
+    /* =========================
+   タイトル
+   ========================= */
 
     .message-unavailable-card h2 {
-        margin: 0 0 18px;
+        margin: 0 0 16px;
+
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
 
         color: #fff;
-
-        font-size: 21px;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-
-        line-height: 1.5;
     }
+
+    /* =========================
+   本文
+   ========================= */
 
     .message-unavailable-card p {
         margin: 0 auto;
 
-        color: rgba(255, 255, 255, 0.72);
+        max-width: 340px;
 
         font-size: 14px;
-        line-height: 1.9;
+        line-height: 1.8;
+
+        color: #cfcfcf;
     }
 
     .message-unavailable-sub {
-        margin-top: 12px !important;
-
-        color: rgba(255, 255, 255, 0.45) !important;
+        margin-top: 10px !important;
 
         font-size: 12px !important;
-        line-height: 1.8 !important;
+        line-height: 1.7 !important;
+
+        color: #777 !important;
     }
+
+    /* =========================
+   ボタン
+   ========================= */
 
     .message-unavailable-actions {
         display: flex;
-        flex-direction: column;
-        gap: 11px;
+        gap: 10px;
 
-        margin-top: 30px;
+        margin-top: 28px;
     }
 
     .message-btn {
+        flex: 1;
+
         display: flex;
         align-items: center;
         justify-content: center;
 
-        min-height: 48px;
-        padding: 0 20px;
+        min-height: 46px;
 
-        box-sizing: border-box;
+        padding: 0 16px;
 
-        border-radius: 13px;
+        border-radius: 12px;
 
         text-decoration: none;
 
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
-        letter-spacing: 0.03em;
 
         transition:
             transform 0.2s ease,
-            opacity 0.2s ease,
-            background 0.2s ease;
+            background 0.2s ease,
+            border-color 0.2s ease;
     }
 
     .message-btn:hover {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
 
-    .message-btn:active {
-        transform: translateY(0);
-    }
-
-    /* メインボタン */
+    /* メイン */
     .message-btn.primary {
+        background: #fff;
         color: #111;
-
-        background: linear-gradient(135deg,
-                #ffffff,
-                #d9d9d9);
-
-        box-shadow:
-            0 8px 25px rgba(255, 255, 255, 0.10);
     }
 
     .message-btn.primary:hover {
-        opacity: 0.9;
+        background: #e8e8e8;
     }
 
-    /* サブボタン */
+    /* サブ */
     .message-btn.secondary {
-        color: rgba(255, 255, 255, 0.72);
+        background: #191919;
+        color: #ddd;
 
-        background: rgba(255, 255, 255, 0.045);
-
-        border: 1px solid rgba(255, 255, 255, 0.09);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .message-btn.secondary:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
-    }
-
-    /* =========================
-   アニメーション
-========================= */
-
-    @keyframes messageCardFade {
-
-        from {
-            opacity: 0;
-            transform: translateY(12px) scale(0.98);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+        background: #242424;
+        border-color: rgba(255, 255, 255, 0.18);
     }
 
     /* =========================
    スマホ
-========================= */
+   ========================= */
 
     @media (max-width: 480px) {
 
         .message-unavailable {
-            min-height: calc(100vh - 60px);
-            padding: 24px 16px;
+            min-height: calc(100vh - 50px);
+            padding: 16px;
         }
 
         .message-unavailable-card {
-            padding: 34px 22px 28px;
-            border-radius: 20px;
-        }
-
-        .message-unavailable-icon {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 20px;
-            font-size: 27px;
+            padding: 36px 22px 28px;
+            border-radius: 22px;
         }
 
         .message-unavailable-card h2 {
-            font-size: 19px;
+            font-size: 18px;
         }
 
-        .message-unavailable-card p {
-            font-size: 13px;
+        .message-unavailable-actions {
+            flex-direction: column;
         }
 
         .message-btn {
-            min-height: 46px;
+            width: 100%;
         }
     }
 </style>
-
 {% endblock %}
 
 {% block body %}
 
 <div class="message-unavailable">
 
-    ```
     <div class="message-unavailable-card">
 
         <div class="message-unavailable-icon">
             💬
         </div>
 
-        <h2>このメッセージは<br>現在利用できません</h2>
+        <h2>このメッセージは現在利用できません</h2>
 
         <p>
-            お互いのLIKEが成立している間のみ、<br>
+            お互いのLIKEが成立している間のみ、
             メッセージをご利用いただけます。
         </p>
 
         <p class="message-unavailable-sub">
-            プロフィールを確認したり、<br>
-            ユーザー一覧から新しい出会いを探せます。
+            相互LIKEが解除されたため、
+            このチャットは一時的に利用できません。
         </p>
 
         <div class="message-unavailable-actions">
@@ -259,7 +241,6 @@
         </div>
 
     </div>
-    ```
 
 </div>
 
