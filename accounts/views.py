@@ -39,6 +39,9 @@ from django.db import transaction
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LoginView
 
+# 広告関連
+from advertisements.utils import get_random_advertisements
+
 
 User = get_user_model()
 
@@ -77,10 +80,24 @@ def user_list(request):
             from_user=request.user
         ).values_list("to_user_id", flat=True)
 
+    # =========================
+    # 📢 A8net広告
+    # =========================
+    advertisements = get_random_advertisements("user_list")
+
+    # =========================
+    # 📢 広告をランダム順にする
+    # =========================
+    import random
+
+    advertisements = get_random_advertisements("user_list")
+    random.shuffle(advertisements)
+
     return render(request, "accounts/user_list.html", {
         "users": users,
         "matched_user_ids": matched_user_ids,
         "liked_user_ids": list(liked_user_ids),
+        "advertisements": advertisements,
     })
 
 # ========================

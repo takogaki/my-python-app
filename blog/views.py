@@ -16,6 +16,9 @@ from notifications.models import Notification
 import uuid
 from .utils import get_device_id
 
+# 広告関連
+from advertisements.utils import get_random_advertisements
+
 
 User = get_user_model()
 
@@ -73,15 +76,43 @@ def get_device_id(request):
 # =======================
 # トップページ
 # =======================
-def frontpage(request):
-    posts = (
-    Post.objects
-    .filter(is_hidden=False)
-    .annotate(comment_count=Count("comments"))
-    .order_by("-posted_date")
-)
 
+def frontpage(request):
+
+    posts = (
+        Post.objects
+        .filter(is_hidden=False)
+        .annotate(
+            comment_count=Count("comments")
+        )
+        .order_by("-posted_date")
+    )
+
+    # =========================
+    # 📢 広告取得
+    # =========================
+    frontpage_ads = get_random_advertisements("frontpage")
+
+    # =========================
+    # 📢 広告を投稿位置に割り当て
+    # 4投稿目のあと
+    # 9投稿目のあと
+    # 14投稿目のあと
+    # 19投稿目のあと……
+    # =========================
+    ads_by_position = {}
+
+    for index, ad in enumerate(frontpage_ads):
+
+        position = 4 + (index * 5)
+
+        ads_by_position[position] = ad
+
+    # =========================
+    # 📝 投稿処理
+    # =========================
     if request.method == "POST":
+
         form = PostForm(
             request.POST,
             request.FILES,
@@ -89,14 +120,18 @@ def frontpage(request):
         )
 
         if form.is_valid():
+
             post = form.save(commit=False)
 
             device_id = None
 
             if request.user.is_authenticated:
+
                 post.author = request.user
                 post.name = request.user.username
+
             else:
+
                 device_id = get_device_id(request)
                 post.name = f"未ログイン-{device_id[:6]}"
 
@@ -105,6 +140,7 @@ def frontpage(request):
             response = redirect("blog:frontpage")
 
             if device_id and not request.COOKIES.get("device_id"):
+
                 response.set_cookie(
                     "device_id",
                     device_id,
@@ -114,7 +150,10 @@ def frontpage(request):
             return response
 
     else:
-        form = PostForm(user=request.user)
+
+        form = PostForm(
+            user=request.user
+        )
 
     return render(
         request,
@@ -122,6 +161,8 @@ def frontpage(request):
         {
             "posts": posts,
             "form": form,
+            "frontpage_ads": frontpage_ads,
+            "ads_by_position": ads_by_position,
         },
     )
 

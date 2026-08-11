@@ -432,30 +432,5 @@ document.addEventListener("DOMContentLoaded", () => {
             prev.preload = "auto";
             prev.load();
         }
-
-        // 🔥 広告ロード
-        if (window.adsbygoogle) {
-            document.querySelectorAll(".adsbygoogle").forEach(ad => {
-                try {
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                    ad.classList.add("ads-loaded");
-
-                    // 🔥 ここ追加
-                    setTimeout(() => {
-                        if (ad.innerHTML.trim() === "") {
-
-                            const wrapper = ad.closest(".ad-card");
-                            if (wrapper) {
-                                const loading = wrapper.querySelector(".ad-loading");
-                                if (loading) loading.textContent = "広告を表示できませんでした";
-                            }
-                        }
-                    }, 1500);
-
-                } catch (e) {
-                    console.log("ad error", e);
-                }
-            });
-        }
     });
 });

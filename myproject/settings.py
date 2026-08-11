@@ -161,6 +161,9 @@ INSTALLED_APPS = [
     "user_messages",
     "notifications",
     'videos',
+
+    # 広告関連
+    "advertisements",
 ]
 
 # ==============================
@@ -344,6 +347,7 @@ CONTENT_SECURITY_POLICY = {
         "img-src": (
             "'self'", "data:",
             "https://res.cloudinary.com",
+            "https://*.a8.net",
         ),
 
         # 🔥🔥🔥 これが最重要 🔥🔥🔥

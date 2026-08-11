@@ -671,3 +671,37 @@ body {
     font-size: 12px;
     opacity: 0.8;
 }
+
+/* =========================
+   📢 A8net広告
+========================= */
+
+.ad-card {
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 20;
+}
+
+.ad-content {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    color: white;
+    text-align: center;
+}
+
+.ad-label {
+    display: block;
+    margin-bottom: 12px;
+
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 1px;
+}

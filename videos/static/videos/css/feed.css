@@ -927,3 +927,52 @@ html, body {
     }
 
 }
+
+/* =========================
+📢 A8広告
+========================= */
+
+.ad-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* A8広告の画像だけFeed画像CSSから隔離 */
+.video-card.ad-card .a8-ad img {
+    position: static !important;
+    inset: auto !important;
+
+    width: 300px !important;
+    height: 250px !important;
+
+    max-width: 100% !important;
+    max-height: 250px !important;
+
+    object-fit: contain !important;
+
+    display: block !important;
+}
+
+/* A8広告本体 */
+.a8-ad {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* A8の計測用1px画像 */
+.video-card.ad-card .a8-ad img[width="1"][height="1"] {
+    width: 1px !important;
+    height: 1px !important;
+
+    position: absolute !important;
+    inset: auto !important;
+
+    opacity: 0 !important;
+}
+
+
+

@@ -9,6 +9,9 @@ from django.contrib.auth import get_user_model
 from accounts.utils import save_page_log
 from django.contrib import messages
 
+# 広告関連
+from advertisements.utils import get_random_advertisements
+
 
 User = get_user_model()
 
@@ -52,22 +55,34 @@ def feed(request):
         liked_ids = set()
 
     # =========================
-    # 🔥 フィード生成（ここが核心）
+    # 📢 広告取得
+    # =========================
+    advertisements = get_random_advertisements("feed")
+
+
+    # =========================
+    # 🔥 フィード生成
     # =========================
     feed_items = []
 
     recruit_index = 0
+    ad_index = 0
+
     recruits = list(recruits)
 
     for i, post in enumerate(posts):
 
-        # 動画投稿
+        # =========================
+        # 🎬 動画投稿
+        # =========================
         feed_items.append({
             "type": "post",
             "data": post,
         })
 
-        # 3投稿ごとに募集を挿入
+        # =========================
+        # 🤝 3投稿ごとに募集
+        # =========================
         if (
             (i + 1) % 3 == 0
             and recruit_index < len(recruits)
@@ -79,12 +94,23 @@ def feed(request):
 
             recruit_index += 1
 
-        # 5投稿ごとに広告
+        # =========================
+        # 📢 5投稿ごとに広告
+        # =========================
         if (i + 1) % 5 == 0:
-            feed_items.append({
-                "type": "ad",
-                "ad_type": "adsense",
-            })
+
+            if advertisements:
+
+                ad = advertisements[
+                    ad_index % len(advertisements)
+                ]
+
+                feed_items.append({
+                    "type": "ad",
+                    "data": ad,
+                })
+
+                ad_index += 1
 
     return render(request, "videos/feed.html", {
         "feed_items": feed_items,

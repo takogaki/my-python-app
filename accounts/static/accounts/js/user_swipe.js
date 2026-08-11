@@ -11,18 +11,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateTopCardState() {
-        const cards = getCards();
+    const cards = getCards();
 
-        cards.forEach((card, index) => {
-            if (index === 0) {
-                card.style.pointerEvents = "auto";
-                card.style.zIndex = "100";
-            } else {
-                card.style.pointerEvents = "none";
-                card.style.zIndex = "0";
-            }
-        });
-    }
+    cards.forEach((card, index) => {
+        if (index === 0) {
+            // 現在表示するカード
+            card.style.pointerEvents = "auto";
+            card.style.zIndex = "100";
+
+        } else if (index === 1) {
+            // 次に表示するカード
+            // 前のカードが一瞬出ないようにする
+            card.style.pointerEvents = "none";
+            card.style.zIndex = "99";
+
+        } else {
+            // その他のカード
+            card.style.pointerEvents = "none";
+            card.style.zIndex = "0";
+        }
+    });
+}
     
     function swipe(direction) {
         const cards = getCards();

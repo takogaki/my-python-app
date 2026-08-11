@@ -783,45 +783,148 @@
     background: transparent !important;
 }
 
-.ad-style {
+/* =========================================================
+📢 Frontpage A8net広告
+通常投稿と同じカードデザイン
+========================================================= */
+
+.frontpage-ad-card {
+    box-sizing: border-box;
+
+    width: calc(100% - 32px);
+    max-width: 680px;
+
+    margin: 16px auto 24px;
+    padding: 16px;
+
     background: #fff;
+
     border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 
-    display: block; /* ←ズレ防止の核心 */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
-.ad-label {
-    font-size: 0.8rem;
-    color: #888;
-    margin-bottom: 6px;
+
+/* =========================
+広告ラベル
+========================= */
+
+.frontpage-ad-card .ad-label {
+    margin: 0 0 4px;
+
+    font-size: 0.75rem;
+    line-height: 1.4;
+
+    color: #999;
 }
 
-.ad-title {
+
+/* =========================
+広告タイトル
+========================= */
+
+.frontpage-ad-card .ad-title {
+    margin: 0 0 10px;
+
     font-size: 1.3rem;
-    margin-bottom: 4px;
+    line-height: 1.4;
+
+    word-break: break-word;
 }
 
-.ad-meta {
-    font-size: 0.8rem;
-    color: #888;
-}
 
-.ad-text {
-    font-size: 1rem;
-    line-height: 1.8;
-    margin-bottom: 12px;
-}
+/* =========================
+広告本体
+========================= */
 
-.ad-body {
+.frontpage-ad-card .frontpage-ad {
     width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
 }
 
-/* adsbygoogleのズレ対策 */
-.ad-body ins {
-    display: block !important;
-    margin: 0 auto;
-    width: 100% !important;
+
+/* =========================
+A8広告リンク
+========================= */
+
+.frontpage-ad-card .frontpage-ad a {
+    display: block;
+
+    max-width: 100%;
+
+    line-height: 0;
+}
+
+
+/* =========================
+A8広告画像
+========================= */
+
+.frontpage-ad-card .frontpage-ad img {
+    display: block;
+
+    width: auto;
+    height: auto;
+
+    max-width: 100%;
+    max-height: 250px;
+
+    object-fit: contain;
+
+    border-radius: 6px;
+}
+
+
+/* =========================
+A8計測画像
+========================= */
+
+.frontpage-ad-card .frontpage-ad img[width="1"][height="1"] {
+    width: 1px !important;
+    height: 1px !important;
+
+    position: absolute !important;
+
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+
+/* =========================================================
+📱 スマホ
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .frontpage-ad-card {
+        width: calc(100% - 32px);
+
+        margin: 16px auto 20px;
+        padding: 16px;
+
+        border-radius: 14px;
+    }
+
+    .frontpage-ad-card .ad-label {
+        font-size: 0.7rem;
+    }
+
+    .frontpage-ad-card .ad-title {
+        font-size: 1.15rem;
+    }
+
+    .frontpage-ad-card .frontpage-ad img {
+        max-width: 100%;
+        max-height: 250px;
+    }
 }
