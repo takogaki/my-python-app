@@ -63,29 +63,41 @@ def send_message(request, username):
 
     sender = request.user
 
-    # 🔥 年齢認証チェック
-    if sender.verification_status != "verified":
-        messages.warning(request, "メッセージ機能は年齢確認後に利用できます")
-        return redirect("accounts:kyc_submit")
+    recipient = get_object_or_404(
+        User,
+        username=username
+    )
 
-    recipient = get_object_or_404(User, username=username)
-
-    # 🔐 マッチ確認
+    # =========================
+    # 🔐 相互LIKE（Match）確認
+    # =========================
     is_matched = Match.objects.filter(
         Q(user1=sender, user2=recipient) |
         Q(user1=recipient, user2=sender)
     ).exists()
 
+    # =========================
+    # ❌ MatchしていなければDM不可
+    # =========================
     if not is_matched:
-        return render(request, "message/not_matched.html", {
-            "target_user": recipient
-        }, status=403)
+        return render(
+            request,
+            "message/not_matched.html",
+            {
+                "target_user": recipient
+            },
+            status=403
+        )
 
     # =========================
     # 🔥 POST（送信処理）
     # =========================
     if request.method == "POST":
-        content = request.POST.get("message", "").strip()
+
+        content = request.POST.get(
+            "message",
+            ""
+        ).strip()
 
         if content:
             Message.objects.create(
@@ -107,12 +119,12 @@ def send_message(request, username):
     )
 
     # =========================
-    # 🔥 チャット履歴取得（重要）
+    # 🔥 チャット履歴取得
     # =========================
     chat_messages = Message.objects.filter(
         Q(sender=sender, recipient=recipient) |
         Q(sender=recipient, recipient=sender)
-    ).order_by("sent_at")  # ← 昇順にするのがポイント
+    ).order_by("sent_at")
 
     # =========================
     # 🔥 最後の既読メッセージ
@@ -123,11 +135,15 @@ def send_message(request, username):
         is_read=True
     ).order_by("-sent_at").first()
 
-    return render(request, "message/send_message.html", {
-        "recipient": recipient,
-        "messages": chat_messages,
-        "last_read_message": last_read_message,
-    })
+    return render(
+        request,
+        "message/send_message.html",
+        {
+            "recipient": recipient,
+            "messages": chat_messages,
+            "last_read_message": last_read_message,
+        }
+    )
 
 
 @login_required
@@ -203,24 +219,65 @@ def message_detail(request, pk):
 
 @login_required
 def message_reply(request, pk):
+
     original = get_object_or_404(
         Message,
         pk=pk,
         recipient=request.user
     )
 
+    # =========================
+    # 🔐 相互LIKE（Match）確認
+    # =========================
+    other_user = original.sender
+
+    is_matched = Match.objects.filter(
+        Q(user1=request.user, user2=other_user) |
+        Q(user1=other_user, user2=request.user)
+    ).exists()
+
+    # =========================
+    # ❌ Match解除済みなら返信不可
+    # =========================
+    if not is_matched:
+        return render(
+            request,
+            "message/not_matched.html",
+            {
+                "target_user": other_user
+            },
+            status=403
+        )
+
+    # =========================
+    # 🔥 返信処理
+    # =========================
     if request.method == "POST":
+
         form = ReplyMessageForm(request.POST)
+
         if form.is_valid():
+
             reply = form.save(commit=False)
+
             reply.sender = request.user
-            reply.recipient = original.sender
+            reply.recipient = other_user
+
             reply.save()
-            return redirect("user_messages:message_detail", pk=original.pk)
+
+            return redirect(
+                "user_messages:message_detail",
+                pk=original.pk
+            )
+
     else:
         form = ReplyMessageForm()
 
-    return render(request, "user_messages/message_reply.html", {
-        "form": form,
-        "original": original,
-    })
+    return render(
+        request,
+        "user_messages/message_reply.html",
+        {
+            "form": form,
+            "original": original,
+        }
+    )

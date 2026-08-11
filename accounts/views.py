@@ -1392,7 +1392,8 @@ def liked_me(request):
     })
 
 # =========================
-# match_resultビュー（LIKEした相手が自分をLIKEしてたときの結果表示）
+# ★ match_resultビュー
+# 相互LIKE成立 → DM可能
 # =========================
 @login_required
 def match_result(request):
@@ -1401,8 +1402,42 @@ def match_result(request):
     if not username:
         return redirect("accounts:user_list")
 
-    matched_user = get_object_or_404(CustomUser, username=username)
+    matched_user = get_object_or_404(
+        CustomUser,
+        username=username
+    )
+
     me = request.user
+
+    # =========================
+    # 🔥 相互LIKE（Match）確認
+    # =========================
+    is_match = Match.objects.filter(
+        Q(user1=me, user2=matched_user) |
+        Q(user1=matched_user, user2=me)
+    ).exists()
+
+    # =========================
+    # ❌ MatchしていなければDM不可
+    # =========================
+    if not is_match:
+        return redirect(
+            "accounts:user_detail",
+            username=matched_user.username
+        )
+
+    # =========================
+    # 💬 相互LIKE成立 → DM可能
+    # =========================
+    redirect_url = reverse(
+        "user_messages:send_message",
+        args=[matched_user.username]
+    )
+
+    return render(request, "accounts/match_result.html", {
+        "user": matched_user,
+        "redirect_url": redirect_url,
+    })
 
     # =========================
     # 🔥 ここが最重要（完全修正）
