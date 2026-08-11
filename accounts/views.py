@@ -716,14 +716,15 @@ def mypage(request):
     )
 
     # =========================
-    # 通知
+    # 🔔 通知
+    # 管理人（superuser）からの通知は表示しない
     # =========================
     notifications = Notification.objects.filter(
         recipient=user,
         is_read=False
+    ).exclude(
+        actor__is_superuser=True
     ).order_by("-created_at")
-
-    unread_count = notifications.count()
 
     # =========================
     # 管理者用 通報
