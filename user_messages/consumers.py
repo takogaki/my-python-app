@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 from django.db.models import Q
+from notifications.models import Notification
 
 from .models import Message
 from accounts.models import Match
@@ -225,6 +226,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sender=sender,
             recipient=recipient,
             content=message_text,
+        )
+
+        # =========================
+        # 🔔 DB通知作成
+        # =========================
+        await sync_to_async(
+            Notification.objects.create
+        )(
+            recipient=recipient,
+            actor=sender,
+            type="message",
+            verb="さんからメッセージが届きました"
         )
 
         # =====================================================

@@ -8,6 +8,8 @@ class Notification(models.Model):
         ("footprint", "足跡"),
         ("match", "マッチ"),
         ("comment", "コメント"),
+        ("message", "メッセージ"),
+        ("tag_match", "タグ一致"),
         ("system", "システム"),
     ]
 
