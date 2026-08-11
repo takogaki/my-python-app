@@ -3,6 +3,36 @@
    完全固定レイアウト
 ================================================== */
 
+/* ==================================================
+SPIRYTUS DM
+ベースレイアウトとの干渉を防止
+================================================== */
+
+/* DMページだけヘッダーを最前面へ */
+body:has(.chat-container) .site-header {
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+
+    z-index: 1000000 !important;
+}
+
+/* DMページだけフッターを最前面へ */
+body:has(.chat-container) .feed-footer {
+    position: fixed !important;
+
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+
+    z-index: 1000000 !important;
+}
 
 /* =========================
    全体
@@ -27,13 +57,22 @@ body {
 .chat-container {
     position: fixed !important;
 
-    top: 0 !important;
+    /*
+     * ヘッダーの下から開始
+     */
+    top: var(--chat-header-height, 72px) !important;
+
+    /*
+     * フッターの上まで
+     */
+    bottom: var(--footer-height, 70px) !important;
+
     left: 0 !important;
     right: 0 !important;
-    bottom: 0 !important;
 
     width: 100% !important;
-    height: 100dvh !important;
+
+    height: auto !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -55,6 +94,9 @@ body {
 
     box-sizing: border-box !important;
 
+    /*
+     * ヘッダー・フッターより下
+     */
     z-index: 1000 !important;
 }
 
@@ -80,7 +122,6 @@ body {
         16px 12px
         calc(
             100px
-            + var(--footer-height, 0px)
             + env(safe-area-inset-bottom)
         ) !important;
 
@@ -652,5 +693,59 @@ body {
         padding-left: 14px !important;
 
         padding-right: 14px !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    body:has(.chat-container) {
+        --chat-header-height: 64px;
+    }
+
+    .chat-input-bar {
+        min-height: 56px !important;
+
+        padding:
+            7px 10px
+            calc(
+                7px
+                + env(safe-area-inset-bottom)
+            ) !important;
+    }
+
+    .chat-input {
+        height: 42px !important;
+        font-size: 16px !important;
+        line-height: 42px !important;
+    }
+
+    .send-btn {
+        width: 42px !important;
+        height: 42px !important;
+    }
+
+    .chat-box {
+        padding:
+            14px 9px
+            calc(
+                100px
+                + env(safe-area-inset-bottom)
+            ) !important;
+    }
+
+    .chat-bubble-wrapper {
+        max-width: 76% !important;
+    }
+
+    .chat-bubble {
+        padding:
+            9px 13px !important;
+
+        font-size: 14px !important;
+    }
+
+    .chat-avatar {
+        width: 34px !important;
+        height: 34px !important;
     }
 }
