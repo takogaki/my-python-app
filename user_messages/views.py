@@ -88,6 +88,19 @@ def send_message(request, username):
     )
 
     # =========================
+    # 🚫 自分自身へのDM禁止
+    # =========================
+    if sender.id == recipient.id:
+        return render(
+            request,
+            "message/not_matched.html",
+            {
+                "target_user": recipient
+            },
+            status=403
+        )
+
+    # =========================
     # 👑 管理人判定
     # =========================
     sender_is_admin = sender.is_superuser
