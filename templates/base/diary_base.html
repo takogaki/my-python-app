@@ -428,6 +428,37 @@
 
     });
 
+    (function () {
+
+            const header = document.querySelector("header");
+
+            if (!header || !window.visualViewport) {
+                return;
+            }
+
+            const updateHeader = () => {
+
+                const viewport = window.visualViewport;
+
+                header.style.transform =
+                    `translate3d(0, ${viewport.offsetTop}px, 0)`;
+
+            };
+
+            window.visualViewport.addEventListener(
+                "resize",
+                updateHeader
+            );
+
+            window.visualViewport.addEventListener(
+                "scroll",
+                updateHeader
+            );
+
+            updateHeader();
+
+        })();
+
 </script>
 
 </body>
