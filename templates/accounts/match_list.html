@@ -47,15 +47,9 @@
                 {% endif %}
 
                 <!-- 🔥 マッチページは必ずDM -->
-                {% if request.user.verification_status == "verified" %}
                 <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
                     💬
                 </a>
-                {% else %}
-                <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
-                    🔒
-                </a>
-                {% endif %}
 
             </div>
 

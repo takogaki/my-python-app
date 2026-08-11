@@ -107,6 +107,22 @@ def user_list(request):
 def footprint_list(request):
     user = request.user
 
+    # =========================
+    # 🔔 足あと未読を既読化
+    # =========================
+    Notification.objects.filter(
+        recipient=user,
+        type="footprint",
+        is_read=False
+    ).update(
+        is_read=True
+    )
+
+    # 🔥 足あと取得
+    footprints = Footprint.objects.filter(
+        to_user=user
+    ).select_related("from_user").order_by("-created_at")
+
     # 🔥 足あと取得
     footprints = Footprint.objects.filter(
         to_user=user
@@ -729,6 +745,25 @@ def mypage(request):
     unread_count = notifications.count()
 
     # =========================
+    # 🔔 交流メニュー未読件数
+    # =========================
+
+    base_unread = Notification.objects.filter(
+        recipient=user,
+        is_read=False
+    ).filter(
+        Q(actor__isnull=True) | Q(actor__is_superuser=False)
+    )
+
+    notification_counts = {
+        "tag_match": base_unread.filter(type="tag_match").count(),
+        "footprint": base_unread.filter(type="footprint").count(),
+        "like": base_unread.filter(type="like").count(),
+        "match": base_unread.filter(type="match").count(),
+        "message": base_unread.filter(type="message").count(),
+    }
+
+    # =========================
     # 管理者用 通報
     # =========================
     reported_posts = Post.objects.none()
@@ -770,6 +805,8 @@ def mypage(request):
             "reported_posts": reported_posts,
             "reported_comments": reported_comments,
             "completion": completion,  # ← 必須
+            # 🔔 追加
+            "notification_counts": notification_counts,
         }
     )
 
@@ -901,21 +938,74 @@ def profile_edit(request):
                 profile.save()
 
                 # =========================
-                # タグ処理
+                # 🏷 タグ処理
                 # =========================
+
                 tag_ids = request.POST.getlist("tags") or []
 
-                ProfileTag.objects.filter(profile=profile)\
-                    .exclude(tag_id__in=tag_ids).delete()
+                # =========================
+                # 🔥 削除されたタグを削除
+                # =========================
+                ProfileTag.objects.filter(
+                    profile=profile
+                ).exclude(
+                    tag_id__in=tag_ids
+                ).delete()
 
+
+                # =========================
+                # 🔥 タグ保存
+                # =========================
                 for tag_id in tag_ids:
-                    level = request.POST.get(f"level_{tag_id}", 2)
 
-                    ProfileTag.objects.update_or_create(
+                    level = request.POST.get(
+                        f"level_{tag_id}",
+                        2
+                    )
+
+                    profile_tag, created = ProfileTag.objects.update_or_create(
                         profile=profile,
                         tag_id=tag_id,
-                        defaults={"level": int(level)}
+                        defaults={
+                            "level": int(level)
+                        }
                     )
+
+                    # =========================
+                    # 🔔 新しく追加されたタグだけ通知
+                    # =========================
+                    if created:
+
+                        # このタグを持っている他ユーザー
+                        matched_users = CustomUser.objects.filter(
+                            profile__profile_tags__tag_id=tag_id,
+                            is_active=True,
+                            is_superuser=False,
+                        ).exclude(
+                            id=request.user.id
+                        ).distinct()
+
+                        for target_user in matched_users:
+
+                            # =========================
+                            # 🔥 同じ未読通知を重複作成しない
+                            # =========================
+                            already_exists = Notification.objects.filter(
+                                recipient=target_user,
+                                actor=request.user,
+                                type="tag_match",
+                                is_read=False,
+                            ).exists()
+
+                            if already_exists:
+                                continue
+
+                            Notification.objects.create(
+                                recipient=target_user,
+                                actor=request.user,
+                                type="tag_match",
+                                verb="さんとタグが一致しました"
+                            )
 
                 messages.success(request, "保存しました")
                 return redirect("accounts:mypage")
@@ -1082,49 +1172,91 @@ def users_by_tag(request, tag_id):
 # =========================
 # ★ タグ完全一致ユーザービュー（タグマッチング）
 # =========================
+
 @login_required
 def tag_match_users(request):
     user = request.user
 
-    # 🔥 修正：ProfileTagから取得
+    # =========================
+    # 🔔 タグ一致未読を既読化
+    # =========================
+    Notification.objects.filter(
+        recipient=user,
+        type="tag_match",
+        is_read=False
+    ).update(
+        is_read=True
+    )
+
+    # =========================
+    # 🔥 自分のタグ取得
+    # =========================
     my_tags = ProfileTag.objects.filter(
         profile=user.profile
     ).values_list("tag_id", flat=True)
 
+    # =========================
+    # 🔥 タグ一致ユーザー
+    # =========================
     if not my_tags:
+
         users = CustomUser.objects.none()
+
     else:
+
         users = CustomUser.objects.filter(
-            profile__profile_tags__tag_id__in=my_tags
+            profile__profile_tags__tag_id__in=my_tags,
+            is_active=True,
+            is_superuser=False,
         ).exclude(
             id=user.id
         ).annotate(
             common_tags=Count(
                 "profile__profile_tags",
-                filter=Q(profile__profile_tags__tag_id__in=my_tags)
+                filter=Q(
+                    profile__profile_tags__tag_id__in=my_tags
+                )
             )
         ).order_by(
             "-common_tags"
         ).distinct()
 
-    # 🔥 ここ追加（超重要）
+    # =========================
+    # 🔥 マッチ済みユーザー
+    # =========================
     matched_user_ids = Match.objects.filter(
         Q(user1=user) | Q(user2=user)
-    ).values_list("user1", "user2")
+    ).values_list(
+        "user1",
+        "user2"
+    )
 
-    matched_user_ids = set([
-        u for pair in matched_user_ids for u in pair if u != user.id
-    ])
+    matched_user_ids = {
+        uid
+        for pair in matched_user_ids
+        for uid in pair
+        if uid != user.id
+    }
 
+    # =========================
+    # ❤️ LIKE済み
+    # =========================
     liked_user_ids = UserLike.objects.filter(
         from_user=user
-    ).values_list("to_user", flat=True)
+    ).values_list(
+        "to_user_id",
+        flat=True
+    )
 
-    return render(request, "accounts/tag_users.html", {
-        "users": users,
-        "matched_user_ids": matched_user_ids,
-        "liked_user_ids": liked_user_ids,
-    })
+    return render(
+        request,
+        "accounts/tag_users.html",
+        {
+            "users": users,
+            "matched_user_ids": matched_user_ids,
+            "liked_user_ids": liked_user_ids,
+        }
+    )
 
 # =========================
 # エラー時、管理人宛てにメッセージ送信
@@ -1363,7 +1495,18 @@ def liked_me(request):
     user = request.user
 
     # =========================
-    # 🔥 ライクしてきたユーザー（最適化）
+    # 🔔 ライク未読を既読化
+    # =========================
+    Notification.objects.filter(
+        recipient=user,
+        type="like",
+        is_read=False
+    ).update(
+        is_read=True
+    )
+
+    # =========================
+    # 🔥 ライクしてきたユーザー
     # =========================
     users = CustomUser.objects.filter(
         given_likes__to_user=user
@@ -1459,14 +1602,27 @@ def match_result(request):
     })
 
 # match_listビュー（自分がマッチしたユーザーのリスト）
+@login_required
 def match_list(request):
     user = request.user
+
+    # =========================
+    # 🔔 マッチ未読を既読化
+    # =========================
+    Notification.objects.filter(
+        recipient=user,
+        type="match",
+        is_read=False
+    ).update(
+        is_read=True
+    )
 
     matches = Match.objects.filter(
         Q(user1=user) | Q(user2=user)
     )
 
     users = []
+
     for match in matches:
         if match.user1 == user:
             users.append(match.user2)

@@ -415,3 +415,21 @@ LIKEボタン
     justify-content:center;
     text-decoration:none;
 }
+
+/* =========================
+   👑 管理人専用DM
+   ========================= */
+
+.admin-message-action {
+    margin-top: 10px;
+}
+
+.admin-message-btn {
+    border: 1px solid #b8860b;
+    color: #8a6500;
+    background: rgba(184, 134, 11, 0.08);
+}
+
+.admin-message-btn:hover {
+    background: rgba(184, 134, 11, 0.16);
+}

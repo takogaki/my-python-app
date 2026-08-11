@@ -125,7 +125,15 @@
                 <!-- マイページ -->
                 <span class="welcome">
                     <a class="btn btn-outline" href="{% url 'accounts:mypage' %}">
+                
                         {{ request.user.username }}
+                
+                        {% if notification_unread_total %}
+                        <span class="notification-badge">
+                            {{ notification_unread_total }}
+                        </span>
+                        {% endif %}
+                
                     </a>
                 </span>
             

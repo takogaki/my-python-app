@@ -95,22 +95,15 @@
 
         <!-- 🔥 行動導線 -->
         {% if user.id in matched_user_ids %}
-
-        {% if request.user.verification_status == "verified" %}
+        
         <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn">
-            💬 話す
+            💬 
         </a>
+        
         {% else %}
-        <a href="{% url 'accounts:kyc_submit' %}" class="chat-btn lock">
-            🔒
-        </a>
-        {% endif %}
-
-        {% else %}
-
-        <button type="button" class="likeBtn {% if user.id in liked_user_ids %}liked{% endif %}"
-            data-user-id="{{ user.id }}">
-            ❤ 
+        
+        <button type="button" class="likeBtn {% if user.id in liked_user_ids %}liked{% endif %}" data-user-id="{{ user.id }}">
+            ❤
         </button>
 
         {% endif %}

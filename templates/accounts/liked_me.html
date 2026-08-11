@@ -67,23 +67,11 @@
                     </button>
             
                     {% else %}
-            
-                    {% if request.user.verification_status == "verified" %}
+                    
                     <a href="{% url 'user_messages:send_message' user.username %}" class="chat-btn primary">
-                        💬 メッセージ
+                        💬
                     </a>
-                    {% else %}
-                    <a href="{% url 'accounts:kyc_submit' %}" class="verify-cta">
-                        <div class="cta-content">
-                            <span class="icon">🔓</span>
-                            <div class="text">
-                                <div class="main">チャットを解放する</div>
-                                <div class="sub">本人確認でメッセージ可能になります</div>
-                            </div>
-                        </div>
-                    </a>
-                    {% endif %}
-            
+                    
                     {% endif %}
             
                 </div>

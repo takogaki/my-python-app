@@ -107,16 +107,35 @@
         </div>
 
         <div class="card-actions">
+        
             {% if request.user.is_authenticated %}
+        
+            {% if request.user.is_superuser %}
+        
+            <!-- 👑 管理人専用 -->
+            <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
+                👑 管理人としてメッセージを送る
+            </a>
+        
+            {% else %}
+        
+            <!-- 通常ユーザー -->
             <a href="{% url 'user_messages:send_message' user.username %}" class="btn primary">
                 メッセージを送る
             </a>
+        
+            {% endif %}
+        
             {% else %}
+        
             <a href="{% url 'accounts:signup' %}" class="btn primary">
                 ログインしてメッセージ
             </a>
+        
             {% endif %}
+        
         </div>
+
     </div>
 </section>
 

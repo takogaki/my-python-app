@@ -167,28 +167,68 @@
         <div class="action-grid">
 
             <!-- タグ一致 -->
-            <a href="{% url 'accounts:tag_match_users' %}" class="action-item">
-                🏷 タグ一致ユーザー
+            <a href="{% url 'accounts:tag_match_users' %}" class="action-item notification-action">
+                <span>
+                    🏷 タグ一致ユーザー
+                </span>
+            
+                {% if notification_counts.tag_match %}
+                <span class="notification-badge">
+                    {{ notification_counts.tag_match }}
+                </span>
+                {% endif %}
             </a>
     
             <!-- 足跡 -->
-            <a href="{% url 'accounts:footprints' %}" class="action-item">
-                👀 足あと
+            <a href="{% url 'accounts:footprints' %}" class="action-item notification-action">
+                <span>
+                    👀 足あと
+                </span>
+            
+                {% if notification_counts.footprint %}
+                <span class="notification-badge">
+                    {{ notification_counts.footprint }}
+                </span>
+                {% endif %}
             </a>
     
             <!-- いいね -->
-            <a href="{% url 'accounts:liked_me' %}" class="action-item">
-                ❤️ ライクされた
+            <a href="{% url 'accounts:liked_me' %}" class="action-item notification-action">
+                <span>
+                    ❤️ ライクされた
+                </span>
+            
+                {% if notification_counts.like %}
+                <span class="notification-badge">
+                    {{ notification_counts.like }}
+                </span>
+                {% endif %}
             </a>
     
             <!-- マッチ -->
-            <a href="{% url 'accounts:match_list' %}" class="action-item">
-                💖 マッチユーザー
+            <a href="{% url 'accounts:match_list' %}" class="action-item notification-action">
+                <span>
+                    💖 マッチユーザー
+                </span>
+            
+                {% if notification_counts.match %}
+                <span class="notification-badge">
+                    {{ notification_counts.match }}
+                </span>
+                {% endif %}
             </a>
     
             <!-- メッセージ -->
-            <a href="{% url 'user_messages:message_box' %}" class="action-item">
-                💌 メッセージ
+            <a href="{% url 'user_messages:message_box' %}" class="action-item notification-action">
+                <span>
+                    💌 メッセージ
+                </span>
+            
+                {% if notification_counts.message %}
+                <span class="notification-badge">
+                    {{ notification_counts.message }}
+                </span>
+                {% endif %}
             </a>
     
         </div>

@@ -22,11 +22,22 @@ User = get_user_model()
 
 @login_required
 def message_box(request):
+
+    # =========================
+    # 🔔 メッセージ通知を既読化
+    # =========================
+    Notification.objects.filter(
+        recipient=request.user,
+        type="message",
+        is_read=False
+    ).update(
+        is_read=True
+    )
+
     # =========================
     # ページログ保存
     # =========================
-    if request.user.is_authenticated:
-        save_page_log(request, "message_box")
+    save_page_log(request, "message_box")
 
     user = request.user
 
@@ -39,6 +50,10 @@ def message_box(request):
     for msg in all_messages:
         partner = msg.recipient if msg.sender == user else msg.sender
 
+        # 匿名メッセージなど、相手が存在しない場合
+        if partner is None:
+            continue
+
         if partner.id not in conversations:
             conversations[partner.id] = {
                 "user": partner,
@@ -46,7 +61,7 @@ def message_box(request):
                 "unread_count": 0,
             }
 
-        # 未読カウント（相手→自分のみ）
+        # 相手 → 自分 の未読メッセージ
         if msg.recipient == user and not msg.is_read:
             conversations[partner.id]["unread_count"] += 1
 
@@ -54,8 +69,11 @@ def message_box(request):
         "conversations": conversations.values()
     }
 
-    return render(request, "message/message_box.html", context)
-
+    return render(
+        request,
+        "message/message_box.html",
+        context
+    )
 
 @never_cache
 @login_required
@@ -69,17 +87,49 @@ def send_message(request, username):
     )
 
     # =========================
-    # 🔐 相互LIKE（Match）確認
+    # 👑 管理人判定
     # =========================
-    is_matched = Match.objects.filter(
-        Q(user1=sender, user2=recipient) |
-        Q(user1=recipient, user2=sender)
-    ).exists()
+    sender_is_admin = sender.is_superuser
+    recipient_is_admin = recipient.is_superuser
 
     # =========================
-    # ❌ MatchしていなければDM不可
+    # 👑 管理人 → 全ユーザー
     # =========================
-    if not is_matched:
+    if sender_is_admin:
+
+        can_send = True
+
+    # =========================
+    # 👤 ユーザー → 管理人
+    # =========================
+    elif recipient_is_admin:
+
+        # 管理人から過去に1通でも
+        # このユーザーへ送信されているか
+        admin_has_sent = Message.objects.filter(
+            sender=recipient,
+            recipient=sender,
+        ).exists()
+
+        can_send = admin_has_sent
+
+    # =========================
+    # 👤 ユーザー → ユーザー
+    # =========================
+    else:
+
+        is_matched = Match.objects.filter(
+            Q(user1=sender, user2=recipient) |
+            Q(user1=recipient, user2=sender)
+        ).exists()
+
+        can_send = is_matched
+
+    # =========================
+    # ❌ DM権限なし
+    # =========================
+    if not can_send:
+
         return render(
             request,
             "message/not_matched.html",
@@ -100,6 +150,7 @@ def send_message(request, username):
         ).strip()
 
         if content:
+
             Message.objects.create(
                 sender=sender,
                 recipient=recipient,

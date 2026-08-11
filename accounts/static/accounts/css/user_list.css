@@ -705,3 +705,20 @@ body {
     color: rgba(255,255,255,0.65);
     letter-spacing: 1px;
 }
+
+/* =========================
+   タグ一致画面
+   アクションボタン中央配置
+========================= */
+
+.profile-card {
+    text-align: center;
+}
+
+.profile-card .likeBtn,
+.profile-card .chat-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 12px auto 0;
+}
