@@ -979,17 +979,13 @@ def recruit_chat(request, pk):
     )
 
     # =========================
-    # 👤 募集主
+    # 募集主
     # =========================
-
-    is_owner = (
-        recruit.user == request.user
-    )
+    is_owner = recruit.user == request.user
 
     # =========================
-    # 👤 承認済み参加者
+    # 承認済み参加者
     # =========================
-
     is_participant = RecruitParticipant.objects.filter(
         recruit=recruit,
         user=request.user,
@@ -999,7 +995,6 @@ def recruit_chat(request, pk):
     # =========================
     # 🔐 権限チェック
     # =========================
-
     if not is_owner and not is_participant:
 
         messages.error(
@@ -1015,7 +1010,6 @@ def recruit_chat(request, pk):
     # =========================
     # 💬 チャットルーム取得・作成
     # =========================
-
     room, created = RecruitChatRoom.objects.get_or_create(
         recruit=recruit
     )
@@ -1023,7 +1017,6 @@ def recruit_chat(request, pk):
     # =========================
     # 💬 メッセージ送信
     # =========================
-
     if request.method == "POST":
 
         text = request.POST.get(
@@ -1047,23 +1040,22 @@ def recruit_chat(request, pk):
     # =========================
     # 💬 メッセージ取得
     # =========================
-
-    chat_messages = (
-        room.messages
-        .select_related("user")
-        .all()
-    )
+    chat_messages = room.messages.select_related(
+        "user"
+    ).all()
 
     # =========================
-    # 🔔 この募集チャットを既読化
+    # 🔔 最後のメッセージを取得
     # =========================
-
     last_message = (
         room.messages
         .order_by("-created_at")
         .first()
     )
 
+    # =========================
+    # 🔥 このユーザーの既読位置を更新
+    # =========================
     if last_message:
 
         RecruitChatRead.objects.update_or_create(
@@ -1073,10 +1065,6 @@ def recruit_chat(request, pk):
                 "last_read_message": last_message,
             }
         )
-
-    # =========================
-    # 🎨 表示
-    # =========================
 
     return render(
         request,
@@ -1104,6 +1092,16 @@ def recruit_management(request):
     )
 
     # =========================
+    # 🔔 募集チャット未読数を付与
+    # =========================
+    for recruit in my_recruits:
+
+        recruit.unread_count = get_recruit_unread_count(
+            recruit,
+            request.user
+        )
+
+    # =========================
     # 自分が応募した募集
     # =========================
     my_applications = (
@@ -1117,46 +1115,6 @@ def recruit_management(request):
         )
         .order_by("-created_at")
     )
-
-    # =========================
-    # 🔔 募集チャットを既読化
-    # =========================
-    rooms = RecruitChatRoom.objects.filter(
-        recruit__user=request.user
-    )
-
-    # 応募者として参加しているチャット
-    participant_rooms = RecruitChatRoom.objects.filter(
-        recruit__participants__user=request.user,
-        recruit__participants__status="approved",
-    )
-
-    rooms = (
-        (rooms | participant_rooms)
-        .distinct()
-    )
-
-    # =========================
-    # 👁 最後のメッセージを既読位置にする
-    # =========================
-    for room in rooms:
-
-        last_message = (
-            RecruitChatMessage.objects
-            .filter(room=room)
-            .order_by("-created_at")
-            .first()
-        )
-
-        if last_message:
-
-            RecruitChatRead.objects.update_or_create(
-                room=room,
-                user=request.user,
-                defaults={
-                    "last_read_message": last_message,
-                }
-            )
 
     return render(
         request,
