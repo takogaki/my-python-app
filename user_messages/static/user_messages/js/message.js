@@ -190,3 +190,62 @@ window.addEventListener("load", function () {
         chatBox.scrollTop = chatBox.scrollHeight;
     }, 100);
 });
+
+/* ==================================================
+   📱 キーボード表示時のビューポート対応
+================================================== */
+
+(function () {
+
+    const chatContainer =
+        document.querySelector(".chat-container");
+
+    if (!chatContainer) return;
+
+    const updateChatViewport = () => {
+
+        if (!window.visualViewport) return;
+
+        const viewport = window.visualViewport;
+
+        const headerHeight =
+            parseFloat(
+                getComputedStyle(document.documentElement)
+                    .getPropertyValue("--chat-header-height")
+            ) || 64;
+
+        const footerHeight =
+            parseFloat(
+                getComputedStyle(document.documentElement)
+                    .getPropertyValue("--footer-height")
+            ) || 70;
+
+        const visibleHeight =
+            viewport.height
+            - headerHeight
+            - footerHeight;
+
+        document.documentElement.style.setProperty(
+            "--chat-visible-height",
+            `${Math.max(visibleHeight, 200)}px`
+        );
+    };
+
+
+    updateChatViewport();
+
+
+    if (window.visualViewport) {
+
+        window.visualViewport.addEventListener(
+            "resize",
+            updateChatViewport
+        );
+
+        window.visualViewport.addEventListener(
+            "scroll",
+            updateChatViewport
+        );
+    }
+
+})();
