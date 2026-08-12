@@ -751,40 +751,134 @@ body {
 }
 
 /* ==================================================
-   📱 DM：スマホキーボード表示時のスクロール改善
+   📱 DM CHAT
+   スマホキーボード対応・完全スクロール
 ================================================== */
 
 @media (max-width: 600px) {
+
+    /* ---------------------------------
+       ページ自体はスクロールさせない
+    --------------------------------- */
 
     body:has(.chat-container) {
         overflow: hidden !important;
         height: 100dvh !important;
     }
 
+
+    /* ---------------------------------
+       チャット全体
+    --------------------------------- */
+
     .chat-container {
-        height: calc(
-            100dvh
-            - var(--chat-header-height, 64px)
-            - var(--footer-height, 70px)
-        ) !important;
+        position: fixed !important;
 
         top: var(--chat-header-height, 64px) !important;
-        bottom: auto !important;
+
+        /*
+         * フッターを基準にする
+         */
+        bottom: var(--footer-height, 70px) !important;
+
+        left: 0 !important;
+        right: 0 !important;
+
+        width: 100% !important;
+
+        height: auto !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow: hidden !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
+
+    /* ---------------------------------
+       メッセージ領域
+       ★ここだけスクロール
+    --------------------------------- */
+
     .chat-box {
+        position: relative !important;
+
         flex: 1 1 0 !important;
 
-        height: 100% !important;
+        width: 100% !important;
+
         min-height: 0 !important;
 
-        overflow-y: scroll !important;
+        height: auto !important;
+
+        overflow-y: auto !important;
         overflow-x: hidden !important;
 
+        /*
+         * iPhone / Android
+         */
         -webkit-overflow-scrolling: touch !important;
 
-        overscroll-behavior-y: auto !important;
+        overscroll-behavior-y: contain !important;
 
-        padding-bottom: 120px !important;
+        /*
+         * 通常の指スクロールを
+         * ブラウザに任せる
+         */
+        scroll-behavior: auto !important;
+
+        /*
+         * 入力バーに隠れないための余白
+         */
+        padding:
+            14px 9px
+            90px !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* ---------------------------------
+       入力バー
+       ★チャットスクロールの外
+    --------------------------------- */
+
+    .chat-input-bar {
+        position: fixed !important;
+
+        left: 0 !important;
+        right: 0 !important;
+
+        /*
+         * フッターの上
+         */
+        bottom:
+            calc(
+                var(--footer-height, 70px)
+                + env(safe-area-inset-bottom)
+            ) !important;
+
+        width: 100% !important;
+
+        min-height: 56px !important;
+
+        flex-shrink: 0 !important;
+
+        display: flex !important;
+        align-items: center !important;
+
+        padding:
+            7px 10px
+            calc(
+                7px
+                + env(safe-area-inset-bottom)
+            ) !important;
+
+        box-sizing: border-box !important;
+
+        z-index: 999999 !important;
     }
 }
