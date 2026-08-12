@@ -1,11 +1,11 @@
 /* ==================================================
    SPIRYTUS DM CHAT
-   完全固定レイアウト
+   募集チャットと同じ固定レイアウト
    ================================================== */
 
 
 /* ==================================================
-   1. DMページ全体
+   1. ページ全体
    ================================================== */
 
 html:has(.chat-container),
@@ -15,26 +15,43 @@ body:has(.chat-container) {
     height: 100% !important;
 
     margin: 0 !important;
+    padding: 0 !important;
+
     overflow: hidden !important;
 }
 
 
 /* ==================================================
-   2. DMチャット全体
+   2. DMチャット本体
+
+   header
+      ↓
+   messages
+      ↓
+   footer
+
+   入力バーはfooterの直上
    ================================================== */
 
 .chat-container {
 
     position: fixed !important;
 
-    top: var(--chat-header-height, 60px) !important;
-    bottom: var(--footer-height, 70px) !important;
+    top:
+        var(--chat-header-height, 64px)
+        !important;
+
+    bottom:
+        var(--footer-height, 70px)
+        !important;
 
     left: 0 !important;
     right: 0 !important;
 
     width: 100% !important;
+
     height: auto !important;
+    min-height: 0 !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -72,43 +89,28 @@ body:has(.chat-container) {
 
     box-sizing: border-box !important;
 
-    /*
-     * 上部
-     */
     padding-top: 14px !important;
 
     padding-left: 9px !important;
     padding-right: 9px !important;
 
     /*
-     * 入力バー＋余裕
-     *
-     * ここが重要
+     * 入力バーが重ならないための余白
      */
     padding-bottom:
         calc(
-            100px
-            + env(safe-area-inset-bottom)
+            100px +
+            env(safe-area-inset-bottom)
         ) !important;
 
     background: #0f0f0f !important;
 
-    /*
-     * iPhone / Safari
-     */
     -webkit-overflow-scrolling: touch !important;
 
     overscroll-behavior-y: contain !important;
 
-    /*
-     * 指で縦スクロール
-     */
     touch-action: pan-y !important;
 
-    /*
-     * 自動スクロールによる
-     * カクつきを防止
-     */
     scroll-behavior: auto !important;
 }
 
@@ -130,9 +132,11 @@ body:has(.chat-container) {
     box-sizing: border-box !important;
 }
 
+
 .my-row {
     justify-content: flex-end !important;
 }
+
 
 .other-row {
     justify-content: flex-start !important;
@@ -150,18 +154,22 @@ body:has(.chat-container) {
 
     flex-shrink: 0 !important;
 
-    margin: 18px 6px 0 !important;
+    margin:
+        18px 6px 0
+        !important;
 
     border-radius: 50% !important;
 
     object-fit: cover !important;
+
+    display: block !important;
 
     cursor: pointer !important;
 }
 
 
 /* ==================================================
-   6. 吹き出し
+   6. 吹き出しラッパー
    ================================================== */
 
 .chat-bubble-wrapper {
@@ -176,6 +184,10 @@ body:has(.chat-container) {
 }
 
 
+/* ==================================================
+   7. ユーザー名
+   ================================================== */
+
 .chat-username {
 
     display: block !important;
@@ -183,6 +195,8 @@ body:has(.chat-container) {
     margin-bottom: 3px !important;
 
     font-size: 11px !important;
+
+    line-height: 1.3 !important;
 
     color: #888 !important;
 
@@ -192,11 +206,22 @@ body:has(.chat-container) {
 }
 
 
+.chat-username:hover {
+    color: #fff !important;
+}
+
+
+/* ==================================================
+   8. 吹き出し
+   ================================================== */
+
 .chat-bubble {
 
     position: relative !important;
 
-    padding: 9px 13px !important;
+    padding:
+        9px 13px
+        !important;
 
     border-radius: 18px !important;
 
@@ -213,7 +238,7 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   7. 自分のメッセージ
+   9. 自分
    ================================================== */
 
 .my-bubble {
@@ -232,7 +257,7 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   8. 相手のメッセージ
+   10. 相手
    ================================================== */
 
 .other-bubble {
@@ -246,7 +271,7 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   9. メタ情報
+   11. メタ情報
    ================================================== */
 
 .chat-meta {
@@ -261,12 +286,24 @@ body:has(.chat-container) {
 
     margin-top: 4px !important;
 
+    padding: 0 3px !important;
+
     font-size: 11px !important;
 }
 
 
+.chat-time {
+
+    font-size: 10px !important;
+
+    color: #777 !important;
+
+    white-space: nowrap !important;
+}
+
+
 /* ==================================================
-   10. 日付
+   12. 日付
    ================================================== */
 
 .chat-time-separator {
@@ -286,7 +323,7 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   11. 既読
+   13. 既読
    ================================================== */
 
 .read-status {
@@ -294,9 +331,12 @@ body:has(.chat-container) {
     display: inline-flex !important;
 
     align-items: center !important;
+
     justify-content: center !important;
 
-    padding: 2px 8px !important;
+    padding:
+        2px 8px
+        !important;
 
     border-radius: 999px !important;
 
@@ -307,25 +347,31 @@ body:has(.chat-container) {
     white-space: nowrap !important;
 }
 
+
 .read-status.unread {
 
-    background: rgba(255,255,255,0.08) !important;
+    background:
+        rgba(255,255,255,0.08)
+        !important;
 
     color: #aaa !important;
 }
 
+
 .read-status.read {
 
-    background: rgba(6,199,85,0.15) !important;
+    background:
+        rgba(6,199,85,0.15)
+        !important;
 
     color: #06C755 !important;
 }
 
 
 /* ==================================================
-   12. 入力バー
-   ★固定
-   ★スクロールしない
+   14. 入力バー
+   ★完全固定
+   ★Footerの直上
    ================================================== */
 
 .chat-input-bar {
@@ -337,9 +383,10 @@ body:has(.chat-container) {
 
     bottom:
         calc(
-            var(--footer-height, 70px)
-            + env(safe-area-inset-bottom)
-        ) !important;
+            var(--footer-height, 70px) +
+            env(safe-area-inset-bottom)
+        )
+        !important;
 
     width: 100% !important;
 
@@ -353,15 +400,19 @@ body:has(.chat-container) {
 
     margin: 0 !important;
 
-    padding: 7px 10px !important;
+    padding:
+        7px 10px
+        !important;
 
     box-sizing: border-box !important;
 
     background:
-        rgba(18,18,18,0.97) !important;
+        rgba(18,18,18,0.97)
+        !important;
 
     border-top:
-        1px solid rgba(255,255,255,0.08) !important;
+        1px solid rgba(255,255,255,0.08)
+        !important;
 
     backdrop-filter: blur(12px) !important;
 
@@ -372,7 +423,7 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   13. 入力欄
+   15. 入力欄
    ================================================== */
 
 .chat-input {
@@ -387,7 +438,9 @@ body:has(.chat-container) {
 
     margin: 0 !important;
 
-    padding: 0 14px !important;
+    padding:
+        0 14px
+        !important;
 
     border: none !important;
 
@@ -401,6 +454,8 @@ body:has(.chat-container) {
 
     font-size: 16px !important;
 
+    line-height: normal !important;
+
     box-sizing: border-box !important;
 
     appearance: none !important;
@@ -410,24 +465,24 @@ body:has(.chat-container) {
 
 
 .chat-input:focus {
-
     background: #333 !important;
 }
 
 
 .chat-input::placeholder {
-
     color: #777 !important;
 }
 
 
 /* ==================================================
-   14. 送信ボタン
+   16. 送信ボタン
    ================================================== */
 
 .send-btn {
 
-    flex: 0 0 42px !important;
+    flex:
+        0 0 42px
+        !important;
 
     width: 42px !important;
     height: 42px !important;
@@ -462,17 +517,36 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   15. スクロールバー
+   17. Footer
+   ★募集チャットと同じ
+   ★必ず最前面
+   ================================================== */
+
+body:has(.chat-container) .feed-footer {
+
+    position: fixed !important;
+
+    left: 0 !important;
+    right: 0 !important;
+
+    bottom: 0 !important;
+
+    width: 100% !important;
+
+    z-index: 1000000 !important;
+}
+
+
+/* ==================================================
+   18. スクロールバー
    ================================================== */
 
 .chat-box::-webkit-scrollbar {
-
     width: 4px !important;
 }
 
 
 .chat-box::-webkit-scrollbar-track {
-
     background: transparent !important;
 }
 
@@ -486,7 +560,7 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   16. スマートフォン
+   19. スマートフォン
    ================================================== */
 
 @media (max-width: 600px) {
@@ -499,18 +573,15 @@ body:has(.chat-container) {
 
     .chat-container {
 
-        top: var(--chat-header-height) !important;
+        top: 64px !important;
 
-        bottom: var(--footer-height, 70px) !important;
+        bottom:
+            var(--footer-height, 70px)
+            !important;
     }
 
 
     .chat-box {
-
-        /*
-         * ここは絶対に
-         * height: ～px を指定しない
-         */
 
         flex: 1 1 auto !important;
 
@@ -518,36 +589,36 @@ body:has(.chat-container) {
 
         overflow-y: auto !important;
 
-        /*
-         * 入力バーを避ける
-         */
+        padding-left: 9px !important;
+
+        padding-right: 9px !important;
+
         padding-bottom:
-            calc(
-                100px
-                + env(safe-area-inset-bottom)
-            ) !important;
+            100px
+            !important;
     }
 
 
     .chat-input-bar {
 
         bottom:
-            calc(
-                var(--footer-height, 70px)
-                + env(safe-area-inset-bottom)
-            ) !important;
+            var(--footer-height, 70px)
+            !important;
+
+        padding:
+            7px 10px
+            !important;
     }
 
 
     .chat-bubble-wrapper {
-
         max-width: 76% !important;
     }
 }
 
 
 /* ==================================================
-   17. 小型スマートフォン
+   20. 小型スマートフォン
    ================================================== */
 
 @media (max-width: 380px) {
@@ -555,6 +626,7 @@ body:has(.chat-container) {
     .chat-input-bar {
 
         padding-left: 8px !important;
+
         padding-right: 8px !important;
     }
 
@@ -562,6 +634,7 @@ body:has(.chat-container) {
     .chat-input {
 
         padding-left: 14px !important;
+
         padding-right: 14px !important;
     }
 }

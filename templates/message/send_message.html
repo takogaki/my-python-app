@@ -1,10 +1,12 @@
 {% extends "base/diary_base.html" %}
+
 {% load static %}
 {% load tz %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'user_messages/css/message.css' %}">
 {% endblock %}
+
 
 {% block body %}
 
@@ -18,7 +20,7 @@
 
         {% for day in message_days %}
 
-        <!-- ✅ 日付セパレーター（正解） -->
+        <!-- 日付 -->
         <div class="chat-time-separator">
             {{ day.grouper|date:"Y/m/d" }}
         </div>
@@ -29,22 +31,21 @@
 
             <!-- アバター -->
             <img src="{{ message.sender.get_profile_image }}" class="chat-avatar" data-url="{% if message.sender == request.user %}
-                            {% url 'accounts:mypage' %}
-                        {% else %}
-                            {% url 'accounts:user_detail' message.sender.username %}
-                        {% endif %}">
-            
+                    {% url 'accounts:mypage' %}
+                {% else %}
+                    {% url 'accounts:user_detail' message.sender.username %}
+                {% endif %}">
+
             <div class="chat-bubble-wrapper">
 
                 <!-- 名前 -->
                 <a class="chat-username" data-url="{% if message.sender == request.user %}
-                                {% url 'accounts:mypage' %}
-                            {% else %}
-                                {% url 'accounts:user_detail' message.sender.username %}
-                            {% endif %}">
+                        {% url 'accounts:mypage' %}
+                    {% else %}
+                        {% url 'accounts:user_detail' message.sender.username %}
+                    {% endif %}">
                     {{ message.sender.username }}
                 </a>
-
 
                 <!-- バブル -->
                 <div
@@ -52,7 +53,7 @@
                     {{ message.content }}
                 </div>
 
-                <!-- 🔥 時間＋既読（LINE核心） -->
+                <!-- 時間＋既読 -->
                 <div class="chat-meta">
 
                     <span class="chat-time">
@@ -60,11 +61,13 @@
                     </span>
 
                     {% if message.sender == request.user %}
-                        {% if message == last_read_message %}
-                        <span class="read-status read">既読</span>
-                        {% else %}
-                        <span class="read-status unread"></span>
-                        {% endif %}
+
+                    {% if message == last_read_message %}
+                    <span class="read-status read">既読</span>
+                    {% else %}
+                    <span class="read-status unread"></span>
+                    {% endif %}
+
                     {% endif %}
 
                 </div>
@@ -78,15 +81,22 @@
 
     </div>
 
+
     <!-- 入力バー -->
     <form id="chat-form" class="chat-input-bar">
+
         <input id="message-input" class="chat-input" placeholder="メッセージ..." required>
-        <button type="submit" class="send-btn">➤</button>
+
+        <button type="submit" class="send-btn">
+            ➤
+        </button>
+
     </form>
 
 </div>
 
 {% endblock %}
+
 
 {% block extra_js %}
 <script src="{% static 'user_messages/js/message.js' %}"></script>
