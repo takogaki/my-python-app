@@ -59,7 +59,7 @@ body {
 
     border-top: none !important;
     border-right: none !important;
-    border-bottom: 1px solid #ddd !important;
+    /* border-bottom: 1px solid #ddd !important; */
     border-left: none !important;
 
     /*

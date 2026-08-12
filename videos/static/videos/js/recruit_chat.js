@@ -531,3 +531,67 @@
 
         }
     );
+
+    /* ==================================================
+    募集チャット
+    スマホキーボード対応
+    Footerを常に表示領域内へ固定
+    ================================================== */
+
+    (function () {
+
+        function adjustRecruitChatViewport() {
+
+            if (!window.visualViewport) {
+                return;
+            }
+
+            const viewport =
+                window.visualViewport;
+
+            const keyboardHeight =
+                Math.max(
+                    0,
+                    window.innerHeight -
+                    viewport.height -
+                    viewport.offsetTop
+                );
+
+            document.documentElement
+                .style
+                .setProperty(
+                    "--recruit-keyboard-height",
+                    keyboardHeight + "px"
+                );
+        }
+
+
+        if (window.visualViewport) {
+
+            window.visualViewport.addEventListener(
+                "resize",
+                adjustRecruitChatViewport
+            );
+
+            window.visualViewport.addEventListener(
+                "scroll",
+                adjustRecruitChatViewport
+            );
+        }
+
+
+        window.addEventListener(
+            "resize",
+            adjustRecruitChatViewport
+        );
+
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            adjustRecruitChatViewport
+        );
+
+
+        adjustRecruitChatViewport();
+
+    })();
