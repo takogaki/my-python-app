@@ -1,12 +1,12 @@
 /* =========================================================
-   SPIRYTUS Header
+   SPIRYTUS HEADER
    完全固定ヘッダー
-========================================================= */
+   ========================================================= */
 
 
 /* =========================================================
    基本変数
-========================================================= */
+   ========================================================= */
 
 :root {
     --header-height: 60px;
@@ -14,38 +14,29 @@
 
 
 /* =========================================================
-   ページ本体
-   Headerとコンテンツが重ならないようにする
-========================================================= */
-
-html {
-    margin: 0;
-    padding: 0;
-}
+   ページ上部のヘッダー分スペース
+   ========================================================= */
 
 body {
-    margin: 0;
-
     padding-top:
         calc(
             var(--header-height)
             + env(safe-area-inset-top)
-            + 10px
         );
 }
 
 
 /* =========================================================
-   Header本体
-========================================================= */
+   HEADER
+   絶対にスクロールさせない
+   ========================================================= */
 
-header.site-header {
+.site-header {
     position: fixed !important;
 
     top: 0 !important;
-    right: 0 !important;
-    bottom: auto !important;
     left: 0 !important;
+    right: 0 !important;
 
     width: 100% !important;
 
@@ -57,114 +48,124 @@ header.site-header {
 
     margin: 0 !important;
 
-    padding-top: env(safe-area-inset-top) !important;
+    padding-top:
+        env(safe-area-inset-top) !important;
+
     padding-right: 0 !important;
     padding-bottom: 0 !important;
     padding-left: 0 !important;
 
-    box-sizing: border-box !important;
-
     background: #fff !important;
-    border-top: 0 !important;
-    border-right: 0 !important;
-    border-bottom: 1px solid #ddd !important;
-    border-left: 0 !important;
 
-    z-index: 2147483647 !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid #ddd !important;
+    border-left: none !important;
 
     /*
-     * Header自身を絶対に移動させない
+     * 最重要
+     * JSによる移動を完全に無効化
      */
     transform: none !important;
 
     /*
-     * ブラウザによる勝手な再配置を抑える
+     * transformによる再配置を防止
+     */
+    translate: none !important;
+
+    /*
+     * 他要素より常に前面
+     */
+    z-index: 2147483647 !important;
+
+    /*
+     * Safari / iOS対策
+     */
+    -webkit-transform: none !important;
+
+    /*
+     * ヘッダー自身をスクロールさせない
+     */
+    overflow: visible !important;
+
+    /*
+     * ブラウザによる余計な合成を抑制
      */
     will-change: auto !important;
 
     /*
-     * Header内部のレイアウトを独立させる
+     * Safariでのタッチスクロールによる
+     * 不要な挙動を防止
      */
-    contain: layout paint style;
-
-    /*
-     * Headerが選択範囲などに巻き込まれにくくする
-     */
-    isolation: isolate;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
 }
 
 
 /* =========================================================
-   Header内部
-========================================================= */
+   HEADER内部
+   ========================================================= */
 
-header.site-header .header-inner {
-    width: 100%;
-    height: var(--header-height);
+.site-header .header-inner {
+    width: 100% !important;
+
+    height: var(--header-height) !important;
 
     max-width: 520px;
 
     margin: 0 auto;
-    padding: 0 16px;
 
-    box-sizing: border-box;
+    padding:
+        0 16px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    position: relative;
+    box-sizing: border-box;
 }
 
 
 /* =========================================================
    ロゴ
-========================================================= */
+   ========================================================= */
 
-header.site-header h1 {
+.site-header h1 {
     margin: 0;
 
     padding: 0;
 
     font-size: 1.4rem;
 
-    line-height: 1.1;
+    line-height: 1.2;
 
     white-space: nowrap;
 }
 
-header.site-header h1 a {
-    display: inline-block;
 
-    margin: 0;
-    padding: 0;
+.site-header h1 a {
+    text-decoration: none;
 
     color: #222;
 
-    text-decoration: none;
     font-weight: bold;
 }
 
 
-/* =========================================================
-   ロゴテキスト
-========================================================= */
-
-header.site-header .logo-text {
+.site-header .logo-text {
     display: inline-block;
-
-    margin: 0;
-    padding: 0;
 
     text-decoration: none;
 }
 
-header.site-header .logo-sub {
+
+.site-header .logo-sub {
     display: block;
 
-    margin: 0;
-
     font-size: 11px;
+
     line-height: 1.2;
 
     opacity: 0.75;
@@ -173,17 +174,14 @@ header.site-header .logo-sub {
 
 /* =========================================================
    ユーザーエリア
-========================================================= */
+   ========================================================= */
 
-header.site-header .user-area {
+.site-header .user-area {
     display: flex;
 
     align-items: center;
 
     gap: 10px;
-
-    margin: 0;
-    padding: 0;
 
     font-size: 0.85rem;
 
@@ -192,23 +190,27 @@ header.site-header .user-area {
 
 
 /* =========================================================
-   Header内ボタン
-========================================================= */
+   HEADER内ボタン
+   ========================================================= */
 
-header.site-header .btn {
+.site-header .btn {
     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
 
-    padding: 6px 14px;
+    min-height: 36px;
 
-    margin: 0;
+    padding:
+        6px 14px;
 
     border: none;
+
     border-radius: 20px;
 
     background: #4f46e5;
+
     color: #fff;
 
     text-decoration: none;
@@ -216,126 +218,172 @@ header.site-header .btn {
     cursor: pointer;
 
     font-size: 0.85rem;
+
     line-height: 1;
 
-    white-space: nowrap;
-
     box-sizing: border-box;
+
+    white-space: nowrap;
 }
 
-header.site-header .btn:hover {
+
+.site-header .btn:hover {
     background: #4338ca;
 }
 
 
 /* =========================================================
-   募集・DM系 未読バッジ
-========================================================= */
+   募集・DM 未読バッジ
+   ========================================================= */
 
-header.site-header .chat-unread-badge {
+.site-header .chat-unread-badge {
     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
 
     min-width: 20px;
+
     height: 20px;
 
     padding: 0 6px;
+
     margin-left: 6px;
 
     border-radius: 999px;
 
     background: #ff2d55;
+
     color: #fff;
 
     font-size: 11px;
+
     font-weight: 700;
+
     line-height: 1;
 
     box-sizing: border-box;
-
-    flex-shrink: 0;
 }
 
 
 /* =========================================================
    マイページ通知バッジ
-========================================================= */
+   ========================================================= */
 
-header.site-header .notification-badge {
+.site-header .notification-badge {
     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
 
     min-width: 20px;
+
     height: 20px;
 
     padding: 0 5px;
+
     margin-left: 4px;
 
     border-radius: 999px;
 
     background: #e53935;
+
     color: #fff;
 
     font-size: 11px;
+
     font-weight: 700;
+
     line-height: 1;
 
     box-sizing: border-box;
-
-    flex-shrink: 0;
 }
 
 
 /* =========================================================
-   iPhone / Safari
-========================================================= */
+   iPhone / iPad
+   ========================================================= */
 
-@supports (-webkit-touch-callout: none) {
+@media (max-width: 600px) {
 
-    header.site-header {
+    :root {
+        --header-height: 60px;
+    }
+
+
+    body {
+        padding-top:
+            calc(
+                var(--header-height)
+                + env(safe-area-inset-top)
+            );
+    }
+
+
+    .site-header {
         position: fixed !important;
 
         top: 0 !important;
+
         bottom: auto !important;
 
+        left: 0 !important;
+        right: 0 !important;
+
+        width: 100vw !important;
+
+        height:
+            calc(
+                var(--header-height)
+                + env(safe-area-inset-top)
+            ) !important;
+
+        /*
+         * キーボード表示時にも
+         * transformさせない
+         */
         transform: none !important;
 
         -webkit-transform: none !important;
 
-        -webkit-backface-visibility: hidden;
+        translate: none !important;
 
-        backface-visibility: hidden;
+        z-index: 2147483647 !important;
     }
 
+
+    .site-header .header-inner {
+        width: 100% !important;
+
+        height: var(--header-height) !important;
+
+        padding:
+            0 12px;
+    }
 }
 
 
 /* =========================================================
-   小さい画面
-========================================================= */
+   小型スマートフォン
+   ========================================================= */
 
-@media (max-width: 480px) {
+@media (max-width: 380px) {
 
-    header.site-header .header-inner {
-        padding-left: 12px;
-        padding-right: 12px;
+    .site-header .header-inner {
+        padding:
+            0 10px;
     }
 
-    header.site-header h1 {
+    .site-header h1 {
         font-size: 1.2rem;
     }
 
-    header.site-header .user-area {
-        gap: 6px;
-    }
+    .site-header .btn {
+        padding:
+            6px 10px;
 
-    header.site-header .btn {
-        padding: 6px 10px;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
     }
-
 }
