@@ -1,0 +1,341 @@
+/* =========================================================
+   SPIRYTUS Header
+   完全固定ヘッダー
+========================================================= */
+
+
+/* =========================================================
+   基本変数
+========================================================= */
+
+:root {
+    --header-height: 60px;
+}
+
+
+/* =========================================================
+   ページ本体
+   Headerとコンテンツが重ならないようにする
+========================================================= */
+
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+
+    padding-top:
+        calc(
+            var(--header-height)
+            + env(safe-area-inset-top)
+            + 10px
+        );
+}
+
+
+/* =========================================================
+   Header本体
+========================================================= */
+
+header.site-header {
+    position: fixed !important;
+
+    top: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    left: 0 !important;
+
+    width: 100% !important;
+
+    height:
+        calc(
+            var(--header-height)
+            + env(safe-area-inset-top)
+        ) !important;
+
+    margin: 0 !important;
+
+    padding-top: env(safe-area-inset-top) !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+
+    box-sizing: border-box !important;
+
+    background: #fff !important;
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid #ddd !important;
+    border-left: 0 !important;
+
+    z-index: 2147483647 !important;
+
+    /*
+     * Header自身を絶対に移動させない
+     */
+    transform: none !important;
+
+    /*
+     * ブラウザによる勝手な再配置を抑える
+     */
+    will-change: auto !important;
+
+    /*
+     * Header内部のレイアウトを独立させる
+     */
+    contain: layout paint style;
+
+    /*
+     * Headerが選択範囲などに巻き込まれにくくする
+     */
+    isolation: isolate;
+}
+
+
+/* =========================================================
+   Header内部
+========================================================= */
+
+header.site-header .header-inner {
+    width: 100%;
+    height: var(--header-height);
+
+    max-width: 520px;
+
+    margin: 0 auto;
+    padding: 0 16px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: relative;
+}
+
+
+/* =========================================================
+   ロゴ
+========================================================= */
+
+header.site-header h1 {
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 1.4rem;
+
+    line-height: 1.1;
+
+    white-space: nowrap;
+}
+
+header.site-header h1 a {
+    display: inline-block;
+
+    margin: 0;
+    padding: 0;
+
+    color: #222;
+
+    text-decoration: none;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   ロゴテキスト
+========================================================= */
+
+header.site-header .logo-text {
+    display: inline-block;
+
+    margin: 0;
+    padding: 0;
+
+    text-decoration: none;
+}
+
+header.site-header .logo-sub {
+    display: block;
+
+    margin: 0;
+
+    font-size: 11px;
+    line-height: 1.2;
+
+    opacity: 0.75;
+}
+
+
+/* =========================================================
+   ユーザーエリア
+========================================================= */
+
+header.site-header .user-area {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 0;
+    padding: 0;
+
+    font-size: 0.85rem;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   Header内ボタン
+========================================================= */
+
+header.site-header .btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 14px;
+
+    margin: 0;
+
+    border: none;
+    border-radius: 20px;
+
+    background: #4f46e5;
+    color: #fff;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    font-size: 0.85rem;
+    line-height: 1;
+
+    white-space: nowrap;
+
+    box-sizing: border-box;
+}
+
+header.site-header .btn:hover {
+    background: #4338ca;
+}
+
+
+/* =========================================================
+   募集・DM系 未読バッジ
+========================================================= */
+
+header.site-header .chat-unread-badge {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 20px;
+    height: 20px;
+
+    padding: 0 6px;
+    margin-left: 6px;
+
+    border-radius: 999px;
+
+    background: #ff2d55;
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+
+    box-sizing: border-box;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   マイページ通知バッジ
+========================================================= */
+
+header.site-header .notification-badge {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 20px;
+    height: 20px;
+
+    padding: 0 5px;
+    margin-left: 4px;
+
+    border-radius: 999px;
+
+    background: #e53935;
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+
+    box-sizing: border-box;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   iPhone / Safari
+========================================================= */
+
+@supports (-webkit-touch-callout: none) {
+
+    header.site-header {
+        position: fixed !important;
+
+        top: 0 !important;
+        bottom: auto !important;
+
+        transform: none !important;
+
+        -webkit-transform: none !important;
+
+        -webkit-backface-visibility: hidden;
+
+        backface-visibility: hidden;
+    }
+
+}
+
+
+/* =========================================================
+   小さい画面
+========================================================= */
+
+@media (max-width: 480px) {
+
+    header.site-header .header-inner {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    header.site-header h1 {
+        font-size: 1.2rem;
+    }
+
+    header.site-header .user-area {
+        gap: 6px;
+    }
+
+    header.site-header .btn {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+    }
+
+}
