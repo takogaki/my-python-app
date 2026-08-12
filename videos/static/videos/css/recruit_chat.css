@@ -2,7 +2,15 @@
    SPIRYTUS 募集チャット
    DMと同じレイアウト
    ================================================== */
+/* ==================================================
+   募集チャット用ビューポート変数
+   ================================================== */
 
+:root {
+    --footer-height: 70px;
+    --recruit-chat-keyboard-height: 0px;
+    --recruit-chat-header-height: 64px;
+}
 
 /* ==================================================
    1. ページ全体
@@ -35,12 +43,17 @@ body:has(.recruit-chat-container) {
 .recruit-chat-container {
     position: fixed !important;
 
-    top: var(--recruit-chat-header-height, 64px) !important;
+    top:
+        var(--recruit-chat-header-height, 64px)
+        !important;
 
-    /*
-     * footerの直上まで
-     */
-    bottom: var(--footer-height, 70px) !important;
+    bottom:
+        calc(
+            var(--footer-height, 70px)
+            +
+            var(--recruit-chat-keyboard-height, 0px)
+        )
+        !important;
 
     left: 0 !important;
     right: 0 !important;
@@ -454,11 +467,13 @@ body:has(.recruit-chat-container) {
     left: 0 !important;
     right: 0 !important;
 
-    /*
-     * footerの高さ分だけ上
-     */
     bottom:
-        var(--footer-height, 70px) !important;
+        calc(
+            var(--footer-height, 70px)
+            +
+            var(--recruit-chat-keyboard-height, 0px)
+        )
+        !important;
 
     width: 100% !important;
 
@@ -601,7 +616,8 @@ body:has(.recruit-chat-container) {
 
 /* ==================================================
    19. 共通Footer
-   ★ 募集チャットでも絶対に最前面
+   ★募集チャットでも常に表示
+   ★キーボード表示時はキーボードの上へ移動
    ================================================== */
 
 body:has(.recruit-chat-container) .feed-footer {
@@ -609,14 +625,31 @@ body:has(.recruit-chat-container) .feed-footer {
 
     left: 0 !important;
     right: 0 !important;
-    bottom: 0 !important;
+
+    bottom:
+        var(--recruit-chat-keyboard-height, 0px)
+        !important;
 
     width: 100% !important;
 
-    /*
-     * 募集チャットより上
-     */
+    height:
+        calc(
+            var(--footer-height, 70px)
+            +
+            env(safe-area-inset-bottom)
+        )
+        !important;
+
+    padding-bottom:
+        env(safe-area-inset-bottom)
+        !important;
+
+    box-sizing: border-box !important;
+
     z-index: 1000000 !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 
@@ -648,20 +681,27 @@ body:has(.recruit-chat-container) .feed-footer {
 @media (max-width: 600px) {
 
     body:has(.recruit-chat-container) {
-        --recruit-chat-header-height: 64px;
+        --recruit-chat-header-height: 60px;
     }
 
 
     .recruit-chat-container {
-        top: 64px !important;
+        top:
+            var(--recruit-chat-header-height, 60px)
+            !important;
 
         bottom:
-            var(--footer-height, 70px) !important;
+            calc(
+                var(--footer-height, 70px)
+                +
+                var(--recruit-chat-keyboard-height, 0px)
+            )
+            !important;
     }
 
 
     .recruit-chat-header {
-        min-height: 64px !important;
+        min-height: 60px !important;
 
         padding: 10px 14px !important;
     }
@@ -672,13 +712,25 @@ body:has(.recruit-chat-container) .feed-footer {
         padding-right: 9px !important;
 
         padding-bottom:
-            100px !important;
+        calc(
+            140px
+            +
+            var(--footer-height, 70px)
+            +
+            env(safe-area-inset-bottom)
+        )
+        !important;
     }
 
 
     .recruit-chat-input-fixed {
-        bottom:
-            var(--footer-height, 70px) !important;
+    bottom:
+        calc(
+            var(--footer-height, 70px)
+            +
+            var(--recruit-chat-keyboard-height, 0px)
+        )
+        !important;
 
         padding:
             7px 10px !important;
