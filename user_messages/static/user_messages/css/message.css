@@ -749,3 +749,42 @@ body {
         height: 34px !important;
     }
 }
+
+/* ==================================================
+   📱 DM：スマホキーボード表示時のスクロール改善
+================================================== */
+
+@media (max-width: 600px) {
+
+    body:has(.chat-container) {
+        overflow: hidden !important;
+        height: 100dvh !important;
+    }
+
+    .chat-container {
+        height: calc(
+            100dvh
+            - var(--chat-header-height, 64px)
+            - var(--footer-height, 70px)
+        ) !important;
+
+        top: var(--chat-header-height, 64px) !important;
+        bottom: auto !important;
+    }
+
+    .chat-box {
+        flex: 1 1 0 !important;
+
+        height: 100% !important;
+        min-height: 0 !important;
+
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+
+        -webkit-overflow-scrolling: touch !important;
+
+        overscroll-behavior-y: auto !important;
+
+        padding-bottom: 120px !important;
+    }
+}
