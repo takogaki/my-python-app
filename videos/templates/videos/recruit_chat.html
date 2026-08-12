@@ -12,227 +12,207 @@
 
 {% block body %}
 
-<!-- =========================
-     ヘッダー
-========================== -->
-
-<div class="recruit-chat-header">
-
-    ```
-    <div class="recruit-chat-header-info">
-
-        <h2>
-            💬 {{ recruit.title }}
-        </h2>
-
-        <p>
-            募集主：
-            {{ recruit.user.username }}
-        </p>
-
-    </div>
-
-    <a href="{% url 'recruit_detail' recruit.id %}" class="recruit-chat-back">
-        ← 募集詳細へ
-    </a>
-    ```
-
-</div>
-
-<!-- =========================
-     メッセージエリア
-========================== -->
-
-<div id="recruit-chat-messages" class="recruit-chat-messages">
-
-    ```
-    {% for message in chat_messages %}
-
-    {% if message.user == request.user %}
+<div class="recruit-chat-container">
 
     <!-- =========================
-             自分
-        ========================== -->
+         募集チャットヘッダー
+    ========================== -->
 
-    <div class="recruit-chat-row my-row">
+    <div class="recruit-chat-header">
 
-        <div class="recruit-chat-bubble-wrapper">
+        <div class="recruit-chat-header-info">
 
-            <div class="recruit-chat-bubble my-bubble">
-                {{ message.text|linebreaksbr }}
-            </div>
+            <h2>
+                💬 {{ recruit.title }}
+            </h2>
 
-            <div class="recruit-chat-meta">
-
-                <span class="recruit-chat-time">
-                    {{ message.created_at|date:"Y/m/d H:i" }}
-                </span>
-
-            </div>
+            <p>
+                募集主：
+                {{ recruit.user.username }}
+            </p>
 
         </div>
 
-
-        <!-- =========================
-                 自分のアイコン
-            ========================== -->
-
-        <a href="{% url 'accounts:mypage' %}" class="recruit-chat-avatar-link">
-
-            {% if request.user.get_profile_image %}
-
-            <img src="{{ request.user.get_profile_image }}" class="recruit-chat-avatar"
-                alt="{{ request.user.username }}">
-
-            {% else %}
-
-            <div class="recruit-chat-avatar recruit-chat-avatar-default">
-                👤
-            </div>
-
-            {% endif %}
-
+        <a href="{% url 'recruit_detail' recruit.id %}" class="recruit-chat-back">
+            ← 募集詳細へ
         </a>
 
     </div>
 
 
-    {% else %}
-
     <!-- =========================
-             相手
-        ========================== -->
+         メッセージエリア
+         ★ここだけスクロール
+    ========================== -->
 
-    <div class="recruit-chat-row other-row">
+    <div id="recruit-chat-messages" class="recruit-chat-messages">
 
+        {% for message in chat_messages %}
+
+        {% if message.user == request.user %}
 
         <!-- =========================
-                 相手のアイコン
-            ========================== -->
+                     自分
+                ========================== -->
 
-        {% if message.user.is_superuser %}
+        <div class="recruit-chat-row my-row">
 
-        <!--
-                    スーパーユーザー
-                    → プロフィールへのリンクなし
-                -->
+            <div class="recruit-chat-bubble-wrapper">
 
-        <div class="recruit-chat-avatar-link">
+                <div class="recruit-chat-bubble my-bubble">
+                    {{ message.text|linebreaksbr }}
+                </div>
 
-            {% if message.user.get_profile_image %}
+                <div class="recruit-chat-meta">
 
-            <img src="{{ message.user.get_profile_image }}" class="recruit-chat-avatar"
-                alt="{{ message.user.username }}">
+                    <span class="recruit-chat-time">
+                        {{ message.created_at|date:"Y/m/d H:i" }}
+                    </span>
 
-            {% else %}
+                </div>
 
-            <div class="recruit-chat-avatar recruit-chat-avatar-default">
-                👤
             </div>
 
-            {% endif %}
+
+            <!-- 自分のアイコン -->
+
+            <a href="{% url 'accounts:mypage' %}" class="recruit-chat-avatar-link">
+
+                {% if request.user.get_profile_image %}
+
+                <img src="{{ request.user.get_profile_image }}" class="recruit-chat-avatar"
+                    alt="{{ request.user.username }}">
+
+                {% else %}
+
+                <div class="recruit-chat-avatar recruit-chat-avatar-default">
+                    👤
+                </div>
+
+                {% endif %}
+
+            </a>
 
         </div>
+
 
         {% else %}
 
-        <!--
-                    通常ユーザー
-                    → DjangoのURL nameを使用
-                -->
-
-        <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-avatar-link">
-
-            {% if message.user.get_profile_image %}
-
-            <img src="{{ message.user.get_profile_image }}" class="recruit-chat-avatar"
-                alt="{{ message.user.username }}">
-
-            {% else %}
-
-            <div class="recruit-chat-avatar recruit-chat-avatar-default">
-                👤
-            </div>
-
-            {% endif %}
-
-        </a>
-
-        {% endif %}
-
-
         <!-- =========================
-                 吹き出し
-            ========================== -->
-
-        <div class="recruit-chat-bubble-wrapper">
-
-
-            <!-- =========================
-                     ユーザー名
+                     相手
                 ========================== -->
+
+        <div class="recruit-chat-row other-row">
+
+            <!-- 相手のアイコン -->
 
             {% if message.user.is_superuser %}
 
-            <!-- スーパーユーザーは名前もリンクなし -->
+            <div class="recruit-chat-avatar-link">
 
-            <span class="recruit-chat-username">
-                {{ message.user.username }}
-            </span>
+                {% if message.user.get_profile_image %}
+
+                <img src="{{ message.user.get_profile_image }}" class="recruit-chat-avatar"
+                    alt="{{ message.user.username }}">
+
+                {% else %}
+
+                <div class="recruit-chat-avatar recruit-chat-avatar-default">
+                    👤
+                </div>
+
+                {% endif %}
+
+            </div>
 
             {% else %}
 
-            <!-- 通常ユーザーはプロフィールへ -->
+            <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-avatar-link">
 
-            <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-username">
-                {{ message.user.username }}
+                {% if message.user.get_profile_image %}
+
+                <img src="{{ message.user.get_profile_image }}" class="recruit-chat-avatar"
+                    alt="{{ message.user.username }}">
+
+                {% else %}
+
+                <div class="recruit-chat-avatar recruit-chat-avatar-default">
+                    👤
+                </div>
+
+                {% endif %}
+
             </a>
 
             {% endif %}
 
 
-            <!-- =========================
-                     メッセージ
-                ========================== -->
+            <!-- 吹き出し -->
 
-            <div class="recruit-chat-bubble other-bubble">
-                {{ message.text|linebreaksbr }}
-            </div>
+            <div class="recruit-chat-bubble-wrapper">
 
+                {% if message.user.is_superuser %}
 
-            <!-- =========================
-                     時刻
-                ========================== -->
-
-            <div class="recruit-chat-meta">
-
-                <span class="recruit-chat-time">
-                    {{ message.created_at|date:"Y/m/d H:i" }}
+                <span class="recruit-chat-username">
+                    {{ message.user.username }}
                 </span>
+
+                {% else %}
+
+                <a href="{% url 'accounts:user_detail' message.user.username %}" class="recruit-chat-username">
+                    {{ message.user.username }}
+                </a>
+
+                {% endif %}
+
+
+                <div class="recruit-chat-bubble other-bubble">
+                    {{ message.text|linebreaksbr }}
+                </div>
+
+
+                <div class="recruit-chat-meta">
+
+                    <span class="recruit-chat-time">
+                        {{ message.created_at|date:"Y/m/d H:i" }}
+                    </span>
+
+                </div>
 
             </div>
 
         </div>
 
+        {% endif %}
+
+
+        {% empty %}
+
+        <div id="recruit-chat-empty" class="recruit-chat-empty">
+            まだメッセージはありません。
+        </div>
+
+        {% endfor %}
+
     </div>
 
-    {% endif %}
 
+    <!-- =========================
+         接続状態
+    ========================== -->
 
-    {% empty %}
-
-    <div id="recruit-chat-empty" class="recruit-chat-empty">
-        まだメッセージはありません。
+    <div id="recruit-chat-status" class="recruit-chat-status">
+        接続中...
     </div>
-
-    {% endfor %}
-    ```
 
 </div>
 
+
 <!-- =========================
      入力エリア
+     ★完全固定
 ========================== -->
+
 <div class="recruit-chat-input-fixed">
 
     <form id="recruit-chat-form" class="recruit-chat-form">
@@ -248,14 +228,6 @@
 
     </form>
 
-</div>
-
-<!-- =========================
-     接続状態
-========================== -->
-
-<div id="recruit-chat-status" class="recruit-chat-status">
-    接続中...
 </div>
 
 {% endblock %}
