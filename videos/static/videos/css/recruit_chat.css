@@ -1,13 +1,12 @@
 /* ==================================================
    SPIRYTUS 募集チャット
-   DMチャットと同じ完全固定レイアウト
-   ================================================== */
+   DMチャットと同一レイアウト
+================================================== */
 
 
 /* ==================================================
    1. 募集チャットページ全体
-   ★ body自体をスクロールさせない
-   ================================================== */
+================================================== */
 
 html:has(.recruit-chat-container),
 body:has(.recruit-chat-container) {
@@ -24,14 +23,20 @@ body:has(.recruit-chat-container) {
 
 /* ==================================================
    2. 募集チャット全体
-   ★ DMの .chat-container と同じ考え方
-   ================================================== */
+   header
+   ↓
+   messages
+   ↓
+   status
+
+   footerはbase側の共通footer
+================================================== */
 
 .recruit-chat-container {
 
     position: fixed !important;
 
-    top: var(--chat-header-height, 60px) !important;
+    top: var(--recruit-chat-header-height, 64px) !important;
 
     bottom: var(--footer-height, 70px) !important;
 
@@ -51,25 +56,18 @@ body:has(.recruit-chat-container) {
     overflow: hidden !important;
 
     background: #0f0f0f !important;
+
     color: #fff !important;
 
     box-sizing: border-box !important;
 
     z-index: 1000 !important;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        sans-serif;
 }
 
 
 /* ==================================================
-   3. 募集チャットヘッダー
-   ★ 固定領域内
-   ================================================== */
+   3. ヘッダー
+================================================== */
 
 .recruit-chat-header {
 
@@ -87,7 +85,7 @@ body:has(.recruit-chat-container) {
 
     gap: 12px !important;
 
-    padding: 12px 16px !important;
+    padding: 10px 14px !important;
 
     box-sizing: border-box !important;
 
@@ -96,9 +94,13 @@ body:has(.recruit-chat-container) {
     border-bottom:
         1px solid #252525 !important;
 
-    z-index: 10 !important;
+    color: #fff !important;
+
+    z-index: 1100 !important;
 }
 
+
+/* ヘッダー情報 */
 
 .recruit-chat-header-info {
 
@@ -110,51 +112,41 @@ body:has(.recruit-chat-container) {
 
 .recruit-chat-header h2 {
 
-    margin: 0 0 4px !important;
+    margin: 0 !important;
 
-    font-size: 17px !important;
-
-    line-height: 1.3 !important;
+    font-size: 16px !important;
 
     font-weight: 700 !important;
 
-    color: #fff !important;
+    line-height: 1.35 !important;
 
-    white-space: nowrap !important;
+    color: #fff !important;
 
     overflow: hidden !important;
 
     text-overflow: ellipsis !important;
+
+    white-space: nowrap !important;
 }
 
 
 .recruit-chat-header p {
 
-    margin: 0 !important;
+    margin: 3px 0 0 !important;
 
     font-size: 11px !important;
 
-    line-height: 1.4 !important;
+    line-height: 1.3 !important;
 
     color: #888 !important;
 }
 
 
+/* 募集詳細へ */
+
 .recruit-chat-back {
 
     flex: 0 0 auto !important;
-
-    display: inline-flex !important;
-
-    align-items: center !important;
-
-    justify-content: center !important;
-
-    padding: 7px 10px !important;
-
-    border-radius: 999px !important;
-
-    background: #222 !important;
 
     color: #aaa !important;
 
@@ -163,16 +155,10 @@ body:has(.recruit-chat-container) {
     text-decoration: none !important;
 
     white-space: nowrap !important;
-
-    transition:
-        background .2s ease,
-        color .2s ease !important;
 }
 
 
 .recruit-chat-back:hover {
-
-    background: #333 !important;
 
     color: #fff !important;
 }
@@ -180,8 +166,8 @@ body:has(.recruit-chat-container) {
 
 /* ==================================================
    4. メッセージエリア
-   ★★★ ここだけスクロール ★★★
-   ================================================== */
+   ★ここだけスクロール
+================================================== */
 
 .recruit-chat-messages {
 
@@ -210,8 +196,8 @@ body:has(.recruit-chat-container) {
      */
     padding-bottom:
         calc(
-            100px +
-            env(safe-area-inset-bottom)
+            100px
+            + env(safe-area-inset-bottom)
         ) !important;
 
     background: #0f0f0f !important;
@@ -228,7 +214,7 @@ body:has(.recruit-chat-container) {
 
 /* ==================================================
    5. メッセージ行
-   ================================================== */
+================================================== */
 
 .recruit-chat-row {
 
@@ -257,8 +243,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   6. アバターリンク
-   ================================================== */
+   6. アバター
+================================================== */
 
 .recruit-chat-avatar-link {
 
@@ -268,12 +254,7 @@ body:has(.recruit-chat-container) {
 
     flex: 0 0 auto !important;
 
-    width: 34px !important;
-    height: 34px !important;
-
     margin: 18px 6px 0 !important;
-
-    padding: 0 !important;
 
     text-decoration: none !important;
 
@@ -281,21 +262,14 @@ body:has(.recruit-chat-container) {
 }
 
 
-/* ==================================================
-   7. アバター
-   ================================================== */
-
 .recruit-chat-avatar {
 
     width: 34px !important;
-
     height: 34px !important;
 
-    flex: 0 0 34px !important;
+    flex-shrink: 0 !important;
 
     margin: 0 !important;
-
-    padding: 0 !important;
 
     border-radius: 50% !important;
 
@@ -303,27 +277,11 @@ body:has(.recruit-chat-container) {
 
     display: block !important;
 
-    box-shadow:
-        0 0 6px rgba(255,255,255,0.05) !important;
-
-    transition:
-        transform .2s ease,
-        opacity .2s ease !important;
+    cursor: pointer !important;
 }
 
 
-.recruit-chat-avatar-link:hover
-.recruit-chat-avatar {
-
-    transform: scale(1.06);
-
-    opacity: .9;
-}
-
-
-/* ==================================================
-   8. デフォルトアイコン
-   ================================================== */
+/* デフォルトアイコン */
 
 .recruit-chat-avatar-default {
 
@@ -337,15 +295,13 @@ body:has(.recruit-chat-container) {
 
     color: #aaa !important;
 
-    font-size: 17px !important;
-
-    box-sizing: border-box !important;
+    font-size: 18px !important;
 }
 
 
 /* ==================================================
-   9. 吹き出しラッパー
-   ================================================== */
+   7. 吹き出しラッパー
+================================================== */
 
 .recruit-chat-bubble-wrapper {
 
@@ -360,8 +316,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   10. ユーザー名
-   ================================================== */
+   8. ユーザー名
+================================================== */
 
 .recruit-chat-username {
 
@@ -388,8 +344,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   11. 吹き出し
-   ================================================== */
+   9. 吹き出し
+================================================== */
 
 .recruit-chat-bubble {
 
@@ -412,8 +368,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   12. 自分
-   ================================================== */
+   10. 自分
+================================================== */
 
 .recruit-chat-bubble.my-bubble {
 
@@ -431,8 +387,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   13. 相手
-   ================================================== */
+   11. 相手
+================================================== */
 
 .recruit-chat-bubble.other-bubble {
 
@@ -445,8 +401,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   14. メタ情報
-   ================================================== */
+   12. メタ情報
+================================================== */
 
 .recruit-chat-meta {
 
@@ -466,15 +422,9 @@ body:has(.recruit-chat-container) {
 }
 
 
-/* ==================================================
-   15. 時刻
-   ================================================== */
-
 .recruit-chat-time {
 
     font-size: 10px !important;
-
-    line-height: 1 !important;
 
     color: #777 !important;
 
@@ -483,8 +433,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   16. 空状態
-   ================================================== */
+   13. 空状態
+================================================== */
 
 .recruit-chat-empty {
 
@@ -505,33 +455,67 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   17. 入力バー
+   14. 接続状態
+================================================== */
+
+.recruit-chat-status {
+
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    min-height: 22px !important;
+
+    padding: 4px 10px !important;
+
+    box-sizing: border-box !important;
+
+    background: #111 !important;
+
+    color: #666 !important;
+
+    font-size: 10px !important;
+
+    line-height: 14px !important;
+
+    text-align: center !important;
+
+    border-top:
+        1px solid #181818 !important;
+
+    z-index: 1100 !important;
+}
+
+
+/* ==================================================
+   15. 入力バー
    ★完全固定
-   ★スクロールしない
-   ================================================== */
+================================================== */
 
 .recruit-chat-input-fixed {
 
     position: fixed !important;
 
     left: 0 !important;
-
     right: 0 !important;
 
     bottom:
         calc(
-            var(--footer-height, 70px) +
-            env(safe-area-inset-bottom)
+            var(--footer-height, 70px)
+            + env(safe-area-inset-bottom)
         ) !important;
 
     width: 100% !important;
 
     min-height: 56px !important;
 
-    padding:
-        7px 10px !important;
+    display: flex !important;
+
+    align-items: center !important;
 
     box-sizing: border-box !important;
+
+    padding: 7px 10px !important;
 
     background:
         rgba(18,18,18,0.97) !important;
@@ -548,8 +532,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   18. 入力フォーム
-   ================================================== */
+   16. 入力フォーム
+================================================== */
 
 .recruit-chat-form {
 
@@ -560,8 +544,6 @@ body:has(.recruit-chat-container) {
     width: 100% !important;
 
     max-width: none !important;
-
-    min-height: 42px !important;
 
     margin: 0 !important;
 
@@ -574,8 +556,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   19. 入力欄
-   ================================================== */
+   17. 入力欄
+================================================== */
 
 #recruit-chat-input {
 
@@ -589,8 +571,7 @@ body:has(.recruit-chat-container) {
 
     margin: 0 !important;
 
-    padding:
-        0 14px !important;
+    padding: 0 14px !important;
 
     border: none !important;
 
@@ -611,10 +592,6 @@ body:has(.recruit-chat-container) {
     appearance: none !important;
 
     -webkit-appearance: none !important;
-
-    opacity: 1 !important;
-
-    visibility: visible !important;
 }
 
 
@@ -631,8 +608,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   20. 送信ボタン
-   ================================================== */
+   18. 送信ボタン
+================================================== */
 
 .recruit-chat-form button {
 
@@ -674,41 +651,8 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   21. 接続状態
-   ================================================== */
-
-.recruit-chat-status {
-
-    flex: 0 0 auto !important;
-
-    width: 100% !important;
-
-    height: 20px !important;
-
-    min-height: 20px !important;
-
-    padding: 4px 10px !important;
-
-    box-sizing: border-box !important;
-
-    background: #111 !important;
-
-    color: #666 !important;
-
-    font-size: 10px !important;
-
-    line-height: 12px !important;
-
-    text-align: center !important;
-
-    border-top:
-        1px solid #181818 !important;
-}
-
-
-/* ==================================================
-   22. スクロールバー
-   ================================================== */
+   19. スクロールバー
+================================================== */
 
 .recruit-chat-messages::-webkit-scrollbar {
 
@@ -731,48 +675,26 @@ body:has(.recruit-chat-container) {
 
 
 /* ==================================================
-   23. アニメーション
-   ================================================== */
-
-@keyframes recruitChatFadeIn {
-
-    from {
-
-        opacity: 0;
-
-        transform:
-            translateY(5px);
-    }
-
-    to {
-
-        opacity: 1;
-
-        transform:
-            translateY(0);
-    }
-}
-
-
-/* ==================================================
-   24. スマートフォン
-   ================================================== */
+   20. スマートフォン
+================================================== */
 
 @media (max-width: 600px) {
 
     body:has(.recruit-chat-container) {
 
-        --chat-header-height: 64px;
+        --recruit-chat-header-height: 64px;
     }
 
 
     .recruit-chat-container {
 
         top:
-            var(--chat-header-height) !important;
+            var(--recruit-chat-header-height)
+            !important;
 
         bottom:
-            var(--footer-height, 70px) !important;
+            var(--footer-height, 70px)
+            !important;
     }
 
 
@@ -780,8 +702,7 @@ body:has(.recruit-chat-container) {
 
         min-height: 64px !important;
 
-        padding:
-            10px 14px !important;
+        padding: 10px 14px !important;
     }
 
 
@@ -793,16 +714,7 @@ body:has(.recruit-chat-container) {
 
     .recruit-chat-header p {
 
-        font-size: 10px !important;
-    }
-
-
-    .recruit-chat-back {
-
-        font-size: 10px !important;
-
-        padding:
-            6px 9px !important;
+        font-size: 11px !important;
     }
 
 
@@ -814,39 +726,15 @@ body:has(.recruit-chat-container) {
 
         overflow-y: auto !important;
 
-        padding:
-            14px 9px !important;
+        padding-left: 9px !important;
+
+        padding-right: 9px !important;
 
         padding-bottom:
             calc(
-                100px +
-                env(safe-area-inset-bottom)
+                100px
+                + env(safe-area-inset-bottom)
             ) !important;
-    }
-
-
-    .recruit-chat-bubble-wrapper {
-
-        max-width: 76% !important;
-    }
-
-
-    .recruit-chat-avatar-link {
-
-        width: 34px !important;
-
-        height: 34px !important;
-
-        margin:
-            18px 6px 0 !important;
-    }
-
-
-    .recruit-chat-avatar {
-
-        width: 34px !important;
-
-        height: 34px !important;
     }
 
 
@@ -854,8 +742,8 @@ body:has(.recruit-chat-container) {
 
         bottom:
             calc(
-                var(--footer-height, 70px) +
-                env(safe-area-inset-bottom)
+                var(--footer-height, 70px)
+                + env(safe-area-inset-bottom)
             ) !important;
 
         padding:
@@ -883,12 +771,43 @@ body:has(.recruit-chat-container) {
 
         height: 42px !important;
     }
+
+
+    .recruit-chat-avatar {
+
+        width: 34px !important;
+
+        height: 34px !important;
+    }
+
+
+    .recruit-chat-avatar-link {
+
+        margin:
+            18px 6px 0 !important;
+    }
+
+
+    .recruit-chat-bubble-wrapper {
+
+        max-width: 76% !important;
+    }
+
+
+    .recruit-chat-bubble {
+
+        padding:
+            9px 13px !important;
+
+        font-size: 14px !important;
+    }
+
 }
 
 
 /* ==================================================
-   25. 小型スマートフォン
-   ================================================== */
+   21. 小型スマートフォン
+================================================== */
 
 @media (max-width: 380px) {
 
@@ -912,15 +831,5 @@ body:has(.recruit-chat-container) {
 
         padding-right: 14px !important;
     }
-}
 
-
-/* ==================================================
-   26. 共通CSSからの干渉を最後に遮断
-   ================================================== */
-
-.recruit-chat-container *,
-.recruit-chat-input-fixed * {
-
-    min-width: 0;
-}
+}   
