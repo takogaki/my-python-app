@@ -960,10 +960,10 @@ section h3 {
 
 .sp-toast-container {
     position: fixed;
-    top: 25px;
+    top: 200px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 999999;
+    z-index: 10000000000;
     pointer-events: none;
 }
 

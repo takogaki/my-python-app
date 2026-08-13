@@ -19,7 +19,7 @@
     <meta name="apple-mobile-web-app-title" content="SPIRYTUS">
 
     <!-- CSRF -->
-    <!-- <meta name="csrf-token" content="{{ csrf_token }}"> -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
 
     <!-- OGP -->
     <meta property="og:type" content="website">
@@ -292,8 +292,10 @@
 
     </div>
 
+    <script src="{% static 'locations/js/gps.js' %}"></script>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+    {% endblock %}
 
     <script>
         if ("serviceWorker" in navigator) {

@@ -118,8 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 JSON.parse(e.data);
 
 
-            /* 通知は無視 */
-
             if (
                 data.type ===
                 "notification"
@@ -127,8 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-
-            /* chat以外も無視 */
 
             if (
                 data.type !==
@@ -237,10 +233,6 @@ document.addEventListener("DOMContentLoaded", function () {
             wrapper.className =
                 "chat-bubble-wrapper";
 
-
-            /* ==================================================
-               名前
-            ================================================== */
 
             wrapper.appendChild(
                 usernameEl
@@ -423,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /* ==================================================
    ページロード後に最下部
-   ================================================== */
+================================================== */
 
 window.addEventListener(
     "load",
@@ -449,3 +441,151 @@ window.addEventListener(
         );
     }
 );
+
+
+/* ==================================================
+📱 DMチャット
+募集チャットと同じキーボード対応
+================================================== */
+
+(function () {
+
+    function updateChatViewport() {
+
+        if (!window.visualViewport) {
+            return;
+        }
+
+
+        const viewport =
+            window.visualViewport;
+
+
+        /* ==================================================
+           キーボード高さ
+        ================================================== */
+
+        const keyboardHeight =
+            Math.max(
+                0,
+                window.innerHeight
+                - viewport.height
+                - viewport.offsetTop
+            );
+
+
+        /* ==================================================
+           CSSへ渡す
+        ================================================== */
+
+        document.documentElement.style.setProperty(
+            "--chat-keyboard-height",
+            keyboardHeight + "px"
+        );
+
+
+        console.log(
+            "📱 DM Chat viewport:",
+            {
+                viewportHeight:
+                    viewport.height,
+
+                windowHeight:
+                    window.innerHeight,
+
+                keyboardHeight:
+                    keyboardHeight
+            }
+        );
+    }
+
+
+    /* ==================================================
+       初期計算
+    ================================================== */
+
+    updateChatViewport();
+
+
+    /* ==================================================
+       visualViewport
+    ================================================== */
+
+    if (window.visualViewport) {
+
+        window.visualViewport.addEventListener(
+            "resize",
+            updateChatViewport
+        );
+
+        window.visualViewport.addEventListener(
+            "scroll",
+            updateChatViewport
+        );
+    }
+
+
+    /* ==================================================
+       通常resize
+    ================================================== */
+
+    window.addEventListener(
+        "resize",
+        updateChatViewport
+    );
+
+
+    /* ==================================================
+       入力欄フォーカス
+    ================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const input =
+                document.getElementById(
+                    "message-input"
+                );
+
+
+            if (!input) return;
+
+
+            input.addEventListener(
+                "focus",
+                function () {
+
+                    setTimeout(
+                        updateChatViewport,
+                        100
+                    );
+
+                    setTimeout(
+                        updateChatViewport,
+                        300
+                    );
+
+                    setTimeout(
+                        updateChatViewport,
+                        500
+                    );
+                }
+            );
+
+
+            input.addEventListener(
+                "blur",
+                function () {
+
+                    setTimeout(
+                        updateChatViewport,
+                        300
+                    );
+                }
+            );
+
+        }
+    );
+
+})();

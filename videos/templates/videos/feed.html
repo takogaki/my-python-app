@@ -8,6 +8,7 @@ Spirytus動画｜SPIRYTUS
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'videos/css/feed.css' %}">
+<link rel="stylesheet" href="{% static 'locations/css/nearby_recruits.css' %}">
 {% endblock %}
 
 {% block body %}
@@ -23,7 +24,24 @@ Spirytus動画｜SPIRYTUS
         </button>
     </div>
 
+    <!-- =========================
+         📍 近くの募集
+    ========================== -->
+    <section class="nearby-recruits">
+    
+        <h2>
+            📍 近くの募集
+        </h2>
+    
+        <div id="nearbyRecruitList">
+            読み込み中...
+        </div>
+    
+    </section>
 
+    <!-- =========================
+        🎞 メインフィード
+    ========================== -->
     <div class="feed video-feed">
 
         <div class="feed-inner">
@@ -80,9 +98,9 @@ Spirytus動画｜SPIRYTUS
                     <source src="{{ post.video.url }}">
                 </video>
                 {% elif post.media_type == "image" %}
-                <img src="{{ post.image.url }}">
+                <img src="{{ post.image.url }}" class="feed-post-image" alt="">
                 {% endif %}
-            
+                
                 {% if post.caption %}
                 <div class="caption">
                     <p class="caption-text">
@@ -309,6 +327,8 @@ Spirytus動画｜SPIRYTUS
 {% endblock %}
 
 {% block extra_js %}
+
+<script src="{% static 'locations/js/nearby_recruits.js' %}"></script>
 
 <script>
     const startIndex = Number("{{ start_index|default:'0' }}");

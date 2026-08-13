@@ -1124,5 +1124,120 @@ html, body {
 
 }
 
+/* ==================================================
+   📍 近くの募集
+   画面上に浮かせる
+================================================== */
+
+.nearby-recruits {
+    position: fixed !important;
+
+    top: 100px !important;
+    left: 0 !important;
+
+    width: 100% !important;
+
+    z-index: 9999 !important;
+
+    margin: 0 !important;
+    padding: 0 15px !important;
+
+    box-sizing: border-box;
+
+    pointer-events: none;
+}
 
 
+/* タイトル */
+
+.nearby-recruits h2 {
+    margin: 0 0 8px !important;
+
+    color: #fff;
+
+    font-size: 15px;
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, .8);
+}
+
+
+/* 募集一覧 */
+
+#nearbyRecruitList {
+    display: flex;
+
+    gap: 8px;
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+
+    pointer-events: auto;
+}
+
+#nearbyRecruitList::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* 募集カード */
+
+.nearby-recruit-card {
+    flex: 0 0 180px;
+
+    padding: 10px;
+
+    box-sizing: border-box;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    background: rgba(0, 0, 0, .65);
+
+    border-radius: 12px;
+
+    backdrop-filter: blur(8px);
+
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* ==================================================
+📷 Feed投稿画像 全画面表示
+================================================== */
+
+.feed-post-image {
+    cursor: pointer;
+    transition: all 0.25s ease;
+    z-index: 1;
+}
+
+
+/* 全画面状態 */
+
+.feed-post-image.image-fullscreen {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    max-width: none;
+    max-height: none;
+
+    object-fit: contain;
+
+    margin: 0;
+
+    z-index: 99999;
+
+    background: #000;
+
+    cursor: pointer;
+}

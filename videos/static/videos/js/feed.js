@@ -434,3 +434,222 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+async function loadNearbyRecruits() {
+
+    const container =
+        document.getElementById(
+            "nearbyRecruitList"
+        );
+
+    if (!container) return;
+
+    try {
+
+        const response =
+            await fetch(
+                "/locations/nearby-recruits/"
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok || !data.success) {
+
+            container.innerHTML =
+                "<p>近くの募集を取得できませんでした。</p>";
+
+            return;
+        }
+
+        if (!data.results.length) {
+
+            container.innerHTML =
+                "<p>近くに募集はありません。</p>";
+
+            return;
+        }
+
+        container.innerHTML =
+            data.results.map(recruit => {
+
+                return `
+                    <a
+                        href="/videos/recruit/${recruit.id}/"
+                        class="nearby-recruit-card"
+                    >
+
+                        <div class="nearby-recruit-title">
+                            ${escapeHtml(recruit.title)}
+                        </div>
+
+                        <div class="nearby-recruit-place">
+                            📍 ${escapeHtml(recruit.place || "")}
+                        </div>
+
+                        <div class="nearby-recruit-distance">
+                            📏 ${recruit.distance} km
+                        </div>
+
+                    </a>
+                `;
+
+            }).join("");
+
+    } catch (error) {
+
+        console.error(
+            "近くの募集取得エラー",
+            error
+        );
+
+        container.innerHTML =
+            "<p>読み込みに失敗しました。</p>";
+    }
+}
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = value;
+
+    return div.innerHTML;
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadNearbyRecruits();
+
+    }
+);
+
+/* ==================================================
+📷 Feed投稿画像 全画面表示
+================================================== */
+
+let fullscreenImage = null;
+let fullscreenPlaceholder = null;
+
+
+/* =========================
+画像を開く
+========================= */
+
+document.addEventListener("click", (event) => {
+
+    const image =
+        event.target.closest(".feed-post-image");
+
+    if (!image) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+
+    /* =========================
+    すでに全画面なら閉じる
+    ========================= */
+
+    if (fullscreenImage) {
+
+        closeFullscreenImage();
+
+        return;
+    }
+
+
+    /* =========================
+    元の位置を記憶
+    ========================= */
+
+    fullscreenPlaceholder =
+        document.createComment(
+            "feed-image-placeholder"
+        );
+
+    image.parentNode.insertBefore(
+        fullscreenPlaceholder,
+        image
+    );
+
+
+    /* =========================
+    body直下へ移動
+    ========================= */
+
+    fullscreenImage = image;
+
+    document.body.appendChild(
+        fullscreenImage
+    );
+
+
+    /* =========================
+    全画面
+    ========================= */
+
+    fullscreenImage.classList.add(
+        "image-fullscreen"
+    );
+
+
+    /* =========================
+    Feedスクロール停止
+    ========================= */
+
+    if (feed) {
+        feed.style.overflow = "hidden";
+    }
+
+});
+
+
+/* =========================
+画像を戻す
+========================= */
+
+function closeFullscreenImage() {
+
+    if (!fullscreenImage) return;
+
+
+    fullscreenImage.classList.remove(
+        "image-fullscreen"
+    );
+
+
+    /* 元の位置へ戻す */
+
+    if (fullscreenPlaceholder) {
+
+        fullscreenPlaceholder.parentNode.insertBefore(
+            fullscreenImage,
+            fullscreenPlaceholder.nextSibling
+        );
+
+        fullscreenPlaceholder.remove();
+
+    }
+
+
+    fullscreenImage = null;
+    fullscreenPlaceholder = null;
+
+
+    /* Feedスクロール復活 */
+
+    if (feed) {
+
+        feed.style.overflowY = "scroll";
+
+        feed.style.overflowX = "hidden";
+
+    }
+
+}

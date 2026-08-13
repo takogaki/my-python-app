@@ -305,6 +305,8 @@ def recruit_create(request):
         max_people = request.POST.get("max_people", "2")
         target_gender = request.POST.get("target_gender", "all")
         industry = request.POST.get("industry", "").strip()
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
 
         # =========================
         # 📷 募集写真
@@ -366,6 +368,8 @@ def recruit_create(request):
             max_people=max_people,
             target_gender=target_gender,
             industry=industry,
+            latitude=latitude or None,
+            longitude=longitude or None,
 
             # 📷 写真
             image=recruit_image,

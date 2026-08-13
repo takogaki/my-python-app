@@ -164,6 +164,9 @@ INSTALLED_APPS = [
 
     # 広告関連
     "advertisements",
+
+    # 位置情報 GPS
+    'locations',
 ]
 
 # ==============================
@@ -303,9 +306,11 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # 500エラー通知先
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL")
+
 ADMINS = [
-    ("Eden", os.environ.get("ADMIN_EMAIL")),
-]
+    ADMIN_EMAIL,
+] if ADMIN_EMAIL else []
 
 # ==============================
 # 🚨 エラー通知

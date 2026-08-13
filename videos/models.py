@@ -300,6 +300,18 @@ class Recruit(models.Model):
         null=True
     )
 
+    latitude = models.FloatField(
+        null=True,
+        blank=True,
+        verbose_name="募集地点緯度"
+    )
+
+    longitude = models.FloatField(
+        null=True,
+        blank=True,
+        verbose_name="募集地点経度"
+    )
+
     class Meta:
         ordering = ["-created_at"]
 

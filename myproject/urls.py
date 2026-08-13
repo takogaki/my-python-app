@@ -41,6 +41,9 @@ urlpatterns = [
     path("videochat/", include("videochat.urls")),
     path("notifications/", include("notifications.urls")),
     path("videos/", include("videos.urls")),
+
+    # 位置情報 GPS
+    path("locations/", include("locations.urls")),
 ]
 
 if settings.DEBUG:

@@ -1,7 +1,21 @@
 /* ==================================================
    SPIRYTUS DM CHAT
-   募集チャットと同じ固定レイアウト
+   募集チャットと同じビューポート設計
    ================================================== */
+
+
+/* ==================================================
+   0. ビューポート変数
+   ================================================== */
+
+:root {
+
+    --footer-height: 70px;
+
+    --chat-keyboard-height: 0px;
+
+    --chat-header-height: 64px;
+}
 
 
 /* ==================================================
@@ -23,26 +37,29 @@ body:has(.chat-container) {
 
 /* ==================================================
    2. DMチャット本体
-
-   header
-      ↓
-   messages
-      ↓
-   footer
-
-   入力バーはfooterの直上
    ================================================== */
 
 .chat-container {
 
     position: fixed !important;
 
+    /*
+     * ★ ヘッダーは絶対にここから上へ行かない
+     */
     top:
-        var(--chat-header-height, 64px)
+        var(--chat-header-height, 60px)
         !important;
 
+    /*
+     * ★ キーボードが出たら
+     * その分だけ下端を上げる
+     */
     bottom:
-        var(--footer-height, 70px)
+        calc(
+            var(--footer-height, 70px)
+            +
+            var(--chat-keyboard-height, 0px)
+        )
         !important;
 
     left: 0 !important;
@@ -51,9 +68,11 @@ body:has(.chat-container) {
     width: 100% !important;
 
     height: auto !important;
+
     min-height: 0 !important;
 
     display: flex !important;
+
     flex-direction: column !important;
 
     margin: 0 !important;
@@ -62,6 +81,7 @@ body:has(.chat-container) {
     overflow: hidden !important;
 
     background: #0f0f0f !important;
+
     color: #fff !important;
 
     box-sizing: border-box !important;
@@ -82,9 +102,11 @@ body:has(.chat-container) {
     min-height: 0 !important;
 
     width: 100% !important;
+
     height: auto !important;
 
     overflow-y: auto !important;
+
     overflow-x: hidden !important;
 
     box-sizing: border-box !important;
@@ -92,16 +114,21 @@ body:has(.chat-container) {
     padding-top: 14px !important;
 
     padding-left: 9px !important;
+
     padding-right: 9px !important;
 
     /*
-     * 入力バーが重ならないための余白
+     * 入力バー分＋Footer分の余白
      */
     padding-bottom:
         calc(
-            100px +
+            140px
+            +
+            var(--footer-height, 70px)
+            +
             env(safe-area-inset-bottom)
-        ) !important;
+        )
+        !important;
 
     background: #0f0f0f !important;
 
@@ -134,11 +161,13 @@ body:has(.chat-container) {
 
 
 .my-row {
+
     justify-content: flex-end !important;
 }
 
 
 .other-row {
+
     justify-content: flex-start !important;
 }
 
@@ -150,21 +179,20 @@ body:has(.chat-container) {
 .chat-avatar {
 
     width: 34px !important;
+
     height: 34px !important;
 
     flex-shrink: 0 !important;
 
-    margin:
-        18px 6px 0
-        !important;
+    margin: 18px 6px 0 !important;
 
     border-radius: 50% !important;
 
     object-fit: cover !important;
 
-    display: block !important;
-
     cursor: pointer !important;
+
+    display: block !important;
 }
 
 
@@ -207,6 +235,7 @@ body:has(.chat-container) {
 
 
 .chat-username:hover {
+
     color: #fff !important;
 }
 
@@ -219,9 +248,7 @@ body:has(.chat-container) {
 
     position: relative !important;
 
-    padding:
-        9px 13px
-        !important;
+    padding: 9px 13px !important;
 
     border-radius: 18px !important;
 
@@ -334,9 +361,7 @@ body:has(.chat-container) {
 
     justify-content: center !important;
 
-    padding:
-        2px 8px
-        !important;
+    padding: 2px 8px !important;
 
     border-radius: 999px !important;
 
@@ -370,8 +395,7 @@ body:has(.chat-container) {
 
 /* ==================================================
    14. 入力バー
-   ★完全固定
-   ★Footerの直上
+   ★募集チャットと同じ方式
    ================================================== */
 
 .chat-input-bar {
@@ -379,12 +403,14 @@ body:has(.chat-container) {
     position: fixed !important;
 
     left: 0 !important;
+
     right: 0 !important;
 
     bottom:
         calc(
-            var(--footer-height, 70px) +
-            env(safe-area-inset-bottom)
+            var(--footer-height, 70px)
+            +
+            var(--chat-keyboard-height, 0px)
         )
         !important;
 
@@ -400,9 +426,7 @@ body:has(.chat-container) {
 
     margin: 0 !important;
 
-    padding:
-        7px 10px
-        !important;
+    padding: 7px 10px !important;
 
     box-sizing: border-box !important;
 
@@ -438,9 +462,7 @@ body:has(.chat-container) {
 
     margin: 0 !important;
 
-    padding:
-        0 14px
-        !important;
+    padding: 0 14px !important;
 
     border: none !important;
 
@@ -465,11 +487,13 @@ body:has(.chat-container) {
 
 
 .chat-input:focus {
+
     background: #333 !important;
 }
 
 
 .chat-input::placeholder {
+
     color: #777 !important;
 }
 
@@ -485,14 +509,17 @@ body:has(.chat-container) {
         !important;
 
     width: 42px !important;
+
     height: 42px !important;
 
     margin: 0 !important;
+
     padding: 0 !important;
 
     display: flex !important;
 
     align-items: center !important;
+
     justify-content: center !important;
 
     border: none !important;
@@ -504,7 +531,8 @@ body:has(.chat-container) {
             135deg,
             #ff4d6d,
             #ff7a8f
-        ) !important;
+        )
+        !important;
 
     color: #fff !important;
 
@@ -517,36 +545,54 @@ body:has(.chat-container) {
 
 
 /* ==================================================
-   17. Footer
-   ★募集チャットと同じ
-   ★必ず最前面
-   ================================================== */
+DM Footer
+キーボード表示時も常に見える
+================================================== */
 
 body:has(.chat-container) .feed-footer {
-
     position: fixed !important;
 
     left: 0 !important;
     right: 0 !important;
 
-    bottom: 0 !important;
+    bottom:
+        var(--chat-keyboard-height, 0px)
+        !important;
 
     width: 100% !important;
 
-    z-index: 1000000 !important;
-}
+    height:
+        calc(
+            var(--footer-height, 70px)
+            +
+            env(safe-area-inset-bottom)
+        )
+        !important;
 
+    padding-bottom:
+        env(safe-area-inset-bottom)
+        !important;
+
+    box-sizing: border-box !important;
+
+    z-index: 1000000 !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
 /* ==================================================
    18. スクロールバー
    ================================================== */
 
 .chat-box::-webkit-scrollbar {
+
     width: 4px !important;
 }
 
 
 .chat-box::-webkit-scrollbar-track {
+
     background: transparent !important;
 }
 
@@ -566,23 +612,26 @@ body:has(.chat-container) .feed-footer {
 @media (max-width: 600px) {
 
     body:has(.chat-container) {
-
-        --chat-header-height: 64px;
+        --chat-header-height: 60px;
     }
 
 
     .chat-container {
-
-        top: 64px !important;
+        top:
+            var(--chat-header-height, 60px)
+            !important;
 
         bottom:
-            var(--footer-height, 70px)
+            calc(
+                var(--footer-height, 70px)
+                +
+                var(--chat-keyboard-height, 0px)
+            )
             !important;
     }
 
 
     .chat-box {
-
         flex: 1 1 auto !important;
 
         min-height: 0 !important;
@@ -590,19 +639,29 @@ body:has(.chat-container) .feed-footer {
         overflow-y: auto !important;
 
         padding-left: 9px !important;
-
         padding-right: 9px !important;
 
         padding-bottom:
-            100px
+            calc(
+                140px
+                +
+                var(--footer-height, 70px)
+                +
+                env(safe-area-inset-bottom)
+            )
             !important;
     }
 
 
     .chat-input-bar {
-
         bottom:
-            var(--footer-height, 70px)
+            calc(
+                var(--footer-height, 70px)
+                +
+                var(--chat-keyboard-height, 0px)
+                +
+                env(safe-area-inset-bottom)
+            )
             !important;
 
         padding:
@@ -615,7 +674,6 @@ body:has(.chat-container) .feed-footer {
         max-width: 76% !important;
     }
 }
-
 
 /* ==================================================
    20. 小型スマートフォン

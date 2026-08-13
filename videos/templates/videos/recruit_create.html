@@ -230,8 +230,11 @@
             
             </div>
 
-            <!-- 作成 -->
+            <!-- 緯度経度 -->
+            <input type="hidden" name="latitude" id="recruitLatitude">
+            <input type="hidden" name="longitude" id="recruitLongitude">
 
+            <!-- 作成 -->
             <button type="submit" class="recruit-submit">
                 🤝 募集を作成する
             </button>
@@ -246,5 +249,82 @@
     </div>
 
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        console.log("📍 募集作成GPS START");
+
+
+        if (!navigator.geolocation) {
+
+            console.error(
+                "このブラウザはGPSに対応していません。"
+            );
+
+            return;
+        }
+
+
+        navigator.geolocation.getCurrentPosition(
+
+            (position) => {
+
+                const latitude =
+                    position.coords.latitude;
+
+                const longitude =
+                    position.coords.longitude;
+
+
+                console.log(
+                    "📍 募集地点GPS取得成功",
+                    latitude,
+                    longitude
+                );
+
+
+                document.getElementById(
+                    "recruitLatitude"
+                ).value = latitude;
+
+
+                document.getElementById(
+                    "recruitLongitude"
+                ).value = longitude;
+
+            },
+
+
+            (error) => {
+
+                console.error(
+                    "❌ 募集地点GPS取得失敗",
+                    error
+                );
+
+            },
+
+
+            {
+
+                enableHighAccuracy: true,
+
+                timeout: 10000,
+
+                maximumAge: 60000,
+
+            }
+
+        );
+
+    });
+
+</script>
 
 {% endblock %}
