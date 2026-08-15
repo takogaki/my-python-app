@@ -1875,3 +1875,53 @@ body:has(.feed-post-image.image-fullscreen) {
     padding: 0 !important;
 
 }
+
+/* =========================================================
+   🎉 通常募集カード
+   縦中央配置 ＋ footer安全領域
+========================================================= */
+
+.video-card.recruit-card .recruit-caption {
+    position: absolute !important;
+
+    top: 50% !important;
+    bottom: auto !important;
+
+    left: 50% !important;
+
+    transform: translate(-50%, -50%) !important;
+
+    width: calc(100% - 40px) !important;
+    max-width: 520px;
+
+    max-height: calc(100% - 100px);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    z-index: 10 !important;
+
+    scrollbar-width: none;
+}
+
+.video-card.recruit-card .recruit-caption::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   📱 スマホ
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .video-card.recruit-card .recruit-caption {
+        width: calc(100% - 30px) !important;
+
+        max-height: calc(100% - 90px);
+
+    }
+
+}
