@@ -16,22 +16,40 @@ Spirytus動画｜SPIRYTUS
 <div id="tiktok-root">
 
     <!-- =========================
-         🤝 募集フィルター
+         🤝 募集ナビ
     ========================== -->
     <div class="recruit-filter-bar">
+    
+        <!-- 募集だけ表示 -->
         <button type="button" id="recruitFilterBtn" class="recruit-filter-btn">
             🤝 募集だけ見る
         </button>
-    </div>
-
-    <!-- =========================
-         📍 近くの募集
-    ========================== -->
-    <section class="nearby-recruits">
     
-        <h2>
+    
+        <!-- 近くの募集 -->
+        <button type="button" id="nearbyRecruitBtn" class="nearby-recruit-btn">
             📍 近くの募集
-        </h2>
+        </button>
+    
+    </div>
+    
+    
+    <!-- =========================
+         📍 近くの募集パネル
+    ========================== -->
+    <section class="nearby-recruits" id="nearbyRecruitPanel">
+    
+        <div class="nearby-recruits-header">
+    
+            <h2>
+                📍 近くの募集
+            </h2>
+    
+            <button type="button" id="nearbyRecruitClose" class="nearby-recruit-close">
+                ×
+            </button>
+    
+        </div>
     
         <div id="nearbyRecruitList">
             読み込み中...
@@ -336,7 +354,13 @@ Spirytus動画｜SPIRYTUS
 
 <script src="{% static 'videos/js/feed.js' %}"></script>
 
+
+<!-- ==================================================
+     🤝 募集フィルター
+================================================== -->
+
 <script>
+
     document.addEventListener("DOMContentLoaded", function () {
 
         const filterBtn =
@@ -344,6 +368,7 @@ Spirytus動画｜SPIRYTUS
 
         const feed =
             document.querySelector(".video-feed");
+
 
         if (!filterBtn || !feed) {
             return;
@@ -353,34 +378,246 @@ Spirytus動画｜SPIRYTUS
         let recruitOnly = false;
 
 
-        filterBtn.addEventListener("click", function () {
+        filterBtn.addEventListener(
+            "click",
+            function () {
 
-            recruitOnly = !recruitOnly;
+                recruitOnly = !recruitOnly;
 
 
-            if (recruitOnly) {
+                if (recruitOnly) {
 
-                feed.classList.add("recruit-only");
+                    feed.classList.add(
+                        "recruit-only"
+                    );
 
-                filterBtn.classList.add("active");
+                    filterBtn.classList.add(
+                        "active"
+                    );
 
-                filterBtn.textContent =
-                    "すべて見る";
+                    filterBtn.textContent =
+                        "すべて見る";
 
-            } else {
+                }
+                else {
 
-                feed.classList.remove("recruit-only");
+                    feed.classList.remove(
+                        "recruit-only"
+                    );
 
-                filterBtn.classList.remove("active");
+                    filterBtn.classList.remove(
+                        "active"
+                    );
 
-                filterBtn.textContent =
-                    "募集だけ見る";
+                    filterBtn.textContent =
+                        "募集だけ見る";
+
+                }
+
+            }
+        );
+
+    });
+
+</script>
+
+
+<!-- ==================================================
+     📍 近くの募集
+================================================== -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            console.log(
+                "📍 近くの募集ボタン START"
+            );
+
+
+            const nearbyBtn =
+                document.getElementById(
+                    "nearbyRecruitBtn"
+                );
+
+
+            const nearbyPanel =
+                document.getElementById(
+                    "nearbyRecruitPanel"
+                );
+
+
+            const nearbyClose =
+                document.getElementById(
+                    "nearbyRecruitClose"
+                );
+
+
+            /* ==================================================
+               要素確認
+            ================================================== */
+
+            if (
+                !nearbyBtn ||
+                !nearbyPanel
+            ) {
+
+                console.error(
+                    "📍 近くの募集UIがありません"
+                );
+
+                return;
 
             }
 
-        });
 
-    });
+            console.log(
+                "📍 近くの募集UI OK"
+            );
+
+
+            /* ==================================================
+               📍 開く / 閉じる
+            ================================================== */
+
+            nearbyBtn.addEventListener(
+                "click",
+                async function (event) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    console.log(
+                        "📍 近くの募集 CLICK"
+                    );
+
+
+                    const isVisible =
+                        nearbyPanel.classList.contains(
+                            "is-visible"
+                        );
+
+
+                    /* ==================================================
+                       閉じる
+                    ================================================== */
+
+                    if (isVisible) {
+
+                        nearbyPanel.classList.remove(
+                            "is-visible"
+                        );
+
+
+                        nearbyBtn.classList.remove(
+                            "active"
+                        );
+
+
+                        console.log(
+                            "📍 近くの募集 CLOSE"
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    /* ==================================================
+                       開く
+                    ================================================== */
+
+                    nearbyPanel.classList.add(
+                        "is-visible"
+                    );
+
+
+                    nearbyBtn.classList.add(
+                        "active"
+                    );
+
+
+                    console.log(
+                        "📍 近くの募集 OPEN"
+                    );
+
+
+                    /* ==================================================
+                       📍 API取得
+                    ================================================== */
+
+                    if (
+                        typeof window.loadNearbyRecruits ===
+                        "function"
+                    ) {
+
+                        console.log(
+                            "📍 近くの募集データ取得開始"
+                        );
+
+
+                        await window.loadNearbyRecruits();
+
+
+                        console.log(
+                            "📍 近くの募集データ取得完了"
+                        );
+
+                    }
+                    else {
+
+                        console.error(
+                            "❌ loadNearbyRecruits が見つかりません"
+                        );
+
+                    }
+
+                }
+            );
+
+
+            /* ==================================================
+               ❌ 閉じるボタン
+            ================================================== */
+
+            if (nearbyClose) {
+
+                nearbyClose.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+
+                        nearbyPanel.classList.remove(
+                            "is-visible"
+                        );
+
+
+                        nearbyBtn.classList.remove(
+                            "active"
+                        );
+
+
+                        console.log(
+                            "📍 近くの募集 CLOSE BUTTON"
+                        );
+
+                    }
+                );
+
+            }
+
+        }
+    );
+
 </script>
 
 {% endblock %}

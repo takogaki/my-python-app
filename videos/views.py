@@ -431,14 +431,30 @@ def recruit_edit(request, pk):
         end_time = request.POST.get("end_time") or None
         expires_at = request.POST.get("expires_at") or None
         max_people = request.POST.get("max_people", "2")
+
         target_gender = request.POST.get(
             "target_gender",
             "all"
         )
+
         industry = request.POST.get(
             "industry",
             ""
         ).strip()
+
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
+
+        # =========================
+        # 📷 募集画像
+        # =========================
+
+        image = request.FILES.get("image")
+
+
+        # =========================
+        # バリデーション
+        # =========================
 
         if not title:
             messages.error(
@@ -450,6 +466,7 @@ def recruit_edit(request, pk):
                 pk=recruit.pk
             )
 
+
         if not category:
             messages.error(
                 request,
@@ -460,7 +477,9 @@ def recruit_edit(request, pk):
                 pk=recruit.pk
             )
 
+
         try:
+
             max_people = int(max_people)
 
             if max_people < 1:
@@ -478,7 +497,12 @@ def recruit_edit(request, pk):
                 pk=recruit.pk
             )
 
-        # 現在の承認人数より少ない人数には変更不可
+
+        # =========================
+        # 👥 現在の承認人数より
+        # 少ない人数には変更不可
+        # =========================
+
         if max_people < recruit.approved_count:
 
             messages.error(
@@ -493,6 +517,11 @@ def recruit_edit(request, pk):
                 pk=recruit.pk
             )
 
+
+        # =========================
+        # 💾 募集情報更新
+        # =========================
+
         recruit.title = title
         recruit.category = category
         recruit.description = description
@@ -505,23 +534,58 @@ def recruit_edit(request, pk):
         recruit.target_gender = target_gender
         recruit.industry = industry
 
-        # 人数変更による状態調整
+
+        # =========================
+        # 📍 GPS更新
+        # =========================
+
+        recruit.latitude = latitude or None
+        recruit.longitude = longitude or None
+
+
+        # =========================
+        # 📷 画像更新
+        #
+        # 新しい画像が選択された場合だけ変更
+        # 選択されなければ現在の画像を維持
+        # =========================
+
+        if image:
+
+            recruit.image = image
+
+
+        # =========================
+        # 👥 人数変更による状態調整
+        # =========================
+
         if recruit.approved_count >= recruit.max_people:
+
             recruit.status = "full"
+
         else:
+
             recruit.status = "open"
 
+
+        # =========================
+        # 保存
+        # =========================
+
         recruit.save()
+
 
         messages.success(
             request,
             "募集内容を更新しました。"
         )
 
+
         return redirect(
             "recruit_detail",
             pk=recruit.pk
         )
+
 
     return render(
         request,

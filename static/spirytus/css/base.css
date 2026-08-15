@@ -19,6 +19,7 @@ main.container {
     padding-bottom: var(--footer-height); /* ← 追加 */
 
     min-height: 100vh;
+    
 }
 
 .content-container {

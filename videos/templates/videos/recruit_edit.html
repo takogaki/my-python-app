@@ -7,6 +7,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'videos/css/recruit_edit.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 {% endblock %}
 
 
@@ -64,9 +65,13 @@
              編集フォーム
         ========================== -->
 
-        <form method="post" class="recruit-edit-form">
+        <form method="post" enctype="multipart/form-data" class="recruit-edit-form">
 
             {% csrf_token %}
+
+            <!-- =========================
+                 📍 開催場所GPS
+            ========================== -->
 
 
             <!-- カテゴリ -->
@@ -136,15 +141,66 @@
 
 
                 <div class="recruit-edit-field">
-
+                
                     <label for="place">
                         場所
                     </label>
-
+                
                     <input type="text" id="place" name="place" value="{{ recruit.place }}" placeholder="新宿駅周辺">
-
+                
                 </div>
+            </div>
 
+            <!-- =========================
+            📍 募集地点
+            ========================= -->
+            
+            <div class="recruit-edit-location">
+            
+                <button type="button" id="setRecruitLocation" class="recruit-location-button">
+            
+                    📍 募集地点を地図で変更
+            
+                </button>
+            
+            
+                <p id="recruitLocationStatus" class="recruit-location-status">
+            
+                    {% if recruit.latitude and recruit.longitude %}
+            
+                    ✅ 現在の募集地点が設定されています
+            
+                    {% else %}
+            
+                    募集地点が設定されていません
+            
+                    {% endif %}
+            
+                </p>
+            
+            
+                <!-- 地図 -->
+            
+                <div id="recruitEditMap" class="recruit-edit-map">
+                </div>
+            
+            
+                <!-- 地点確定 -->
+            
+                <button type="button"
+                id="confirmRecruitLocation"
+                class="recruit-location-confirm"
+                {% if not recruit.latitude or not recruit.longitude %}disabled{% endif %}>
+                    ✅ この地点に決定
+                </button>
+            
+            
+                <!-- 緯度経度 -->
+            
+                <input type="hidden" name="latitude" id="recruitLatitude" value="{{ recruit.latitude|default:'' }}">
+            
+                <input type="hidden" name="longitude" id="recruitLongitude" value="{{ recruit.longitude|default:'' }}">
+            
             </div>
 
 
@@ -230,6 +286,47 @@
 
             </div>
 
+            <!-- ==================================================
+                 📷 募集写真
+            ================================================== -->
+            
+            <div class="recruit-edit-field recruit-edit-photo-field">
+            
+                <label>
+                    📷 募集写真
+                </label>
+            
+            
+                {% if recruit.image %}
+            
+                <div class="recruit-edit-current-image">
+            
+                    <img src="{{ recruit.image.url }}" alt="{{ recruit.title }}" id="recruitEditImagePreview">
+            
+                </div>
+            
+                {% else %}
+            
+                <div class="recruit-edit-no-image">
+                    📷 現在、募集写真はありません。
+                </div>
+            
+                {% endif %}
+            
+            
+                <label for="recruit_image" class="recruit-photo-change-button">
+                    📷 写真を変更する
+                </label>
+            
+            
+                <input type="file" id="recruit_image" name="image" accept="image/*" capture="environment" hidden>
+            
+            
+                <small>
+                    新しい写真を選択すると、現在の写真が変更されます。
+                </small>
+            
+            </div>
 
             <!-- 業界 -->
 
@@ -282,5 +379,402 @@
     </div>
 
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        console.log("📍 募集編集MAP START");
+
+
+        /* ==================================================
+           要素取得
+        ================================================== */
+
+        const button =
+            document.getElementById("setRecruitLocation");
+
+        const mapElement =
+            document.getElementById("recruitEditMap");
+
+        const confirmButton =
+            document.getElementById("confirmRecruitLocation");
+
+        const status =
+            document.getElementById("recruitLocationStatus");
+
+        const latitudeInput =
+            document.getElementById("recruitLatitude");
+
+        const longitudeInput =
+            document.getElementById("recruitLongitude");
+
+
+        if (
+            !button ||
+            !mapElement ||
+            !confirmButton ||
+            !status ||
+            !latitudeInput ||
+            !longitudeInput
+        ) {
+
+            console.error(
+                "📍 募集編集MAP 必要要素がありません"
+            );
+
+            return;
+        }
+
+
+        let map = null;
+
+        let marker = null;
+
+
+        /* ==================================================
+           既存の緯度経度
+        ================================================== */
+
+        const existingLatitude =
+            parseFloat(latitudeInput.value);
+
+        const existingLongitude =
+            parseFloat(longitudeInput.value);
+
+
+        const hasExistingLocation =
+            !isNaN(existingLatitude) &&
+            !isNaN(existingLongitude);
+
+
+        console.log(
+            "📍 既存地点",
+            existingLatitude,
+            existingLongitude
+        );
+
+
+        /* ==================================================
+           地図を初期化
+        ================================================== */
+
+        function initializeMap() {
+
+            if (map) {
+
+                map.invalidateSize();
+
+                return;
+
+            }
+
+
+            /*
+             * 既存地点があればそこを表示
+             * なければ東京駅
+             */
+
+            const initialLatitude =
+                hasExistingLocation
+                    ? existingLatitude
+                    : 35.681236;
+
+
+            const initialLongitude =
+                hasExistingLocation
+                    ? existingLongitude
+                    : 139.767125;
+
+
+            const initialZoom =
+                hasExistingLocation
+                    ? 15
+                    : 13;
+
+
+            map = L.map(
+                "recruitEditMap"
+            ).setView(
+                [
+                    initialLatitude,
+                    initialLongitude
+                ],
+                initialZoom
+            );
+
+
+            /* ==================================================
+               OpenStreetMap
+            ================================================== */
+
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                    maxZoom: 19,
+
+                    attribution:
+                        "&copy; OpenStreetMap contributors"
+                }
+            ).addTo(map);
+
+
+            /* ==================================================
+               マーカー
+            ================================================== */
+
+            marker = L.marker(
+                [
+                    initialLatitude,
+                    initialLongitude
+                ],
+                {
+                    draggable: true
+                }
+            ).addTo(map);
+
+
+            /* ==================================================
+               マーカー移動
+            ================================================== */
+
+            marker.on(
+                "dragend",
+                function () {
+
+                    const position =
+                        marker.getLatLng();
+
+
+                    console.log(
+                        "📍 マーカー移動",
+                        position.lat,
+                        position.lng
+                    );
+
+
+                    status.textContent =
+                        "📍 新しい募集地点を選択しています。";
+
+
+                    confirmButton.disabled =
+                        false;
+
+                }
+            );
+
+
+            /* ==================================================
+               地図クリック
+            ================================================== */
+
+            map.on(
+                "click",
+                function (event) {
+
+                    marker.setLatLng(
+                        event.latlng
+                    );
+
+
+                    console.log(
+                        "📍 地図クリック",
+                        event.latlng.lat,
+                        event.latlng.lng
+                    );
+
+
+                    status.textContent =
+                        "📍 新しい募集地点を選択しています。";
+
+
+                    confirmButton.disabled =
+                        false;
+
+                }
+            );
+
+
+            /* ==================================================
+               地図サイズ調整
+            ================================================== */
+
+            setTimeout(
+                function () {
+
+                    map.invalidateSize();
+
+                },
+                100
+            );
+
+        }
+
+
+        /* ==================================================
+           地図表示ボタン
+        ================================================== */
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                console.log(
+                    "📍 募集地点編集開始"
+                );
+
+
+                mapElement.classList.add(
+                    "is-visible"
+                );
+
+
+                initializeMap();
+
+
+                confirmButton.disabled =
+                    false;
+
+
+                status.textContent =
+                    "📍 地図上で募集地点を変更してください。";
+
+            }
+        );
+
+
+        /* ==================================================
+           地点確定
+        ================================================== */
+
+        confirmButton.addEventListener(
+            "click",
+            function () {
+
+                if (!map || !marker) {
+
+                    return;
+
+                }
+
+
+                const position =
+                    marker.getLatLng();
+
+
+                latitudeInput.value =
+                    position.lat;
+
+
+                longitudeInput.value =
+                    position.lng;
+
+
+                console.log(
+                    "✅ 募集地点確定",
+                    position.lat,
+                    position.lng
+                );
+
+
+                status.textContent =
+                    "✅ 募集地点を更新しました。";
+
+
+                confirmButton.disabled =
+                    true;
+
+            }
+        );
+
+
+        /* ==================================================
+           既存地点がある場合
+           → 最初から地図を表示
+        ================================================== */
+
+        if (hasExistingLocation) {
+
+            mapElement.classList.add(
+                "is-visible"
+            );
+
+
+            initializeMap();
+
+
+            confirmButton.disabled =
+                true;
+
+        }
+
+    });
+
+</script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const imageInput =
+            document.getElementById("recruit_image");
+
+        const imagePreview =
+            document.getElementById("recruitEditImagePreview");
+
+
+        if (!imageInput) {
+            return;
+        }
+
+
+        imageInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+
+            if (!file.type.startsWith("image/")) {
+
+                alert("画像ファイルを選択してください。");
+
+                this.value = "";
+
+                return;
+            }
+
+
+            const reader = new FileReader();
+
+
+            reader.onload = function (event) {
+
+                if (imagePreview) {
+
+                    imagePreview.src =
+                        event.target.result;
+
+                }
+
+            };
+
+
+            reader.readAsDataURL(file);
+
+        });
+
+    });
+
+</script>
 
 {% endblock %}

@@ -5,9 +5,13 @@
 {{ recruit.title }}｜SPIRYTUS
 {% endblock %}
 
+{% block body_class %}
+recruit-detail-body
+{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'videos/css/recruit_detail.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 {% endblock %}
 
 
@@ -30,11 +34,23 @@
             {{ recruit.title }}
         </h2>
 
-        <p class="recruit-owner">
-            👤 {{ recruit.user.username }}
-        </p>
+        {% include "accounts/components/user_link.html" with user=recruit.user %}
 
     </div>
+
+    <!-- ==================================================
+         募集画像
+    ================================================== -->
+    
+    {% if recruit.image %}
+    
+    <div class="recruit-image-card">
+    
+        <img src="{{ recruit.image.url }}" alt="{{ recruit.title }}" class="recruit-detail-image">
+    
+    </div>
+    
+    {% endif %}
 
 
     <!-- ==================================================
@@ -102,6 +118,24 @@
 
     </div>
 
+        </div>
+        
+        
+        <!-- ==================================================
+                 🗺️ 募集地点
+            ================================================== -->
+        
+        {% if recruit.latitude and recruit.longitude %}
+        
+        <div class="recruit-map-section">
+        
+            <h3>🗺️ 募集地点</h3>
+        
+            <div id="recruitDetailMap"></div>
+        
+        </div>
+        
+        {% endif %}
 
     <!-- ==================================================
          募集状況
@@ -216,6 +250,14 @@
             </span>
             {% endif %}
         
+        </a>
+
+        <!-- =========================
+                 ✏️ 募集編集
+            ========================== -->
+        
+        <a href="{% url 'recruit_edit' recruit.id %}" class="recruit-edit-button">
+            ✏️ 募集を編集する
         </a>
 
 
@@ -702,8 +744,46 @@
 
 {% block extra_js %}
 
-<script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+{% if recruit.latitude and recruit.longitude %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const latitude = Number("{{ recruit.latitude }}");
+        const longitude = Number("{{ recruit.longitude }}");
+
+        const mapElement = document.getElementById("recruitDetailMap");
+
+        if (!mapElement) {
+            console.error("募集地点マップの要素が見つかりません。");
+            return;
+        }
+
+        const map = L.map("recruitDetailMap").setView(
+            [latitude, longitude],
+            15
+        );
+
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution: "&copy; OpenStreetMap contributors"
+            }
+        ).addTo(map);
+
+        L.marker([latitude, longitude])
+            .addTo(map);
+
+    });
+</script>
+
+{% endif %}
+
+
+<script>
     function confirmCancelRecruit() {
 
         const selected = document.querySelector(
@@ -719,7 +799,6 @@
             return false;
         }
 
-
         if (selected.value === "1") {
 
             return confirm(
@@ -730,7 +809,6 @@
 
         }
 
-
         return confirm(
             "応募者情報を残したまま募集を中止します。\n\n" +
             "後から募集を再開できます。\n" +
@@ -738,7 +816,6 @@
         );
 
     }
-
 </script>
 
 {% endblock %}

@@ -163,53 +163,41 @@
 
 .nearby-recruit-user {
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
     margin-bottom: 8px;
 }
-
 
 .nearby-recruit-avatar {
     width: 32px;
     height: 32px;
-
     border-radius: 50%;
-
     object-fit: cover;
-
     flex-shrink: 0;
-
     border: 1px solid rgba(255,255,255,.5);
 }
 
-
 .nearby-recruit-user-info {
+    display: flex;
+    flex-direction: column;
     min-width: 0;
 }
 
-
 .nearby-recruit-username {
     font-size: 12px;
-
     font-weight: 700;
-
+    line-height: 1.2;
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
 }
 
-
 .nearby-recruit-gender {
-    margin-top: 2px;
-
-    font-size: 10px;
-
-    opacity: .75;
+    display: block;
+    margin-top: 3px;
+    font-size: 11px;
+    line-height: 1.2;
+    color: rgba(255,255,255,.8);
 }
 
 

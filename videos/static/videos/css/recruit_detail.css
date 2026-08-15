@@ -40,6 +40,13 @@
         font-size: 14px;
     }
 
+    /* メインコンテナの余白修正 */
+    body.recruit-detail-body main.container {
+        min-height: auto;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+
 
     /* ==================================================
        共通カード
@@ -255,6 +262,47 @@
         color: #856404;
     }
 
+
+    /* ==================================================
+    ✏️ 募集編集ボタン
+    ================================================== */
+
+    .recruit-edit-button {
+        display: block;
+
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 13px 16px;
+
+        margin-top: 10px;
+        margin-bottom: 10px;
+
+        border-radius: 12px;
+
+        background: #333;
+        border: 1px solid #444;
+
+        color: #fff;
+
+        text-align: center;
+        text-decoration: none;
+
+        font-size: 14px;
+        font-weight: 700;
+
+        transition:
+            background 0.2s ease,
+            transform 0.15s ease;
+    }
+
+    .recruit-edit-button:hover {
+        background: #444;
+    }
+
+    .recruit-edit-button:active {
+        transform: scale(0.98);
+    }
 
     /* ==================================================
        中止設定
@@ -551,4 +599,45 @@
             flex-direction: column;
         }
 
+    }
+
+    /* ==================================================
+    🗺️ 募集地点マップ
+    ================================================== */
+
+    .recruit-map-section {
+        margin-top: 20px;
+    }
+
+    .recruit-map-section h3 {
+        margin-bottom: 12px;
+    }
+
+    #recruitDetailMap {
+        width: 100%;
+        height: 350px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        background: #eee;
+    }
+
+    /* ==================================================
+    📷 募集画像
+    ================================================== */
+
+    .recruit-image-card {
+        width: 100%;
+        margin: 20px 0;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #f3f3f3;
+    }
+
+    .recruit-detail-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: cover;
     }

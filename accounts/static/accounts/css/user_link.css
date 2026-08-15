@@ -1,0 +1,149 @@
+/* ==================================================
+👤 共通ユーザーリンク
+================================================== */
+
+.user-link,
+.user-link-disabled {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin: 0;
+    padding: 0;
+
+    text-decoration: none;
+    color: inherit;
+
+    line-height: 1;
+
+    flex-shrink: 0;
+}
+
+
+/* ==================================================
+👤 通常ユーザー
+================================================== */
+
+.user-link {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.user-link:hover {
+    opacity: 0.8;
+}
+
+
+/* ==================================================
+🛡️ スーパーユーザー
+================================================== */
+
+.user-link-disabled {
+    cursor: default;
+}
+
+
+/* ==================================================
+📷 ユーザーアイコン
+================================================== */
+
+.user-link-avatar {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+    min-height: 36px;
+
+    max-width: 36px;
+    max-height: 36px;
+
+    display: block;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+    object-position: center;
+
+    flex: 0 0 36px;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
+}
+
+
+/* ==================================================
+👤 ユーザー名
+================================================== */
+
+.user-link-name {
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 1.2;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==================================================
+   👤 ユーザーリンク
+================================================== */
+
+.user-link,
+.user-link-disabled {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    height: 36px;
+
+    margin: 0;
+    padding: 0;
+
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.user-link-avatar {
+    display: block;
+
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+    min-height: 36px;
+
+    margin: 0;
+    padding: 0;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+    object-position: center;
+
+    flex: 0 0 36px;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.user-link-name {
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+}

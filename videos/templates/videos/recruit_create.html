@@ -6,9 +6,12 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'videos/css/recruit_create.css' %}">
-{% endblock %}
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<link rel="stylesheet" href="{% static 'videos/css/recruit_create.css' %}">
+
+{% endblock %}
 
 {% block body %}
 
@@ -98,16 +101,37 @@
 
             <!-- 場所 -->
 
+            <!-- =========================
+                 📍 募集場所
+            ========================= -->
+            
             <div class="recruit-field">
-
+            
                 <label for="place">
                     場所
                 </label>
-
+            
                 <input type="text" id="place" name="place" maxlength="100" placeholder="例：新宿駅周辺">
-
+            
+                <button type="button" id="setRecruitLocationButton" class="recruit-location-button">
+                    📍 この場所を募集地点に設定
+                </button>
+            
+                <div id="recruitLocationStatus" class="recruit-location-status">
+                    募集地点はまだ設定されていません。
+                </div>
+            
+                <!-- 地図 -->
+            
+                <div id="recruitLocationMap" class="recruit-location-map"></div>
+            
+                <!-- 地点確定 -->
+            
+                <button type="button" id="confirmRecruitLocation" class="recruit-location-confirm" disabled>
+                    ✅ この地点に決定
+                </button>
+            
             </div>
-
 
             <!-- 開始 -->
 
@@ -254,74 +278,319 @@
 
 {% block extra_js %}
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 
     document.addEventListener("DOMContentLoaded", () => {
 
-        console.log("📍 募集作成GPS START");
+        console.log("📍 募集地点MAP START");
 
 
-        if (!navigator.geolocation) {
+        const placeInput =
+            document.getElementById("place");
+
+        const mapElement =
+            document.getElementById("recruitLocationMap");
+
+        const openButton =
+            document.getElementById("setRecruitLocationButton");
+
+        const confirmButton =
+            document.getElementById("confirmRecruitLocation");
+
+        const status =
+            document.getElementById("recruitLocationStatus");
+
+        const latitudeInput =
+            document.getElementById("recruitLatitude");
+
+        const longitudeInput =
+            document.getElementById("recruitLongitude");
+
+
+        if (
+            !placeInput ||
+            !mapElement ||
+            !openButton ||
+            !confirmButton ||
+            !status ||
+            !latitudeInput ||
+            !longitudeInput
+        ) {
 
             console.error(
-                "このブラウザはGPSに対応していません。"
+                "📍 募集地点MAP 必要要素がありません"
             );
 
             return;
         }
 
 
-        navigator.geolocation.getCurrentPosition(
+        let map = null;
+        let marker = null;
 
-            (position) => {
 
-                const latitude =
-                    position.coords.latitude;
+        /*
+         * ==========================================
+         * 📍 地図を開く
+         * ==========================================
+         */
 
-                const longitude =
-                    position.coords.longitude;
+        openButton.addEventListener(
+            "click",
+            () => {
+
+                console.log(
+                    "📍 募集地点設定開始"
+                );
+
+
+                mapElement.classList.add(
+                    "is-visible"
+                );
+
+
+                if (!map) {
+
+                    /*
+                     * 東京を初期位置にする
+                     */
+
+                    map = L.map(
+                        "recruitLocationMap"
+                    ).setView(
+                        [35.681236, 139.767125],
+                        13
+                    );
+
+
+                    /*
+                     * OpenStreetMap
+                     */
+
+                    L.tileLayer(
+                        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                        {
+                            maxZoom: 19,
+
+                            attribution:
+                                '&copy; OpenStreetMap contributors'
+                        }
+                    ).addTo(map);
+
+
+                    /*
+                     * 初期ピン
+                     */
+
+                    marker = L.marker(
+                        [35.681236, 139.767125],
+                        {
+                            draggable: true
+                        }
+                    ).addTo(map);
+
+
+                    /*
+                     * ピンをドラッグ
+                     */
+
+                    marker.on(
+                        "dragend",
+                        () => {
+
+                            const position =
+                                marker.getLatLng();
+
+
+                            console.log(
+                                "📍 ピン移動",
+                                position.lat,
+                                position.lng
+                            );
+
+
+                            status.textContent =
+                                "📍 ピンを移動しました。場所を確認してください。";
+
+                        }
+                    );
+
+
+                    /*
+                     * 地図をクリック
+                     */
+
+                    map.on(
+                        "click",
+                        (event) => {
+
+                            marker.setLatLng(
+                                event.latlng
+                            );
+
+
+                            console.log(
+                                "📍 地図クリック",
+                                event.latlng.lat,
+                                event.latlng.lng
+                            );
+
+
+                            status.textContent =
+                                "📍 この場所を募集地点として選択しています。";
+
+                        }
+                    );
+
+
+                    /*
+                     * 地図サイズ調整
+                     */
+
+                    setTimeout(
+                        () => {
+
+                            map.invalidateSize();
+
+                        },
+                        100
+                    );
+
+                }
+
+
+                confirmButton.disabled = false;
+
+
+                status.textContent =
+                    "📍 地図上で募集地点を選択してください。";
+
+            }
+        );
+
+
+        /*
+         * ==========================================
+         * ✅ 募集地点を確定
+         * ==========================================
+         */
+
+        confirmButton.addEventListener(
+            "click",
+            () => {
+
+                if (!map || !marker) {
+
+                    return;
+                }
+
+
+                const position =
+                    marker.getLatLng();
+
+
+                latitudeInput.value =
+                    position.lat;
+
+                longitudeInput.value =
+                    position.lng;
 
 
                 console.log(
-                    "📍 募集地点GPS取得成功",
-                    latitude,
-                    longitude
+                    "✅ 募集地点確定",
+                    position.lat,
+                    position.lng
                 );
 
 
-                document.getElementById(
-                    "recruitLatitude"
-                ).value = latitude;
+                status.textContent =
+                    "✅ 募集地点を設定しました。";
 
 
-                document.getElementById(
-                    "recruitLongitude"
-                ).value = longitude;
-
-            },
-
-
-            (error) => {
-
-                console.error(
-                    "❌ 募集地点GPS取得失敗",
-                    error
-                );
-
-            },
-
-
-            {
-
-                enableHighAccuracy: true,
-
-                timeout: 10000,
-
-                maximumAge: 60000,
+                confirmButton.disabled =
+                    true;
 
             }
-
         );
+
+    });
+
+</script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const imageInput =
+            document.getElementById("recruit_image");
+
+        const preview =
+            document.getElementById("recruit-photo-preview");
+
+        const previewImage =
+            document.getElementById("recruit-photo-preview-image");
+
+
+        if (!imageInput || !preview || !previewImage) {
+            return;
+        }
+
+
+        imageInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+
+            if (!file) {
+
+                preview.style.display = "none";
+                previewImage.src = "";
+
+                return;
+            }
+
+
+            /* =========================
+               画像ファイル確認
+            ========================= */
+
+            if (!file.type.startsWith("image/")) {
+
+                alert("画像ファイルを選択してください。");
+
+                this.value = "";
+
+                preview.style.display = "none";
+                previewImage.src = "";
+
+                return;
+            }
+
+
+            /* =========================
+               プレビュー
+            ========================= */
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload = function (event) {
+
+                previewImage.src =
+                    event.target.result;
+
+                preview.style.display =
+                    "block";
+
+            };
+
+
+            reader.readAsDataURL(file);
+
+        });
 
     });
 

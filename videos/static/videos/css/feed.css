@@ -975,18 +975,34 @@ html, body {
 }
 
 /* ==================================================
-   🤝 募集フィルター
+   🤝 募集ナビ
+   最終版
 ================================================== */
 
+/* --------------------------------------------------
+   ナビ全体
+-------------------------------------------------- */
+
 .recruit-filter-bar {
+
     position: fixed;
 
-    top: 80px;
+    top: 68px;
     left: 0;
     right: 0;
 
+    width: 100%;
+    height: 42px;
+
+    padding: 0 10px;
+
     display: flex;
+    align-items: center;
     justify-content: center;
+
+    gap: 6px;
+
+    box-sizing: border-box;
 
     z-index: 9000;
 
@@ -994,250 +1010,868 @@ html, body {
 }
 
 
-/* =========================
-   ボタン
-========================= */
+/* --------------------------------------------------
+   ボタン共通
+-------------------------------------------------- */
 
-.recruit-filter-btn {
+.recruit-filter-btn,
+.nearby-recruit-btn {
+
     pointer-events: auto;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    flex: 1 1 0;
 
-    min-width: 150px;
-    height: 42px;
+    width: 0;
 
-    padding: 0 18px;
+    max-width: 180px;
 
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 22px;
+    height: 38px;
 
-    background:
-        rgba(20,20,28,0.82);
+    padding: 0 10px;
 
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255,255,255,0.14);
+
+    border-radius: 11px;
+
+    background: rgba(15,15,22,0.65);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 
     color: #fff;
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
 
     cursor: pointer;
 
-    box-shadow:
-        0 6px 20px rgba(0,0,0,0.25);
+    -webkit-tap-highlight-color: transparent;
 
     transition:
-        background .2s ease,
-        transform .2s ease,
-        box-shadow .2s ease;
+        transform .15s ease,
+        background .2s ease;
 }
 
 
-/* =========================
-   hover
-========================= */
+/* --------------------------------------------------
+   押下
+-------------------------------------------------- */
 
-.recruit-filter-btn:hover {
+.recruit-filter-btn:active,
+.nearby-recruit-btn:active {
 
-    background:
-        rgba(40,40,50,0.92);
-
-    transform:
-        translateY(-1px);
+    transform: scale(.96);
 
 }
 
 
-/* =========================
-   active
-========================= */
-
-.recruit-filter-btn:active {
-
-    transform:
-        scale(.96);
-
-}
-
-
-/* =========================
-   募集モード
-========================= */
+/* --------------------------------------------------
+   募集だけ見る ON
+-------------------------------------------------- */
 
 .recruit-filter-btn.active {
 
-    background:
-        linear-gradient(
-            135deg,
-            #ff2d75,
-            #ff6b81
-        );
+    background: rgba(255,45,117,0.82);
 
     border-color:
-        rgba(255,255,255,0.3);
+        rgba(255,255,255,0.22);
 
-    box-shadow:
-        0 6px 24px
-        rgba(255,45,117,0.35);
+}
+
+
+/* --------------------------------------------------
+   近くの募集 ON
+-------------------------------------------------- */
+
+.nearby-recruit-btn.active {
+
+    background: rgba(70,120,235,0.82);
+
+    border-color:
+        rgba(255,255,255,0.22);
 
 }
 
 
 /* ==================================================
-   募集フィルター中
+   📍 近くの募集パネル
 ================================================== */
 
+.nearby-recruits {
+
+    position: fixed !important;
+
+    top: 112px !important;
+
+    left: 50% !important;
+
+    right: auto !important;
+
+    transform: translateX(-50%) !important;
+
+    width: calc(100% - 20px) !important;
+
+    max-width: 680px;
+
+    height: auto;
+
+    margin: 0 !important;
+
+    padding: 8px 6px 6px !important;
+
+    box-sizing: border-box;
+
+    background: transparent !important;
+
+    border: none !important;
+
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    z-index: 8999;
+
+    display: none;
+
+    overflow: visible;
+
+}
+
+
+/* --------------------------------------------------
+   表示
+-------------------------------------------------- */
+
+.nearby-recruits.is-visible {
+
+    display: block;
+
+}
+
+
+/* ==================================================
+   ヘッダー
+================================================== */
+
+.nearby-recruits-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin: 0 4px 5px;
+
+}
+
+
+.nearby-recruits-header h2 {
+
+    margin: 0;
+
+    color: #fff;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+}
+
+
+/* --------------------------------------------------
+   閉じるボタン
+-------------------------------------------------- */
+
+.nearby-recruit-close {
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background:
+        rgba(20,20,28,0.75);
+
+    color: #fff;
+
+    font-size: 18px;
+
+    line-height: 28px;
+
+    cursor: pointer;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+}
+
+
+/* ==================================================
+   📍 横スクロール
+================================================== */
+
+#nearbyRecruitList {
+
+    display: flex;
+
+    align-items: stretch;
+
+    gap: 7px;
+
+    width: 100%;
+
+    max-width: 100%;
+
+    padding: 0 2px 3px;
+
+    margin: 0;
+
+    box-sizing: border-box;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+
+    overscroll-behavior-x: contain;
+
+}
+
+
+#nearbyRecruitList::-webkit-scrollbar {
+
+    display: none;
+
+}
+
+
+/* ==================================================
+   🃏 近くの募集カード
+================================================== */
+
+.nearby-recruit-card {
+
+    flex: 0 0 145px;
+
+    width: 145px;
+
+    min-width: 145px;
+
+    min-height: 92px;
+
+    padding: 8px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid rgba(255,255,255,0.12);
+
+    border-radius: 11px;
+
+    background:
+        rgba(15,15,22,0.78);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    color: #fff;
+
+    text-decoration: none;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 5px 18px rgba(0,0,0,0.18);
+
+}
+
+
+/* ==================================================
+   👤 ユーザー
+================================================== */
+
+.nearby-recruit-user {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-bottom: 5px;
+
+}
+
+
+.nearby-recruit-avatar {
+
+    width: 28px;
+    height: 28px;
+
+    flex: 0 0 28px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: #222;
+
+}
+
+
+.nearby-recruit-user-info {
+
+    min-width: 0;
+
+}
+
+
+.nearby-recruit-username {
+
+    max-width: 100px;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+
+.nearby-recruit-gender {
+
+    margin-top: 1px;
+
+    color:
+        rgba(255,255,255,0.55);
+
+    font-size: 9px;
+
+}
+
+
+/* ==================================================
+   🎉 タイトル
+================================================== */
+
+.nearby-recruit-title {
+
+    margin-bottom: 4px;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    color: #fff;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+}
+
+
+/* ==================================================
+   📍 場所
+================================================== */
+
+.nearby-recruit-place {
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    color:
+        rgba(255,255,255,0.72);
+
+    font-size: 9px;
+
+}
+
+
+/* ==================================================
+   📏 距離
+================================================== */
+
+.nearby-recruit-distance {
+
+    margin-top: 3px;
+
+    color:
+        rgba(255,255,255,0.5);
+
+    font-size: 9px;
+
+}
+
+
+/* ==================================================
+   🎞 FEED
+   ここが重要
+================================================== */
+
+.video-feed {
+
+    position: relative;
+
+    z-index: 1;
+
+    width: 100%;
+
+    height: 100%;
+
+}
+
+
+/* --------------------------------------------------
+   Feedカード
+-------------------------------------------------- */
+
+.video-card {
+
+    position: relative;
+
+    width: 100%;
+
+    height: calc(100vh - 130px);
+    height: calc(100dvh - 130px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+}
+
+
+/* ==================================================
+   📷 Feed画像
+   絶対位置＋中央固定
+================================================== */
+
+.video-card > .feed-post-image {
+
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    margin: 0 !important;
+
+    object-fit: contain !important;
+
+    object-position: center center !important;
+
+    display: block !important;
+
+    z-index: 1 !important;
+
+}
+
+
+/* ==================================================
+   🎥 Feed動画
+================================================== */
+
+.video-card > video {
+
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    object-fit: contain !important;
+
+    object-position: center center !important;
+
+    display: block !important;
+
+    z-index: 1 !important;
+
+}
+
+
+/* ==================================================
+   Feedの操作ボタン
+================================================== */
+
+.video-card .actions {
+
+    z-index: 100 !important;
+
+}
+
+
+/* ==================================================
+   Feedキャプション
+================================================== */
+
+.video-card .caption {
+
+    z-index: 20 !important;
+
+}
+
+
+/* ==================================================
+   📷 募集カードの画像は別処理
+================================================== */
+
+.video-card.recruit-card .recruit-background {
+
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    z-index: 0 !important;
+
+}
+
+
+.video-card.recruit-card .recruit-background-image {
+
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: contain !important;
+
+    object-position: center center !important;
+
+    z-index: 2 !important;
+
+}
+
+
+/* ==================================================
+   📱 スマホ
+================================================== */
+
+@media (max-width: 600px) {
+
+    .recruit-filter-bar {
+
+        top: 68px;
+
+        height: 38px;
+
+        padding: 0 8px;
+
+        gap: 5px;
+
+    }
+
+
+    .recruit-filter-btn,
+    .nearby-recruit-btn {
+
+        height: 36px;
+
+        max-width: none;
+
+        border-radius: 10px;
+
+        font-size: 11px;
+
+        padding: 0 7px;
+
+    }
+
+
+    .nearby-recruits {
+
+        top: 108px !important;
+
+        left: 50% !important;
+
+        width: calc(100% - 16px) !important;
+
+        padding:
+            5px
+            4px
+            5px !important;
+
+    }
+
+
+    .nearby-recruits-header {
+
+        margin:
+            0
+            3px
+            4px;
+
+    }
+
+
+    .nearby-recruits-header h2 {
+
+        font-size: 12px;
+
+    }
+
+
+    .nearby-recruit-close {
+
+        width: 26px;
+        height: 26px;
+
+        font-size: 17px;
+
+        line-height: 26px;
+
+    }
+
+
+    #nearbyRecruitList {
+
+        gap: 6px;
+
+        padding:
+            0
+            2px
+            2px;
+
+    }
+
+
+    .nearby-recruit-card {
+
+        flex-basis: 138px;
+
+        width: 138px;
+
+        min-width: 138px;
+
+        min-height: 88px;
+
+        padding: 7px;
+
+        border-radius: 10px;
+
+    }
+
+
+    .nearby-recruit-avatar {
+
+        width: 26px;
+        height: 26px;
+
+        flex-basis: 26px;
+
+    }
+
+
+    .nearby-recruit-title {
+
+        font-size: 11px;
+
+    }
+
+
+    .nearby-recruit-place,
+    .nearby-recruit-distance {
+
+        font-size: 9px;
+
+    }
+
+}
+
+/* =========================================================
+   🔥 最終修正版
+   通常Feed画像 ＆ 募集フィルター
+========================================================= */
+
+
+/* =========================================================
+   📷 通常Feed画像
+========================================================= */
+
+.video-card .feed-post-image {
+
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: contain !important;
+    object-position: center center !important;
+
+    z-index: 2 !important;
+
+    cursor: zoom-in;
+
+}
+
+
+/* =========================================================
+   📷 Feed画像 全画面
+========================================================= */
+
+.video-card .feed-post-image.image-fullscreen {
+
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    object-fit: contain !important;
+    object-position: center center !important;
+
+    background: #000 !important;
+
+    z-index: 2147483647 !important;
+
+    cursor: zoom-out;
+
+}
+
+
+/* =========================================================
+   🔒 全画面中のカード
+========================================================= */
+
+.video-card:has(.feed-post-image.image-fullscreen) {
+
+    z-index: 2147483646 !important;
+
+}
+
+
+/* =========================================================
+   🤝 募集だけ見る
+   CSS側でも確実に非募集を隠す
+========================================================= */
+
 .video-feed.recruit-only
-.snap-item:not(.recruit-card) {
+.video-card:not(.recruit-card) {
 
     display: none !important;
 
 }
 
 
-/* ==================================================
-   スマホ
-================================================== */
+/* 募集カードは表示 */
 
-@media (max-width: 480px) {
+.video-feed.recruit-only
+.video-card.recruit-card {
 
-    .recruit-filter-bar {
-
-        top: 72px;
-
-    }
-
-    .recruit-filter-btn {
-
-        min-width: 140px;
-
-        height: 40px;
-
-        font-size: 13px;
-
-        padding: 0 16px;
-
-    }
+    display: flex !important;
 
 }
 
-/* ==================================================
-   📍 近くの募集
-   画面上に浮かせる
-================================================== */
+
+/* =========================================================
+   📍 近くの募集パネルはFeedより前
+========================================================= */
 
 .nearby-recruits {
-    position: fixed !important;
-
-    top: 100px !important;
-    left: 0 !important;
-
-    width: 100% !important;
 
     z-index: 9999 !important;
 
-    margin: 0 !important;
-    padding: 0 15px !important;
-
-    box-sizing: border-box;
-
-    pointer-events: none;
 }
 
 
-/* タイトル */
+/* =========================================================
+   📷 全画面画像が何にも邪魔されないようにする
+========================================================= */
 
-.nearby-recruits h2 {
-    margin: 0 0 8px !important;
+body:has(.feed-post-image.image-fullscreen) {
 
-    color: #fff;
+    overflow: hidden !important;
 
-    font-size: 15px;
-
-    text-shadow:
-        0 2px 5px rgba(0, 0, 0, .8);
-}
-
-
-/* 募集一覧 */
-
-#nearbyRecruitList {
-    display: flex;
-
-    gap: 8px;
-
-    width: 100%;
-
-    overflow-x: auto;
-
-    scrollbar-width: none;
-
-    pointer-events: auto;
-}
-
-#nearbyRecruitList::-webkit-scrollbar {
-    display: none;
-}
-
-
-/* 募集カード */
-
-.nearby-recruit-card {
-    flex: 0 0 180px;
-
-    padding: 10px;
-
-    box-sizing: border-box;
-
-    color: #fff;
-
-    text-decoration: none;
-
-    background: rgba(0, 0, 0, .65);
-
-    border-radius: 12px;
-
-    backdrop-filter: blur(8px);
-
-    -webkit-backdrop-filter: blur(8px);
 }
 
 /* ==================================================
-📷 Feed投稿画像 全画面表示
+📷 Feed画像 全画面表示
 ================================================== */
-
-.feed-post-image {
-    cursor: pointer;
-    transition: all 0.25s ease;
-    z-index: 1;
-}
-
-
-/* 全画面状態 */
 
 .feed-post-image.image-fullscreen {
 
-    position: fixed;
+    position: fixed !important;
 
-    top: 0;
-    left: 0;
+    inset: 0 !important;
 
-    width: 100vw;
-    height: 100vh;
+    width: 100vw !important;
+    height: 100vh !important;
 
-    max-width: none;
-    max-height: none;
+    width: 100dvw !important;
+    height: 100dvh !important;
 
-    object-fit: contain;
+    max-width: none !important;
+    max-height: none !important;
 
-    margin: 0;
+    object-fit: contain !important;
 
-    z-index: 99999;
+    object-position: center center !important;
 
-    background: #000;
+    background: #000 !important;
 
-    cursor: pointer;
+    z-index: 999999 !important;
+
+    cursor: zoom-out !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
 }

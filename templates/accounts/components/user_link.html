@@ -1,0 +1,57 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/user_link.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="recruit-detail-page">
+{% if user.is_superuser %}
+
+<!-- =========================
+         🛡️ スーパーユーザー
+         クリック不可
+    ========================== -->
+
+<div class="user-link user-link-disabled">
+
+    <img src="{{ user.get_profile_image }}" class="user-link-avatar" alt="{{ user.username }}">
+
+    <span class="user-link-name">
+        {{ user.username }}
+    </span>
+
+</div>
+
+{% else %}
+
+<!-- =========================
+         👤 通常ユーザー
+    ========================== -->
+
+{% if request.user.id == user.id %}
+
+<a href="{% url 'accounts:mypage' %}" class="user-link">
+
+    {% else %}
+
+    <a href="{% url 'accounts:user_detail' user.username %}" class="user-link">
+
+        {% endif %}
+
+        <img src="{{ user.get_profile_image }}" class="user-link-avatar" alt="{{ user.username }}">
+
+        <span class="user-link-name">
+            {{ user.username }}
+        </span>
+
+    </a>
+
+    {% endif %}
+
+    </div>
+    
+{% endblock %}

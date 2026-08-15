@@ -348,12 +348,15 @@ CONTENT_SECURITY_POLICY = {
             "https://www.youtube.com",
             "https://www.tiktok.com",
             "https://pagead2.googlesyndication.com",  # 広告用（必要なら）
+            "https://unpkg.com",
         ),
-        "style-src": ("'self'", "'unsafe-inline'"),
+        "style-src": ("'self'", "'unsafe-inline'", "https://unpkg.com",),
         "img-src": (
             "'self'", "data:",
             "https://res.cloudinary.com",
             "https://*.a8.net",
+            "https://*.tile.openstreetmap.org",
+            "https://unpkg.com",
         ),
 
         # 🔥🔥🔥 これが最重要 🔥🔥🔥

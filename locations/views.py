@@ -3,6 +3,8 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.db.models import Q
+from django.utils import timezone
 
 from .models import UserLocation
 from .utils import calculate_distance_km
@@ -126,6 +128,10 @@ def nearby_recruits(request):
             latitude__isnull=False,
             longitude__isnull=False,
         )
+        .filter(
+            Q(expires_at__isnull=True) |
+            Q(expires_at__gt=timezone.now())
+        )
         .select_related("user")
     )
 
@@ -148,6 +154,10 @@ def nearby_recruits(request):
             recruit.longitude,
 
         )
+
+        # 50kmを超える募集は表示しない
+        if distance > 50:
+            continue
 
 
         nearby.append(
@@ -185,3 +195,4 @@ def nearby_recruits(request):
             "results": nearby,
         }
     )
+

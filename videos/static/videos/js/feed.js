@@ -1,3 +1,12 @@
+/* ==================================================
+🧠 Feed共通参照
+================================================== */
+
+let feed = null;
+let fullscreenImage = null;
+let fullscreenPlaceholder = null;
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
     /* =========================
@@ -8,8 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let isCommentOpen = false;
     let isLocked = false;
 
-    const feed = document.querySelector(".video-feed");
-    if (!feed) return; // ← ここに統合
+    feed = document.querySelector(".video-feed");
+
+    if (!feed) return;
     const modal = document.getElementById("commentModal");
     const commentList = document.querySelector(".comment-list");
 
@@ -214,24 +224,43 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /* =========================
-    🧠 外側クリック制御（TikTok仕様）
+    🖱️ Feedカードクリック
     ========================= */
+
     document.addEventListener("click", (e) => {
 
         const card = e.target.closest(".video-card");
+
         if (!card) return;
+
+
+        /* =========================
+        クリックしてもカード遷移させないもの
+        ========================= */
 
         if (
             e.target.closest(".action-btn") ||
             e.target.closest(".more-btn") ||
             e.target.closest(".comment-user") ||
             e.target.closest(".recruit-image-clickable") ||
-            e.target.closest(".recruit-image-modal")
-        ) return;
+            e.target.closest(".recruit-image-modal") ||
+            e.target.closest(".feed-post-image")
+        ) {
+            return;
+        }
 
-        const url = card.dataset.url;
-        if (url) location.href = url;
-    });
+
+    /* =========================
+       カードURLへ移動
+    ========================= */
+
+    const url = card.dataset.url;
+
+    if (url) {
+        location.href = url;
+    }
+
+});
 
     document.addEventListener("click", (e) => {
 
@@ -533,9 +562,6 @@ document.addEventListener(
 📷 Feed投稿画像 全画面表示
 ================================================== */
 
-let fullscreenImage = null;
-let fullscreenPlaceholder = null;
-
 
 /* =========================
 画像を開く
@@ -548,12 +574,13 @@ document.addEventListener("click", (event) => {
 
     if (!image) return;
 
+
     event.preventDefault();
     event.stopPropagation();
 
 
     /* =========================
-    すでに全画面なら閉じる
+       すでに全画面なら閉じる
     ========================= */
 
     if (fullscreenImage) {
@@ -565,13 +592,14 @@ document.addEventListener("click", (event) => {
 
 
     /* =========================
-    元の位置を記憶
+       元の位置を保存
     ========================= */
 
     fullscreenPlaceholder =
         document.createComment(
             "feed-image-placeholder"
         );
+
 
     image.parentNode.insertBefore(
         fullscreenPlaceholder,
@@ -580,7 +608,7 @@ document.addEventListener("click", (event) => {
 
 
     /* =========================
-    body直下へ移動
+       全画面用にbodyへ移動
     ========================= */
 
     fullscreenImage = image;
@@ -591,7 +619,7 @@ document.addEventListener("click", (event) => {
 
 
     /* =========================
-    全画面
+       全画面クラス
     ========================= */
 
     fullscreenImage.classList.add(
@@ -600,33 +628,47 @@ document.addEventListener("click", (event) => {
 
 
     /* =========================
-    Feedスクロール停止
+       Feedスクロール停止
     ========================= */
 
     if (feed) {
-        feed.style.overflow = "hidden";
+
+        feed.style.overflowY = "hidden";
+        feed.style.overflowX = "hidden";
+
     }
 
 });
 
 
 /* =========================
-画像を戻す
+画像を閉じる
 ========================= */
 
 function closeFullscreenImage() {
 
-    if (!fullscreenImage) return;
+    if (!fullscreenImage) {
+        return;
+    }
 
+
+    /* =========================
+       全画面クラス解除
+    ========================= */
 
     fullscreenImage.classList.remove(
         "image-fullscreen"
     );
 
 
-    /* 元の位置へ戻す */
+    /* =========================
+       元の場所へ戻す
+    ========================= */
 
-    if (fullscreenPlaceholder) {
+    if (
+        fullscreenPlaceholder &&
+        fullscreenPlaceholder.parentNode
+    ) {
 
         fullscreenPlaceholder.parentNode.insertBefore(
             fullscreenImage,
@@ -638,18 +680,38 @@ function closeFullscreenImage() {
     }
 
 
+    /* =========================
+       状態リセット
+    ========================= */
+
     fullscreenImage = null;
     fullscreenPlaceholder = null;
 
 
-    /* Feedスクロール復活 */
+    /* =========================
+       Feedスクロール復活
+    ========================= */
 
     if (feed) {
 
         feed.style.overflowY = "scroll";
-
         feed.style.overflowX = "hidden";
 
     }
 
 }
+
+
+/* =========================
+ESCで閉じる
+========================= */
+
+document.addEventListener("keydown", (event) => {
+
+    if (event.key === "Escape") {
+
+        closeFullscreenImage();
+
+    }
+
+});
