@@ -145,6 +145,26 @@ def nearby_recruits(request):
 
     for recruit in recruits:
 
+        # ==================================================
+        # 🚻 募集対象性別チェック
+        # ==================================================
+
+        if recruit.target_gender == "male":
+
+            # 男性のみ → M のユーザーだけ
+            if request.user.gender != "M":
+                continue
+
+
+        elif recruit.target_gender == "female":
+
+            # 女性のみ → F のユーザーだけ
+            if request.user.gender != "F":
+                continue
+
+        # ==================================================
+        # 📏 距離計算
+        # ==================================================
         distance = calculate_distance_km(
 
             user_location.latitude,

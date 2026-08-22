@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_POST
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.contrib.auth import get_user_model
 from accounts.utils import save_page_log
 from django.contrib import messages
@@ -35,6 +35,10 @@ def feed(request):
         .order_by("-created_at")
     )
 
+    # =========================
+    # 🤝 募集
+    # =========================
+
     recruits = (
         Recruit.objects
         .select_related("user")
@@ -44,6 +48,37 @@ def feed(request):
         )
         .order_by("-created_at")
     )
+
+
+    # ==================================================
+    # 🚻 募集対象性別でフィルター
+    # ==================================================
+
+    if request.user.is_authenticated:
+
+        recruits = recruits.filter(
+            Q(
+                target_gender="all"
+            )
+            |
+            Q(
+                target_gender=(
+                    "male"
+                    if request.user.gender == "M"
+                    else "female"
+                    if request.user.gender == "F"
+                    else "__none__"
+                )
+            )
+        )
+
+    else:
+
+        # 未ログインユーザーには
+        # 性別限定募集を表示しない
+        recruits = recruits.filter(
+            target_gender="all"
+        )
 
     # 👍 いいね済み
     if request.user.is_authenticated:
@@ -810,6 +845,35 @@ def recruit_detail(request, pk):
         pk=pk,
     )
 
+    # ==================================================
+    # 🚻 募集対象性別チェック
+    # ==================================================
+
+    if recruit.target_gender == "male":
+
+        # 男性のみ
+        if request.user.gender != "M":
+
+            messages.error(
+                request,
+                "この募集は男性のみ参加できます。"
+            )
+
+            return redirect("feed")
+
+
+    elif recruit.target_gender == "female":
+
+        # 女性のみ
+        if request.user.gender != "F":
+
+            messages.error(
+                request,
+                "この募集は女性のみ参加できます。"
+            )
+
+            return redirect("feed")
+
     # =========================
     # 他ユーザーは非公開募集を見られない
     # =========================
@@ -854,6 +918,42 @@ def apply_recruit(request, pk):
             "自分の募集には応募できません。"
         )
         return redirect("recruit_detail", pk=recruit.pk)
+    
+    # ==================================================
+    # 🚻 募集対象性別チェック
+    # ==================================================
+
+    if recruit.target_gender == "male":
+
+        # 男性のみ
+        if request.user.gender != "M":
+
+            messages.error(
+                request,
+                "この募集は男性のみ応募できます。"
+            )
+
+            return redirect(
+                "recruit_detail",
+                pk=recruit.pk
+            )
+
+
+    elif recruit.target_gender == "female":
+
+        # 女性のみ
+        if request.user.gender != "F":
+
+            messages.error(
+                            request,
+                            "この募集は女性のみ応募できます。"
+                        )
+
+            return redirect(
+                "recruit_detail",
+                pk=recruit.pk
+            )
+
 
     # すでに応募済み
     if RecruitParticipant.objects.filter(
