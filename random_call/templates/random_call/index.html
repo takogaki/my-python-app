@@ -1,0 +1,316 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+誰かと話す｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'random_call/css/random_call.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<main class="random-call-page">
+
+    <!-- =========================================
+         メインコンテナ
+    ========================================== -->
+
+    <section class="random-call-container">
+
+        <!-- =====================================
+             ヘッダー
+        ====================================== -->
+
+        <header class="random-call-header">
+
+            <a href="{% url 'diary:index' %}" class="random-call-back">
+                ←
+            </a>
+
+            <div class="random-call-brand">
+                <span class="brand-mark">SPIRYTUS</span>
+                <span class="brand-subtitle">
+                    RANDOM CALL
+                </span>
+            </div>
+
+            <div class="random-call-header-space"></div>
+
+        </header>
+
+
+        <!-- =====================================
+             メイン
+        ====================================== -->
+
+        <div class="random-call-main">
+
+            <!-- ---------------------------------
+                 待機前
+            ---------------------------------- -->
+
+            <section id="state-idle" class="random-call-state is-active">
+
+                <div class="random-call-icon">
+                    <span>◉</span>
+                </div>
+
+                <p class="random-call-eyebrow">
+                    RANDOM CALL
+                </p>
+
+                <h1>
+                    誰かと話す
+                </h1>
+
+                <p class="random-call-description">
+                    今この瞬間、SPIRYTUSにいる<br>
+                    誰かとランダムにつながります。
+                </p>
+
+                <button type="button" id="call-button" class="random-call-button">
+                    <span class="button-icon">📞</span>
+                    <span>誰かと話す</span>
+                </button>
+
+                <p class="random-call-note">
+                    相手を選ぶことはできません
+                </p>
+
+            </section>
+
+
+            <!-- ---------------------------------
+                 マッチング中
+            ---------------------------------- -->
+
+            <section id="state-searching" class="random-call-state">
+
+                <div class="search-animation">
+
+                    <div class="search-ring ring-1"></div>
+                    <div class="search-ring ring-2"></div>
+                    <div class="search-ring ring-3"></div>
+
+                    <div class="search-center">
+                        <span>📞</span>
+                    </div>
+
+                </div>
+
+                <p class="random-call-eyebrow">
+                    SEARCHING
+                </p>
+
+                <h1>
+                    相手を探しています
+                </h1>
+
+                <p id="search-status" class="random-call-description">
+                    SPIRYTUSにいる誰かを探しています。
+                </p>
+
+                <button type="button" id="cancel-button" class="random-call-button secondary">
+                    キャンセル
+                </button>
+
+            </section>
+
+
+            <!-- ---------------------------------
+                 マッチ成立
+            ---------------------------------- -->
+
+            <section id="state-matched" class="random-call-state">
+
+                <div class="voice-call-center-text">
+                
+                    <div class="matched-icon">
+                        ✓
+                    </div>
+                
+                    <p class="random-call-eyebrow">
+                        CONNECTED
+                    </p>
+                
+                    <h1>
+                        相手が見つかりました
+                    </h1>
+                
+                    <p id="matched-status" class="random-call-description">
+                        通話を開始しています。
+                    </p>
+                
+                </div>
+
+                <!--
+                    ② WebRTC実装時に
+                    ここへ映像エリアを追加
+                -->
+
+                <div id="video-area" class="random-call-video-area">
+                
+                    <!-- ==================================================
+                         音声通話用
+                    ================================================== -->
+                
+                    <audio id="remote-audio" autoplay playsinline>
+                    </audio>
+                
+                
+                    <!-- ==================================================
+                         相手映像
+                    ================================================== -->
+                
+                    <video id="remote-video" autoplay playsinline>
+                    </video>
+                
+                
+                    <!-- ==================================================
+                         自分の映像
+                    ================================================== -->
+                
+                    <video id="local-video" autoplay muted playsinline>
+                    </video>
+                
+                
+                    <!-- ==================================================
+                         電話画面
+                         カメラOFF時に表示
+                    ================================================== -->
+                
+                    <div id="voice-call-screen" class="voice-call-screen">
+                
+                        <div class="voice-call-avatar">
+                            <span>◉</span>
+                        </div>
+                
+                        <p class="voice-call-label">
+                            SPIRYTUS
+                        </p>
+                
+                        <p id="voice-call-status" class="voice-call-status">
+                            接続しています…
+                        </p>
+                
+                    </div>
+                
+                
+                    <!-- ==================================================
+                         接続中
+                    ================================================== -->
+                
+                    <div id="video-placeholder" class="video-placeholder">
+                
+                        <span>📞</span>
+                
+                        <p>
+                            接続しています…
+                        </p>
+                
+                    </div>
+                
+                </div>
+                
+                
+                <div class="call-controls">
+                
+                    <!-- マイク -->
+                
+                    <button type="button" id="mic-button" class="call-control" aria-label="マイク">
+                
+                        🎤
+                
+                    </button>
+                
+                
+                    <!-- スピーカー -->
+                
+                    <button type="button" id="speaker-button" class="call-control" aria-label="スピーカー">
+                
+                        🔊
+                
+                    </button>
+                
+                
+                    <!-- カメラ -->
+                
+                    <button type="button" id="camera-button" class="call-control" aria-label="カメラ">
+                
+                        📹
+                
+                    </button>
+                
+                
+                    <!-- 通話終了 -->
+                
+                    <button type="button" id="leave-button" class="call-control end" aria-label="通話終了">
+                
+                        📞
+                
+                    </button>
+                
+                </div>
+
+            </section>
+
+
+            <!-- ---------------------------------
+                 終了
+            ---------------------------------- -->
+
+            <section id="state-ended" class="random-call-state">
+
+                <div class="ended-icon">
+                    ×
+                </div>
+
+                <p class="random-call-eyebrow">
+                    CALL ENDED
+                </p>
+
+                <h1>
+                    通話が終了しました
+                </h1>
+
+                <p id="ended-status" class="random-call-description">
+                    また誰かと話してみませんか？
+                </p>
+
+                <button type="button" id="retry-button" class="random-call-button">
+                    <span class="button-icon">📞</span>
+                    <span>もう一度話す</span>
+                </button>
+
+            </section>
+
+        </div>
+
+
+        <!-- =====================================
+             フッター
+        ====================================== -->
+
+        <footer class="random-call-footer">
+
+            <p>
+                SPIRYTUS
+            </p>
+
+            <span>
+                誰かと、今つながる。
+            </span>
+
+        </footer>
+
+    </section>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'random_call/js/random_call.js' %}"></script>
+{% endblock %}

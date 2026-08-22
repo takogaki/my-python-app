@@ -17,6 +17,7 @@ django.setup()
 import user_messages.routing
 import accounts.routing
 import videos.routing
+import random_call.routing
 
 
 application = ProtocolTypeRouter({
@@ -38,6 +39,11 @@ application = ProtocolTypeRouter({
 
             # 募集チャット
             videos.routing.websocket_urlpatterns
+
+            +
+
+            # ランダム通話
+            random_call.routing.websocket_urlpatterns
 
         )
     ),

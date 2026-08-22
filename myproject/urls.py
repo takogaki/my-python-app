@@ -44,6 +44,9 @@ urlpatterns = [
 
     # 位置情報 GPS
     path("locations/", include("locations.urls")),
+
+    # ランダム通話
+    path("random-call/", include("random_call.urls")),
 ]
 
 if settings.DEBUG:

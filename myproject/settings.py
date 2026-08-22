@@ -141,6 +141,8 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 # 📦 アプリ
 # ==============================
 INSTALLED_APPS = [
+    "daphne",
+
     "csp",
     "channels",
     "cloudinary",
@@ -167,6 +169,9 @@ INSTALLED_APPS = [
 
     # 位置情報 GPS
     'locations',
+
+    # ランダム通話
+    "random_call",
 ]
 
 # ==============================

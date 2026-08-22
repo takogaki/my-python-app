@@ -1,0 +1,225 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+ランダム通話｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'random_call/css/random_call.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<main class="random-call-page">
+
+    <section class="random-call-card">
+
+        <!-- =========================
+             ヘッダー
+        ========================== -->
+
+        <div class="random-call-header">
+
+            <a href="{% url 'diary:index' %}" class="back-button">
+                ←
+            </a>
+
+            <div class="random-call-title">
+                <span class="title-icon">📞</span>
+
+                <div>
+                    <h1>ランダム通話</h1>
+                    <p>誰かと、ちょっと話してみる。</p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             メイン
+        ========================== -->
+
+        <div class="random-call-main">
+
+
+            <!-- アイドル -->
+
+            <div id="call-idle" class="call-state active">
+
+                <div class="call-orb">
+                    <span>📞</span>
+                </div>
+
+                <h2>
+                    誰かと話してみる
+                </h2>
+
+                <p class="call-description">
+                    SPIRYTUSにいる誰かと<br>
+                    ランダムにつながります。
+                </p>
+
+                <p class="call-note">
+                    無料で利用できます。
+                </p>
+
+                <button id="call-button" class="call-button" type="button">
+                    <span>📞</span>
+                    誰かと話す
+                </button>
+
+            </div>
+
+
+            <!-- =========================
+                 マッチング中
+            ========================== -->
+
+            <div id="call-searching" class="call-state">
+
+                <div class="search-animation">
+
+                    <div class="search-ring"></div>
+
+                    <span>📞</span>
+
+                </div>
+
+                <h2>
+                    相手を探しています
+                </h2>
+
+                <p>
+                    誰かが「誰かと話す」を<br>
+                    押すのを待っています。
+                </p>
+
+                <div class="search-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <button id="cancel-button" class="cancel-button" type="button">
+                    キャンセル
+                </button>
+
+            </div>
+
+
+            <!-- =========================
+                 マッチ成立
+            ========================== -->
+
+            <div id="call-matched" class="call-state">
+
+                <div class="matched-orb">
+                    <span>✓</span>
+                </div>
+
+                <h2>
+                    相手が見つかりました
+                </h2>
+
+                <p>
+                    通話を開始しています。
+                </p>
+
+                <div class="matched-loading"></div>
+
+            </div>
+
+
+            <!-- =========================
+                 通話中
+            ========================== -->
+
+            <div id="call-active" class="call-state">
+
+                <div class="active-orb">
+                    <span>📞</span>
+                </div>
+
+                <div class="active-status">
+                    <span class="status-dot"></span>
+                    通話中
+                </div>
+
+                <h2>
+                    誰かと話しています
+                </h2>
+
+                <p>
+                    SPIRYTUSランダム通話
+                </p>
+
+                <div class="call-time" id="call-time">
+                    00:00
+                </div>
+
+                <button id="leave-button" class="leave-button" type="button">
+                    通話を終了
+                </button>
+
+            </div>
+
+
+            <!-- =========================
+                 エラー
+            ========================== -->
+
+            <div id="call-error" class="call-state">
+
+                <div class="error-orb">
+                    !
+                </div>
+
+                <h2>
+                    接続できませんでした
+                </h2>
+
+                <p id="error-message">
+                    通話サーバーとの接続に失敗しました。
+                </p>
+
+                <button id="retry-button" class="call-button" type="button">
+                    もう一度試す
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             フッター
+        ========================== -->
+
+        <div class="random-call-footer">
+
+            <p>
+                相手に個人情報は表示されません。
+            </p>
+
+            <a href="{% url 'accounts:guideline' %}">
+                ガイドライン
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- WebRTC用の音声 -->
+
+<audio id="remote-audio" autoplay playsinline></audio>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'random_call/js/random_call.js' %}"></script>
+{% endblock %}

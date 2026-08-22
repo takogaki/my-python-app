@@ -14,6 +14,25 @@
 
 <main class="top">
         <div class="dashboard">
+
+                <!-- 📞 ランダム通話 -->
+                
+                <div class="dashboard-section random-call-special">
+                
+                        <div class="random-call-special-label">
+                                RANDOM CALL
+                        </div>
+                
+                        <h3>📞 誰かと話す</h3>
+                
+                        <a href="{% url 'random_call:index' %}" class="dashboard-button highlight random-call-special-button">
+                                <span>誰かとランダムに通話する</span>
+                                <span class="random-call-arrow">→</span>
+                        </a>
+                
+                </div>
+
+
                 <h1 class="site-catch">好きなときに、好きなだけ</h1>
 
                 <!-- 🎬 フィード導線 -->
