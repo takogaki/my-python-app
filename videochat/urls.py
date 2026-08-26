@@ -1,23 +1,129 @@
 from django.urls import path
 from . import views
-from .views import jitsi_test
+
 
 app_name = "videochat"
 
+
 urlpatterns = [
-    # テスト用（環境確認）
-    path("jitsi-test/", jitsi_test, name="jitsi_test"),
-    
-    path("", views.room_list, name="room_list"),
-    path("start/", views.start_room, name="start"),
-    path("<slug:room_slug>/start/", views.room_start, name="room_start"),
-    path("room/<slug:room_slug>/password/", views.room_password, name="room_password"),
-    path("join/<slug:room_slug>/", views.room_join, name="room_join"),
-    path("password/<slug:room_slug>/", views.room_password, name="room_password"),
-    path("videochat/<slug:room_slug>/heartbeat/", views.room_heartbeat, name="room_heartbeat"),
-    path("<slug:room_slug>/manage/", views.room_manage, name="room_manage"),
-    path("<slug:room_slug>/approve/<int:user_id>/", views.approve_participant, name="approve_participant"),
-    path("<slug:room_slug>/end/", views.room_end, name="room_end"),
-    path("force-close/<int:room_id>/", views.force_close, name="force_close"),
-    path("open-jitsi/<slug:room_slug>/", views.mark_jitsi_opened, name="mark_jitsi_opened"),
+
+    # ==================================================
+    # LIVE一覧
+    # ==================================================
+
+    path(
+        "",
+        views.room_list,
+        name="room_list",
+    ),
+
+
+    # ==================================================
+    # LIVE作成
+    # ==================================================
+
+    path(
+        "start/",
+        views.start_room,
+        name="start",
+    ),
+
+
+    # ==================================================
+    # 配信者用LIVE画面
+    # ==================================================
+
+    path(
+        "<slug:room_slug>/start/",
+        views.room_start,
+        name="room_start",
+    ),
+
+
+    # ==================================================
+    # LIVE視聴
+    # ==================================================
+
+    path(
+        "join/<slug:room_slug>/",
+        views.room_join,
+        name="room_join",
+    ),
+
+
+    # ==================================================
+    # パスワード
+    # ==================================================
+
+    path(
+        "password/<slug:room_slug>/",
+        views.room_password,
+        name="room_password",
+    ),
+
+
+    # ==================================================
+    # LIVE管理
+    # ==================================================
+
+    path(
+        "<slug:room_slug>/manage/",
+        views.room_manage,
+        name="room_manage",
+    ),
+
+
+    # ==================================================
+    # 参加者承認
+    # ==================================================
+
+    path(
+        "<slug:room_slug>/approve/<int:user_id>/",
+        views.approve_participant,
+        name="approve_participant",
+    ),
+
+
+    # ==================================================
+    # LIVE参加申請
+    # ==================================================
+
+    path(
+        "<slug:room_slug>/request-participation/",
+        views.request_participation,
+        name="request_participation",
+    ),
+
+
+    # ==================================================
+    # LIVE終了
+    # ==================================================
+
+    path(
+        "<slug:room_slug>/end/",
+        views.room_end,
+        name="room_end",
+    ),
+
+
+    # ==================================================
+    # 強制終了
+    # ==================================================
+
+    path(
+        "force-close/<int:room_id>/",
+        views.force_close,
+        name="force_close",
+    ),
+
+
+    # ==================================================
+    # ホストHeartbeat
+    # ==================================================
+
+    path(
+        "videochat/<slug:room_slug>/heartbeat/",
+        views.room_heartbeat,
+        name="room_heartbeat",
+    ),
 ]

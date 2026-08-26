@@ -85,7 +85,7 @@
 
 <body {% if post is not None %} data-post="{{ post.id }}" {% endif %}
     class="{% if unclosed_room %}has-warning{% endif %} {% block body_class %}{% endblock %}">
-    
+
     {% if messages %}
     <div class="sp-toast-container">
         {% for message in messages %}
@@ -291,8 +291,6 @@
         <img id="modal-image">
 
     </div>
-
-    <script src="{% static 'locations/js/gps.js' %}"></script>
 
     {% block extra_js %}
     {% endblock %}

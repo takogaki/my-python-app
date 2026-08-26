@@ -176,7 +176,7 @@ def nearby_recruits(request):
         )
 
         # 50kmを超える募集は表示しない
-        if distance > 50:
+        if distance > 30:
             continue
 
 

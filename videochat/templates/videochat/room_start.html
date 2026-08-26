@@ -1,0 +1,185 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+{{ room.title }}｜LIVE配信｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'videochat/css/live_room.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<main class="live-page">
+
+    <section class="live-container">
+
+        <!-- =========================
+             ヘッダー
+        ========================== -->
+
+        <header class="live-header">
+
+            <div class="live-header-left">
+
+                <span class="live-badge">
+                    🔴 LIVE
+                </span>
+
+                <h1>
+                    {{ room.title }}
+                </h1>
+
+            </div>
+
+            <div class="live-header-right">
+
+                <span id="viewer-count">
+                    👥 0
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================
+             配信エリア
+        ========================== -->
+
+        <section class="live-video-section">
+
+            <div class="video-wrapper">
+
+                <video id="local-video" autoplay playsinline muted></video>
+
+                <div id="camera-placeholder" class="camera-placeholder">
+                    <div class="camera-placeholder-icon">
+                        📹
+                    </div>
+
+                    <p>
+                        カメラを起動しています
+                    </p>
+                </div>
+
+                <div class="live-overlay">
+
+                    <span class="live-status">
+                        🔴 配信中
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 配信操作
+            ========================== -->
+
+            <div class="live-controls">
+
+                <button type="button" id="camera-toggle" class="live-control-button">
+                    📹 カメラ
+                </button>
+
+                <button type="button" id="mic-toggle" class="live-control-button">
+                    🎤 マイク
+                </button>
+
+                <button type="button" id="end-live" class="live-control-button danger">
+                    ⛔ 配信終了
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             コメント
+        ========================== -->
+
+        <section class="live-comments">
+
+            <div class="comments-header">
+
+                <h2>
+                    💬 コメント
+                </h2>
+
+            </div>
+
+
+            <div id="comments-list" class="comments-list">
+                <div class="comment-system">
+                    LIVEを開始しました
+                </div>
+            </div>
+
+
+            <form id="comment-form" class="comment-form">
+
+                {% csrf_token %}
+
+                <input type="text" id="comment-input" name="comment" maxlength="300" placeholder="コメントを書く..."
+                    autocomplete="off">
+
+                <button type="submit">
+                    送信
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- =========================
+             参加申請
+        ========================== -->
+
+        <section id="participant-requests" class="participant-requests">
+
+            <div class="requests-header">
+
+                <h2>
+                    🎤 参加リクエスト
+                </h2>
+
+            </div>
+
+            <div id="requests-list">
+
+                <p class="empty-request">
+                    参加リクエストはありません
+                </p>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    window.LIVE_CONFIG = {
+        roomSlug: "{{ room.room_slug|escapejs }}",
+        username: "{{ request.user.username|escapejs }}",
+        userId: "{{ request.user.id }}",
+        isHost: true,
+        websocketUrl:
+            (window.location.protocol === "https:" ? "wss://" : "ws://")
+            + window.location.host
+            + "/ws/live/{{ room.room_slug }}/"
+    };
+
+</script>
+
+<script src="{% static 'videochat/js/live_room.js' %}"></script>
+
+{% endblock %}

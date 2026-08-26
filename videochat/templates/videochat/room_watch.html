@@ -1,0 +1,173 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+{{ room.title }}｜LIVE｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'videochat/css/live_room.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<main class="live-page">
+
+    <section class="live-container">
+
+        <!-- ==========================================
+             LIVE HEADER
+        =========================================== -->
+
+        <header class="live-header">
+
+            <div class="live-header-left">
+
+                <span class="live-badge">
+                    🔴 LIVE
+                </span>
+
+                <h1>
+                    {{ room.title }}
+                </h1>
+
+            </div>
+
+            <div class="live-header-right">
+
+                <span id="viewer-count">
+                    👥 0
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- ==========================================
+             VIDEO
+        =========================================== -->
+
+        <section class="live-video-section">
+
+            <div class="video-wrapper">
+
+                <video id="remote-video" autoplay playsinline></video>
+
+                <div id="video-placeholder" class="camera-placeholder">
+
+                    <div class="camera-placeholder-icon">
+                        📺
+                    </div>
+
+                    <p>
+                        配信に接続しています...
+                    </p>
+
+                </div>
+
+                <div class="live-overlay">
+
+                    <span class="live-status">
+                        🔴 LIVE
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             PARTICIPATION
+        =========================================== -->
+
+        <section class="live-participation">
+
+            <p>
+                視聴中はコメントで参加できます。
+            </p>
+
+            <div class="participation-buttons">
+
+                <button type="button" id="request-audio" class="live-control-button">
+                    🎤 音声で参加
+                </button>
+
+                <button type="button" id="request-video" class="live-control-button">
+                    📹 映像で参加
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             COMMENTS
+        =========================================== -->
+
+        <section class="live-comments">
+
+            <div class="comments-header">
+
+                <h2>
+                    💬 コメント
+                </h2>
+
+            </div>
+
+            <div id="comments-list" class="comments-list">
+
+                <div class="comment-system">
+                    LIVEに参加しました
+                </div>
+
+            </div>
+
+
+            <form id="comment-form" class="comment-form">
+
+                {% csrf_token %}
+
+                <input type="text" id="comment-input" maxlength="300" placeholder="コメントを書く..." autocomplete="off">
+
+                <button type="submit">
+                    送信
+                </button>
+
+            </form>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    window.LIVE_CONFIG = {
+        roomSlug: "{{ room.room_slug }}",
+        username: "{{ request.user.username|escapejs }}",
+        userId: "{{ request.user.id }}",
+        isHost: false,
+
+        websocketUrl:
+            (window.location.protocol === "https:"
+                ? "wss://"
+                : "ws://")
+            + window.location.host
+            + "/ws/live/{{ room.room_slug }}/",
+
+        participationUrl:
+            "{% url 'videochat:request_participation' room.room_slug %}"
+    };
+
+</script>
+
+
+<script src="{% static 'videochat/js/live_watch.js' %}"></script>
+
+{% endblock %}

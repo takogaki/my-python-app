@@ -18,6 +18,8 @@ import user_messages.routing
 import accounts.routing
 import videos.routing
 import random_call.routing
+import videochat.routing
+
 
 
 application = ProtocolTypeRouter({
@@ -44,6 +46,11 @@ application = ProtocolTypeRouter({
 
             # ランダム通話
             random_call.routing.websocket_urlpatterns
+
+            +
+
+            # SPIRYTUS LIVE
+            videochat.routing.websocket_urlpatterns
 
         )
     ),
