@@ -246,20 +246,41 @@ class CustomUserCreationForm(UserCreationForm):
 # 🔥 ユーザー情報編集
 # =========================
 class UserForm(forms.ModelForm):
+
+    username = forms.CharField(
+        label="ユーザー名",
+        validators=[validate_username],
+        widget=forms.TextInput(attrs={
+            "placeholder": "ユーザー名を入力",
+            "class": "form-input",
+        }),
+    )
+
     class Meta:
         model = User
         fields = [
             "username",
             "home_screen",
-            ]
-        
+        ]
+
         widgets = {
-            "username": forms.TextInput(attrs={
-                "placeholder": "ユーザー名を入力",
-                "class": "form-input"
-            }),
             "home_screen": forms.HiddenInput(),
         }
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+
+        # 自分以外に同じユーザー名が存在するか確認
+        qs = User.objects.filter(username=username).exclude(
+            pk=self.instance.pk
+        )
+
+        if qs.exists():
+            raise ValidationError(
+                "このユーザー名はすでに使われています。"
+            )
+
+        return username
 
 # =========================
 # 🔥 プロフィール編集

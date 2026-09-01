@@ -31,17 +31,34 @@
         </div>
         {% endif %}
 
-        <!-- ユーザー名 -->
-        <div class="form-group">
-            <label>ユーザー名</label>
+        <!-- ユーザー名 -->     
+        <div class="form-group {% if user_form.username.errors %}has-error{% endif %}">
+        
+            ```
+            <label for="{{ user_form.username.id_for_label }}">
+                ユーザー名
+            </label>
+        
             {{ user_form.username }}
-            <div class="error-text">{{ user_form.username.errors }}</div>
-            <!-- 全エラー表示 -->
-            {% if user_form.errors %}
-            <div class="error-box">
-                {{ user_form.errors }}
+        
+            <!-- 使用可能文字の説明 -->
+            <p class="field-help">
+                使用できる文字：日本語・英数字・「_」「-」「.」
+            </p>
+        
+            <!-- Django側のエラー -->
+            {% if user_form.username.errors %}
+            <div class="error-text">
+                {{ user_form.username.errors }}
             </div>
             {% endif %}
+        
+            <!-- 入力中のリアルタイム警告 -->
+            <div id="username-warning" class="field-warning"></div>
+            ```
+        
+        </div>
+
 
         {% if force_profile_image %}
         <div class="force-profile-alert">

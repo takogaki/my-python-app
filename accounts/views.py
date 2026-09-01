@@ -334,11 +334,31 @@ class SignUpView(generic.CreateView):
         )
 
         send_mail(
-            subject="【本登録のご案内】",
-            message=f"以下のリンクをクリックしてください。\n\n{activation_url}",
+            subject="【SPIRYTUS】本登録のご案内",
+            message=f"""SPIRYTUSへの仮登録ありがとうございます。
+
+            以下の内容で登録されています。
+
+            ユーザー名：{user.username}
+            メールアドレス：{user.email}
+
+            ━━━━━━━━━━━━━━━━━━
+
+            下記のリンクをクリックして、本登録を完了してください。
+
+            {activation_url}
+
+            ━━━━━━━━━━━━━━━━━━
+
+            このメールに心当たりがない場合は、
+            このメールを破棄してください。
+
+            SPIRYTUS
+            """,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
         )
+
 
         return super().form_valid(form)
     

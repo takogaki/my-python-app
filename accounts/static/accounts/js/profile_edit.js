@@ -155,3 +155,65 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const usernameInput = document.getElementById("id_username");
+    const usernameWarning = document.getElementById("username-warning");
+
+    if (!usernameInput || !usernameWarning) {
+        return;
+    }
+
+    usernameInput.addEventListener("input", () => {
+
+        const value = usernameInput.value;
+
+        // 空欄
+        if (!value) {
+            usernameWarning.textContent = "";
+            usernameWarning.classList.remove("show");
+            return;
+        }
+
+        // 使用できない文字
+        const invalidMatch = value.match(/[^\w.\-]/u);
+
+        if (invalidMatch) {
+
+            usernameWarning.textContent =
+                `⚠️ 「${invalidMatch[0]}」は使用できません。`;
+
+            usernameWarning.classList.add("show");
+
+            return;
+        }
+
+        // 最初が記号
+        if (/^[._-]/.test(value)) {
+
+            usernameWarning.textContent =
+                "⚠️ 「.」「-」「_」から始めることはできません。";
+
+            usernameWarning.classList.add("show");
+
+            return;
+        }
+
+        // 最後が記号
+        if (/[._-]$/.test(value)) {
+
+            usernameWarning.textContent =
+                "⚠️ 「.」「-」「_」で終わることはできません。";
+
+            usernameWarning.classList.add("show");
+
+            return;
+        }
+
+        // 問題なし
+        usernameWarning.textContent = "";
+        usernameWarning.classList.remove("show");
+    });
+
+});

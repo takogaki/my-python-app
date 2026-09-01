@@ -394,3 +394,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # WhiteNoise（開発用）
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_USE_FINDERS = True
+
+AUTHENTICATION_BACKENDS = [
+    "accounts.backends.EmailOrUsernameBackend",
+]
