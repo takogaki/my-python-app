@@ -30,19 +30,21 @@
 
     let socket = null;
 
+    let socketChannelName = null;
+
     let localStream = null;
 
     let cameraEnabled = true;
 
     let microphoneEnabled = true;
 
+    let currentViewerCount = 0;
+
 
     /*
      * 視聴者ごとのPeerConnection
      *
-     * {
-     *     channel_name: RTCPeerConnection
-     * }
+     * channel_name -> RTCPeerConnection
      */
     const peerConnections = new Map();
 
@@ -50,14 +52,21 @@
     /*
      * 視聴者情報
      *
-     * {
-     *     channel_name: {
-     *         user_id,
-     *         username
-     *     }
+     * channel_name -> {
+     *     user_id,
+     *     username
      * }
      */
     const viewers = new Map();
+
+
+    /*
+     * WebRTCのICE candidate保留
+     *
+     * remoteDescription設定前に
+     * ICEが届いた場合に備える
+     */
+    const pendingIceCandidates = new Map();
 
 
     /* ==================================================
@@ -149,9 +158,15 @@
 
     function connectSocket() {
 
-        socket = new WebSocket(
-            config.websocketUrl
+        console.log(
+            "[LIVE] WebSocket connecting..."
         );
+
+
+        socket =
+            new WebSocket(
+                config.websocketUrl
+            );
 
 
         socket.onopen = () => {
@@ -160,13 +175,14 @@
                 "[LIVE] WebSocket connected"
             );
 
-
-            /*
-             * 接続後、現在の視聴者へ
-             * 接続情報を要求
-             */
             sendMessage({
-                type: "request_viewers"
+
+                type:
+                    "identify",
+
+                role:
+                    "host"
+
             });
 
         };
@@ -177,6 +193,7 @@
         ) => {
 
             let data;
+
 
             try {
 
@@ -194,6 +211,12 @@
 
                 return;
             }
+
+
+            console.log(
+                "[LIVE] Received:",
+                data
+            );
 
 
             await handleSocketMessage(
@@ -236,7 +259,7 @@
 
 
         /* ------------------------------------------
-           自分の接続情報
+           Connection information
         ------------------------------------------ */
 
         if (
@@ -244,17 +267,87 @@
             "connection_info"
         ) {
 
+            socketChannelName =
+                data.channel_name;
+
+
             console.log(
-                "[LIVE] Connection info:",
-                data
+                "[LIVE] My channel:",
+                socketChannelName
             );
+
 
             return;
         }
 
 
         /* ------------------------------------------
-           視聴者参加
+           Current viewers
+        ------------------------------------------ */
+
+        if (
+            data.type ===
+            "current_viewers"
+        ) {
+
+            console.log(
+                "[LIVE] Current viewers:",
+                data.viewers
+            );
+
+
+            if (
+                Array.isArray(
+                    data.viewers
+                )
+            ) {
+
+                for (
+                    const viewer
+                    of data.viewers
+                ) {
+
+                    if (
+                        !viewer.channel_name
+                    ) {
+
+                        continue;
+                    }
+
+
+                    viewers.set(
+                        viewer.channel_name,
+                        {
+                            user_id:
+                                viewer.user_id,
+
+                            username:
+                                viewer.username
+                        }
+                    );
+
+
+                    /*
+                     * 既存視聴者とのWebRTC開始
+                     */
+                    await createOfferForViewer(
+                        viewer.channel_name
+                    );
+
+                }
+
+            }
+
+
+            updateViewerCount();
+
+
+            return;
+        }
+
+
+        /* ------------------------------------------
+           LIVE system
         ------------------------------------------ */
 
         if (
@@ -305,7 +398,7 @@
 
 
         /* ------------------------------------------
-           コメント
+           Comment
         ------------------------------------------ */
 
         if (
@@ -323,7 +416,7 @@
 
 
         /* ------------------------------------------
-           参加リクエスト
+           Participant request
         ------------------------------------------ */
 
         if (
@@ -360,7 +453,7 @@
         ) {
 
             /*
-             * 自分自身のjoin通知は無視
+             * 自分自身を除外
              */
             if (
                 data.channel_name ===
@@ -372,7 +465,7 @@
 
 
             /*
-             * 配信者自身の通知は無視
+             * 配信者自身を除外
              */
             if (
                 Number(data.user_id) ===
@@ -384,37 +477,63 @@
 
 
             if (
-                data.channel_name
+                !data.channel_name
             ) {
 
-                viewers.set(
-                    data.channel_name,
-                    {
-                        user_id:
-                            data.user_id,
+                return;
+            }
 
-                        username:
-                            data.username
-                    }
+
+            /*
+             * すでに登録済みなら
+             * 二重接続しない
+             */
+            const alreadyExists =
+                viewers.has(
+                    data.channel_name
                 );
 
 
-                updateViewerCount();
+            viewers.set(
+                data.channel_name,
+                {
+                    user_id:
+                        data.user_id,
 
+                    username:
+                        data.username
+                }
+            );
+
+
+            updateViewerCount();
+
+
+            if (
+                !alreadyExists &&
+                data.username
+            ) {
 
                 addSystemMessage(
                     `${data.username} さんが参加しました`
                 );
 
+            }
 
-                /*
-                 * 視聴者とのWebRTC接続開始
-                 */
+
+            /*
+             * WebRTC接続
+             */
+            if (
+                !alreadyExists
+            ) {
+
                 await createOfferForViewer(
                     data.channel_name
                 );
 
             }
+
 
             return;
         }
@@ -462,13 +581,6 @@
 
 
     /* ==================================================
-       Own WebSocket channel
-    ================================================== */
-
-    let socketChannelName = null;
-
-
-    /* ==================================================
        Send WebSocket
     ================================================== */
 
@@ -482,12 +594,18 @@
             WebSocket.OPEN
         ) {
 
+            console.warn(
+                "[LIVE] Socket is not open"
+            );
+
             return false;
         }
 
 
         socket.send(
-            JSON.stringify(data)
+            JSON.stringify(
+                data
+            )
         );
 
 
@@ -515,8 +633,14 @@
                     });
 
 
-            localVideo.srcObject =
-                localStream;
+            if (
+                localVideo
+            ) {
+
+                localVideo.srcObject =
+                    localStream;
+
+            }
 
 
             cameraPlaceholder
@@ -534,7 +658,7 @@
         } catch (error) {
 
             console.error(
-                "[LIVE] Media error",
+                "[LIVE] Media error:",
                 error
             );
 
@@ -564,7 +688,7 @@
     ) {
 
         /*
-         * 既存接続があれば終了
+         * 既存接続を終了
          */
         if (
             peerConnections.has(
@@ -572,12 +696,15 @@
             )
         ) {
 
-            peerConnections
-                .get(
-                    viewerChannel
-                )
-                .close();
+            try {
 
+                peerConnections
+                    .get(
+                        viewerChannel
+                    )
+                    .close();
+
+            } catch (error) {}
 
             peerConnections.delete(
                 viewerChannel
@@ -596,7 +723,9 @@
            Local tracks
         ------------------------------------------ */
 
-        if (localStream) {
+        if (
+            localStream
+        ) {
 
             localStream
                 .getTracks()
@@ -615,7 +744,7 @@
 
 
         /* ------------------------------------------
-           ICE candidate
+           ICE
         ------------------------------------------ */
 
         pc.onicecandidate = (
@@ -662,31 +791,13 @@
 
 
                 if (
-                    [
-                        "failed",
-                        "closed",
-                        "disconnected"
-                    ].includes(
-                        pc.connectionState
-                    )
+                    pc.connectionState ===
+                    "failed"
                 ) {
 
-                    /*
-                     * disconnected は
-                     * 一時的な場合もあるため、
-                     * Mapからは即削除しない。
-                     */
-
-                    if (
-                        pc.connectionState ===
-                        "failed"
-                    ) {
-
-                        removePeerConnection(
-                            viewerChannel
-                        );
-
-                    }
+                    removePeerConnection(
+                        viewerChannel
+                    );
 
                 }
 
@@ -700,6 +811,7 @@
 
 
         return pc;
+
     }
 
 
@@ -720,11 +832,21 @@
             );
 
             return;
+
+        }
+
+
+        if (
+            !viewerChannel
+        ) {
+
+            return;
+
         }
 
 
         console.log(
-            "[LIVE] Creating offer for:",
+            "[LIVE] Creating offer:",
             viewerChannel
         );
 
@@ -738,15 +860,7 @@
         try {
 
             const offer =
-                await pc.createOffer({
-
-                    offerToReceiveAudio:
-                        false,
-
-                    offerToReceiveVideo:
-                        false
-
-                });
+                await pc.createOffer();
 
 
             await pc.setLocalDescription(
@@ -802,10 +916,6 @@
             !senderChannel
         ) {
 
-            console.warn(
-                "[LIVE] Answer sender_channel がありません"
-            );
-
             return;
         }
 
@@ -829,6 +939,14 @@
         }
 
 
+        if (
+            !data.sdp
+        ) {
+
+            return;
+        }
+
+
         try {
 
             await pc.setRemoteDescription({
@@ -840,6 +958,15 @@
                     data.sdp
 
             });
+
+
+            /*
+             * 保留していたICEを追加
+             */
+            await flushPendingIceCandidates(
+                senderChannel,
+                pc
+            );
 
 
             console.log(
@@ -873,7 +1000,8 @@
 
 
         if (
-            !senderChannel
+            !senderChannel ||
+            !data.candidate
         ) {
 
             return;
@@ -886,10 +1014,33 @@
             );
 
 
+        /*
+         * PeerConnectionがまだない場合
+         */
         if (
-            !pc ||
-            !data.candidate
+            !pc
         ) {
+
+            storePendingIceCandidate(
+                senderChannel,
+                data.candidate
+            );
+
+            return;
+        }
+
+
+        /*
+         * RemoteDescriptionがまだない場合
+         */
+        if (
+            !pc.remoteDescription
+        ) {
+
+            storePendingIceCandidate(
+                senderChannel,
+                data.candidate
+            );
 
             return;
         }
@@ -903,7 +1054,6 @@
                 )
             );
 
-
         } catch (error) {
 
             console.error(
@@ -912,6 +1062,88 @@
             );
 
         }
+
+    }
+
+
+    /* ==================================================
+       Pending ICE
+    ================================================== */
+
+    function storePendingIceCandidate(
+        channel,
+        candidate
+    ) {
+
+        if (
+            !pendingIceCandidates.has(
+                channel
+            )
+        ) {
+
+            pendingIceCandidates.set(
+                channel,
+                []
+            );
+
+        }
+
+
+        pendingIceCandidates
+            .get(channel)
+            .push(candidate);
+
+    }
+
+
+    async function flushPendingIceCandidates(
+        channel,
+        pc
+    ) {
+
+        const candidates =
+            pendingIceCandidates.get(
+                channel
+            );
+
+
+        if (
+            !candidates ||
+            !candidates.length
+        ) {
+
+            return;
+        }
+
+
+        for (
+            const candidate
+            of candidates
+        ) {
+
+            try {
+
+                await pc.addIceCandidate(
+                    new RTCIceCandidate(
+                        candidate
+                    )
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "[LIVE] Pending ICE error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        pendingIceCandidates.delete(
+            channel
+        );
 
     }
 
@@ -930,7 +1162,9 @@
             );
 
 
-        if (viewer) {
+        if (
+            viewer
+        ) {
 
             addSystemMessage(
                 `${viewer.username} さんが退出しました`
@@ -940,6 +1174,11 @@
 
 
         viewers.delete(
+            viewerChannel
+        );
+
+
+        pendingIceCandidates.delete(
             viewerChannel
         );
 
@@ -968,20 +1207,15 @@
             );
 
 
-        if (pc) {
+        if (
+            pc
+        ) {
 
             try {
 
                 pc.close();
 
-            } catch (error) {
-
-                console.error(
-                    "[LIVE] Peer close error:",
-                    error
-                );
-
-            }
+            } catch (error) {}
 
         }
 
@@ -1033,7 +1267,9 @@
         );
 
 
-        if (cameraToggle) {
+        if (
+            cameraToggle
+        ) {
 
             cameraToggle.textContent =
                 cameraEnabled
@@ -1099,7 +1335,9 @@
         );
 
 
-        if (micToggle) {
+        if (
+            micToggle
+        ) {
 
             micToggle.textContent =
                 microphoneEnabled
@@ -1333,6 +1571,34 @@
                 : "🎤 音声参加を許可";
 
 
+        /*
+         * ここではまだ許可処理本体は
+         * Consumer側との仕様確定後に接続する
+         */
+        button.addEventListener(
+            "click",
+            () => {
+
+                sendMessage({
+
+                    type:
+                        "approve_participation",
+
+                    target_channel:
+                        data.channel_name,
+
+                    participation_type:
+                        data.request_type
+
+                });
+
+
+                wrapper.remove();
+
+            }
+        );
+
+
         wrapper.appendChild(
             name
         );
@@ -1370,6 +1636,9 @@
         }
 
 
+        /*
+         * WebSocket
+         */
         sendMessage({
 
             type:
@@ -1407,7 +1676,7 @@
         } catch (error) {
 
             console.error(
-                "[LIVE] End error",
+                "[LIVE] End error:",
                 error
             );
 
@@ -1415,7 +1684,7 @@
         } finally {
 
             /*
-             * 全PeerConnection終了
+             * PeerConnection終了
              */
 
             peerConnections.forEach(
@@ -1433,11 +1702,15 @@
 
             peerConnections.clear();
 
+
             viewers.clear();
 
 
+            pendingIceCandidates.clear();
+
+
             /*
-             * カメラ・マイク停止
+             * Media停止
              */
 
             if (
@@ -1447,12 +1720,36 @@
                 localStream
                     .getTracks()
                     .forEach(
-                        track =>
-                            track.stop()
+                        track => {
+
+                            track.stop();
+
+                        }
                     );
 
             }
 
+
+            /*
+             * WebSocket終了
+             */
+
+            if (
+                socket
+            ) {
+
+                try {
+
+                    socket.close();
+
+                } catch (error) {}
+
+            }
+
+
+            /*
+             * LIVE一覧へ
+             */
 
             window.location.href =
                 "/videochat/";
@@ -1524,13 +1821,13 @@
     async function initialize() {
 
         /*
-         * 先にカメラを取得
+         * カメラ・マイクを先に取得
          */
         await startMedia();
 
 
         /*
-         * その後WebSocket
+         * Media取得後にWebSocket
          */
         connectSocket();
 

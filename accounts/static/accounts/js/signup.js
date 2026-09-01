@@ -53,3 +53,62 @@ document.addEventListener("DOMContentLoaded", function () {
         sessionStorage.removeItem("signup_form");
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const usernameInput = document.getElementById("id_username");
+    const usernameWarning = document.getElementById("username-warning");
+
+    if (!usernameInput || !usernameWarning) {
+        return;
+    }
+
+    usernameInput.addEventListener("input", () => {
+
+        const value = usernameInput.value;
+
+        if (!value) {
+            usernameWarning.textContent = "";
+            return;
+        }
+
+        // 許可する文字
+        const invalidMatch = value.match(/[^\w.\-]/u);
+
+        if (invalidMatch) {
+
+            usernameWarning.textContent =
+                `⚠️ 「${invalidMatch[0]}」は使用できません。`;
+
+            usernameWarning.classList.add("show");
+
+            return;
+        }
+
+        // 最初の記号
+        if (/^[._-]/.test(value)) {
+
+            usernameWarning.textContent =
+                "⚠️ 「.」「-」「_」から始めることはできません。";
+
+            usernameWarning.classList.add("show");
+
+            return;
+        }
+
+        // 最後の記号
+        if (/[._-]$/.test(value)) {
+
+            usernameWarning.textContent =
+                "⚠️ 「.」「-」「_」で終わることはできません。";
+
+            usernameWarning.classList.add("show");
+
+            return;
+        }
+
+        usernameWarning.textContent = "";
+        usernameWarning.classList.remove("show");
+    });
+
+});

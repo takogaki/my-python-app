@@ -1,5 +1,3 @@
-# videochat/consumers.py
-
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 
@@ -12,7 +10,13 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
     ・コメント
     ・視聴者参加/退出
     ・音声/映像参加リクエスト
+    ・参加許可
+    ・LIVE終了
     """
+
+    # ==================================================
+    # Connect
+    # ==================================================
 
     async def connect(self):
 
@@ -33,6 +37,10 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
             return
 
 
+        # ------------------------------------------
+        # WebSocket Group
+        # ------------------------------------------
+
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name,
@@ -43,14 +51,23 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
 
         # ------------------------------------------
-        # 接続完了
+        # 自分の接続情報
         # ------------------------------------------
 
         await self.send_json({
-            "type": "connection_info",
-            "channel_name": self.channel_name,
-            "user_id": user.id,
-            "username": user.username,
+
+            "type":
+                "connection_info",
+
+            "channel_name":
+                self.channel_name,
+
+            "user_id":
+                user.id,
+
+            "username":
+                user.username,
+
         })
 
 
@@ -61,8 +78,12 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                "type": "live_system",
-                "event": "viewer_joined",
+
+                "type":
+                    "live_system",
+
+                "event":
+                    "viewer_joined",
 
                 "channel_name":
                     self.channel_name,
@@ -72,9 +93,14 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
                 "username":
                     user.username,
+
             },
         )
 
+
+    # ==================================================
+    # Disconnect
+    # ==================================================
 
     async def disconnect(
         self,
@@ -103,8 +129,12 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
-                    "type": "live_system",
-                    "event": "viewer_left",
+
+                    "type":
+                        "live_system",
+
+                    "event":
+                        "viewer_left",
 
                     "channel_name":
                         self.channel_name,
@@ -114,6 +144,7 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
                     "username":
                         user.username,
+
                 },
             )
 
@@ -129,6 +160,13 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
     ):
 
         message_type = content.get("type")
+
+        user = self.scope.get("user")
+
+
+        if not user or not user.is_authenticated:
+
+            return
 
 
         # ==================================================
@@ -156,6 +194,7 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.send(
                 target_channel,
                 {
+
                     "type":
                         "webrtc_signal",
 
@@ -165,6 +204,7 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
                         "sender_channel":
                             self.channel_name,
                     },
+
                 },
             )
 
@@ -176,8 +216,6 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
         # ==================================================
 
         if message_type == "comment":
-
-            user = self.scope["user"]
 
             text = str(
                 content.get(
@@ -198,6 +236,7 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
+
                     "type":
                         "live_comment",
 
@@ -209,6 +248,7 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
                     "text":
                         text,
+
                 },
             )
 
@@ -221,12 +261,10 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
         if message_type == "request_audio":
 
-            user = self.scope["user"]
-
-
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
+
                     "type":
                         "participant_request",
 
@@ -241,6 +279,7 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
                     "channel_name":
                         self.channel_name,
+
                 },
             )
 
@@ -253,12 +292,10 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
         if message_type == "request_video":
 
-            user = self.scope["user"]
-
-
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
+
                     "type":
                         "participant_request",
 
@@ -270,6 +307,83 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
                     "user_id":
                         user.id,
+
+                    "channel_name":
+                        self.channel_name,
+
+                },
+            )
+
+            return
+
+
+        # ==================================================
+        # 現在の視聴者情報要求
+        # ==================================================
+
+        if message_type == "request_viewers":
+
+            await self.send_current_viewers()
+
+            return
+
+
+        # ==================================================
+        # 参加許可
+        # ==================================================
+
+        if message_type == "approve_participation":
+
+            target_channel = (
+                content.get(
+                    "target_channel"
+                )
+            )
+
+            participation_type = (
+                content.get(
+                    "participation_type"
+                )
+            )
+
+
+            if not target_channel:
+
+                return
+
+
+            if participation_type not in {
+                "audio",
+                "video",
+            }:
+
+                return
+
+
+            # ------------------------------------------
+            # 許可した視聴者へ直接通知
+            # ------------------------------------------
+
+            await self.channel_layer.send(
+                target_channel,
+                {
+
+                    "type":
+                        "participation_approved",
+
+                    "message": {
+
+                        "type":
+                            "participation_approved",
+
+                        "participation_type":
+                            participation_type,
+
+                        "host_channel":
+                            self.channel_name,
+
+                    },
+
                 },
             )
 
@@ -285,15 +399,41 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
+
                     "type":
                         "live_system",
 
                     "event":
                         "live_ended",
+
                 },
             )
 
             return
+
+
+    # ==================================================
+    # Current viewers
+    # ==================================================
+
+    async def send_current_viewers(self):
+
+        """
+        現在の視聴者一覧。
+
+        ChannelsのGroup自体からメンバー一覧を取得する
+        ことはできないため、現在は補助的に使用。
+        """
+
+        await self.send_json({
+
+            "type":
+                "current_viewers",
+
+            "viewers":
+                [],
+
+        })
 
 
     # ==================================================
@@ -314,7 +454,24 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
 
     # ==================================================
-    # コメント
+    # Participation approved
+    # ==================================================
+
+    async def participation_approved(
+        self,
+        event
+    ):
+
+        message = event["message"]
+
+
+        await self.send_json(
+            message
+        )
+
+
+    # ==================================================
+    # Comment
     # ==================================================
 
     async def live_comment(
@@ -340,7 +497,7 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
 
 
     # ==================================================
-    # 参加リクエスト
+    # Participant request
     # ==================================================
 
     async def participant_request(
@@ -362,11 +519,16 @@ class LiveRoomConsumer(AsyncJsonWebsocketConsumer):
             "user_id":
                 event["user_id"],
 
+            "channel_name":
+                event.get(
+                    "channel_name"
+                ),
+
         })
 
 
     # ==================================================
-    # システムイベント
+    # System event
     # ==================================================
 
     async def live_system(

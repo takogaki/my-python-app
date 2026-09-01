@@ -48,16 +48,27 @@
             </div>
         
             <!-- ユーザー名 -->
-            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
-        
+            <!-- ユーザー名 -->
+            <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+            
+                <label for="{{ form.username.id_for_label }}">
+                    ユーザー名
+                </label>
+            
+                {{ form.username }}
+            
+                <p class="field-help">
+                    使用できる文字：日本語・英数字・「_」「-」「.」
+                </p>
+            
                 {% if form.username.errors %}
                 <div class="field-error">
                     {{ form.username.errors }}
                 </div>
                 {% endif %}
-        
-                <label>ユーザー名</label>
-                {{ form.username }}
+            
+                <div id="username-warning" class="field-warning"></div>
+            
             </div>
         
             <!-- メール -->

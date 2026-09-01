@@ -61,9 +61,45 @@ def validate_kyc_image(image):
     return image
 
 
-def validate_username_ascii(value):
-    if not re.match(r'^[a-zA-Z0-9_]+$', value):
-        raise ValidationError("ユーザー名は英数字とアンダースコアのみ使用できます。")
+def validate_username(value):
+    """
+    ユーザー名に使用できる文字を制限する。
+
+    許可:
+    ・日本語
+    ・英字
+    ・数字
+    ・アンダースコア _
+    ・ハイフン -
+    ・ドット .
+
+    禁止:
+    ・スペース
+    ・記号
+    ・絵文字
+    """
+
+    if not value:
+        raise ValidationError("ユーザー名を入力してください。")
+
+    # Unicodeの文字・数字 + _ - . のみ許可
+    if not re.match(r'^[\w.-]+$', value, re.UNICODE):
+        raise ValidationError(
+            "ユーザー名に使用できない文字が含まれています。"
+        )
+
+    # \w にはUnicode文字・数字・アンダースコアが含まれる
+    # ただし、念のため連続する記号などをチェック
+
+    if value.startswith((".", "-", "_")):
+        raise ValidationError(
+            "ユーザー名の最初に「.」「-」「_」は使用できません。"
+        )
+
+    if value.endswith((".", "-", "_")):
+        raise ValidationError(
+            "ユーザー名の最後に「.」「-」「_」は使用できません。"
+        )
 
 
 # =========================
@@ -95,7 +131,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     username = forms.CharField(
         label="ユーザー名",
-        validators=[validate_username_ascii],
+        validators=[validate_username],
     )
 
     email = forms.EmailField(

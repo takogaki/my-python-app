@@ -32,14 +32,22 @@
 
     let socket = null;
 
-    let peerConnection = null;
-
-    let myChannelName = null;
+    let socketChannelName = null;
 
     let hostChannelName = null;
 
+    let peerConnection = null;
 
     let currentViewerCount = 0;
+
+    let liveEnded = false;
+
+
+    /*
+     * 配信者からICEが
+     * RemoteDescription設定前に届いた場合に保留
+     */
+    const pendingIceCandidates = [];
 
 
     /* ==================================================
@@ -119,6 +127,11 @@
 
     function connectSocket() {
 
+        console.log(
+            "[LIVE] WebSocket connecting..."
+        );
+
+
         socket =
             new WebSocket(
                 config.websocketUrl
@@ -130,6 +143,20 @@
             console.log(
                 "[LIVE] WebSocket connected"
             );
+
+
+            /*
+             * 視聴者として参加
+             */
+            sendMessage({
+
+                type:
+                    "identify",
+
+                role:
+                    "viewer"
+
+            });
 
         };
 
@@ -151,7 +178,7 @@
             } catch (error) {
 
                 console.error(
-                    "[LIVE] JSON error",
+                    "[LIVE] JSON error:",
                     error
                 );
 
@@ -159,7 +186,13 @@
             }
 
 
-            await handleMessage(
+            console.log(
+                "[LIVE] Received:",
+                data
+            );
+
+
+            await handleSocketMessage(
                 data
             );
 
@@ -180,7 +213,7 @@
         ) => {
 
             console.error(
-                "[LIVE] WebSocket error",
+                "[LIVE] WebSocket error:",
                 error
             );
 
@@ -190,10 +223,10 @@
 
 
     /* ==================================================
-       Message handler
+       WebSocket message
     ================================================== */
 
-    async function handleMessage(
+    async function handleSocketMessage(
         data
     ) {
 
@@ -207,13 +240,13 @@
             "connection_info"
         ) {
 
-            myChannelName =
+            socketChannelName =
                 data.channel_name;
 
 
             console.log(
                 "[LIVE] My channel:",
-                myChannelName
+                socketChannelName
             );
 
 
@@ -222,7 +255,7 @@
 
 
         /* ------------------------------------------
-           WebRTC offer
+           WebRTC Offer
         ------------------------------------------ */
 
         if (
@@ -237,9 +270,171 @@
             return;
         }
 
+        /* ==================================================
+        Participation approved
+        ================================================== */
+
+        async function handleParticipationApproved(
+            data
+        ) {
+
+            const participationType =
+                data.participation_type;
+
+
+            const hostChannel =
+                data.host_channel;
+
+
+            if (
+                !hostChannel
+            ) {
+
+                console.warn(
+                    "[LIVE] Host channel がありません"
+                );
+
+                return;
+            }
+
+
+            console.log(
+                "[LIVE] Participation approved:",
+                participationType
+            );
+
+
+            /*
+            * 配信者channelを保存
+            */
+
+            hostChannelName =
+                hostChannel;
+
+
+            /*
+            * 現在のPeerConnectionがあれば
+            * 一度終了
+            */
+
+            if (
+                peerConnection
+            ) {
+
+                try {
+
+                    peerConnection.close();
+
+                } catch (error) {}
+
+                peerConnection =
+                    null;
+
+            }
+
+
+            /*
+            * 視聴者側のカメラ・マイクを取得
+            */
+
+            try {
+
+                const stream =
+                    await navigator
+                        .mediaDevices
+                        .getUserMedia({
+
+                            video:
+                                participationType ===
+                                "video",
+
+                            audio:
+                                true
+
+                        });
+
+
+                /*
+                * 新しいPeerConnection
+                */
+
+                const pc =
+                    createPeerConnection();
+
+
+                /*
+                * 自分の参加用Mediaを追加
+                */
+
+                stream
+                    .getTracks()
+                    .forEach(
+                        track => {
+
+                            pc.addTrack(
+                                track,
+                                stream
+                            );
+
+                        }
+                    );
+
+
+                /*
+                * Offer作成
+                */
+
+                const offer =
+                    await pc.createOffer();
+
+
+                await pc.setLocalDescription(
+                    offer
+                );
+
+
+                /*
+                * 配信者へOffer
+                */
+
+                sendMessage({
+
+                    type:
+                        "offer",
+
+                    target_channel:
+                        hostChannelName,
+
+                    sdp:
+                        offer.sdp
+
+                });
+
+
+                console.log(
+                    "[LIVE] Participation offer sent"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "[LIVE] Participation media error:",
+                    error
+                );
+
+
+                alert(
+                    "カメラ・マイクを使用できませんでした。"
+                );
+
+            }
+
+        }
+
 
         /* ------------------------------------------
-           ICE candidate
+           WebRTC ICE
         ------------------------------------------ */
 
         if (
@@ -272,9 +467,25 @@
             return;
         }
 
+        /* ------------------------------------------
+        Participation approved
+        ------------------------------------------ */
+
+        if (
+            data.type ===
+            "participation_approved"
+        ) {
+
+            await handleParticipationApproved(
+                data
+            );
+
+            return;
+        }
+
 
         /* ------------------------------------------
-           System
+           LIVE system
         ------------------------------------------ */
 
         if (
@@ -293,16 +504,23 @@
 
 
     /* ==================================================
-       Create PeerConnection
+       WebRTC PeerConnection
     ================================================== */
 
     function createPeerConnection() {
 
+        /*
+         * 既存接続があれば終了
+         */
         if (
             peerConnection
         ) {
 
-            peerConnection.close();
+            try {
+
+                peerConnection.close();
+
+            } catch (error) {}
 
         }
 
@@ -335,12 +553,15 @@
                     event.streams[0];
 
 
+                /*
+                 * autoplay
+                 */
                 remoteVideo
                     .play()
                     .catch(
                         error => {
 
-                            console.log(
+                            console.warn(
                                 "[LIVE] Autoplay blocked:",
                                 error
                             );
@@ -381,7 +602,7 @@
             ) {
 
                 console.warn(
-                    "[LIVE] Host channel not found"
+                    "[LIVE] Host channel がありません"
                 );
 
                 return;
@@ -411,6 +632,14 @@
         peerConnection.onconnectionstatechange =
             () => {
 
+                if (
+                    !peerConnection
+                ) {
+
+                    return;
+                }
+
+
                 const state =
                     peerConnection.connectionState;
 
@@ -436,22 +665,13 @@
 
 
                 if (
-                    state ===
-                    "failed"
-                ) {
-
-                    videoPlaceholder
-                        ?.classList
-                        .remove(
-                            "hidden"
-                        );
-
-                }
-
-
-                if (
-                    state ===
-                    "closed"
+                    [
+                        "failed",
+                        "disconnected",
+                        "closed"
+                    ].includes(
+                        state
+                    )
                 ) {
 
                     videoPlaceholder
@@ -471,7 +691,7 @@
 
 
     /* ==================================================
-       Handle offer
+       Handle Offer
     ================================================== */
 
     async function handleOffer(
@@ -484,12 +704,16 @@
 
 
         /*
-         * Offerを送ってきた相手が
-         * 配信者
+         * Offerを送ってきた相手 = 配信者
          */
+        if (
+            data.sender_channel
+        ) {
 
-        hostChannelName =
-            data.sender_channel;
+            hostChannelName =
+                data.sender_channel;
+
+        }
 
 
         if (
@@ -497,7 +721,19 @@
         ) {
 
             console.error(
-                "[LIVE] sender_channel がありません"
+                "[LIVE] 配信者channelがありません"
+            );
+
+            return;
+        }
+
+
+        if (
+            !data.sdp
+        ) {
+
+            console.error(
+                "[LIVE] SDPがありません"
             );
 
             return;
@@ -510,6 +746,9 @@
 
         try {
 
+            /*
+             * 配信者のOfferを設定
+             */
             await pc.setRemoteDescription({
 
                 type:
@@ -521,15 +760,32 @@
             });
 
 
+            /*
+             * 保留していたICEを追加
+             */
+            await flushPendingIceCandidates(
+                pc
+            );
+
+
+            /*
+             * Answer作成
+             */
             const answer =
                 await pc.createAnswer();
 
 
+            /*
+             * LocalDescription設定
+             */
             await pc.setLocalDescription(
                 answer
             );
 
 
+            /*
+             * 配信者へAnswer
+             */
             sendMessage({
 
                 type:
@@ -552,7 +808,7 @@
         } catch (error) {
 
             console.error(
-                "[LIVE] Offer handling error",
+                "[LIVE] Offer handling error:",
                 error
             );
 
@@ -570,10 +826,12 @@
     ) {
 
         if (
-            !peerConnection
+            data.sender_channel
         ) {
 
-            return;
+            hostChannelName =
+                data.sender_channel;
+
         }
 
 
@@ -586,35 +844,102 @@
 
 
         /*
-         * 配信者のchannelを覚える
+         * PeerConnectionがまだない
          */
-
         if (
-            data.sender_channel
+            !peerConnection
         ) {
 
-            hostChannelName =
-                data.sender_channel;
+            pendingIceCandidates.push(
+                data.candidate
+            );
 
+            return;
+        }
+
+
+        /*
+         * RemoteDescriptionがまだない
+         */
+        if (
+            !peerConnection.remoteDescription
+        ) {
+
+            pendingIceCandidates.push(
+                data.candidate
+            );
+
+            return;
         }
 
 
         try {
 
-            await peerConnection
-                .addIceCandidate(
-                    new RTCIceCandidate(
-                        data.candidate
-                    )
-                );
+            await peerConnection.addIceCandidate(
+                new RTCIceCandidate(
+                    data.candidate
+                )
+            );
 
 
         } catch (error) {
 
             console.error(
-                "[LIVE] ICE error",
+                "[LIVE] ICE error:",
                 error
             );
+
+        }
+
+    }
+
+
+    /* ==================================================
+       Pending ICE
+    ================================================== */
+
+    async function flushPendingIceCandidates(
+        pc
+    ) {
+
+        if (
+            !pendingIceCandidates.length
+        ) {
+
+            return;
+        }
+
+
+        console.log(
+            "[LIVE] Flushing ICE:",
+            pendingIceCandidates.length
+        );
+
+
+        while (
+            pendingIceCandidates.length
+        ) {
+
+            const candidate =
+                pendingIceCandidates.shift();
+
+
+            try {
+
+                await pc.addIceCandidate(
+                    new RTCIceCandidate(
+                        candidate
+                    )
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "[LIVE] Pending ICE error:",
+                    error
+                );
+
+            }
 
         }
 
@@ -789,10 +1114,10 @@
         data
     ) {
 
-        /*
-         * 自分自身の参加通知は
-         * 視聴者数に加えない
-         */
+
+        /* ------------------------------------------
+           自分の参加通知
+        ------------------------------------------ */
 
         if (
             data.event ===
@@ -801,13 +1126,29 @@
 
             if (
                 data.channel_name ===
-                myChannelName
+                socketChannelName
             ) {
 
                 return;
             }
 
 
+            /*
+             * 配信者自身は視聴者数に含めない
+             */
+            if (
+                Number(data.user_id) ===
+                Number(config.hostUserId)
+            ) {
+
+                return;
+            }
+
+
+            /*
+             * viewer_joined は
+             * 自分以外の視聴者が入った場合
+             */
             currentViewerCount++;
 
 
@@ -829,6 +1170,10 @@
         }
 
 
+        /* ------------------------------------------
+           Viewer left
+        ------------------------------------------ */
+
         if (
             data.event ===
             "viewer_left"
@@ -836,7 +1181,7 @@
 
             if (
                 data.channel_name ===
-                myChannelName
+                socketChannelName
             ) {
 
                 return;
@@ -847,8 +1192,7 @@
 
 
             if (
-                currentViewerCount <
-                0
+                currentViewerCount < 0
             ) {
 
                 currentViewerCount = 0;
@@ -863,10 +1207,18 @@
         }
 
 
+        /* ------------------------------------------
+           LIVE ended
+        ------------------------------------------ */
+
         if (
             data.event ===
             "live_ended"
         ) {
+
+            liveEnded =
+                true;
+
 
             addSystemMessage(
                 "配信が終了しました"
@@ -889,6 +1241,24 @@
 
             }
 
+
+            if (
+                peerConnection
+            ) {
+
+                try {
+
+                    peerConnection.close();
+
+                } catch (error) {}
+
+                peerConnection =
+                    null;
+
+            }
+
+
+            return;
         }
 
     }
@@ -916,18 +1286,43 @@
         type
     ) {
 
-        /*
-         * 今回はこちらをWebSocket方式に統一
-         */
+        if (
+            liveEnded
+        ) {
 
-        sendMessage({
+            alert(
+                "このLIVEは終了しています。"
+            );
 
-            type:
-                type === "audio"
-                    ? "request_audio"
-                    : "request_video"
+            return;
+        }
 
-        });
+
+        const messageType =
+            type === "audio"
+                ? "request_audio"
+                : "request_video";
+
+
+        const sent =
+            sendMessage({
+
+                type:
+                    messageType
+
+            });
+
+
+        if (
+            !sent
+        ) {
+
+            alert(
+                "LIVEへの接続が完了していません。"
+            );
+
+            return;
+        }
 
 
         alert(
@@ -1001,10 +1396,55 @@
 
 
     /* ==================================================
+       Cleanup
+    ================================================== */
+
+    function cleanup() {
+
+        if (
+            peerConnection
+        ) {
+
+            try {
+
+                peerConnection.close();
+
+            } catch (error) {}
+
+            peerConnection =
+                null;
+
+        }
+
+
+        if (
+            remoteVideo
+        ) {
+
+            remoteVideo.srcObject =
+                null;
+
+        }
+
+    }
+
+
+    window.addEventListener(
+        "beforeunload",
+        cleanup
+    );
+
+
+    /* ==================================================
        Initialize
     ================================================== */
 
     function initialize() {
+
+        console.log(
+            "[LIVE] Viewer initialize"
+        );
+
 
         connectSocket();
 
