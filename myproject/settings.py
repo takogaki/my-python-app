@@ -27,6 +27,8 @@ ALLOWED_HOSTS = [
     "my-python-app-0t2k.onrender.com",
     ".onrender.com",
     ".ngrok-free.app",
+    "the-spirytus.com",
+    "www.the-spirytus.com",
 ]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
@@ -110,6 +112,8 @@ if DJANGO_ENV == "production":
     CSRF_TRUSTED_ORIGINS = [
         "https://my-python-app-0t2k.onrender.com",
         "http://127.0.0.1:8000",
+        "https://the-spirytus.com",
+        "https://www.the-spirytus.com",
     ]
 
     SECURE_BROWSER_XSS_FILTER = True
