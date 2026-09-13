@@ -253,7 +253,7 @@ html, body {
 /* もっと見る */
 .video-card .more-btn {
     margin-top: 2px;
-    font-size: 12px;
+    font-size: 18px;
     color: rgba(255,255,255,0.7);
     background: linear-gradient(
         to top,
