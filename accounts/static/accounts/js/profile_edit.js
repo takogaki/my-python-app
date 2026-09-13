@@ -176,8 +176,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // 使用できない文字
-        const invalidMatch = value.match(/[^\w.\-]/u);
+        // 日本語・英字・数字・_・-・. 以外を検出
+        const invalidMatch = value.match(/[^\p{L}\p{N}_\-.]/u);
 
         if (invalidMatch) {
 
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // 最初が記号
+        // 最初の記号
         if (/^[._-]/.test(value)) {
 
             usernameWarning.textContent =
@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // 最後が記号
+        // 最後の記号
         if (/[._-]$/.test(value)) {
 
             usernameWarning.textContent =

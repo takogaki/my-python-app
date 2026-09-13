@@ -183,27 +183,42 @@ class CustomUserCreationForm(UserCreationForm):
     def clean_username(self):
         username = self.cleaned_data["username"]
 
-        qs = CustomUser.objects.filter(username=username)
+        # 本登録済み（is_active=True）のユーザーだけ重複チェック
+        qs = CustomUser.objects.filter(
+            username=username,
+            is_active=True,
+        )
 
-        # 🔥 自分自身は除外
+        # 自分自身は除外
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
 
         if qs.exists():
-            raise ValidationError("このユーザー名はすでに使われています")
+            raise ValidationError(
+                "このユーザー名はすでに使われています"
+            )
 
         return username
+    
     
     def clean_email(self):
         email = self.cleaned_data.get("email")
 
         if not email:
-            raise ValidationError("メールアドレスを入力してください")
+            raise ValidationError(
+                "メールアドレスを入力してください"
+            )
 
         email = email.lower().strip()
 
-        if CustomUser.objects.filter(email=email).exists():
-            raise ValidationError("このメールアドレスは既に登録されています")
+        # 本登録済み（is_active=True）のメールアドレスだけ重複チェック
+        if CustomUser.objects.filter(
+            email=email,
+            is_active=True,
+        ).exists():
+            raise ValidationError(
+                "このメールアドレスは既に登録されています"
+            )
 
         return email
 

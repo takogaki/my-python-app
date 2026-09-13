@@ -67,13 +67,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const value = usernameInput.value;
 
+        // 空欄
         if (!value) {
             usernameWarning.textContent = "";
+            usernameWarning.classList.remove("show");
             return;
         }
 
-        // 許可する文字
-        const invalidMatch = value.match(/[^\w.\-]/u);
+        // 日本語・英字・数字・_・-・. 以外を検出
+        const invalidMatch = value.match(/[^\p{L}\p{N}_\-.]/u);
 
         if (invalidMatch) {
 
@@ -107,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // 問題なし
         usernameWarning.textContent = "";
         usernameWarning.classList.remove("show");
     });
