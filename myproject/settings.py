@@ -110,7 +110,6 @@ if DJANGO_ENV == "production":
     CSRF_COOKIE_SAMESITE = "Lax"
 
     CSRF_TRUSTED_ORIGINS = [
-        "https://my-python-app-0t2k.onrender.com",
         "http://127.0.0.1:8000",
         "https://the-spirytus.com",
         "https://www.the-spirytus.com",
@@ -373,7 +372,7 @@ CONTENT_SECURITY_POLICY = {
             "'self'",
             "ws://127.0.0.1:8000",
             "ws://localhost:8000",
-            "wss://my-python-app-0t2k.onrender.com",
+            "wss://the-spirytus.com",
             "https://ep1.adtrafficquality.google",
         ),
     }
