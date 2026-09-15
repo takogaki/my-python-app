@@ -316,51 +316,104 @@ class SignUpView(generic.CreateView):
     success_url = reverse_lazy("accounts:signup_done")
 
     def form_valid(self, form):
+
+        # ==================================================
         # ★ next を session に保存
+        # ==================================================
         next_url = self.request.GET.get("next")
+
         if next_url:
             self.request.session["signup_next"] = next_url
 
+        # ==================================================
+        # 🔥 入力されたユーザー名・メールアドレス
+        # ==================================================
+        username = form.cleaned_data["username"]
+        email = form.cleaned_data["email"]
+
+        # ==================================================
+        # 🔥 同じユーザー名の「未認証アカウント」を削除
+        # ==================================================
+        CustomUser.objects.filter(
+            username=username,
+            is_active=False,
+        ).delete()
+
+        # ==================================================
+        # 🔥 同じメールアドレスの「未認証アカウント」を削除
+        # ==================================================
+        CustomUser.objects.filter(
+            email=email,
+            is_active=False,
+        ).delete()
+
+        # ==================================================
+        # 🔥 新しい仮登録ユーザーを作成
+        # ==================================================
         user = form.save(commit=False)
+
         user.is_active = False
         user.activation_token = uuid.uuid4()
+
         user.save()
 
+        # ==================================================
+        # 🔥 プロフィール画像を保存
+        # ==================================================
+        profile, created = Profile.objects.get_or_create(
+            user=user
+        )
+
+        profile.profile_image = form.cleaned_data["profile_image"]
+        profile.save()
+
+        # ==================================================
+        # 🔥 本登録URLを作成
+        # ==================================================
         activation_url = self.request.build_absolute_uri(
             reverse(
                 "accounts:activate",
-                kwargs={"token": user.activation_token}
+                kwargs={
+                    "token": user.activation_token
+                }
             )
         )
 
+        # ==================================================
+        # 🔥 本登録メール送信
+        # ==================================================
         send_mail(
             subject="【SPIRYTUS】本登録のご案内",
             message=f"""SPIRYTUSへの仮登録ありがとうございます。
 
-            以下の内容で登録されています。
+以下の内容で登録されています。
 
-            ユーザー名：{user.username}
-            メールアドレス：{user.email}
+ユーザー名：{user.username}
+メールアドレス：{user.email}
 
-            ━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━
 
-            下記のリンクをクリックして、本登録を完了してください。
+下記のリンクをクリックして、本登録を完了してください。
 
-            {activation_url}
+{activation_url}
 
-            ━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━
 
-            このメールに心当たりがない場合は、
-            このメールを破棄してください。
+このメールに心当たりがない場合は、
+このメールを破棄してください。
 
-            SPIRYTUS
-            """,
+SPIRYTUS
+""",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
         )
 
+        # ==================================================
+        # 🔥 CreateViewのredirect用
+        # ==================================================
+        self.object = user
 
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
     
 # =========================
 # 利用規約

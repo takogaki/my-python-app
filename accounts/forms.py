@@ -105,12 +105,15 @@ def validate_username(value):
 # =========================
 # 🔥 ユーザー登録
 # =========================
+# =========================
+# 🔥 ユーザー登録
+# =========================
 class CustomUserCreationForm(UserCreationForm):
 
     agree = forms.BooleanField(
-    required=True,
-    label="利用規約に同意する"
-)
+        required=True,
+        label="利用規約に同意する"
+    )
 
     profile_image = forms.ImageField(
         required=True,
@@ -120,14 +123,6 @@ class CustomUserCreationForm(UserCreationForm):
         }),
         label="プロフィール画像"
     )
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if not cleaned_data.get("agree"):
-            raise ValidationError("利用規約に同意してください")
-
-        return cleaned_data
 
     username = forms.CharField(
         label="ユーザー名",
@@ -180,18 +175,35 @@ class CustomUserCreationForm(UserCreationForm):
             "agree",
         ]
 
+    # =========================
+    # 🔥 利用規約
+    # =========================
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not cleaned_data.get("agree"):
+            raise ValidationError(
+                "利用規約に同意してください"
+            )
+
+        return cleaned_data
+
+    # =========================
+    # 🔥 ユーザー名
+    # =========================
     def clean_username(self):
         username = self.cleaned_data["username"]
 
-        # 本登録済み（is_active=True）のユーザーだけ重複チェック
+        # 本登録済みユーザーだけ重複チェック
         qs = CustomUser.objects.filter(
             username=username,
             is_active=True,
         )
 
-        # 自分自身は除外
         if self.instance.pk:
-            qs = qs.exclude(pk=self.instance.pk)
+            qs = qs.exclude(
+                pk=self.instance.pk
+            )
 
         if qs.exists():
             raise ValidationError(
@@ -199,8 +211,10 @@ class CustomUserCreationForm(UserCreationForm):
             )
 
         return username
-    
-    
+
+    # =========================
+    # 🔥 メールアドレス
+    # =========================
     def clean_email(self):
         email = self.cleaned_data.get("email")
 
@@ -211,7 +225,7 @@ class CustomUserCreationForm(UserCreationForm):
 
         email = email.lower().strip()
 
-        # 本登録済み（is_active=True）のメールアドレスだけ重複チェック
+        # 本登録済みユーザーだけ重複チェック
         if CustomUser.objects.filter(
             email=email,
             is_active=True,
@@ -221,6 +235,72 @@ class CustomUserCreationForm(UserCreationForm):
             )
 
         return email
+
+    # =========================
+    # 🔥 Django標準のuniqueチェックを
+    #    仮登録ユーザーについて無効化
+    # =========================
+    def validate_unique(self):
+        return
+
+    # =========================
+    # 🔥 生年月日
+    # =========================
+    def clean_birth_date_input(self):
+        value = self.cleaned_data["birth_date_input"]
+
+        if not value.isdigit() or len(value) != 8:
+            raise ValidationError(
+                "生年月日は数字8桁で入力してください（例：19901114）"
+            )
+
+        try:
+            birth_date = datetime.strptime(
+                value,
+                "%Y%m%d"
+            ).date()
+
+        except ValueError:
+            raise ValidationError(
+                "存在しない日付です"
+            )
+
+        if birth_date > datetime.now().date():
+            raise ValidationError(
+                "未来の日付は指定できません"
+            )
+
+        return birth_date
+
+    # =========================
+    # 🔥 保存
+    # =========================
+    def save(self, commit=True):
+        user = super().save(commit=False)
+
+        user.birth_date = self.cleaned_data[
+            "birth_date_input"
+        ]
+
+        # メール認証が完了するまでは無効
+        user.is_active = False
+
+        user.agreed_terms_at = timezone.now()
+
+        if commit:
+            user.save()
+
+            profile, created = Profile.objects.get_or_create(
+                user=user
+            )
+
+            profile.profile_image = self.cleaned_data[
+                "profile_image"
+            ]
+
+            profile.save()
+
+        return user
 
     def clean_birth_date_input(self):
         value = self.cleaned_data["birth_date_input"]
