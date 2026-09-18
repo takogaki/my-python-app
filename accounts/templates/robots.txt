@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://the-spirytus.com/sitemap.xml
+Sitemap: https://the-spirytus-sns.com/sitemap.xml

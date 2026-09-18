@@ -27,8 +27,8 @@ ALLOWED_HOSTS = [
     "my-python-app-0t2k.onrender.com",
     ".onrender.com",
     ".ngrok-free.app",
-    "the-spirytus.com",
-    "www.the-spirytus.com",
+    "the-spirytus-sns.com",
+    "www.the-spirytus-sns.com",
 ]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
@@ -111,8 +111,8 @@ if DJANGO_ENV == "production":
 
     CSRF_TRUSTED_ORIGINS = [
         "http://127.0.0.1:8000",
-        "https://the-spirytus.com",
-        "https://www.the-spirytus.com",
+        "https://the-spirytus-sns.com",
+        "https://www.the-spirytus-sns.comm",
     ]
 
     SECURE_BROWSER_XSS_FILTER = True
@@ -372,7 +372,7 @@ CONTENT_SECURITY_POLICY = {
             "'self'",
             "ws://127.0.0.1:8000",
             "ws://localhost:8000",
-            "wss://the-spirytus.com",
+            "wss://the-spirytus-sns.com",
             "https://ep1.adtrafficquality.google",
         ),
     }
