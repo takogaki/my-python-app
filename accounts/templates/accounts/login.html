@@ -40,10 +40,20 @@
         </form>
 
         <div class="login-footer">
+        
+            <!-- パスワード再設定 -->
+            <p>
+                <a href="{% url 'accounts:password_reset' %}">
+                    パスワードを忘れた方はこちら
+                </a>
+            </p>
+        
             <p>アカウントをお持ちでない方</p>
+        
             <a href="{% url 'accounts:signup' %}?next={{ request.GET.next }}">
                 新規登録はこちら
             </a>
+        
         </div>
 
     </div>
