@@ -170,17 +170,34 @@ def frontpage(request):
 # 投稿詳細 + コメント
 # =======================
 def post_detail(request, slug):
-    post = get_object_or_404(Post, slug=slug, is_hidden=False)
+
+    post = get_object_or_404(
+        Post,
+        slug=slug,
+        is_hidden=False
+    )
+
     comment = None
 
+
+    # =====================================================
+    # 保存済み判定
+    # =====================================================
+
     is_saved = False
+
     if request.user.is_authenticated:
+
         is_saved = SavedPost.objects.filter(
             user=request.user,
             post=post
         ).exists()
 
+
+    # =====================================================
     # 親コメント
+    # =====================================================
+
     parent_comments = (
         Comment.objects
         .filter(
@@ -188,84 +205,205 @@ def post_detail(request, slug):
             parent__isnull=True,
             is_hidden=False
         )
-        .order_by("-posted_date")
+        .select_related("author", "reply_to")
         .prefetch_related(
             models.Prefetch(
                 "replies",
-                queryset=Comment.objects.filter(is_hidden=False).order_by("-posted_date")
+                queryset=(
+                    Comment.objects
+                    .filter(is_hidden=False)
+                    .select_related(
+                        "author",
+                        "reply_to"
+                    )
+                    .order_by("posted_date")
+                )
             )
         )
+        .order_by("-posted_date")
     )
-    
-    # =======================
+
+
+    # =====================================================
     # 表示名・リンク可否設定
-    # =======================
+    # =====================================================
+
     for parent_comment in parent_comments:
 
-        # ===== 親コメント =====
+
+        # -------------------------------------------------
+        # 親コメント
+        # -------------------------------------------------
+
         if parent_comment.author is None:
-            parent_comment.display_name = parent_comment.name
+
+            parent_comment.display_name = (
+                parent_comment.name
+            )
+
             parent_comment.can_link = False
+
 
         elif parent_comment.author.is_superuser:
-            parent_comment.display_name = parent_comment.author.username
+
+            parent_comment.display_name = (
+                parent_comment.author.username
+            )
+
             parent_comment.can_link = False
+
 
         elif not parent_comment.author.is_active:
+
             parent_comment.display_name = "退会ユーザー"
+
             parent_comment.can_link = False
 
+
         else:
-            parent_comment.display_name = parent_comment.author.username
+
+            parent_comment.display_name = (
+                parent_comment.author.username
+            )
+
             parent_comment.can_link = True
 
-        # ===== 返信 =====
+
+        # -------------------------------------------------
+        # 返信
+        # -------------------------------------------------
+
         for reply in parent_comment.replies.all():
 
-            # ---- 書いた人（左：A）----
+
+            # =============================================
+            # 返信を書いたユーザー
+            # =============================================
+
             if reply.author is None:
-                reply.author_display = reply.name
+
+                reply.author_display = (
+                    reply.name
+                )
+
                 reply.author_can_link = False
+
 
             elif reply.author.is_superuser:
-                reply.author_display = reply.author.username
+
+                reply.author_display = (
+                    reply.author.username
+                )
+
                 reply.author_can_link = False
+
 
             elif not reply.author.is_active:
+
                 reply.author_display = "退会ユーザー"
+
                 reply.author_can_link = False
 
+
             else:
-                reply.author_display = reply.author.username
+
+                reply.author_display = (
+                    reply.author.username
+                )
+
                 reply.author_can_link = True
 
-            # ---- 返信先（右：B）----
+
+            # =============================================
+            # 返信先ユーザー
+            # =============================================
+
             if reply.reply_to:
+
                 if reply.reply_to.is_superuser:
-                    reply.reply_to_display = reply.reply_to.username
+
+                    reply.reply_to_display = (
+                        reply.reply_to.username
+                    )
+
                     reply.reply_to_can_link = False
+
 
                 elif not reply.reply_to.is_active:
-                    reply.reply_to_display = "退会ユーザー"
+
+                    reply.reply_to_display = (
+                        "退会ユーザー"
+                    )
+
                     reply.reply_to_can_link = False
 
+
                 else:
-                    reply.reply_to_display = reply.reply_to.username
+
+                    reply.reply_to_display = (
+                        reply.reply_to.username
+                    )
+
                     reply.reply_to_can_link = True
 
-            else:
-                # reply_to が無い場合は「親コメントの投稿者」
-                reply.reply_to_display = parent_comment.display_name
-                reply.reply_to_can_link = parent_comment.can_link
 
-    # =======================
-    # フォーム
-    # =======================
-    form = CommentForm(user=request.user)
+            else:
+
+                # reply_to がない場合は
+                # 親コメントの投稿者
+                reply.reply_to_display = (
+                    parent_comment.display_name
+                )
+
+                reply.reply_to_can_link = (
+                    parent_comment.can_link
+                )
+
+
+    # =====================================================
+    # コメントフォーム
+    # =====================================================
+
+    form = CommentForm(
+        user=request.user
+    )
+
+
+    # =====================================================
+    # コメント・返信投稿
+    # =====================================================
 
     if request.method == "POST":
-        parent_id = request.POST.get("parent_id")
-        parent = Comment.objects.filter(id=parent_id).first()
+
+
+        # -------------------------------------------------
+        # 親コメントID
+        # -------------------------------------------------
+
+        parent_id = request.POST.get(
+            "parent_id"
+        )
+
+
+        parent = None
+
+
+        if parent_id:
+
+            parent = (
+                Comment.objects
+                .filter(
+                    id=parent_id,
+                    post=post,
+                    is_hidden=False
+                )
+                .first()
+            )
+
+
+        # -------------------------------------------------
+        # フォーム
+        # -------------------------------------------------
 
         form = CommentForm(
             request.POST,
@@ -274,60 +412,168 @@ def post_detail(request, slug):
             user=request.user,
         )
 
+
         if form.is_valid():
-            comment = form.save(commit=False)
+
+
+            # =============================================
+            # Comment作成
+            # =============================================
+
+            comment = form.save(
+                commit=False
+            )
+
+
             comment.post = post
+
+
+            # =============================================
+            # 投稿者
+            # =============================================
 
             device_id = None
 
+
             if request.user.is_authenticated:
+
                 comment.author = request.user
-                comment.name = request.user.username
+
+                comment.name = (
+                    request.user.username
+                )
+
+
             else:
-                device_id = get_device_id(request)
-                comment.name = f"未ログイン-{device_id[:6]}"
 
+                device_id = get_device_id(
+                    request
+                )
+
+                comment.name = (
+                    f"未ログイン-{device_id[:6]}"
+                )
+
+
+            # =============================================
             # 返信先ユーザー
-            reply_to_id = request.POST.get("reply_to")
-            if reply_to_id:
-                comment.reply_to = User.objects.filter(id=reply_to_id).first()
+            # =============================================
 
+            reply_to_id = request.POST.get(
+                "reply_to"
+            )
+
+
+            if reply_to_id:
+
+                reply_to = (
+                    User.objects
+                    .filter(
+                        id=reply_to_id,
+                        is_active=True
+                    )
+                    .first()
+                )
+
+
+                if reply_to:
+
+                    comment.reply_to = reply_to
+
+
+            # =============================================
             # 親コメント
+            # =============================================
+
             if parent:
-                comment.parent = parent.root_parent
+
+                comment.parent = (
+                    parent.root_parent
+                )
+
+
+            # =============================================
+            # 保存
+            # =============================================
 
             comment.save()
 
-            # =======================
-            # 🔔 通知
-            # =======================
+
+            # =================================================
+            # 通知
+            # =================================================
+
             if request.user.is_authenticated:
+
                 recipient = None
 
+
+                # ---------------------------------------------
+                # 返信の場合
+                # ---------------------------------------------
+
                 if comment.reply_to:
+
                     recipient = comment.reply_to
+
+
+                # ---------------------------------------------
+                # 通常コメントの場合
+                # ---------------------------------------------
+
                 elif post.author:
+
                     recipient = post.author
 
-                if recipient and recipient != request.user:
+
+                # ---------------------------------------------
+                # 自分自身には通知しない
+                # ---------------------------------------------
+
+                if (
+                    recipient
+                    and recipient != request.user
+                ):
+
                     Notification.objects.create(
                         recipient=recipient,
                         actor=request.user,
                         post=post,
                         type="comment",
                         verb="さんがコメントしました",
-                        # target_url=(
-                        #     reverse("blog:post_detail", args=[post.slug])
-                        #     + f"#comment-{comment.id}"
-                        # ),
                     )
 
-            response = redirect("blog:post_detail", slug=slug)
 
-            if device_id and not request.COOKIES.get("device_id"):
-                response.set_cookie("device_id", max_age=60 * 60 * 24 * 365)
+            # =================================================
+            # 投稿詳細へ戻る
+            # =================================================
+
+            response = redirect(
+                "blog:post_detail",
+                slug=slug
+            )
+
+
+            if (
+                device_id
+                and not request.COOKIES.get(
+                    "device_id"
+                )
+            ):
+
+                response.set_cookie(
+                    "device_id",
+                    device_id,
+                    max_age=60 * 60 * 24 * 365,
+                )
+
 
             return response
+
+
+    # =====================================================
+    # 表示
+    # =====================================================
 
     return render(
         request,

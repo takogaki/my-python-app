@@ -1,0 +1,231 @@
+/* =========================================================
+SPIRYTUS COMMON
+共通設定・モーダル・動画表示
+========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    background: #fafafa;
+    color: #111;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Helvetica Neue",
+        "Hiragino Kaku Gothic ProN",
+        "Hiragino Sans",
+        Meiryo,
+        sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* =========================================================
+メインコンテナ
+========================================================= */
+
+.content-container,
+.instagram-feed {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 12px 60px;
+}
+
+/* =========================================================
+メディアモーダル
+========================================================= */
+
+.media-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.88);
+}
+
+.media-modal.is-open {
+    display: flex;
+}
+
+.media-modal-content {
+    max-width: 95vw;
+    max-height: 90vh;
+}
+
+.media-modal-content img {
+    display: block;
+    max-width: 95vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.media-modal-close {
+    position: fixed;
+    top: 12px;
+    right: 15px;
+    z-index: 10000;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 38px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* =========================================================
+動画プレースホルダー
+========================================================= */
+
+.video-placeholder {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    height: 315px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 12px auto;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.video-label {
+    padding: 6px 12px;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.video-label.live {
+    background: #e53935;
+    animation: live-blink 2s infinite;
+}
+
+.video-label.ended {
+    background: #777;
+    opacity: 0.7;
+    animation: none;
+}
+
+.video-placeholder.ended {
+    pointer-events: none;
+}
+
+@keyframes live-blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+動画リンク
+========================================================= */
+
+.video-link-box {
+    margin-top: 10px;
+}
+
+.video-link {
+    display: inline-block;
+    padding: 9px 13px;
+    border-radius: 7px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    opacity: 0.85;
+}
+
+.video-link.youtube {
+    background: #ff0000;
+}
+
+.video-link.tiktok {
+    background: #111;
+}
+
+.video-link.instagram {
+    background: #e1306c;
+}
+
+.video-link.twitter {
+    background: #1da1f2;
+}
+
+.video-link.facebook {
+    background: #1877f2;
+}
+
+/* =========================================================
+スマートフォン共通
+========================================================= */
+
+@media (max-width: 767px) {
+    body {
+        background: #fff;
+    }
+
+    .content-container,
+    .instagram-feed {
+        max-width: 100%;
+        margin: 0;
+        padding: 0 0 50px;
+    }
+
+    .media-modal {
+        padding: 10px;
+    }
+
+    .media-modal-content {
+        max-width: 100vw;
+        max-height: 92vh;
+    }
+
+    .media-modal-content img {
+        max-width: 100vw;
+        max-height: 92vh;
+        border-radius: 0;
+    }
+
+    .video-placeholder {
+        height: 220px;
+        margin: 8px auto;
+        border-radius: 0;
+    }
+}

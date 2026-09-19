@@ -3,129 +3,349 @@
 {% load comment_tags %}
 {% load static %}
 
+
 {% block title %}
 会話する｜SPIRYTUS
 {% endblock %}
 
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
-<link rel="stylesheet" href="{% static 'blog/css/blog_form.css' %}">
+
+<link rel="stylesheet" href="{% static 'blog/css/common.css' %}">
+<link rel="stylesheet" href="{% static 'blog/css/post_detail.css' %}">
+<link rel="stylesheet" href="{% static 'blog/css/child_comments.css' %}">
+
 {% endblock %}
+
+
 
 {% block body %}
 
 <div class="content-container">
 
-    <!-- 投稿カード -->
-    <div class="post-detail-card">
+    <article class="instagram-post post-detail">
 
-        <div class="post-meta">
-            <small>🕒 {{ post.posted_date }}</small><br>
-        
-            {% if post.author %}
-            {% if post.author.is_superuser %}
-            <span class="admin-name">
-                {{ post.author.username }}
-            </span>
-            {% else %}
-            <a href="{% url 'accounts:user_detail' post.author.username %}">
-                {{ post.author.username }}
-            </a>
-            {% endif %}
-            {% else %}
-            <span class="guest-name">
-                {{ post.name }}
-            </span>
-            {% endif %}
+        <header class="post-header">
+
+            <div class="post-user">
+
+
+                {# プロフィール画像 #}
+
+                <div class="post-avatar">
+
+                    {% if post.author and post.author.profile_image %}
+
+                    <img src="{{ post.author.profile_image.url }}" alt="{{ post.author.username }}">
+
+                    {% else %}
+
+                    <span>👤</span>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="post-user-info">
+
+                    {% if post.author %}
+
+                    {% if post.author.is_superuser %}
+
+                    <span class="post-username">
+                        {{ post.author.username }}
+                    </span>
+
+                    {% else %}
+
+                    <a href="{% url 'accounts:user_detail' post.author.username %}" class="post-username">
+                        {{ post.author.username }}
+                    </a>
+
+                    {% endif %}
+
+                    {% else %}
+
+                    <span class="post-username guest-name">
+                        {{ post.name }}
+                    </span>
+
+                    {% endif %}
+
+
+                    <span class="post-date">
+                        {{ post.posted_date }}
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="post-menu">
+                <button type="button" class="post-menu-button" aria-label="投稿メニュー" aria-expanded="false">
+                    ⋯
+                </button>
+            
+                <div class="post-menu-dropdown" hidden>
+            
+                    <!-- 通報 -->
+                    <button type="button" class="post-menu-item report-menu-open">
+                        🚩 通報
+                    </button>
+            
+                    <!-- 通報フォーム -->
+                    <form method="post" action="{% url 'blog:report_post' post.id %}" class="post-report-form" hidden>
+                        <form method="post" action="{% url 'blog:report_post' post.id %}" class="post-report-form">
+                        
+                            {% csrf_token %}
+                        
+                            <label for="report-reason-{{ post.id }}">
+                                通報理由を選択
+                            </label>
+                        
+                            <select id="report-reason-{{ post.id }}" name="reason" required>
+                        
+                                <option value="" selected disabled>
+                                    選択してください
+                                </option>
+                        
+                                <option value="sexual">卑猥</option>
+                                <option value="violent">暴力</option>
+                                <option value="harassment">嫌がらせ</option>
+                                <option value="spam">スパム</option>
+                                <option value="other">その他</option>
+                        
+                            </select>
+                        
+                            <button type="submit" class="post-menu-item">
+                                通報を送信
+                            </button>
+                        
+                        </form>
+            
+                </div>
+            </div>
+
+        </header>
+
+        {% if post.title %}
+
+        <div class="post-title-area detail-title">
+
+            <h1>
+                {{ post.title }}
+            </h1>
+
         </div>
 
-        {% if user.is_authenticated and post.author != user %}
-        <div class="save-post-float">
-            <form method="post" action="{% url 'blog:toggle_save_post' post.id %}">
-                {% csrf_token %}
-                {% if is_saved %}
-                <button class="save-btn saved">保存済み👍</button>
-                {% else %}
-                <button class="save-btn">マイページに保存</button>
-                {% endif %}
-            </form>
-        </div>
         {% endif %}
 
-        <h1 class="post-title">{{ post.title }}</h1>
+        {% if post.body %}
 
         <div class="post-body">
+
             {{ post.body|linebreaks }}
+
         </div>
 
-        <div class="media-wrapper">
-            {% if post.image %}
-            <img src="{{ post.image.url }}" class="comment-media-thumb">
-            {% endif %}
+        {% endif %}
 
-            <!-- {% include "blog/video_embed.html" with video_url=post.video_url %} -->
+        {% if post.image %}
+
+        <div class="post-image-wrapper">
+
+            <img src="{{ post.image.url }}" class="post-media-thumb post-image" alt="{{ post.title|default:'投稿画像' }}"
+                loading="lazy">
+
+        </div>
+
+        {% endif %}
+
+        {% if post.video_url %}
+
+        <div class="post-video-area">
+
             {% include "blog/video_embed.html" with obj=post %}
+
+        </div>
+
+        {% endif %}
+
+        <div class="post-actions">
+
+            <div class="post-actions-left">
+
+
+                {# いいね #}
+
+                <button type="button" class="post-action-button" aria-label="いいね">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-heart">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                    </svg>
+                </button>
+
+
+                {# コメント #}
+
+                <a href="#comments" class="post-action-button" aria-label="コメント">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-message-dots">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 11v.01" />
+                        <path d="M8 11v.01" />
+                        <path d="M16 11v.01" />
+                        <path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3l12 0" />
+                    </svg>
+                </a>
+
+
+                {# 共有 #}
+
+                <button type="button" class="post-action-button" aria-label="共有">
+                    ↗
+                </button>
+
+            </div>
+
         </div>
 
         {% if user.is_authenticated and post.author != user %}
-            <div class="report-area subtle-report">
-                <form method="post" action="{% url 'blog:report_post' post.id %}">
-                    {% csrf_token %}
-                    <select name="reason">
-                        <option value="sexual">卑猥な内容</option>
-                        <option value="violent">暴力・グロ</option>
-                        <option value="harassment">嫌がらせ</option>
-                        <option value="spam">スパム</option>
-                        <option value="other">その他</option>
-                    </select>
-                    <button type="submit" class="report-btn">通報する</button>
-                </form>
-            </div>
+
+        <div class="save-post-area">
+
+            <form method="post" action="{% url 'blog:toggle_save_post' post.id %}">
+
+                {% csrf_token %}
+
+
+                {% if is_saved %}
+
+                <button type="submit" class="save-btn saved">
+                    保存済み
+                </button>
+
+                {% else %}
+
+                <button type="submit" class="save-btn">
+                    マイページに保存
+                </button>
+
+                {% endif %}
+
+            </form>
+
+        </div>
+
         {% endif %}
 
-    </div>
+    </article>
 
-    <!-- コメント投稿 -->
-    <div class="comment-form-card">
-        <h2 class="section-title">💬 コメントを書く</h2>
+    <section id="comments" class="youtube-comment-section">
 
-        <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="submit-btn">
-                コメントを投稿
-            </button>
-        </form>
-    </div>
+        <div class="comment-section-header">
 
-    <!-- コメント一覧 -->
-    <div class="comment-list-card">
-        <h2 class="section-title">🗂 コメント一覧</h2>
+            <h2>
+                コメント
+            </h2>
 
-        {% include "blog/child_comments.html" with comments=parent_comments form=form %}
-    </div>
 
-    <!-- 戻る -->
+            {% if parent_comments %}
+
+            <span>
+                {{ parent_comments|length }}件
+            </span>
+
+            {% endif %}
+
+        </div>
+
+        <div class="comment-input-card">
+
+
+            <div class="comment-input-avatar">
+
+                {% if user.is_authenticated %}
+
+                👤
+
+                {% else %}
+
+                ◎
+
+                {% endif %}
+
+            </div>
+
+
+            <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" enctype="multipart/form-data"
+                class="comment-form">
+
+                {% csrf_token %}
+
+
+                {{ form.as_p }}
+
+
+                <div class="comment-form-actions">
+
+                    <button type="submit" class="comment-submit-btn">
+                        コメントを投稿
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="youtube-comments">
+
+            {% include "blog/child_comments.html" with comments=parent_comments form=form post=post %}
+
+        </div>
+
+
+    </section>
+
     <div class="back-area">
-        <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="back-button">
-            ← 戻る
+
+        <a href="{% url 'blog:frontpage' %}" class="back-button">
+            戻る
         </a>
+
     </div>
 
+
 </div>
 
-<!-- メディアモーダル -->
-<div id="media-modal" class="media-modal" onclick="closeMedia()">
-    <div id="media-content"></div>
-</div>
+<div id="media-modal" class="media-modal" aria-hidden="true">
 
-<script src="{% static 'blog/js/blog.js' %}"></script>
-<script async src="https://www.tiktok.com/embed.js"></script>
-<script async src="//www.instagram.com/embed.js"></script>
-<script async src="https://platform.twitter.com/widgets.js"></script>
+    <button type="button" class="media-modal-close" aria-label="閉じる">
+        ×
+    </button>
+
+
+    <div id="media-content" class="media-modal-content"></div>
+
+</div>
 
 {% endblock %}
 
+
+
 {% block extra_js %}
-<link rel="stylesheet" href="{% static 'blog/js/blog.js' %}">
+
+<script src="{% static 'blog/js/blog.js' %}"></script>
+
+
+<script async src="https://www.tiktok.com/embed.js"></script>
+
+<script async src="https://www.instagram.com/embed.js"></script>
+
+<script async src="https://platform.twitter.com/widgets.js"></script>
+
 {% endblock %}

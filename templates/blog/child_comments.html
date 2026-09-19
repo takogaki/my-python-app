@@ -1,200 +1,506 @@
+{% load comment_tags %}
 {% load static %}
 {% load youtube_extras %}
 
-{% for comment in parent_comments %}
-<div id="comment-{{ comment.id }}" class="comment parent">
+{% for comment in comments %}
 
-    <!-- =====================
-        親コメント
-    ===================== -->
-    <p class="post-content">
-        {% if comment.can_link %}
-        <a href="{% url 'accounts:user_detail' comment.author.username %}">
-            {{ comment.display_name }}
-        </a>
+<article id="comment-{{ comment.id }}" class="youtube-comment">
+
+    ```
+    <!-- =========================================
+     コメント本体
+========================================== -->
+    <div class="comment-avatar">
+
+        {% if comment.author and comment.author.profile_image %}
+
+        <img src="{{ comment.author.profile_image.url }}" alt="{{ comment.display_name }}" loading="lazy">
+
         {% else %}
-        <span class="comment-author guest">
-            {{ comment.display_name }}
-        </span>
+
+        <span aria-hidden="true">👤</span>
+
         {% endif %}
-        <br>
-        {{ comment.body|linebreaksbr }}
-    </p>
 
-    {% if comment.image %}
-    <img src="{{ comment.image.url }}" class="comment-media-thumb">
-    {% endif %}
+    </div>
 
-    {% include "blog/video_embed.html" with obj=comment %}
 
-    <!-- 通報フォーム -->
-    {% if user.is_authenticated %}
-    <form method="post" action="{% url 'blog:report_comment' comment.id %}" class="report-form subtle-report">
-        {% csrf_token %}
-        <select name="reason">
-            <option value="sexual">卑猥</option>
-            <option value="violent">暴力</option>
-            <option value="harassment">嫌がらせ</option>
-            <option value="spam">スパム</option>
-            <option value="other">その他</option>
-        </select>
-        <button type="submit" class="report-btn">通報</button>
-    </form>
-    {% endif %}
+    <div class="comment-main">
 
-    {% if comment.replies.count %}
-    <button type="button" class="replies-toggle" data-comment-id="{{ comment.id }}">
-        返信を見る（{{ comment.replies.count }}件）
-    </button>
-    {% endif %}
+        <!-- =====================================
+         コメントヘッダー
+    ====================================== -->
+        <div class="comment-header">
 
-    <!-- =====================
-        子コメント（返信）
-    ===================== -->
-    <div id="replies-{{ comment.id }}" style="display:none; margin-left:20px;">
+            <div class="comment-author">
 
-        {% for reply in comment.replies.all %}
-        <div id="comment-{{ reply.id }}" class="comment reply">
+                {% if comment.can_link %}
 
-            <!-- 返信ヘッダー -->
-            <p class="reply-header">
-            
-                <!-- ===== 書いた人（左）===== -->
-                <span class="reply-from">
-                    {% if reply.author %}
-                    {% if reply.author.is_superuser %}
-                    {{ reply.author.username }}
-                    {% elif reply.author.is_active %}
-                    <a href="{% url 'accounts:user_detail' reply.author.username %}">
-                        {{ reply.author.username }}
-                    </a>
-                    {% else %}
-                    退会ユーザー
-                    {% endif %}
-                    {% else %}
-                    {{ reply.name }}
-                    {% endif %}
-                </span>
-            
-                <span class="reply-arrow"> >>>> </span>
-            
-                <!-- ===== 返信先（右）===== -->
-                <span class="reply-to">
-                    {% if reply.reply_to %}
-                    {% if reply.reply_to.is_superuser %}
-                    {{ reply.reply_to.username }}
-                    {% elif reply.reply_to.is_active %}
-                    <a href="{% url 'accounts:user_detail' reply.reply_to.username %}">
-                        {{ reply.reply_to.username }}
-                    </a>
-                    {% else %}
-                    退会ユーザー
-                    {% endif %}
-                    {% else %}
+                <a href="{% url 'accounts:user_detail' comment.author.username %}">
                     {{ comment.display_name }}
-                    {% endif %}
+                </a>
+
+                {% else %}
+
+                <span>
+                    {{ comment.display_name }}
                 </span>
-            
-            </p>
 
-            <p class="post-content">
-                {{ reply.body|linebreaksbr }}
-            </p>
-
-            {% if reply.image %}
-            <img src="{{ reply.image.url }}" class="comment-media-thumb">
-            {% endif %}
-
-            {% include "blog/video_embed.html" with obj=reply %}
-
-            <!-- 通報フォーム -->
-            {% if user.is_authenticated %}
-            <form method="post" action="{% url 'blog:report_comment' reply.id %}" class="report-form subtle-report">
-                {% csrf_token %}
-                <select name="reason">
-                    <option value="sexual">卑猥</option>
-                    <option value="violent">暴力</option>
-                    <option value="harassment">嫌がらせ</option>
-                    <option value="spam">スパム</option>
-                    <option value="other">その他</option>
-                </select>
-                <button type="submit" class="report-btn">通報</button>
-            </form>
-            {% endif %}
-
-            <!-- 返信への返信フォーム -->
-            <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" class="reply-form-ui">
-                {% csrf_token %}
-                <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                {% if reply.author %}
-                <input type="hidden" name="reply_to" value="{{ reply.author.id }}">
                 {% endif %}
 
-                <label class="form-label">body:</label>
-                {{ form.body }}
+            </div>
 
-                <label class="form-label">image:</label>
-                {{ form.image }}
 
-                <label class="form-label">video url:</label>
-                {{ form.video_url }}
+            <div class="comment-meta">
+            
+                <time class="comment-date">
+                    {{ reply.posted_date }}
+                </time>
+            
+                {% if user.is_authenticated %}
+            
+                <form method="post" action="{% url 'blog:report_comment' comment.pk %}" class="comment-report-form">
+                
+                    {% csrf_token %}
+                
+                    <select name="reason">
+                        <option value="sexual">卑猥</option>
+                        <option value="violent">暴力</option>
+                        <option value="harassment">嫌がらせ</option>
+                        <option value="spam">スパム</option>
+                        <option value="other">その他</option>
+                    </select>
+                
+                    <button type="submit" class="report-btn">
+                        通報
+                    </button>
+                
+                </form>
+            
+                {% endif %}
+            
+            </div>
 
-                <label class="form-label">video type:</label>
-                {{ form.video_type }}
+        </div>
 
-                <button type="submit" class="reply-submit-btn">
-                    返信を投稿
-                </button>
+
+        <!-- =====================================
+         コメント本文
+    ====================================== -->
+        {% if comment.body %}
+
+        <div class="comment-body">
+
+            {{ comment.body|linebreaksbr }}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =====================================
+         コメント画像
+    ====================================== -->
+        {% if comment.image %}
+
+        <div class="comment-image-wrapper">
+
+            <img src="{{ comment.image.url }}" class="comment-media-thumb" alt="コメント画像" loading="lazy">
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =====================================
+         コメント動画
+    ====================================== -->
+        {% if comment.video_url %}
+
+        <div class="comment-video">
+
+            {% include "blog/video_embed.html" with obj=comment %}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =====================================
+         アクション
+    ====================================== -->
+        <div class="comment-actions">
+
+            <button type="button" class="comment-action" aria-label="いいね">
+                ♡
+            </button>
+
+
+            {% if comment.author %}
+            <button type="button" class="comment-action reply-toggle" data-id="{{ comment.id }}"
+                data-reply-to="{{ comment.author.id }}" data-reply-username="{{ comment.author.username }}">
+                返信
+            </button>
+            {% else %}
+            <button type="button" class="comment-action reply-toggle" data-id="{{ comment.id }}">
+                返信
+            </button>
+            {% endif %}
+
+        </div>
+
+
+        <!-- =====================================
+         返信フォーム
+    ====================================== -->
+        <div id="reply-form-comment-{{ comment.id }}" class="reply-form" hidden>
+
+            <div class="replying-to">
+
+                {{ comment.display_name }} に返信
+
+            </div>
+
+
+            <form method="post" action="{% url 'blog:post_detail' slug=post.slug %}" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+
+
+                {% if comment.author %}
+
+                <input type="hidden" name="reply_to" value="{{ comment.author.id }}">
+
+                {% endif %}
+
+
+                <!-- 本文 -->
+                <div class="reply-form-field">
+
+                    <label>
+                        コメント
+                    </label>
+
+                    {{ form.body }}
+
+                </div>
+
+
+                <!-- 画像 -->
+                <div class="reply-form-field">
+
+                    <label>
+                        画像
+                    </label>
+
+                    {{ form.image }}
+
+                </div>
+
+
+                <!-- 動画URL -->
+                <div class="reply-form-field">
+
+                    <label>
+                        動画URL
+                    </label>
+
+                    {{ form.video_url }}
+
+                </div>
+
+
+                <!-- 動画タイプ -->
+                <div class="reply-form-field">
+
+                    <label>
+                        動画タイプ
+                    </label>
+
+                    {{ form.video_type }}
+
+                </div>
+
+
+                <!-- ボタン -->
+                <div class="reply-form-buttons">
+
+                    <button type="button" class="reply-cancel-btn reply-toggle" data-id="{{ comment.id }}">
+                        キャンセル
+                    </button>
+
+
+                    <button type="submit" class="reply-submit-btn">
+                        返信する
+                    </button>
+
+                </div>
+
             </form>
 
         </div>
-        {% endfor %}
+
+
+        <!-- =====================================
+         返信一覧
+    ====================================== -->
+        {% if comment.replies.count %}
+        
+        <!-- 返信件数ボタン -->
+        <button type="button" class="reply-count-toggle" data-id="{{ comment.id }}">
+            返信{{ comment.replies.count }}件
+        </button>
+        
+        <!-- 返信一覧（最初は非表示） -->
+        <div id="replies-{{ comment.id }}" class="youtube-replies" hidden>
+
+            {% for reply in comment.replies.all %}
+
+            <article id="comment-{{ reply.id }}" class="youtube-comment reply">
+
+                <!-- 返信アバター -->
+                <div class="comment-avatar">
+
+                    {% if reply.author and reply.author.profile_image %}
+
+                    <img src="{{ reply.author.profile_image.url }}" alt="{{ reply.display_name }}" loading="lazy">
+
+                    {% else %}
+
+                    <span aria-hidden="true">👤</span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="comment-main">
+
+                    <!-- =================================
+                     返信ヘッダー
+                ================================== -->
+                    <div class="comment-header">
+
+                        <div class="comment-author">
+
+                            {% if reply.author %}
+
+                            {% if reply.author.is_superuser %}
+
+                            <span>
+                                {{ reply.author.username }}
+                            </span>
+
+                            {% elif reply.author.is_active %}
+
+                            <a href="{% url 'accounts:user_detail' reply.author.username %}">
+                                {{ reply.author.username }}
+                            </a>
+
+                            {% else %}
+
+                            <span>
+                                退会ユーザー
+                            </span>
+
+                            {% endif %}
+
+                            {% else %}
+
+                            <span>
+                                {{ reply.name }}
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="comment-meta">
+                        
+                            <time class="comment-date">
+                                {{ comment.posted_date }}
+                            </time>
+                        
+                            {% if user.is_authenticated %}
+                        
+                            <form method="post" action="{% url 'blog:report_comment' comment.id %}" class="comment-report-form">
+                        
+                                {% csrf_token %}
+                        
+                                <select name="reason">
+                                    <option value="sexual">卑猥</option>
+                                    <option value="violent">暴力</option>
+                                    <option value="harassment">嫌がらせ</option>
+                                    <option value="spam">スパム</option>
+                                    <option value="other">その他</option>
+                                </select>
+                        
+                                <button type="submit" class="report-btn">
+                                    通報
+                                </button>
+                        
+                            </form>
+                        
+                            {% endif %}
+                        
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================
+                     返信先
+                ================================== -->
+                    {% if reply.reply_to %}
+
+                    <div class="reply-target">
+
+                        @{{ reply.reply_to.username }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================
+                     返信本文
+                ================================== -->
+                    {% if reply.body %}
+
+                    <div class="comment-body">
+
+                        {{ reply.body|linebreaksbr }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================
+                     返信画像
+                ================================== -->
+                    {% if reply.image %}
+
+                    <div class="comment-image-wrapper">
+
+                        <img src="{{ reply.image.url }}" class="comment-media-thumb" alt="返信画像" loading="lazy">
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================
+                     返信動画
+                ================================== -->
+                    {% if reply.video_url %}
+
+                    <div class="comment-video">
+
+                        {% include "blog/video_embed.html" with obj=reply %}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================
+                     返信アクション
+                ================================== -->
+                    <div class="comment-actions">
+
+                        <button type="button" class="comment-action" aria-label="いいね">
+                            ♡
+                        </button>
+
+                    </div>
+
+
+                    <!-- =================================
+                     返信の通報
+                ================================== -->
+                    {% if user.is_authenticated %}
+
+                    <form method="post" action="{% url 'blog:report_comment' reply.id %}" class="comment-report-form">
+
+                        {% csrf_token %}
+
+                        <select name="reason">
+
+                            <option value="sexual">
+                                卑猥
+                            </option>
+
+                            <option value="violent">
+                                暴力
+                            </option>
+
+                            <option value="harassment">
+                                嫌がらせ
+                            </option>
+
+                            <option value="spam">
+                                スパム
+                            </option>
+
+                            <option value="other">
+                                その他
+                            </option>
+
+                        </select>
+
+
+                        <button type="submit" class="report-btn">
+                            通報
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
     </div>
+    ```
 
-    <!-- =====================
-        親コメントへの返信フォーム
-    ===================== -->
-    <button type="button" class="reply-toggle" data-id="{{ comment.id }}">
-        返信
-    </button>
+</article>
 
-    <div id="reply-form-comment-{{ comment.id }}" class="reply-form" style="display:none;">
-
-        <p class="reply-header">
-            >>> {{ comment.display_name }} に返信
-        </p>
-
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="hidden" name="parent_id" value="{{ comment.id }}">
-
-            <label class="form-label">body:</label>
-            {{ form.body }}
-
-            <label class="form-label">image:</label>
-            {{ form.image }}
-
-            <label class="form-label">video url:</label>
-            {{ form.video_url }}
-
-            <label class="form-label">video type:</label>
-            <div class="form-group video-type-group">
-                {{ form.video_type }}
-            </div>
-
-            <button type="submit">送信</button>
-        </form>
-    </div>
-</div>
-<hr>
 {% empty %}
-<p>コメントはまだありません。</p>
+
+<!-- =========================================
+     コメントなし
+========================================== -->
+
+<div class="no-comments">
+
+    ```
+    <div class="no-comments-icon" aria-hidden="true">
+        💬
+    </div>
+
+
+    <p>
+        まだコメントはありません。
+    </p>
+
+
+    <span>
+        最初のコメントを書いてみましょう。
+    </span>
+    ```
+
+</div>
+
 {% endfor %}
-
-<script async src="https://www.tiktok.com/embed.js"></script>
-<script async src="//www.instagram.com/embed.js"></script>
-<script async src="https://platform.twitter.com/widgets.js"></script>
-
-{% block extra_js %}
-<link rel="stylesheet" href="{% static 'blog/js/blog.js' %}">
-{% endblock %}

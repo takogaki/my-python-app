@@ -1,0 +1,603 @@
+/* =========================================================
+SPIRYTUS FRONTPAGE
+投稿一覧・投稿カード・広告
+========================================================= */
+
+/* =========================================================
+投稿作成カード
+========================================================= */
+
+.create-post-card {
+    width: 100%;
+    margin-bottom: 18px;
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.create-post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #efefef;
+}
+
+.create-post-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f2f2f2;
+    font-size: 23px;
+}
+
+.create-post-header h1 {
+    margin: 0;
+    color: #111;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.create-post-header p {
+    margin: 3px 0 0;
+    color: #888;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+動画ガイド
+========================================================= */
+
+.video-guide-card {
+    width: 100%;
+    margin-bottom: 18px;
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-guide-card summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    color: #333;
+    font-size: 13px;
+    font-weight: 700;
+    list-style: none;
+    user-select: none;
+}
+
+.video-guide-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.video-guide-summary-icon {
+    font-size: 13px;
+}
+
+.video-guide-content {
+    padding: 0 16px 16px;
+    color: #666;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.video-guide-content > p {
+    margin-top: 0;
+}
+
+.service-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.service-tags span {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background: #f2f2f2;
+    color: #555;
+    font-size: 11px;
+}
+
+.video-guide-steps {
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f8f8;
+}
+
+.video-guide-steps p {
+    margin: 0 0 6px;
+    color: #333;
+}
+
+.video-guide-content ol {
+    margin: 0;
+    padding-left: 19px;
+}
+
+.video-guide-content li {
+    margin-bottom: 4px;
+}
+
+.video-guide-note {
+    margin-bottom: 0;
+    color: #999;
+    font-size: 11px;
+}
+
+/* =========================================================
+Instagramフィード
+========================================================= */
+
+.instagram-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* =========================================================
+投稿カード
+========================================================= */
+
+.instagram-post {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.post-header {
+    min-height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 13px;
+}
+
+.post-user {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.post-avatar {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #eee;
+    color: #888;
+    font-size: 19px;
+}
+
+.post-avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.post-user-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.post-username {
+    max-width: 430px;
+    overflow: hidden;
+    color: #111;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+a.post-username {
+    text-decoration: underline;
+}
+
+span.post-username {
+    text-decoration: none;
+}
+
+.post-date {
+    margin-top: 2px;
+    color: #999;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* =========================================================
+投稿メニュー
+========================================================= */
+
+.post-menu {
+    position: relative;
+}
+
+.post-menu-button {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #f5f5f5;
+    color: #555;
+    font-size: 23px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.post-menu-dropdown {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    z-index: 1000;
+    min-width: 180px;
+    padding: 6px 0;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.post-menu-item {
+    display: block;
+    width: 100%;
+    padding: 11px 16px;
+    border: none;
+    background: transparent;
+    color: #333;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.post-menu-item:hover {
+    background: #f5f5f5;
+}
+
+.post-report-form {
+    padding: 8px 12px;
+}
+
+.post-report-form select {
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 7px;
+}
+
+/* =========================================================
+タイトル・キャプション
+========================================================= */
+
+.post-title-area {
+    padding: 2px 14px 11px;
+}
+
+.post-title-area h1,
+.post-title-area h2 {
+    margin: 0;
+    color: #111;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.post-caption {
+    padding: 0 14px 10px;
+}
+
+.caption-text {
+    margin: 0;
+    color: #222;
+    font-size: 14px;
+    line-height: 1.7;
+    word-break: break-word;
+}
+
+/* =========================================================
+画像・動画
+========================================================= */
+
+.post-image-wrapper {
+    width: 100%;
+    margin: 0;
+    background: #f5f5f5;
+    overflow: hidden;
+}
+
+.post-image {
+    width: 100%;
+    max-height: 760px;
+    display: block;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.post-video-area {
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+}
+
+.post-video-area iframe {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border: 0;
+}
+
+/* =========================================================
+アクション・コメントリンク
+========================================================= */
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px 2px;
+}
+
+.post-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.post-action-button {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #111;
+    font-size: 25px;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: 0.55;
+    transition:
+        transform 0.1s ease,
+        opacity 0.2s ease;
+}
+
+.post-action-button:active {
+    transform: scale(0.9);
+}
+
+.post-comment-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 14px 16px;
+}
+
+.post-comment-link a {
+    color: #111;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.post-comment-link .comment-count {
+    color: #888;
+    white-space: nowrap;
+}
+
+/* =========================================================
+広告
+========================================================= */
+
+.frontpage-ad-card {
+    width: 100%;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.frontpage-ad-card .ad-label {
+    display: inline-block;
+    margin: 0 0 7px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: #f2f2f2;
+    color: #888;
+    font-size: 9px;
+    line-height: 1.3;
+}
+
+.frontpage-ad-card .ad-title {
+    margin: 0 0 10px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.frontpage-ad {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.frontpage-ad a {
+    display: block;
+    max-width: 100%;
+    line-height: 0;
+}
+
+.frontpage-ad img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+}
+
+.frontpage-ad img[width="1"][height="1"] {
+    width: 1px !important;
+    height: 1px !important;
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* =========================================================
+投稿なし
+========================================================= */
+
+.empty-feed {
+    width: 100%;
+    padding: 60px 20px;
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.empty-feed-icon {
+    margin-bottom: 10px;
+    color: #aaa;
+    font-size: 42px;
+}
+
+.empty-feed h2 {
+    margin: 0 0 6px;
+    color: #333;
+    font-size: 17px;
+}
+
+.empty-feed p {
+    margin: 0;
+    color: #999;
+    font-size: 13px;
+}
+
+/* =========================================================
+保存
+========================================================= */
+
+.save-post-area {
+    padding: 0 14px 14px;
+}
+
+.save-btn {
+    padding: 7px 13px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: #f5f5f5;
+    color: #444;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.save-btn.saved {
+    background: #f4f4f4;
+    color: #555;
+    font-weight: 600;
+}
+
+/* =========================================================
+スマートフォン
+========================================================= */
+
+@media (max-width: 767px) {
+    .create-post-card,
+    .video-guide-card,
+    .instagram-post,
+    .frontpage-ad-card,
+    .empty-feed {
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+    }
+
+    .instagram-feed {
+        gap: 10px;
+    }
+
+    .instagram-post {
+        margin: 0;
+    }
+
+    .post-header {
+        padding: 10px 14px;
+    }
+
+    .post-avatar {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+    }
+
+    .post-username {
+        max-width: 260px;
+    }
+
+    .post-image {
+        max-height: 650px;
+    }
+
+    .create-post-header {
+        padding: 14px;
+    }
+
+    .video-guide-content {
+        padding-right: 14px;
+        padding-left: 14px;
+    }
+}
+
+@media (max-width: 380px) {
+    .post-username {
+        max-width: 210px;
+    }
+
+    .post-action-button {
+        width: 36px;
+        height: 36px;
+        font-size: 23px;
+    }
+
+    .post-title-area h1,
+    .post-title-area h2 {
+        font-size: 16px;
+    }
+}

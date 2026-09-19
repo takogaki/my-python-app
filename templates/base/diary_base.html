@@ -81,6 +81,8 @@
     }
     </script>
 
+
+
 </head>
 
 <body {% if post is not None %} data-post="{{ post.id }}" {% endif %}
@@ -316,25 +318,32 @@
     <!-- =========================
     📲 PWA Install Popup
     ========================= -->
-    <div id="pwa-install-popup" class="pwa-popup">
+    
+    <div id="pwa-install-popup" class="pwa-popup" aria-hidden="true">
     
         <div class="pwa-popup-content">
     
+            <button id="pwa-close-x" class="pwa-popup-close" type="button">
+                ×
+            </button>
+    
             <h3>SPIRYTUSをアプリ化</h3>
     
-            <p>
-                インストールすると<br>
-                全画面で快適に使えます
+            <p id="pwa-install-message">
+                ホーム画面に追加すると<br>
+                アプリのように快適に利用できます。
             </p>
     
             <div class="pwa-buttons">
-                <button id="pwa-install-btn">
+    
+                <button id="pwa-install-btn" type="button">
                     インストール
                 </button>
     
-                <button id="pwa-close-btn">
+                <button id="pwa-close-btn" type="button">
                     あとで
                 </button>
+    
             </div>
     
         </div>
@@ -342,92 +351,214 @@
     </div>
 
    <script>
+    document.addEventListener("DOMContentLoaded", () => {
 
-    let deferredPrompt = null;
+                let deferredPrompt = null;
+            let popupShown = false;
 
-    const popup = document.getElementById("pwa-install-popup");
-    const installBtn = document.getElementById("pwa-install-btn");
-    const closeBtn = document.getElementById("pwa-close-btn");
+            const popup = document.getElementById("pwa-install-popup");
+            const installBtn = document.getElementById("pwa-install-btn");
+            const closeBtn = document.getElementById("pwa-close-btn");
+            const closeXBtn = document.getElementById("pwa-close-x");
+            const message = document.getElementById("pwa-install-message");
 
-    /* =========================
-    🧠 インストール済み判定
-    ========================= */
-    function isInstalled() {
-        return (
-            window.matchMedia('(display-mode: standalone)').matches ||
+            if (
+            !popup ||
+            !installBtn ||
+            !closeBtn ||
+            !closeXBtn ||
+            !message
+            ) {
+            return;
+        }
+
+            // =========================
+            // インストール済み判定
+            // =========================
+
+            function isInstalled() {
+
+            return (
+            window.matchMedia("(display-mode: standalone)").matches ||
             window.navigator.standalone === true
-        );
-    }
+            );
 
-    /* =========================
-    🧠 非表示期間チェック
-    ========================= */
-    function getHiddenUntil() {
-        return Number(localStorage.getItem("pwa-popup-hidden-until") || 0);
-    }
+        }
 
-    /* =========================
-    📲 install候補検知
-    ========================= */
-    window.addEventListener("beforeinstallprompt", (e) => {
+            // =========================
+            // iPhone / iPad判定
+            // =========================
 
-        // ブラウザ標準バナー抑制
-        e.preventDefault();
+            function isIOS() {
 
-        // インストール済みなら何もしない
-        if (isInstalled()) return;
+            return /iphone|ipad|ipod/i.test(
+            navigator.userAgent
+            );
 
-        const now = Date.now();
+        }
 
-        // 非表示期間中なら出さない
-        if (now < getHiddenUntil()) return;
+            // =========================
+            // ポップアップ表示
+            // =========================
 
-        deferredPrompt = e;
+            function showPopup() {
 
-        // 少し遅延して自然に表示
-        setTimeout(() => {
+            if (popupShown || isInstalled()) {
+                return;
+            }
+
+            popupShown = true;
+
+            if (isIOS()) {
+
+                message.innerHTML = `
+                    Safariの共有ボタンを押して<br>
+                    「ホーム画面に追加」を選択してください。
+                `;
+
+            installBtn.textContent = "追加方法を見る";
+
+            } else if (deferredPrompt) {
+
+                message.innerHTML = `
+                    インストールすると<br>
+                    アプリのように快適に利用できます。
+                `;
+
+            installBtn.textContent = "インストール";
+
+            } else {
+
+                message.innerHTML = `
+                    ブラウザのメニューから<br>
+                    「ホーム画面に追加」または<br>
+                    「アプリをインストール」を選択してください。
+                `;
+
+            installBtn.textContent = "追加方法を見る";
+
+            }
+
             popup.classList.add("show");
-        }, 3000);
+            popup.setAttribute("aria-hidden", "false");
+
+        }
+
+            // =========================
+            // ポップアップを閉じる
+            // =========================
+
+            function closePopup() {
+
+                popup.classList.remove("show");
+            popup.setAttribute("aria-hidden", "true");
+
+        }
+
+            closeBtn.addEventListener("click", closePopup);
+            closeXBtn.addEventListener("click", closePopup);
+
+            // =========================
+            // Androidのインストール検知
+            // =========================
+
+            window.addEventListener(
+            "beforeinstallprompt",
+            event => {
+
+                event.preventDefault();
+
+            deferredPrompt = event;
+
+                setTimeout(() => {
+                showPopup();
+                }, 3000);
+
+            }
+            );
+
+            // =========================
+            // インストールボタン
+            // =========================
+
+            installBtn.addEventListener(
+            "click",
+            async () => {
+
+                // iPhone・iPad
+                if (isIOS()) {
+
+                alert(
+                    "Safariの共有ボタンを押して、" +
+                    "「ホーム画面に追加」を選択してください。"
+                );
+
+            return;
+
+                }
+
+            // Androidの標準インストール画面
+            if (deferredPrompt) {
+
+                deferredPrompt.prompt();
+
+            const result =
+            await deferredPrompt.userChoice;
+
+            console.log(
+            "PWA install result:",
+            result.outcome
+            );
+
+            deferredPrompt = null;
+
+            closePopup();
+
+            return;
+
+                }
+
+            // 標準インストール画面が利用できない場合
+            alert(
+            "ブラウザのメニューを開き、" +
+            "「ホーム画面に追加」または" +
+            "「アプリをインストール」を選択してください。"
+            );
+
+            }
+            );
+
+            // =========================
+            // インストール完了
+            // =========================
+
+            window.addEventListener(
+            "appinstalled",
+            () => {
+
+                console.log("SPIRYTUS installed");
+
+            deferredPrompt = null;
+
+            closePopup();
+
+            }
+            );
+
+            // =========================
+            // 全ユーザーに表示
+            // =========================
+
+            if (!isInstalled()) {
+
+                setTimeout(() => {
+                    showPopup();
+                }, 3000);
+
+        }
 
     });
-
-    /* =========================
-    📲 インストール実行
-    ========================= */
-    installBtn.addEventListener("click", async () => {
-
-        if (!deferredPrompt) return;
-
-        deferredPrompt.prompt();
-
-        await deferredPrompt.userChoice;
-
-        deferredPrompt = null;
-
-        popup.classList.remove("show");
-
-        // 30日間非表示
-        localStorage.setItem(
-            "pwa-popup-hidden-until",
-            Date.now() + (1000 * 60 * 60 * 24 * 30)
-        );
-
-    });
-
-    /* =========================
-    ❌ 閉じる（あとで）
-    ========================= */
-    closeBtn.addEventListener("click", () => {
-
-        popup.classList.remove("show");
-
-        // 7日間非表示
-        localStorage.setItem(
-            "pwa-popup-hidden-until",
-            Date.now() + (1000 * 60 * 60 * 24 * 7)
-        );
-
-    });
+    
 </script>
 
 </body>
