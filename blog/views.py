@@ -683,6 +683,16 @@ def toggle_save_post(request, post_id):
 def report_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
+    # GETアクセスでは通報処理を実行しない
+    if request.method != "POST":
+        return redirect("blog:post_detail", slug=post.slug)
+
+    if Report.objects.filter(
+        post=post,
+        reporter=request.user
+    ).exists():
+        return redirect("blog:post_detail", slug=post.slug)
+
     # 既に通報済みなら防止
     if Report.objects.filter(post=post, reporter=request.user).exists():
         return redirect("blog:post_detail", slug=post.slug)
@@ -714,6 +724,22 @@ def report_post(request, post_id):
 @login_required
 def report_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
+
+    # GETアクセスでは通報処理を実行しない
+    if request.method != "POST":
+        return redirect(
+            "blog:post_detail",
+            slug=comment.post.slug
+        )
+
+    if CommentReport.objects.filter(
+        comment=comment,
+        reporter=request.user
+    ).exists():
+        return redirect(
+            "blog:post_detail",
+            slug=comment.post.slug
+        )
 
     # 二重通報防止（unique_together あるが保険）
     if CommentReport.objects.filter(

@@ -6,63 +6,71 @@
 
 <article id="comment-{{ comment.id }}" class="youtube-comment">
 
-    ```
     <!-- =========================================
      コメント本体
 ========================================== -->
-    <div class="comment-avatar">
-
-        {% if comment.author and comment.author.profile_image %}
-
-        <img src="{{ comment.author.profile_image.url }}" alt="{{ comment.display_name }}" loading="lazy">
-
-        {% else %}
-
-        <span aria-hidden="true">👤</span>
-
-        {% endif %}
-
-    </div>
-
 
     <div class="comment-main">
-
-        <!-- =====================================
-         コメントヘッダー
-    ====================================== -->
+    
         <div class="comment-header">
-
-            <div class="comment-author">
-
-                {% if comment.can_link %}
-
-                <a href="{% url 'accounts:user_detail' comment.author.username %}">
-                    {{ comment.display_name }}
-                </a>
-
-                {% else %}
-
-                <span>
-                    {{ comment.display_name }}
-                </span>
-
-                {% endif %}
-
+    
+            <!-- ユーザー情報コンテナ -->
+            <div class="comment-user-container">
+    
+                <!-- アバター -->
+                <div class="comment-avatar">
+    
+                    {% if comment.author and comment.author.profile.profile_image %}
+    
+                    <img src="{{ comment.author.profile.profile_image.url }}" alt="{{ comment.display_name }}"
+                        loading="lazy">
+    
+                    {% else %}
+    
+                    <span aria-hidden="true">👤</span>
+    
+                    {% endif %}
+    
+                </div>
+    
+    
+                <!-- 日時・ユーザーネーム -->
+                <div class="comment-author-area">
+    
+                    <time class="comment-date">
+                        {{ comment.posted_date }}
+                    </time>
+    
+                    <div class="comment-author">
+    
+                        {% if comment.can_link %}
+    
+                        <a href="{% url 'accounts:user_detail' comment.author.username %}">
+                            {{ comment.display_name }}
+                        </a>
+    
+                        {% else %}
+    
+                        <span>
+                            {{ comment.display_name }}
+                        </span>
+    
+                        {% endif %}
+    
+                    </div>
+    
+                </div>
+    
             </div>
-
-
+        
             <div class="comment-meta">
-            
-                <time class="comment-date">
-                    {{ reply.posted_date }}
-                </time>
-            
+        
                 {% if user.is_authenticated %}
-            
+        
                 <form method="post" action="{% url 'blog:report_comment' comment.pk %}" class="comment-report-form">
-                
+        
                     {% csrf_token %}
-                
+        
                     <select name="reason">
                         <option value="sexual">卑猥</option>
                         <option value="violent">暴力</option>
@@ -70,17 +78,17 @@
                         <option value="spam">スパム</option>
                         <option value="other">その他</option>
                     </select>
-                
+        
                     <button type="submit" class="report-btn">
                         通報
                     </button>
-                
+        
                 </form>
-            
+        
                 {% endif %}
-            
+        
             </div>
-
+        
         </div>
 
 
@@ -131,9 +139,14 @@
     ====================================== -->
         <div class="comment-actions">
 
-            <button type="button" class="comment-action" aria-label="いいね">
-                ♡
-            </button>
+            <!-- <button type="button" class="comment-action" aria-label="いいね">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-heart">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                </svg>
+            </button> -->
 
 
             {% if comment.author %}
@@ -261,76 +274,54 @@
 
             <article id="comment-{{ reply.id }}" class="youtube-comment reply">
 
-                <!-- 返信アバター -->
-                <div class="comment-avatar">
-
-                    {% if reply.author and reply.author.profile_image %}
-
-                    <img src="{{ reply.author.profile_image.url }}" alt="{{ reply.display_name }}" loading="lazy">
-
-                    {% else %}
-
-                    <span aria-hidden="true">👤</span>
-
-                    {% endif %}
-
-                </div>
-
-
                 <div class="comment-main">
 
                     <!-- =================================
                      返信ヘッダー
                 ================================== -->
+                    
                     <div class="comment-header">
-
-                        <div class="comment-author">
-
-                            {% if reply.author %}
-
-                            {% if reply.author.is_superuser %}
-
-                            <span>
-                                {{ reply.author.username }}
-                            </span>
-
-                            {% elif reply.author.is_active %}
-
-                            <a href="{% url 'accounts:user_detail' reply.author.username %}">
-                                {{ reply.author.username }}
-                            </a>
-
-                            {% else %}
-
-                            <span>
-                                退会ユーザー
-                            </span>
-
-                            {% endif %}
-
-                            {% else %}
-
-                            <span>
-                                {{ reply.name }}
-                            </span>
-
-                            {% endif %}
-
+                    
+                        <div class="comment-user-container">
+                    
+                            <div class="comment-avatar">
+                    
+                                {% if reply.author and reply.author.profile.profile_image %}
+                    
+                                <img src="{{ reply.author.profile.profile_image.url }}" alt="{{ reply.display_name }}" loading="lazy">
+                    
+                                {% else %}
+                    
+                                <span aria-hidden="true">👤</span>
+                    
+                                {% endif %}
+                    
+                            </div>
+                    
+                            <div class="comment-author-area">
+                    
+                                <time class="comment-date">
+                                    {{ reply.posted_date }}
+                                </time>
+                    
+                                <div class="comment-author">
+                    
+                                    <!-- 既存のreply.author判定をここに残す -->
+                    
+                                </div>
+                    
+                            </div>
+                    
                         </div>
-
-
+                    
                         <div class="comment-meta">
-                        
-                            <time class="comment-date">
-                                {{ comment.posted_date }}
-                            </time>
-                        
+                    
                             {% if user.is_authenticated %}
-                        
-                            <form method="post" action="{% url 'blog:report_comment' comment.id %}" class="comment-report-form">
-                        
+                    
+                            <form method="post" action="{% url 'blog:report_comment' reply.id %}" class="comment-report-form">
+                    
                                 {% csrf_token %}
-                        
+                    
                                 <select name="reason">
                                     <option value="sexual">卑猥</option>
                                     <option value="violent">暴力</option>
@@ -338,17 +329,17 @@
                                     <option value="spam">スパム</option>
                                     <option value="other">その他</option>
                                 </select>
-                        
+                    
                                 <button type="submit" class="report-btn">
                                     通報
                                 </button>
-                        
+                    
                             </form>
-                        
+                    
                             {% endif %}
-                        
+                    
                         </div>
-
+                    
                     </div>
 
 
@@ -413,9 +404,9 @@
                 ================================== -->
                     <div class="comment-actions">
 
-                        <button type="button" class="comment-action" aria-label="いいね">
+                        <!-- <button type="button" class="comment-action" aria-label="いいね">
                             ♡
-                        </button>
+                        </button> -->
 
                     </div>
 
@@ -423,7 +414,7 @@
                     <!-- =================================
                      返信の通報
                 ================================== -->
-                    {% if user.is_authenticated %}
+                    <!-- {% if user.is_authenticated %}
 
                     <form method="post" action="{% url 'blog:report_comment' reply.id %}" class="comment-report-form">
 
@@ -458,7 +449,7 @@
                             通報
                         </button>
 
-                    </form>
+                    </form> -->
 
                     {% endif %}
 
@@ -473,7 +464,6 @@
         {% endif %}
 
     </div>
-    ```
 
 </article>
 
@@ -485,7 +475,6 @@
 
 <div class="no-comments">
 
-    ```
     <div class="no-comments-icon" aria-hidden="true">
         💬
     </div>
@@ -499,7 +488,6 @@
     <span>
         最初のコメントを書いてみましょう。
     </span>
-    ```
 
 </div>
 

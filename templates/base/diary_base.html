@@ -246,19 +246,20 @@
     
         <!-- 右側 -->
         <div class="footer-side right-tools">
-
-            <!--
-                        category: Communication
-                        version: "2.10"
-                        unicode: "f93f"
-                        -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#607d8b"
-                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10.5 19h-5.5a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
-                <path d="M3 7l9 6l2.983 -1.989l6.017 -4.011" />
-                <path
-                    d="M18 22l3.35 -3.284a2.143 2.143 0 0 0 .005 -3.071a2.242 2.242 0 0 0 -3.129 -.006l-.224 .22l-.223 -.22a2.242 2.242 0 0 0 -3.128 -.006a2.143 2.143 0 0 0 -.006 3.071l3.355 3.296z" />
-            </svg>
+            <a href="{% url 'user_messages:message_box' %}" class="footer-tool live-btn">
+                <!--
+                            category: Communication
+                            version: "2.10"
+                            unicode: "f93f"
+                            -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#607d8b"
+                    stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.5 19h-5.5a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
+                    <path d="M3 7l9 6l2.983 -1.989l6.017 -4.011" />
+                    <path
+                        d="M18 22l3.35 -3.284a2.143 2.143 0 0 0 .005 -3.071a2.242 2.242 0 0 0 -3.129 -.006l-.224 .22l-.223 -.22a2.242 2.242 0 0 0 -3.128 -.006a2.143 2.143 0 0 0 -.006 3.071l3.355 3.296z" />
+                </svg>
+            </a>
     
             <!-- ビデオチャット -->
             <a href="{% url 'videochat:start' %}" class="footer-tool live-btn">
@@ -445,115 +446,148 @@
         }
 
             // =========================
-            // ポップアップを閉じる
-            // =========================
+        // ポップアップを閉じる
+        // =========================
 
-            function closePopup() {
+        function closePopup() {
 
-                popup.classList.remove("show");
+            popup.classList.remove("show");
             popup.setAttribute("aria-hidden", "true");
 
         }
 
-            closeBtn.addEventListener("click", closePopup);
-            closeXBtn.addEventListener("click", closePopup);
 
-            // =========================
-            // Androidのインストール検知
-            // =========================
+        // =========================
+        // あとで・閉じる
+        // =========================
 
-            window.addEventListener(
+        function hidePopupForSession() {
+
+            closePopup();
+
+            // このタブを開いている間は再表示しない
+            sessionStorage.setItem(
+                "pwa-popup-dismissed",
+                "true"
+            );
+
+        }
+
+        closeBtn.addEventListener(
+            "click",
+            hidePopupForSession
+        );
+
+        closeXBtn.addEventListener(
+            "click",
+            hidePopupForSession
+        );
+
+
+        // =========================
+        // Androidのインストール検知
+        // =========================
+
+        window.addEventListener(
             "beforeinstallprompt",
             event => {
 
                 event.preventDefault();
 
-            deferredPrompt = event;
+                deferredPrompt = event;
 
                 setTimeout(() => {
-                showPopup();
+                    showPopup();
                 }, 3000);
 
             }
-            );
+        );
 
-            // =========================
-            // インストールボタン
-            // =========================
 
-            installBtn.addEventListener(
+        // =========================
+        // インストールボタン
+        // =========================
+
+        installBtn.addEventListener(
             "click",
             async () => {
 
                 // iPhone・iPad
                 if (isIOS()) {
 
+                    alert(
+                        "Safariの共有ボタンを押して、" +
+                        "「ホーム画面に追加」を選択してください。"
+                    );
+
+                    return;
+
+                }
+
+
+                // Androidの標準インストール画面
+                if (deferredPrompt) {
+
+                    deferredPrompt.prompt();
+
+                    const result =
+                        await deferredPrompt.userChoice;
+
+                    console.log(
+                        "PWA install result:",
+                        result.outcome
+                    );
+
+                    deferredPrompt = null;
+
+                    closePopup();
+
+                    return;
+
+                }
+
+
+                // 標準インストール画面が利用できない場合
                 alert(
-                    "Safariの共有ボタンを押して、" +
-                    "「ホーム画面に追加」を選択してください。"
+                    "ブラウザのメニューを開き、" +
+                    "「ホーム画面に追加」または" +
+                    "「アプリをインストール」を選択してください。"
                 );
 
-            return;
-
-                }
-
-            // Androidの標準インストール画面
-            if (deferredPrompt) {
-
-                deferredPrompt.prompt();
-
-            const result =
-            await deferredPrompt.userChoice;
-
-            console.log(
-            "PWA install result:",
-            result.outcome
-            );
-
-            deferredPrompt = null;
-
-            closePopup();
-
-            return;
-
-                }
-
-            // 標準インストール画面が利用できない場合
-            alert(
-            "ブラウザのメニューを開き、" +
-            "「ホーム画面に追加」または" +
-            "「アプリをインストール」を選択してください。"
-            );
-
             }
-            );
+        );
 
-            // =========================
-            // インストール完了
-            // =========================
 
-            window.addEventListener(
+        // =========================
+        // インストール完了
+        // =========================
+
+        window.addEventListener(
             "appinstalled",
             () => {
 
                 console.log("SPIRYTUS installed");
 
-            deferredPrompt = null;
+                deferredPrompt = null;
 
-            closePopup();
+                closePopup();
 
             }
-            );
+        );
 
-            // =========================
-            // 全ユーザーに表示
-            // =========================
 
-            if (!isInstalled()) {
+        // =========================
+        // 全ユーザーに表示
+        // =========================
 
-                setTimeout(() => {
-                    showPopup();
-                }, 3000);
+        if (
+            !isInstalled() &&
+            sessionStorage.getItem("pwa-popup-dismissed") !== "true"
+        ) {
+
+            setTimeout(() => {
+                showPopup();
+            }, 3000);
 
         }
 

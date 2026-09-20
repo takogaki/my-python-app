@@ -20,6 +20,7 @@ from accounts.utils import save_page_log
 User = get_user_model()
 
 
+
 @login_required
 def message_box(request):
 
@@ -41,6 +42,9 @@ def message_box(request):
 
     user = request.user
 
+    # =========================
+    # 💬 メッセージ一覧
+    # =========================
     all_messages = Message.objects.filter(
         Q(sender=user) | Q(recipient=user)
     ).order_by("-sent_at")
@@ -48,13 +52,19 @@ def message_box(request):
     conversations = {}
 
     for msg in all_messages:
-        partner = msg.recipient if msg.sender == user else msg.sender
+
+        partner = (
+            msg.recipient
+            if msg.sender == user
+            else msg.sender
+        )
 
         # 匿名メッセージなど、相手が存在しない場合
         if partner is None:
             continue
 
         if partner.id not in conversations:
+
             conversations[partner.id] = {
                 "user": partner,
                 "last_message": msg,
@@ -62,11 +72,37 @@ def message_box(request):
             }
 
         # 相手 → 自分 の未読メッセージ
-        if msg.recipient == user and not msg.is_read:
+        if (
+            msg.recipient == user
+            and not msg.is_read
+        ):
             conversations[partner.id]["unread_count"] += 1
 
+    # =========================
+    # 💕 マッチ中ユーザー一覧
+    # =========================
+    matches = Match.objects.filter(
+        Q(user1=user) | Q(user2=user)
+    ).select_related(
+        "user1",
+        "user2"
+    ).order_by("-created_at")
+
+    matched_users = []
+
+    for match in matches:
+
+        partner = match.get_partner(user)
+
+        if partner is not None:
+            matched_users.append(partner)
+
+    # =========================
+    # コンテキスト
+    # =========================
     context = {
-        "conversations": conversations.values()
+        "conversations": conversations.values(),
+        "matched_users": matched_users,
     }
 
     return render(

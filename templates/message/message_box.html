@@ -13,92 +13,288 @@
 
 <div class="page-container">
 
-    {% if conversations %}
-    <div class="dm-card-list">
+    <!-- =========================
+         タブ切り替え
+    ========================= -->
+    <div class="message-tabs">
 
-        {% for convo in conversations %}
+        <button type="button" class="message-tab active" data-tab="messages">
 
-        <div class="dm-card {% if convo.unread_count > 0 %}unread{% endif %}">
-        
-            <!-- 左：アイコン（ユーザープロフィールへ） -->
-            <a href="{% url 'accounts:user_detail' convo.user.username %}" class="dm-avatar-link">
-                <div class="dm-avatar">
-                    <img src="{{ convo.user.get_profile_image }}">
-                </div>
-            </a>
-        
-            <!-- 中央：情報 -->
-            <div class="dm-main">
-        
-                <div class="dm-top">
-                    <span class="dm-name">
-                        {{ convo.user.username }}
-                    </span>
-        
-                    <span class="dm-time">
-                        {{ convo.last_message.sent_at|date:"H:i" }}
-                    </span>
-                </div>
-        
-                <div class="dm-message">
-                    {% if convo.last_message.sender == request.user %}
-                    <span class="you-label">あなた:</span>
-                    {% endif %}
-                    {{ convo.last_message.content|truncatechars:28 }}
-                </div>
-        
-            </div>
-        
-            <!-- 右：アクション -->
-            <div class="dm-action">
-        
-                {% if convo.unread_count > 0 %}
-                <div class="dm-badge">
-                    {{ convo.unread_count }}
-                </div>
-                {% endif %}
-        
-                <a href="{% url 'user_messages:send_message' convo.user.username %}" class="reply-btn">
-                    返信
+            メッセージ
+
+        </button>
+
+        <button type="button" class="message-tab" data-tab="matches">
+
+            マッチ中
+
+            <span class="match-tab-count">
+                {{ matched_users|length }}
+            </span>
+
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         メッセージ一覧
+    ========================= -->
+    <div id="messages-panel" class="tab-panel active">
+
+        {% if conversations %}
+
+        <div class="dm-card-list">
+
+            {% for convo in conversations %}
+
+            <div class="dm-card {% if convo.unread_count > 0 %}unread{% endif %}">
+
+                <!-- 左：アイコン -->
+                <a href="{% url 'accounts:user_detail' convo.user.username %}" class="dm-avatar-link">
+
+                    <div class="dm-avatar">
+
+                        <img src="{{ convo.user.get_profile_image }}" alt="{{ convo.user.username }}">
+
+                    </div>
+
                 </a>
-        
+
+
+                <!-- 中央：情報 -->
+                <div class="dm-main">
+
+                    <div class="dm-top">
+
+                        <span class="dm-name">
+                            {{ convo.user.username }}
+                        </span>
+
+                        <span class="dm-time">
+                            {{ convo.last_message.sent_at|date:"H:i" }}
+                        </span>
+
+                    </div>
+
+                    <div class="dm-message">
+
+                        {% if convo.last_message.sender == request.user %}
+
+                        <span class="you-label">
+                            あなた:
+                        </span>
+
+                        {% endif %}
+
+                        {{ convo.last_message.content|truncatechars:28 }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- 右：アクション -->
+                <div class="dm-action">
+
+                    {% if convo.unread_count > 0 %}
+
+                    <div class="dm-badge">
+                        {{ convo.unread_count }}
+                    </div>
+
+                    {% endif %}
+
+                    <a href="{% url 'user_messages:send_message' convo.user.username %}" class="reply-btn">
+
+                        返信
+
+                    </a>
+
+                </div>
+
             </div>
-        
+
+            {% endfor %}
+
         </div>
 
-        {% endfor %}
+        {% else %}
+
+        <div class="empty-box">
+
+            <p>
+                まだメッセージはありません。
+            </p>
+
+        </div>
+
+        {% endif %}
 
     </div>
 
-    {% else %}
-    <div class="empty-box">
-        <p>まだメッセージはありません。</p>
-    </div>
-    {% endif %}
 
+    <!-- =========================
+         マッチ中一覧
+    ========================= -->
+    <div id="matches-panel" class="tab-panel">
+
+        {% if matched_users %}
+
+        <div class="dm-card-list">
+
+            {% for matched_user in matched_users %}
+
+            <div class="dm-card">
+
+                <!-- 左：プロフィール画像 -->
+                <a href="{% url 'accounts:user_detail' matched_user.username %}" class="dm-avatar-link">
+
+                    <div class="dm-avatar">
+
+                        <img src="{{ matched_user.get_profile_image }}" alt="{{ matched_user.username }}">
+
+                    </div>
+
+                </a>
+
+
+                <!-- 中央：ユーザー名 -->
+                <div class="dm-main">
+
+                    <div class="dm-top">
+
+                        <span class="dm-name">
+
+                            {{ matched_user.username }}
+
+                        </span>
+
+                    </div>
+
+                    <div class="dm-message">
+
+                        マッチ中のユーザー
+
+                    </div>
+
+                </div>
+
+
+                <!-- 右：メッセージ -->
+                <div class="dm-action">
+
+                    <a href="{% url 'user_messages:send_message' matched_user.username %}" class="reply-btn">
+
+                        メッセージ
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-box">
+
+            <p>
+                まだマッチしていません。
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =========================
+         戻るボタン
+    ========================= -->
     <div class="terms-actions">
-    
+
         <button type="button" class="btn-back" onclick="
-                    if(history.length > 1){
-                        history.back();
-                    }else{
-                        window.location.href='/';
-                    }
-                ">
-    
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#607d8b"
-                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-    
+                if(history.length > 1){
+                    history.back();
+                }else{
+                    window.location.href='/';
+                }
+            ">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke="#607d8b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+
                 <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
-    
+
             </svg>
-    
+
             戻る
-    
+
         </button>
-    
+
     </div>
 
 </div>
+
+
+<!-- =========================
+     タブ切り替えJavaScript
+========================= -->
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const tabs = document.querySelectorAll(".message-tab");
+
+        const panels = document.querySelectorAll(".tab-panel");
+
+
+        tabs.forEach(function (tab) {
+
+            tab.addEventListener("click", function () {
+
+                const target = tab.dataset.tab;
+
+
+                // タブのactive切り替え
+                tabs.forEach(function (item) {
+
+                    item.classList.remove("active");
+
+                });
+
+                tab.classList.add("active");
+
+
+                // パネルの切り替え
+                panels.forEach(function (panel) {
+
+                    panel.classList.remove("active");
+
+                });
+
+
+                const targetPanel = document.getElementById(
+                    target + "-panel"
+                );
+
+                if (targetPanel) {
+
+                    targetPanel.classList.add("active");
+
+                }
+
+            });
+
+        });
+
+    });
+
+</script>
 
 {% endblock %}

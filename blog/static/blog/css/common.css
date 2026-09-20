@@ -229,3 +229,33 @@ img {
         border-radius: 0;
     }
 }
+
+/* 投稿者アイコン */
+.post-avatar,
+.comment-avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eeeeee;
+}
+
+/* プロフィール画像 */
+.post-avatar img,
+.comment-avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* 未登録ユーザーのアイコン */
+.post-avatar span,
+.comment-avatar span {
+    font-size: 24px;
+    line-height: 1;
+}

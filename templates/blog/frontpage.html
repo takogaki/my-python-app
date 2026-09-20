@@ -134,23 +134,20 @@
 
                 <div class="post-user">
 
-
                     {# プロフィール画像 #}
-
                     <div class="post-avatar">
-
-                        {% if post.author and post.author.profile_image %}
-
-                        <img src="{{ post.author.profile_image.url }}" alt="{{ post.author.username }}">
-
+                    
+                        {% if post.author and post.author.profile.profile_image %}
+                        
+                        <img src="{{ post.author.profile.profile_image.url }}" alt="{{ post.author.username }}" loading="lazy">
+                        
                         {% else %}
-
-                        <span>👤</span>
-
+                        
+                        <span aria-hidden="true">👤</span>
+                        
                         {% endif %}
-
+                    
                     </div>
-
 
                     {# ユーザー情報 #}
 
@@ -191,10 +188,10 @@
 
 
                 {# 投稿メニュー #}
-
-                <button type="button" class="post-menu-button" aria-label="投稿メニュー">
+                <!-- 投稿編集 投稿削除 通報 非表示 その他のメニュー を作成するまではコメントアウト-->
+                <!-- <button type="button" class="post-menu-button" aria-label="投稿メニュー">
                     ⋯
-                </button>
+                </button> -->
 
             </header>
 
@@ -247,14 +244,14 @@
 
                 <div class="post-actions-left">
 
-                    <button type="button" class="post-action-button" aria-label="いいね">
+                    <!-- <button type="button" class="post-action-button" aria-label="いいね">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="icon icon-tabler icons-tabler-outline icon-tabler-heart">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                             <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                         </svg>
-                    </button>
+                    </button> -->
 
 
                     {% if post.slug %}
@@ -274,9 +271,9 @@
                     {% endif %}
 
 
-                    <button type="button" class="post-action-button" aria-label="共有">
+                    <!-- <button type="button" class="post-action-button" aria-label="共有">
                         ↗
-                    </button>
+                    </button> -->
 
                 </div>
 

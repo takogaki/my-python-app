@@ -34,29 +34,6 @@ html, body {
     display: none;
 }
 
-/* 投稿は「画面サイズ固定」 */
-.video-card {
-    height: calc(100vh - 60px - 70px);
-    height: calc(100dvh - 60px - 70px);
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    position: relative;
-    overflow: hidden;
-    contain: layout paint size;
-}
-
-/* メディア */
-.video-card img,
-.video-card video {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain; /* ← containやめる */
-}
-
 .double-heart {
     display: none;
 }
@@ -1755,38 +1732,6 @@ html, body {
 
 
 /* =========================================================
-   📷 Feed画像 全画面
-========================================================= */
-
-.video-card .feed-post-image.image-fullscreen {
-
-    position: fixed !important;
-
-    top: 0 !important;
-    left: 0 !important;
-
-    width: 100vw !important;
-    height: 100vh !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    object-fit: contain !important;
-    object-position: center center !important;
-
-    background: #000 !important;
-
-    z-index: 2147483647 !important;
-
-    cursor: zoom-out;
-
-}
-
-
-/* =========================================================
    🔒 全画面中のカード
 ========================================================= */
 
@@ -1801,14 +1746,6 @@ html, body {
    🤝 募集だけ見る
    CSS側でも確実に非募集を隠す
 ========================================================= */
-
-.video-feed.recruit-only
-.video-card:not(.recruit-card) {
-
-    display: none !important;
-
-}
-
 
 /* 募集カードは表示 */
 
@@ -1838,41 +1775,6 @@ html, body {
 body:has(.feed-post-image.image-fullscreen) {
 
     overflow: hidden !important;
-
-}
-
-/* ==================================================
-📷 Feed画像 全画面表示
-================================================== */
-
-.feed-post-image.image-fullscreen {
-
-    position: fixed !important;
-
-    inset: 0 !important;
-
-    width: 100vw !important;
-    height: 100vh !important;
-
-    width: 100dvw !important;
-    height: 100dvh !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    object-fit: contain !important;
-
-    object-position: center center !important;
-
-    background: #000 !important;
-
-    z-index: 999999 !important;
-
-    cursor: zoom-out !important;
-
-    margin: 0 !important;
-
-    padding: 0 !important;
 
 }
 
@@ -1924,4 +1826,254 @@ body:has(.feed-post-image.image-fullscreen) {
 
     }
 
+}
+
+/* =========================================================
+   🔥 Feed下ずれ・フッター隠れ対策【最終上書き】
+========================================================= */
+
+/* Feed全体をヘッダーとフッターの間に固定 */
+#tiktok-root {
+    position: fixed !important;
+
+    top: 60px !important;
+    bottom: 70px !important;
+
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    background: #000;
+
+    box-sizing: border-box;
+}
+
+/* スクロール担当 */
+#tiktok-root .video-feed {
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    scroll-snap-type: y mandatory;
+
+    box-sizing: border-box;
+}
+
+/* Feed内側 */
+#tiktok-root .feed-inner {
+    width: 100% !important;
+    min-height: 100%;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box;
+}
+
+/* カードをFeed表示領域に統一 */
+#tiktok-root .video-card {
+    position: relative !important;
+
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+
+    box-sizing: border-box;
+}
+
+/* 右側アクション */
+#tiktok-root .video-card .actions {
+    position: absolute !important;
+
+    right: 12px !important;
+    bottom: 16px !important;
+
+    z-index: 100 !important;
+}
+
+/* キャプション */
+#tiktok-root .video-card > .caption {
+    bottom: 16px !important;
+
+    z-index: 20 !important;
+}
+
+/* 募集カードは既存の中央配置を維持 */
+#tiktok-root .video-card.recruit-card .recruit-caption {
+    top: 50% !important;
+    bottom: auto !important;
+
+    transform: translate(-50%, -50%) !important;
+}
+
+
+/* =========================================
+   🔥 Feed表示復旧用・最終修正版
+========================================= */
+
+/* Feedの表示領域 */
+#tiktok-root {
+    position: fixed !important;
+
+    top: 60px !important;
+    bottom: 70px !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+    height: auto !important;
+
+    overflow: hidden !important;
+    background: #000 !important;
+}
+
+/* スクロール領域 */
+#tiktok-root .video-feed {
+    position: absolute !important;
+
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    scroll-snap-type: y mandatory;
+}
+
+/* 内側 */
+#tiktok-root .feed-inner {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* カード */
+#tiktok-root .video-card {
+    position: relative !important;
+
+    width: 100% !important;
+    height: calc(100dvh - 130px) !important;
+    min-height: calc(100dvh - 130px) !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+
+    box-sizing: border-box;
+}
+
+/* 通常画像 */
+#tiktok-root .video-card > .feed-post-image {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: contain !important;
+    object-position: center center !important;
+
+    z-index: 2 !important;
+}
+
+/* 動画 */
+#tiktok-root .video-card > video {
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: contain !important;
+
+    z-index: 2 !important;
+}
+
+/* アクション */
+#tiktok-root .video-card .actions {
+    z-index: 100 !important;
+}
+
+/* キャプション */
+#tiktok-root .video-card > .caption {
+    z-index: 20 !important;
+}
+
+
+/* =========================================
+   📷 画像全画面時のみヘッダー・フッターを隠す
+========================================= */
+
+/* 全画面画像を最前面に表示 */
+body:has(.feed-post-image.image-fullscreen) .feed-post-image.image-fullscreen {
+    position: fixed !important;
+
+    inset: 0 !important;
+
+    width: 100vw !important;
+    width: 100dvw !important;
+
+    height: 100vh !important;
+    height: 100dvh !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    object-fit: contain !important;
+
+    background: #000 !important;
+
+    z-index: 2147483647 !important;
+}
+
+/* ヘッダーを隠す */
+body:has(.feed-post-image.image-fullscreen) header {
+    visibility: hidden !important;
+}
+
+/* フッターを隠す */
+body:has(.feed-post-image.image-fullscreen) footer {
+    visibility: hidden !important;
+}
+
+/* ヘッダー・フッターの代表的な固定要素 */
+body:has(.feed-post-image.image-fullscreen) .bottom-nav,
+body:has(.feed-post-image.image-fullscreen) .bottom-navigation,
+body:has(.feed-post-image.image-fullscreen) .site-footer {
+    visibility: hidden !important;
 }

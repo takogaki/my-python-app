@@ -174,3 +174,214 @@
     padding: 40px;
     color: #aaa;
 }
+
+
+
+/* =========================
+   📌 固定タブ：洗練デザイン
+========================= */
+
+.message-tabs {
+
+    position: fixed;
+
+    top: 60px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: calc(100% - 20px);
+
+    max-width: 580px;
+
+    box-sizing: border-box;
+
+    z-index: 1000;
+
+    display: flex;
+
+    gap: 5px;
+
+    padding: 5px;
+
+    margin: 0;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
+    border-radius: 16px;
+
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    backdrop-filter: blur(12px);
+
+}
+
+
+/* =========================
+   タブ
+========================= */
+
+.message-tab {
+
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 12px 8px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: transparent;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+/* 選択中 */
+
+.message-tab.active {
+
+    background: #e8f0fe;
+
+    color: #2563eb;
+
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+
+}
+
+
+/* ホバー */
+
+.message-tab:hover:not(.active) {
+
+    background: #f1f5f9;
+
+    color: #334155;
+
+}
+
+
+/* マッチ数 */
+
+.match-tab-count {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 18px;
+
+    height: 18px;
+
+    margin-left: 5px;
+
+    padding: 0 5px;
+
+    border-radius: 9px;
+
+    background: #dbeafe;
+
+    color: #2563eb;
+
+    font-size: 11px;
+
+}
+
+
+/* =========================
+   パネル
+========================= */
+
+.tab-panel {
+
+    display: none;
+
+    padding-top: 80px;
+
+}
+
+
+.tab-panel.active {
+
+    display: block;
+
+}
+
+
+/* =========================
+   スマホ
+========================= */
+
+@media (max-width: 480px) {
+
+    .message-tabs {
+
+        top: 60px;
+
+        width: calc(100% - 16px);
+
+        padding: 4px;
+
+        border-radius: 14px;
+
+    }
+
+    .message-tab {
+
+        padding: 11px 4px;
+
+        font-size: 13px;
+
+    }
+
+}
+
+/* =========================
+   マッチ中カード
+========================= */
+
+#matches-panel .dm-card {
+
+    animation: matchFadeIn 0.2s ease;
+
+}
+
+
+@keyframes matchFadeIn {
+
+    from {
+
+        opacity: 0;
+        transform: translateY(4px);
+
+    }
+
+    to {
+
+        opacity: 1;
+        transform: translateY(0);
+
+    }
+
+}
+
+
