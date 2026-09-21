@@ -330,14 +330,22 @@ span.post-username {
 .post-image-wrapper {
     width: 100%;
     margin: 0;
+    padding: 0;
     background: #f5f5f5;
     overflow: hidden;
 }
 
 .post-image {
-    width: 100%;
-    max-height: 760px;
     display: block;
+
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+
+    margin: 0;
+    padding: 0;
+
     object-fit: contain;
     cursor: pointer;
 }
