@@ -1780,3 +1780,22 @@ body:has(.feed-post-image.image-fullscreen) .bottom-navigation,
 body:has(.feed-post-image.image-fullscreen) .site-footer {
     visibility: hidden !important;
 }
+
+/* ==================================================
+⌨️ キーボード表示時：Feed領域を拡張
+================================================== */
+
+body.comment-keyboard-open #tiktok-root {
+    top: 0 !important;
+    bottom: 0 !important;
+}
+
+body.comment-keyboard-open .video-feed {
+    top: 0 !important;
+    bottom: 0 !important;
+}
+
+body.comment-keyboard-open .video-card {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+}
