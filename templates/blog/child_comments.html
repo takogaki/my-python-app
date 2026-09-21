@@ -305,9 +305,15 @@
                                 </time>
                     
                                 <div class="comment-author">
-                    
-                                    <!-- 既存のreply.author判定をここに残す -->
-                    
+                                    {% if reply.author %}
+                                    <a href="{% url 'accounts:user_detail' reply.author.username %}">
+                                        {{ reply.author.username }}
+                                    </a>
+                                    {% elif reply.name %}
+                                    <span>{{ reply.name }}</span>
+                                    {% else %}
+                                    <span>退会ユーザー</span>
+                                    {% endif %}
                                 </div>
                     
                             </div>

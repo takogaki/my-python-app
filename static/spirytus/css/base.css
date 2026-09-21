@@ -1027,3 +1027,62 @@ section h3 {
         transform: translateY(-20px);
     }
 }
+
+
+/* =========================================
+   SPIRYTUS 固定ヘッダー・フッター
+========================================= */
+
+/* ヘッダー */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+    height: var(--header-height);
+
+    z-index: 9000;
+
+    background: #fff;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+/* フッター */
+.feed-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+    height: var(--footer-height);
+
+    z-index: 9000;
+
+    background: #fff;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+/* =========================================
+   キーボード・画像拡大時は非表示
+========================================= */
+
+body.ui-chrome-hidden .site-header {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+body.ui-chrome-hidden .feed-footer {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+}

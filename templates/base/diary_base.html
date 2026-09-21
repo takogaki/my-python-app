@@ -595,6 +595,92 @@
     
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const body = document.body;
+        const imageModal = document.getElementById("image-modal");
+
+        let keyboardOpen = false;
+        let imageOpen = false;
+
+        // =========================================
+        // UI表示状態を更新
+        // =========================================
+
+        function updateChromeVisibility() {
+
+            if (keyboardOpen || imageOpen) {
+
+                body.classList.add("ui-chrome-hidden");
+
+            } else {
+
+                body.classList.remove("ui-chrome-hidden");
+
+            }
+
+        }
+
+
+        // =========================================
+        // スマホキーボード検知
+        // =========================================
+
+        if (window.visualViewport) {
+
+            const initialHeight = window.visualViewport.height;
+
+            window.visualViewport.addEventListener("resize", () => {
+
+                const currentHeight = window.visualViewport.height;
+
+                const heightDifference =
+                    initialHeight - currentHeight;
+
+                // 150px以上の縮小をキーボード表示と判定
+                keyboardOpen = heightDifference > 150;
+
+                updateChromeVisibility();
+
+            });
+
+        }
+
+
+        // =========================================
+        // 画像モーダル検知
+        // =========================================
+
+        if (imageModal) {
+
+            const observer = new MutationObserver(() => {
+
+                const style = window.getComputedStyle(imageModal);
+
+                imageOpen =
+                    style.display !== "none" &&
+                    style.visibility !== "hidden";
+
+                updateChromeVisibility();
+
+            });
+
+            observer.observe(imageModal, {
+
+                attributes: true,
+                attributeFilter: [
+                    "class",
+                    "style"
+                ]
+
+            });
+
+        }
+
+    });
+</script>
+
 </body>
 
 </html>
