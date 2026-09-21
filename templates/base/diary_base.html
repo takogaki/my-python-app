@@ -86,7 +86,7 @@
 </head>
 
 <body {% if post is not None %} data-post="{{ post.id }}" {% endif %}
-    class="{% if unclosed_room %}has-warning{% endif %} {% block body_class %}{% endblock %}">
+    class="{% block body_class %}{% endblock %}">
 
     {% if messages %}
     <div class="sp-toast-container">
@@ -152,27 +152,6 @@
 
         </div>
     </header>
-
-
-    {% if unclosed_room %}
-    <div class="warning-bar">
-
-        <div class="warning-bar-inner">
-
-            <span>
-                ⚠️ 前回の配信が終了していません
-            </span>
-
-            <a href="{% url 'videochat:force_close' unclosed_room.id %}" class="warning-action">
-
-                配信を終了する
-
-            </a>
-
-        </div>
-
-    </div>
-    {% endif %}
 
 
     <main class="container">
