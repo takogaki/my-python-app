@@ -14,22 +14,6 @@ html, body {
     background: #000;
 }
 
-/* root：画面内に収めるだけ */
-#tiktok-root {
-    height: calc(100vh - 60px - 70px);
-    height: calc(100dvh - 60px - 70px);
-    overflow: hidden;
-    background: #000;
-}
-
-/* スクロール担当はここだけ */
-.video-feed {
-    height: 100%;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
-}
-
 .video-feed::-webkit-scrollbar {
     display: none;
 }
@@ -137,12 +121,6 @@ html, body {
 /* =========================
 💥 ハートばら撒き演出
 ========================= */
-
-/* 基準になる親 */
-.video-card .actions {
-    position: absolute;
-}
-
 /* ハート本体 */
 /* ハート */
 
@@ -1114,7 +1092,7 @@ html, body {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 
-    z-index: 8999;
+    z-index: 9999;
 
     display: none;
 
@@ -1406,166 +1384,6 @@ html, body {
 
 }
 
-
-/* ==================================================
-   🎞 FEED
-   ここが重要
-================================================== */
-
-.video-feed {
-
-    position: relative;
-
-    z-index: 1;
-
-    width: 100%;
-
-    height: 100%;
-
-}
-
-
-/* --------------------------------------------------
-   Feedカード
--------------------------------------------------- */
-
-.video-card {
-
-    position: relative;
-
-    width: 100%;
-
-    height: calc(100vh - 130px);
-    height: calc(100dvh - 130px);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    overflow: hidden;
-
-}
-
-
-/* ==================================================
-   📷 Feed画像
-   絶対位置＋中央固定
-================================================== */
-
-.video-card > .feed-post-image {
-
-    position: absolute !important;
-
-    top: 0 !important;
-    left: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    max-width: 100% !important;
-    max-height: 100% !important;
-
-    margin: 0 !important;
-
-    object-fit: contain !important;
-
-    object-position: center center !important;
-
-    display: block !important;
-
-    z-index: 1 !important;
-
-}
-
-
-/* ==================================================
-   🎥 Feed動画
-================================================== */
-
-.video-card > video {
-
-    position: absolute !important;
-
-    top: 0 !important;
-    left: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    max-width: 100% !important;
-    max-height: 100% !important;
-
-    object-fit: contain !important;
-
-    object-position: center center !important;
-
-    display: block !important;
-
-    z-index: 1 !important;
-
-}
-
-
-/* ==================================================
-   Feedの操作ボタン
-================================================== */
-
-.video-card .actions {
-
-    z-index: 100 !important;
-
-}
-
-
-/* ==================================================
-   Feedキャプション
-================================================== */
-
-.video-card .caption {
-
-    z-index: 20 !important;
-
-}
-
-
-/* ==================================================
-   📷 募集カードの画像は別処理
-================================================== */
-
-.video-card.recruit-card .recruit-background {
-
-    position: absolute !important;
-
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    z-index: 0 !important;
-
-}
-
-
-.video-card.recruit-card .recruit-background-image {
-
-    position: absolute !important;
-
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    object-fit: contain !important;
-
-    object-position: center center !important;
-
-    z-index: 2 !important;
-
-}
-
-
 /* ==================================================
    📱 スマホ
 ================================================== */
@@ -1756,18 +1574,6 @@ html, body {
 
 }
 
-
-/* =========================================================
-   📍 近くの募集パネルはFeedより前
-========================================================= */
-
-.nearby-recruits {
-
-    z-index: 9999 !important;
-
-}
-
-
 /* =========================================================
    📷 全画面画像が何にも邪魔されないようにする
 ========================================================= */
@@ -1828,109 +1634,6 @@ body:has(.feed-post-image.image-fullscreen) {
 
 }
 
-/* =========================================================
-   🔥 Feed下ずれ・フッター隠れ対策【最終上書き】
-========================================================= */
-
-/* Feed全体をヘッダーとフッターの間に固定 */
-#tiktok-root {
-    position: fixed !important;
-
-    top: 60px !important;
-    bottom: 70px !important;
-
-    left: 0 !important;
-    right: 0 !important;
-
-    width: 100% !important;
-    height: auto !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    overflow: hidden !important;
-
-    background: #000;
-
-    box-sizing: border-box;
-}
-
-/* スクロール担当 */
-#tiktok-root .video-feed {
-    position: absolute !important;
-
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-
-    width: 100% !important;
-    height: auto !important;
-
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-
-    scroll-snap-type: y mandatory;
-
-    box-sizing: border-box;
-}
-
-/* Feed内側 */
-#tiktok-root .feed-inner {
-    width: 100% !important;
-    min-height: 100%;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    box-sizing: border-box;
-}
-
-/* カードをFeed表示領域に統一 */
-#tiktok-root .video-card {
-    position: relative !important;
-
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 100% !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    overflow: hidden !important;
-
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-
-    box-sizing: border-box;
-}
-
-/* 右側アクション */
-#tiktok-root .video-card .actions {
-    position: absolute !important;
-
-    right: 12px !important;
-    bottom: 16px !important;
-
-    z-index: 100 !important;
-}
-
-/* キャプション */
-#tiktok-root .video-card > .caption {
-    bottom: 16px !important;
-
-    z-index: 20 !important;
-}
-
-/* 募集カードは既存の中央配置を維持 */
-#tiktok-root .video-card.recruit-card .recruit-caption {
-    top: 50% !important;
-    bottom: auto !important;
-
-    transform: translate(-50%, -50%) !important;
-}
-
-
 /* =========================================
    🔥 Feed表示復旧用・最終修正版
 ========================================= */
@@ -1939,8 +1642,8 @@ body:has(.feed-post-image.image-fullscreen) {
 #tiktok-root {
     position: fixed !important;
 
-    top: 60px !important;
-    bottom: 70px !important;
+    top: 50px !important;
+    bottom: 60px !important;
     left: 0 !important;
     right: 0 !important;
 
