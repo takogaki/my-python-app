@@ -579,10 +579,6 @@ span.post-username {
         max-width: 260px;
     }
 
-    .post-image {
-        max-height: 650px;
-    }
-
     .create-post-header {
         padding: 14px;
     }
