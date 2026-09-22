@@ -86,6 +86,46 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse("blog:post_detail", kwargs={"slug": self.slug})
 
+
+
+# =========================
+# ❤️ Blogいいね
+# =========================
+class PostLike(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="liked_blog_posts",
+    )
+
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name="likes",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "post"],
+                name="unique_blog_post_like",
+            ),
+        ]
+
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["post"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user} → {self.post}"
+
+
 class Comment(models.Model):
     VIDEO_TYPE_CHOICES = [
             ("normal", "通常動画"),

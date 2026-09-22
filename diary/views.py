@@ -13,6 +13,7 @@ from django.http import Http404, JsonResponse
 from django.db.models import F
 from accounts.utils import save_page_log
 import uuid
+from django.db import transaction
 
 User = get_user_model()
 
@@ -156,77 +157,74 @@ class UserDetailView(DetailView):
 
 
 
+@transaction.atomic
 def like_diary(request, pk):
 
     if request.method != "POST":
-        return JsonResponse({"error": "Invalid request"}, status=400)
+        return JsonResponse(
+            {"error": "Invalid request"},
+            status=400
+        )
 
-    page = get_object_or_404(Page, pk=pk)
+    # ログインユーザーのみ
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {
+                "error": "ログインが必要です"
+            },
+            status=401
+        )
 
-    # =========================
-    # 👍 総数加算
-    # =========================
-    Page.objects.filter(pk=pk).update(
-        likes=F("likes") + 1
+    # 対象の日記をロック
+    page = get_object_or_404(
+        Page.objects.select_for_update(),
+        pk=pk
     )
 
-    page.refresh_from_db()
-
-    # =========================
-    # ログインユーザー
-    # =========================
-    if request.user.is_authenticated:
-
-        like_record, created = LikeRecord.objects.get_or_create(
-            user=request.user,
-            page=page
+    # 自分自身の日記にはいいね不可
+    if page.author == request.user:
+        return JsonResponse(
+            {
+                "error": "自分の日記にはいいねできません"
+            },
+            status=403
         )
 
-        LikeRecord.objects.filter(
-            pk=like_record.pk
-        ).update(
-            like_count=F("like_count") + 1
-        )
+    # すでにいいね済みか確認
+    like_record = LikeRecord.objects.filter(
+        user=request.user,
+        page=page
+    ).first()
 
-        like_record.refresh_from_db()
+    # すでにいいね済み
+    if like_record:
 
-        page.liked_users.add(request.user)
+        return JsonResponse({
+            "likes": page.likes,
+            "unique_users": page.liked_users.count(),
+            "user_like_count": 1,
+            "already_liked": True
+        })
 
-        user_like_count = like_record.like_count
+    # 初回いいねを記録
+    LikeRecord.objects.create(
+        user=request.user,
+        page=page,
+        like_count=1
+    )
 
-    # =========================
-    # ゲストユーザー
-    # =========================
-    else:
+    # 総いいね数を1増加
+    page.likes += 1
+    page.save(update_fields=["likes"])
 
-        guest_id = request.session.get("guest_id")
+    # ユーザーを登録
+    page.liked_users.add(request.user)
 
-        if not guest_id:
-            guest_id = str(uuid.uuid4())
-            request.session["guest_id"] = guest_id
-
-        guest_record, created = GuestLikeRecord.objects.get_or_create(
-            guest_id=guest_id,
-            page=page
-        )
-
-        GuestLikeRecord.objects.filter(
-            pk=guest_record.pk
-        ).update(
-            like_count=F("like_count") + 1
-        )
-
-        guest_record.refresh_from_db()
-
-        user_like_count = guest_record.like_count
-
-    # =========================
-    # 返却
-    # =========================
     return JsonResponse({
         "likes": page.likes,
-        "unique_users": page.unique_likes_count(),
-        "user_like_count": user_like_count
+        "unique_users": page.liked_users.count(),
+        "user_like_count": 1,
+        "already_liked": False
     })
 
 class PublicDiaryListView(ListView):

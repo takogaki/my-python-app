@@ -29,4 +29,7 @@ urlpatterns = [
     path("posts/<int:post_id>/toggle-save/", views.toggle_save_post, name="toggle_save_post"),
     path("report/<int:post_id>/", views.report_post, name="report_post"),
     path("comment/report/<int:comment_id>/", views.report_comment, name="report_comment"),
+    
+    # like機能のURLパターン
+    path("like/<int:post_id>/", views.toggle_post_like, name="toggle_post_like"),
 ]

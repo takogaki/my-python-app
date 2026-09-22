@@ -18,12 +18,12 @@ from django.utils.http import urlencode, urlsafe_base64_encode, urlsafe_base64_d
 from django.utils import timezone
 from datetime import date, timedelta
 
-from diary.models import Page              # 日記
-from blog.models import Post, Comment      # ブログ投稿
-from videos.models import PostVideo
+from diary.models import Page, LikeRecord          # 日記
+from blog.models import Post, Comment, PostLike      # ブログ投稿
+from videos.models import PostVideo, PostVideoLike
 from accounts.models import SavedPost      # 保存した投稿
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
-from django.db.models import Count, Q, F, Exists, OuterRef
+from django.db.models import Count, Q, F, Exists, OuterRef, Sum
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
 from .forms import ActivateProfileImageForm, CustomUserCreationForm, UserForm, ProfileForm, KYCForm
@@ -41,7 +41,6 @@ from django.contrib.auth.views import LoginView
 
 # 広告関連
 from advertisements.utils import get_random_advertisements
-
 
 User = get_user_model()
 
@@ -772,7 +771,44 @@ def mypage(request):
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
     # 投稿（動画・画像）
-    video_posts = PostVideo.objects.filter(user=user).order_by("-created_at") 
+    video_posts = PostVideo.objects.filter(user=user).order_by("-created_at")
+
+    # =========================
+    # 🌟 SPIRIT集計
+    # =========================
+
+    # Feed：ログインユーザー・ゲストから受け取ったいいね
+    feed_spirit = PostVideoLike.objects.filter(
+        post__user=user
+    ).count()
+
+    # Blog：受け取ったいいね
+    blog_spirit = PostLike.objects.filter(
+        post__author=user
+    ).count()
+
+    # Diary：受け取ったいいね回数
+    diary_spirit = LikeRecord.objects.filter(
+        page__author=user
+    ).aggregate(
+        total=Sum("like_count")
+    )["total"] or 0
+
+
+    # 合計SPIRIT
+    total_spirit = (
+        feed_spirit
+        + blog_spirit
+        + diary_spirit
+    )
+
+    # 次の特典
+    next_spirit_threshold = 500
+
+    spirit_remaining = max(
+        next_spirit_threshold - total_spirit,
+        0
+    )
 
     profile_tags = ProfileTag.objects.filter(
         profile=profile
@@ -880,6 +916,13 @@ def mypage(request):
             "completion": completion,  # ← 必須
             # 🔔 追加
             "notification_counts": notification_counts,
+            # 🌟 SPIRIT
+            "feed_spirit": feed_spirit,
+            "blog_spirit": blog_spirit,
+            "diary_spirit": diary_spirit,
+            "total_spirit": total_spirit,
+            "spirit_remaining": spirit_remaining,
+            "next_spirit_threshold": next_spirit_threshold,
         }
     )
 

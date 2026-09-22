@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Count
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from .forms import CommentForm, PostForm
-from .models import Post, Comment, Report, CommentReport
+from .models import Post, Comment, Report, CommentReport, PostLike
 from django.contrib import messages
 from blog.models import Post
 from accounts.models import SavedPost
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
 
 from notifications.models import Notification
 import uuid
@@ -83,10 +84,29 @@ def frontpage(request):
         Post.objects
         .filter(is_hidden=False)
         .annotate(
-            comment_count=Count("comments")
+            comment_count=Count("comments", distinct=True),
+            like_count=Count("likes", distinct=True),
         )
         .order_by("-posted_date")
     )
+
+    # =========================
+    # ❤️ いいね済み投稿
+    # =========================
+    if request.user.is_authenticated:
+
+        liked_ids = set(
+            PostLike.objects.filter(
+                user=request.user
+            ).values_list(
+                "post_id",
+                flat=True
+            )
+        )
+
+    else:
+
+        liked_ids = set()
 
     # =========================
     # 📢 広告取得
@@ -163,6 +183,7 @@ def frontpage(request):
             "form": form,
             "frontpage_ads": frontpage_ads,
             "ads_by_position": ads_by_position,
+            "liked_ids": liked_ids,
         },
     )
 
@@ -172,7 +193,12 @@ def frontpage(request):
 def post_detail(request, slug):
 
     post = get_object_or_404(
-        Post,
+        Post.objects.annotate(
+            like_count=Count(
+                "likes",
+                distinct=True
+            )
+        ),
         slug=slug,
         is_hidden=False
     )
@@ -189,6 +215,19 @@ def post_detail(request, slug):
     if request.user.is_authenticated:
 
         is_saved = SavedPost.objects.filter(
+            user=request.user,
+            post=post
+        ).exists()
+
+    # =====================================================
+    # ❤️ いいね済み判定
+    # =====================================================
+
+    is_liked = False
+
+    if request.user.is_authenticated:
+
+        is_liked = PostLike.objects.filter(
             user=request.user,
             post=post
         ).exists()
@@ -583,6 +622,7 @@ def post_detail(request, slug):
             "parent_comments": parent_comments,
             "form": form,
             "is_saved": is_saved,
+            "is_liked": is_liked,
         }
     )
 
@@ -769,3 +809,39 @@ def report_comment(request, comment_id):
         comment.save(update_fields=["report_notice_level"])
 
     return redirect("blog:post_detail", slug=comment.post.slug)
+
+
+# =========================
+# ❤️ Blogいいね
+# =========================
+@require_POST
+def toggle_post_like(request, post_id):
+
+    # 未ログインの場合
+    if not request.user.is_authenticated:
+
+        return JsonResponse({
+            "authenticated": False,
+            "login_url": reverse("accounts:login"),
+        }, status=401)
+
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+        is_hidden=False
+    )
+
+    # いいね登録（重複防止）
+    like, created = PostLike.objects.get_or_create(
+        user=request.user,
+        post=post
+    )
+
+    return JsonResponse({
+        "authenticated": True,
+        "liked": True,
+        "already_liked": not created,
+        "count": PostLike.objects.filter(
+            post=post
+        ).count(),
+    })

@@ -54,16 +54,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
         e.stopPropagation();
 
+        // いいね済みなら何もしない
+        if (btn.dataset.liked === "1") {
+            return;
+        }
+
         const card = getCard(btn);
         const postId = btn.dataset.id;
+
+        // 連打防止
+        if (btn.disabled) return;
+        btn.disabled = true;
 
         try {
             const res = await fetch(`/videos/like/${postId}/`, {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": getCSRFToken(),
+                    "X-Requested-With": "XMLHttpRequest",
                 }
             });
+
+            // 未ログインの場合
+            if (res.status === 401) {
+                const data = await res.json();
+
+                if (data.login_url) {
+                    window.location.href = data.login_url;
+                }
+
+                return;
+            }
+
+            if (!res.ok) {
+                console.error("like request failed:", res.status);
+                return;
+            }
 
             const data = await res.json();
 
@@ -71,13 +97,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.liked) {
                 btn.classList.add("liked");
-                spawnHearts(card);
-            } else {
-                btn.classList.remove("liked");
+                btn.dataset.liked = "1";
+
+                // 新規いいねのときだけ演出
+                if (!data.already_liked) {
+                    spawnHearts(card);
+                }
             }
 
         } catch (err) {
             console.error("like error", err);
+
+        } finally {
+            btn.disabled = false;
         }
     });
 

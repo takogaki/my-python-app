@@ -421,6 +421,23 @@ SPIRYTUS CHILD COMMENTS
     cursor: pointer;
 }
 
+/* =========================
+   返信フォームボタン中央寄せ
+========================= */
+
+.reply-form-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.reply-form-buttons button {
+    min-width: 100px;
+    text-align: center;
+}
+
 /* =========================================================
 動画タイプ
 ========================================================= */

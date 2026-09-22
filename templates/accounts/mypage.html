@@ -126,6 +126,84 @@
         </div>
     </section>
 
+    <!-- =========================
+         🌟 SPIRIT
+    ========================= -->
+    
+    <section class="content-card spirit-card">
+    
+        <h3 class="section-title">
+            🌟 SPIRIT
+        </h3>
+    
+        <p class="spirit-description">
+            あなたの投稿が受け取った共感の合計
+        </p>
+    
+        <div class="spirit-breakdown">
+    
+            <div class="spirit-item">
+                <span class="spirit-label">
+                    Feed いいね
+                </span>
+    
+                <strong class="spirit-value">
+                    {{ feed_spirit }}
+                </strong>
+            </div>
+    
+            <div class="spirit-item">
+                <span class="spirit-label">
+                    Blog いいね
+                </span>
+    
+                <strong class="spirit-value">
+                    {{ blog_spirit }}
+                </strong>
+            </div>
+    
+            <div class="spirit-item">
+                <span class="spirit-label">
+                    Diary いいね
+                </span>
+    
+                <strong class="spirit-value">
+                    {{ diary_spirit }}
+                </strong>
+            </div>
+    
+        </div>
+    
+        <div class="spirit-total">
+    
+            <span>
+                合計 SPIRIT
+            </span>
+    
+            <strong>
+                {{ total_spirit }}
+            </strong>
+    
+        </div>
+    
+        <div class="spirit-next">
+    
+            <p>
+                次の特典まで
+            </p>
+    
+            <strong>
+                あと {{ spirit_remaining }}
+            </strong>
+    
+            <span>
+                {{ next_spirit_threshold }} SPIRITで特典解放
+            </span>
+    
+        </div>
+    
+    </section>
+
     <!-- 🔔 通知 -->
     <section class="content-card">
         <h3 class="section-title">🔔 通知</h3>

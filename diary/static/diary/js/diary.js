@@ -34,6 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     button.addEventListener("click", async function () {
 
+        // 連打防止
+        if (button.disabled) return;
+
+        button.disabled = true;
+
         try {
 
             const res = await fetch(button.dataset.url, {
@@ -44,6 +49,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
+            if (res.status === 401) {
+                alert("いいねするにはログインしてください。");
+                button.disabled = false;
+                return;
+            }
+
             if (!res.ok) {
                 throw new Error("HTTP ERROR: " + res.status);
             }
@@ -52,21 +63,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
             console.log(data);
 
-            // 👍総数
+            // 総数
             document.getElementById("likes-count").textContent =
                 data.likes;
 
-            // 👥ユニーク人数
+            // ユニークユーザー数
             document.getElementById("unique-users-count").textContent =
                 data.unique_users;
 
-            // 🔥あなたの回数
+            // 自分のいいね回数
             document.getElementById("user-likes-count").textContent =
                 data.user_like_count;
+
+            // いいね済みに変更
+            button.textContent = "👍 いいね済み";
+            button.disabled = true;
 
         } catch (err) {
 
             console.error("LIKE ERROR:", err);
+
+            // エラー時は再試行可能にする
+            button.disabled = false;
 
         }
 

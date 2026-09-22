@@ -605,3 +605,32 @@ span.post-username {
         font-size: 16px;
     }
 }
+
+/* =========================
+   ❤️ ハート内のいいね数
+========================= */
+
+.blog-like-btn .like-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blog-like-btn .like-icon svg {
+    display: block;
+}
+
+.blog-like-btn .like-count {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -48%);
+
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+
+    color: currentColor;
+    pointer-events: none;
+}

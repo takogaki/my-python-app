@@ -52,13 +52,8 @@ class Page(models.Model):
 
     def unique_likes_count(self):
 
-        user_count = self.liked_users.count()
-
-        guest_count = GuestLikeRecord.objects.filter(
-            page=self
-        ).count()
-
-        return user_count + guest_count
+        return self.liked_users.count()
+    
 
     def __str__(self):
         return self.title

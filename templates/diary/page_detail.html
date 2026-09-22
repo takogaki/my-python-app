@@ -64,10 +64,18 @@
         <p>👍したユニークユーザー数：<strong id="unique-users-count">{{ page.unique_likes_count }}</strong></p>
         <p>あなたの👍回数：<strong id="user-likes-count">0</strong></p>
 
-            {% if page.author != request.user %}
-                <button id="like-button" class="submit-btn" data-url="{% url 'diary:like_diary' page.pk %}">
-                    👍 いいねする
-                </button>
+            {% if request.user.is_authenticated and page.author != request.user %}
+            
+            <button id="like-button" class="submit-btn" data-url="{% url 'diary:like_diary' page.pk %}">
+                👍 いいねする
+            </button>
+            
+            {% elif not request.user.is_authenticated %}
+            
+            <p class="info-text">
+                いいねするにはログインしてください。
+            </p>
+            
             {% endif %}
         {% endif %}
     </div>

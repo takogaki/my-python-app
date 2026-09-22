@@ -6,6 +6,10 @@ from django.conf import settings
 from django.templatetags.static import static
 from blog.models import Post
 
+from diary.models import Page, LikeRecord, GuestLikeRecord
+from videos.models import PostVideo, PostVideoLike
+from blog.models import Post, PostLike
+
 
 # =========================
 # 👤 ユーザー

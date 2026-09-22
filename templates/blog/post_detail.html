@@ -173,17 +173,28 @@
 
             <div class="post-actions-left">
 
-
-                {# いいね #}
-
-                <!-- <button type="button" class="post-action-button" aria-label="いいね">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-heart">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                    </svg>
-                </button> -->
+                {# ❤️ いいね #}
+                
+                <button type="button" class="post-action-button blog-like-btn" aria-label="いいね" data-id="{{ post.id }}"
+                    data-liked="{% if is_liked %}1{% else %}0{% endif %}">
+                
+                    <span class="like-icon">
+                
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-heart">
+                
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                
+                            <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                
+                        </svg>
+                
+                        <span class="like-count">{{ post.like_count }}</span>
+                
+                    </span>
+                
+                </button>
 
 
                 {# コメント #}

@@ -742,3 +742,36 @@
     flex: 1;
     min-width: 0;
 }
+
+/* =========================
+   ❤️ いいねボタン
+========================= */
+
+.post-detail .blog-like-btn .like-icon {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-detail .blog-like-btn .like-icon svg {
+    display: block;
+}
+
+.post-detail .blog-like-btn .like-count {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -48%);
+
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+
+    color: currentColor;
+
+    pointer-events: none;
+}

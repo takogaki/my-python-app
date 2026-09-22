@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from django.contrib.auth import get_user_model
 from accounts.utils import save_page_log
 from django.contrib import messages
+from django.urls import reverse
 
 # 広告関連
 from advertisements.utils import get_random_advertisements
@@ -189,67 +190,41 @@ def upload(request):
     return render(request, "videos/upload.html")
 
 
+
 # =========================
-# ❤️ いいねトグル（シンプル拡張版）
+# ❤️ Feedいいね
+# =========================
+# =========================
+# ❤️ Feedいいね
 # =========================
 @require_POST
 def toggle_like(request, post_id):
-    post = get_object_or_404(PostVideo, id=post_id)
 
-    # =========================
-    # 🔐 ログインユーザー
-    # =========================
-    if request.user.is_authenticated:
-
-        like, created = PostVideoLike.objects.get_or_create(
-            user=request.user,
-            post=post
-        )
-
-        if not created:
-            like.delete()
-            liked = False
-        else:
-            liked = True
-
+    # 未ログインの場合
+    if not request.user.is_authenticated:
         return JsonResponse({
-            "liked": liked,
-            "count": post.likes.count()
-        })
+            "authenticated": False,
+            "login_url": reverse("accounts:login"),
+        }, status=401)
 
-    # =========================
-    # 👤 未ログインユーザー
-    # =========================
-    else:
-        guest_id = request.COOKIES.get("guest_id")
+    post = get_object_or_404(
+        PostVideo,
+        id=post_id
+    )
 
-        if not guest_id:
-            guest_id = str(uuid.uuid4())
+    # すでにいいね済みか確認
+    like, created = PostVideoLike.objects.get_or_create(
+        user=request.user,
+        post=post
+    )
 
-        like, created = PostVideoLike.objects.get_or_create(
-            guest_id=guest_id,
-            post=post
-        )
+    return JsonResponse({
+        "authenticated": True,
+        "liked": True,
+        "already_liked": not created,
+        "count": post.likes.count(),
+    })
 
-        if not created:
-            like.delete()
-            liked = False
-        else:
-            liked = True
-
-        response = JsonResponse({
-            "liked": liked,
-            "count": post.likes.count()
-        })
-
-        response.set_cookie(
-            "guest_id",
-            guest_id,
-            max_age=60 * 60 * 24 * 365,
-            samesite="Lax"
-        )
-
-        return response
 
 # =========================
 # 💬 コメント取得

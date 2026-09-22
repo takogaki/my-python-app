@@ -3,6 +3,30 @@
    Instagram × YouTube Style
    ========================================================= */
 
+   /* =========================================================
+   🔐 CSRFトークン取得
+   ========================================================= */
+function getCSRFToken() {
+
+    const name = "csrftoken=";
+
+    const cookies = document.cookie.split(";");
+
+    for (let cookie of cookies) {
+
+        cookie = cookie.trim();
+
+        if (cookie.startsWith(name)) {
+            return decodeURIComponent(
+                cookie.substring(name.length)
+            );
+        }
+
+    }
+
+    return "";
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
 
@@ -735,5 +759,88 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     });
+
+});
+
+/* =========================
+   ❤️ Blogいいね
+   ========================= */
+document.addEventListener("click", async (e) => {
+
+    const btn = e.target.closest(".blog-like-btn");
+
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // すでにいいね済みなら何もしない
+    if (btn.dataset.liked === "1") {
+        return;
+    }
+
+    // 連打防止
+    if (btn.disabled) return;
+
+    btn.disabled = true;
+
+    const postId = btn.dataset.id;
+
+    try {
+
+        const res = await fetch(
+            `/blog/like/${postId}/`,
+            {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                    "X-Requested-With": "XMLHttpRequest",
+                }
+            }
+        );
+
+        // 未ログイン
+        if (res.status === 401) {
+
+            const data = await res.json();
+
+            if (data.login_url) {
+                window.location.href = data.login_url;
+            }
+
+            return;
+        }
+
+        if (!res.ok) {
+            console.error("Blog like error:", res.status);
+            return;
+        }
+
+        const data = await res.json();
+
+        // いいね数を更新
+        const count = btn.querySelector(".like-count");
+
+        if (count) {
+            count.textContent = data.count;
+        }
+
+        // いいね済み表示
+        if (data.liked) {
+
+            btn.classList.add("liked");
+            btn.dataset.liked = "1";
+
+        }
+
+    } catch (err) {
+
+        console.error("Blog like error:", err);
+
+    } finally {
+
+        btn.disabled = false;
+
+    }
 
 });
