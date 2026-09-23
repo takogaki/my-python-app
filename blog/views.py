@@ -20,6 +20,10 @@ from .utils import get_device_id
 # 広告関連
 from advertisements.utils import get_random_advertisements
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 User = get_user_model()
 
@@ -160,27 +164,46 @@ def frontpage(request):
             # =========================
             # 🖼️ 複数画像を保存
             # =========================
+
             images = form.cleaned_data.get("images", [])
+
+            logger.warning(
+                "BLOG IMAGE DEBUG: images=%s, type=%s",
+                images,
+                type(images),
+            )
 
             for index, image in enumerate(images):
 
-                PostImage.objects.create(
-                    post=post,
-                    image=image,
-                    order=index,
-                )
+                try:
 
-            response = redirect("blog:frontpage")
+                    logger.warning(
+                        "BLOG IMAGE DEBUG: saving index=%s name=%s size=%s",
+                        index,
+                        image.name,
+                        image.size,
+                    )
 
-            if device_id and not request.COOKIES.get("device_id"):
+                    PostImage.objects.create(
+                        post=post,
+                        image=image,
+                        order=index,
+                    )
 
-                response.set_cookie(
-                    "device_id",
-                    device_id,
-                    max_age=60 * 60 * 24 * 365,
-                )
+                    logger.warning(
+                        "BLOG IMAGE DEBUG: saved index=%s",
+                        index,
+                    )
 
-            return response
+                except Exception:
+
+                    logger.exception(
+                        "BLOG IMAGE ERROR: index=%s name=%s",
+                        index,
+                        getattr(image, "name", "unknown"),
+                    )
+
+                    raise
 
     else:
 
