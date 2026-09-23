@@ -164,3 +164,24 @@ body{
         font-size:18px;
     }
 }
+
+/* =========================
+   投稿者情報（称号＋名前）
+========================= */
+
+.author-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+}
+
+.author-info .user-spirit-title {
+    display: block;
+    margin-bottom: 0;
+}
+
+.author-info .author-link {
+    display: block;
+}

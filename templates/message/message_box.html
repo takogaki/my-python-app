@@ -7,6 +7,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'user_messages/css/message_box.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/spirit_title.css' %}?v=2">
 {% endblock %}
 
 {% block body %}
@@ -66,15 +67,24 @@
                 <div class="dm-main">
 
                     <div class="dm-top">
-
-                        <span class="dm-name">
-                            {{ convo.user.username }}
-                        </span>
-
+                    
+                        <div class="dm-user-info">
+                    
+                            {# 🌟 SPIRITオリジナル称号 #}
+                            {% with display_user=convo.user %}
+                            {% include "accounts/includes/spirit_title.html" %}
+                            {% endwith %}
+                    
+                            <span class="dm-name">
+                                {{ convo.user.username }}
+                            </span>
+                    
+                        </div>
+                    
                         <span class="dm-time">
                             {{ convo.last_message.sent_at|date:"H:i" }}
                         </span>
-
+                    
                     </div>
 
                     <div class="dm-message">
@@ -163,13 +173,20 @@
                 <div class="dm-main">
 
                     <div class="dm-top">
-
-                        <span class="dm-name">
-
-                            {{ matched_user.username }}
-
-                        </span>
-
+                    
+                        <div class="dm-user-info">
+                    
+                            {# 🌟 SPIRITオリジナル称号 #}
+                            {% with display_user=matched_user %}
+                            {% include "accounts/includes/spirit_title.html" %}
+                            {% endwith %}
+                    
+                            <span class="dm-name">
+                                {{ matched_user.username }}
+                            </span>
+                    
+                        </div>
+                    
                     </div>
 
                     <div class="dm-message">

@@ -7,6 +7,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'diary/css/public_diary_list.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/spirit_title.css' %}?v=3">
 {% endblock %}
 
 {% block body %}
@@ -22,17 +23,35 @@
     <div class="diary-card">
 
         <div class="diary-header">
-
-            <a href="{% url 'accounts:user_detail' page.author.username %}" class="author-link">
-
-                {{ page.author.username }}
-
-            </a>
-
+        
+            <div class="author-info">
+        
+                {# 🌟 SPIRITオリジナル称号 #}
+                {% with display_user=page.author %}
+                {% include "accounts/includes/spirit_title.html" %}
+                {% endwith %}
+        
+                {# ユーザー名 #}
+                {% if request.user == page.author %}
+        
+                <a href="{% url 'accounts:mypage' %}" class="author-link">
+                    {{ page.author.username }}
+                </a>
+        
+                {% else %}
+        
+                <a href="{% url 'accounts:user_detail' page.author.username %}" class="author-link">
+                    {{ page.author.username }}
+                </a>
+        
+                {% endif %}
+        
+            </div>
+        
             <span class="diary-date">
                 {{ page.page_date }}
             </span>
-
+        
         </div>
 
         <a href="{% url 'diary:page_detail' page.pk %}" class="diary-title">

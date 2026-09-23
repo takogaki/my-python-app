@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'accounts/css/user_list.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/spirit_title.css' %}?v=2">
 {% endblock %}
 
 {% block body %}
@@ -36,15 +37,21 @@
             </a>
 
             <div class="profile-card">
+            
+                {# 🌟 SPIRITオリジナル称号 #}
+                {% with display_user=user %}
+                {% include "accounts/includes/spirit_title.html" %}
+                {% endwith %}
+            
                 <h2>
                     {{ user.username }}
-
+            
                     {% if request.user.is_authenticated and request.user.verification_status == "verified" %}
                     <span class="kyc-badge">✔</span>
                     {% else %}
                     <span class="kyc-badge gray">未認証</span>
                     {% endif %}
-
+            
                     {% if user.get_age %}, {{ user.get_age }}{% endif %}
                 </h2>
 
