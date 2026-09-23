@@ -318,3 +318,87 @@ class SavedPost(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.post.id}"
+    
+
+# =========================
+# 🌟 SPIRIT称号
+# =========================
+class SpiritTitle(models.Model):
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="spirit_title"
+    )
+
+    slot1 = models.CharField(max_length=30, blank=True, default="")
+    slot2 = models.CharField(max_length=30, blank=True, default="")
+    slot3 = models.CharField(max_length=30, blank=True, default="")
+    slot4 = models.CharField(max_length=30, blank=True, default="")
+    slot5 = models.CharField(max_length=30, blank=True, default="")
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_title_parts(self):
+        return [
+            part
+            for part in [
+                self.slot1,
+                self.slot2,
+                self.slot3,
+                self.slot4,
+                self.slot5,
+            ]
+            if part
+        ]
+
+    def get_title(self):
+        return " ".join(self.get_title_parts())
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_title()}"
+
+
+# =========================
+# 🌟 SPIRIT称号パーツ
+# =========================
+class SpiritTitlePart(models.Model):
+
+    SLOT_CHOICES = [
+        (1, "第1枠"),
+        (2, "第2枠"),
+        (3, "第3枠"),
+        (4, "第4枠"),
+        (5, "第5枠"),
+    ]
+
+    slot = models.PositiveSmallIntegerField(
+        choices=SLOT_CHOICES,
+        verbose_name="選択枠"
+    )
+
+    text = models.CharField(
+        max_length=30,
+        verbose_name="称号パーツ"
+    )
+
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="表示順"
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="有効"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["slot", "order", "id"]
+        indexes = [
+            models.Index(fields=["slot", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"{self.get_slot_display()}：{self.text}"

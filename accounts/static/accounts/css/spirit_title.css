@@ -1,0 +1,157 @@
+/* =========================
+   🌟 SPIRIT称号編集
+========================= */
+
+.spirit-title-page {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    box-sizing: border-box;
+}
+
+.spirit-title-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.spirit-title-card h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+}
+
+.spirit-title-description {
+    margin: 12px 0 28px;
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+}
+
+/* 選択欄 */
+
+.spirit-title-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.spirit-title-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.spirit-title-field label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #444;
+}
+
+.spirit-title-select {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    background: #fafafa;
+    color: #333;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+/* プレビュー */
+
+.spirit-title-preview {
+    margin-top: 28px;
+    padding: 18px 14px;
+    border-radius: 14px;
+    background: linear-gradient(
+        135deg,
+        #fff8dc,
+        #fff0b8
+    );
+    text-align: center;
+}
+
+.spirit-title-preview h2 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #856404;
+}
+
+.spirit-title-preview p {
+    margin: 0;
+    min-height: 24px;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.8;
+    color: #4b3900;
+    overflow-wrap: anywhere;
+}
+
+/* エラー */
+
+.spirit-title-error {
+    color: #d93025;
+    font-size: 13px;
+}
+
+/* 保存ボタン */
+
+.spirit-title-save-button {
+    display: block;
+    width: 100%;
+    margin-top: 28px;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #222;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.spirit-title-save-button:hover {
+    opacity: 0.8;
+}
+
+/* 戻るリンク */
+
+.spirit-title-back {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.spirit-title-back:hover {
+    text-decoration: underline;
+}
+
+/* スマートフォン */
+
+@media (max-width: 480px) {
+
+    .spirit-title-page {
+        padding: 16px 10px 90px;
+    }
+
+    .spirit-title-card {
+        padding: 22px 16px;
+        border-radius: 16px;
+    }
+
+    .spirit-title-card h1 {
+        font-size: 21px;
+    }
+
+}

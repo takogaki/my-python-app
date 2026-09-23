@@ -475,3 +475,64 @@ class KYCForm(forms.ModelForm):
             )
 
         return cleaned_data
+    
+
+# =========================
+# 🌟 SPIRIT称号選択フォーム
+# =========================
+class SpiritTitleForm(forms.ModelForm):
+
+    class Meta:
+        from .models import SpiritTitle
+
+        model = SpiritTitle
+
+        fields = [
+            "slot1",
+            "slot2",
+            "slot3",
+            "slot4",
+            "slot5",
+        ]
+
+        widgets = {
+            "slot1": forms.Select(attrs={
+                "class": "spirit-title-select",
+            }),
+            "slot2": forms.Select(attrs={
+                "class": "spirit-title-select",
+            }),
+            "slot3": forms.Select(attrs={
+                "class": "spirit-title-select",
+            }),
+            "slot4": forms.Select(attrs={
+                "class": "spirit-title-select",
+            }),
+            "slot5": forms.Select(attrs={
+                "class": "spirit-title-select",
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        from .models import SpiritTitlePart
+
+        for slot_number in range(1, 6):
+            field_name = f"slot{slot_number}"
+
+            parts = SpiritTitlePart.objects.filter(
+                slot=slot_number,
+                is_active=True,
+            ).order_by("order", "id")
+
+            choices = [("", "（空欄）")]
+
+            choices += [
+                (part.text, part.text)
+                for part in parts
+            ]
+
+            self.fields[field_name].choices = choices
+            self.fields[field_name].label = f"第{slot_number}枠"
+            self.fields[field_name].required = False

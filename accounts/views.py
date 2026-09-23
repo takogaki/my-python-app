@@ -26,9 +26,9 @@ from user_messages.models import Message   # メッセージ（※名前は実�
 from django.db.models import Count, Q, F, Exists, OuterRef, Sum
 from django.utils.encoding import force_str, force_bytes
 from django.utils.decorators import method_decorator
-from .forms import ActivateProfileImageForm, CustomUserCreationForm, UserForm, ProfileForm, KYCForm
+from .forms import ActivateProfileImageForm, CustomUserCreationForm, UserForm, ProfileForm, KYCForm, SpiritTitleForm
 from notifications.models import Notification
-from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint, Profile, TagCategory, ProfileTag, Tag, TagCategory, UserPageLog
+from .models import CustomUser, UserLike, Match, VerificationLog, KYCSubmission, Footprint, Profile, TagCategory, ProfileTag, Tag, TagCategory, UserPageLog, SpiritTitle
 from django.views.decorators.csrf import csrf_exempt
 from accounts.utils import compatibility, profile_completion
 from collections import defaultdict
@@ -802,13 +802,37 @@ def mypage(request):
         + diary_spirit
     )
 
-    # 次の特典
-    next_spirit_threshold = 500
+    # =========================
+    # 🌟 SPIRIT特典進行状況
+    # =========================
 
-    spirit_remaining = max(
-        next_spirit_threshold - total_spirit,
-        0
+    spirit_thresholds = [500, 1000, 2000, 5000]
+
+    # 次に解放される特典の閾値を取得
+    next_spirit_threshold = next(
+        (
+            threshold
+            for threshold in spirit_thresholds
+            if total_spirit < threshold
+        ),
+        None
     )
+
+    if next_spirit_threshold is not None:
+
+        spirit_remaining = max(
+            next_spirit_threshold - total_spirit,
+            0
+        )
+
+    else:
+
+        # すべての現在設定された特典を解放済み
+        spirit_remaining = 0
+    # =========================
+    # 🌟 SPIRIT称号解放判定
+    # =========================
+    can_edit_spirit_title = total_spirit >= 500
 
     profile_tags = ProfileTag.objects.filter(
         profile=profile
@@ -923,6 +947,7 @@ def mypage(request):
             "total_spirit": total_spirit,
             "spirit_remaining": spirit_remaining,
             "next_spirit_threshold": next_spirit_threshold,
+            "can_edit_spirit_title": can_edit_spirit_title,
         }
     )
 
@@ -1788,3 +1813,88 @@ def notification_read(request, id):
     # fallback
     # =========================
     return redirect("accounts:mypage")
+
+
+# =========================
+# 🌟 SPIRIT称号編集
+# =========================
+@login_required
+def spirit_title_edit(request):
+
+    user = request.user
+
+    # =========================
+    # 🌟 SPIRIT集計
+    # =========================
+    feed_spirit = PostVideoLike.objects.filter(
+        post__user=user
+    ).count()
+
+    blog_spirit = PostLike.objects.filter(
+        post__author=user
+    ).count()
+
+    diary_spirit = LikeRecord.objects.filter(
+        page__author=user
+    ).aggregate(
+        total=Sum("like_count")
+    )["total"] or 0
+
+    total_spirit = (
+        feed_spirit
+        + blog_spirit
+        + diary_spirit
+    )
+
+    # =========================
+    # 🌟 500 SPIRIT未満は利用不可
+    # =========================
+    if total_spirit < 500:
+
+        messages.warning(
+            request,
+            "称号変更は500 SPIRIT以上で利用できます。"
+        )
+
+        return redirect("accounts:mypage")
+
+    # =========================
+    # 🌟 称号取得・作成
+    # =========================
+    spirit_title, created = SpiritTitle.objects.get_or_create(
+        user=user
+    )
+
+    if request.method == "POST":
+
+        form = SpiritTitleForm(
+            request.POST,
+            instance=spirit_title
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "SPIRIT称号を保存しました。"
+            )
+
+            return redirect("accounts:spirit_title_edit")
+
+    else:
+
+        form = SpiritTitleForm(
+            instance=spirit_title
+        )
+
+    return render(
+        request,
+        "accounts/spirit_title_edit.html",
+        {
+            "form": form,
+            "spirit_title": spirit_title,
+            "total_spirit": total_spirit,
+        }
+    )

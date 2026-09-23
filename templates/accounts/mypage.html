@@ -187,20 +187,50 @@
         </div>
     
         <div class="spirit-next">
-    
+        
+            {% if next_spirit_threshold %}
+        
             <p>
                 次の特典まで
             </p>
-    
+        
             <strong>
-                あと {{ spirit_remaining }}
+                あと {{ spirit_remaining }} SPIRIT
             </strong>
-    
+        
             <span>
                 {{ next_spirit_threshold }} SPIRITで特典解放
             </span>
-    
+        
+            {% else %}
+        
+            <p>
+                🎉 特典コンプリート
+            </p>
+        
+            <strong>
+                すべての特典を解放済み
+            </strong>
+        
+            <span>
+                今後の特典追加をお楽しみに
+            </span>
+        
+            {% endif %}
+        
         </div>
+
+        {% if can_edit_spirit_title %}
+        
+        <div class="spirit-title-action">
+        
+            <a href="{% url 'accounts:spirit_title_edit' %}" class="spirit-title-edit-button">
+                🌟 オリジナル称号を変更する
+            </a>
+        
+        </div>
+        
+        {% endif %}
     
     </section>
 

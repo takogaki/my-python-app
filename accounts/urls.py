@@ -38,6 +38,9 @@ urlpatterns = [
     # 自分専用（mypage領域）
     # =========================
     path("mypage/", views.mypage, name="mypage"),
+    
+    # SPIRIT称号編集
+    path("mypage/spirit-title/", views.spirit_title_edit, name="spirit_title_edit"),
 
     # メール認証（★これが唯一の activate）
     path("activate/<uuid:token>/", views.activate, name="activate"),

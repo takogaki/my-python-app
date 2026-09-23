@@ -1,0 +1,81 @@
+{% extends "base/diary_base.html" %}
+{% load static %}
+
+{% block title %}
+SPIRIT称号｜SPIRYTUS
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/spirit_title.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="spirit-title-page">
+
+    <div class="spirit-title-card">
+
+        <h1>🌟 SPIRIT称号</h1>
+
+        <p class="spirit-title-description">
+            あなたらしい称号を組み合わせてください。
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="spirit-title-fields">
+
+                {% for field in form %}
+                <div class="spirit-title-field">
+                
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                
+                    <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="spirit-title-select">
+                
+                        {% for value, label in field.field.choices %}
+                        <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                
+                    </select>
+                
+                    {% if field.errors %}
+                    <div class="spirit-title-error">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <div class="spirit-title-preview">
+
+                <h2>称号プレビュー</h2>
+
+                <p>
+                    {{ spirit_title.get_title|default:"称号を選択してください" }}
+                </p>
+
+            </div>
+
+            <button type="submit" class="spirit-title-save-button">
+                称号を保存する
+            </button>
+
+        </form>
+
+        <a href="{% url 'accounts:mypage' %}" class="spirit-title-back">
+            マイページに戻る
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

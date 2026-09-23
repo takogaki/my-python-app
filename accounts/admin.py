@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.db.models.deletion import Collector
 from django.db import router
-from .models import CustomUser, KYCSubmission, TagCategory, Profile, Tag, ProfileTag
+from .models import CustomUser, KYCSubmission, TagCategory, Profile, Tag, ProfileTag, SpiritTitle, SpiritTitlePart
 from django.utils import timezone
 
 
@@ -179,3 +179,58 @@ class ProfileAdmin(admin.ModelAdmin):
         return "-"
 
     delete_scheduled_at.short_description = "削除予定日"
+
+# =========================
+# 🌟 SPIRIT称号パーツ管理
+# =========================
+@admin.register(SpiritTitlePart)
+class SpiritTitlePartAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "slot",
+        "text",
+        "order",
+        "is_active",
+        "created_at",
+    )
+
+    list_filter = (
+        "slot",
+        "is_active",
+    )
+
+    search_fields = (
+        "text",
+    )
+
+    ordering = (
+        "slot",
+        "order",
+        "id",
+    )
+
+
+# =========================
+# 🌟 SPIRIT称号管理
+# =========================
+@admin.register(SpiritTitle)
+class SpiritTitleAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "user",
+        "slot1",
+        "slot2",
+        "slot3",
+        "slot4",
+        "slot5",
+        "updated_at",
+    )
+
+    search_fields = (
+        "user__username",
+    )
+
+    readonly_fields = (
+        "updated_at",
+    )
