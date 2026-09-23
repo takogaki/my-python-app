@@ -1,0 +1,9 @@
+{% if display_user.spirit_title %}
+{% with title=display_user.spirit_title.get_title %}
+{% if title %}
+<div class="user-spirit-title">
+    🌟 {{ title }}
+</div>
+{% endif %}
+{% endwith %}
+{% endif %}
