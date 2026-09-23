@@ -87,6 +87,35 @@ class Post(models.Model):
         return reverse("blog:post_detail", kwargs={"slug": self.slug})
 
 
+# =========================
+# 🖼️ Blog複数画像
+# =========================
+class PostImage(models.Model):
+
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name="images",
+    )
+
+    image = models.ImageField(
+        upload_to="post_images/",
+    )
+
+    order = models.PositiveIntegerField(
+        default=0,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.post.title} - {self.id}"
+
 
 # =========================
 # ❤️ Blogいいね

@@ -6,7 +6,7 @@ from django.db.models import Count
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from .forms import CommentForm, PostForm
-from .models import Post, Comment, Report, CommentReport, PostLike
+from .models import Post, PostImage, Comment, Report, CommentReport, PostLike
 from django.contrib import messages
 from blog.models import Post
 from accounts.models import SavedPost
@@ -156,6 +156,19 @@ def frontpage(request):
                 post.name = f"未ログイン-{device_id[:6]}"
 
             post.save()
+
+            # =========================
+            # 🖼️ 複数画像を保存
+            # =========================
+            images = form.cleaned_data.get("images", [])
+
+            for index, image in enumerate(images):
+
+                PostImage.objects.create(
+                    post=post,
+                    image=image,
+                    order=index,
+                )
 
             response = redirect("blog:frontpage")
 

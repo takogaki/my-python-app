@@ -2,8 +2,41 @@ from django import forms
 from django.core.exceptions import ValidationError
 from urllib.parse import urlparse
 from .validators import validate_video_url
+from django.core.validators import FileExtensionValidator
 
 from .models import Post, Comment
+
+# =========================
+# 複数画像アップロード用
+# =========================
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault(
+            "widget",
+            MultipleFileInput()
+        )
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+
+        if not data:
+            return []
+
+        if isinstance(data, (list, tuple)):
+            return [
+                super().clean(item, initial)
+                for item in data
+            ]
+
+        return [
+            super().clean(data, initial)
+        ]
 
 # =======================
 # 許可する動画ドメイン（本番用）
@@ -67,22 +100,77 @@ def validate_video_url(url: str | None):
 # Post の投稿フォーム
 # =======================
 class PostForm(forms.ModelForm):
+
+    images = MultipleFileField(
+        required=False,
+        label="画像（最大10枚）",
+        widget=MultipleFileInput(
+            attrs={
+                "accept": "image/jpeg,image/png,image/webp",
+            }
+        ),
+    )
+
     class Meta:
         model = Post
-        fields = ["title", "body", "image", "video_url", "video_type"]
+        fields = [
+            "title",
+            "body",
+            "video_url",
+            "video_type",
+        ]
+
         widgets = {
-            "title": forms.TextInput(attrs={"placeholder": "タイトル"}),
-            "body": forms.Textarea(attrs={
-                "placeholder": "本文を入力してください",
-                "rows": 6,
-            }),
-            "video_type": forms.RadioSelect
+            "title": forms.TextInput(
+                attrs={
+                    "placeholder": "タイトル"
+                }
+            ),
+
+            "body": forms.Textarea(
+                attrs={
+                    "placeholder": "本文を入力してください",
+                    "rows": 6,
+                }
+            ),
+
+            "video_type": forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
+
         self.user = kwargs.pop("user", None)
+
         super().__init__(*args, **kwargs)
 
+    def clean_images(self):
+
+        images = self.files.getlist("images")
+
+        if len(images) > 10:
+            raise forms.ValidationError(
+                "画像は最大10枚まで投稿できます。"
+            )
+
+        allowed_types = {
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        }
+
+        for image in images:
+
+            if image.content_type not in allowed_types:
+                raise forms.ValidationError(
+                    "JPEG・PNG・WEBP形式の画像のみ投稿できます。"
+                )
+
+            if image.size > 10 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "画像1枚の容量は10MB以下にしてください。"
+                )
+
+        return images
 
 # =======================
 # コメントフォーム

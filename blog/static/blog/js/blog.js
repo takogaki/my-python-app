@@ -844,3 +844,161 @@ document.addEventListener("click", async (e) => {
     }
 
 });
+
+/* =========================================
+   🖼️ Blog 複数画像スライダー
+========================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll("[data-slider]").forEach(function (slider) {
+
+        const track = slider.querySelector(".post-image-track");
+        const slides = slider.querySelectorAll(".post-image-slide");
+
+        const prevButton = slider.querySelector(".slider-prev");
+        const nextButton = slider.querySelector(".slider-next");
+
+        const dots = slider.querySelectorAll(".slider-dot");
+
+        const currentCounter = slider.querySelector(".slider-current");
+
+        if (!track || slides.length <= 1) {
+            return;
+        }
+
+        let currentIndex = 0;
+
+        let startX = 0;
+        let isDragging = false;
+
+
+        function updateSlider() {
+
+            track.style.transform =
+                `translateX(-${currentIndex * 100}%)`;
+
+
+            dots.forEach(function (dot, index) {
+
+                dot.classList.toggle(
+                    "active",
+                    index === currentIndex
+                );
+
+            });
+
+
+            if (currentCounter) {
+
+                currentCounter.textContent =
+                    currentIndex + 1;
+
+            }
+
+
+            if (prevButton) {
+
+                prevButton.disabled =
+                    currentIndex === 0;
+
+            }
+
+
+            if (nextButton) {
+
+                nextButton.disabled =
+                    currentIndex === slides.length - 1;
+
+            }
+
+        }
+
+
+        function goToSlide(index) {
+
+            currentIndex =
+                Math.max(
+                    0,
+                    Math.min(index, slides.length - 1)
+                );
+
+            updateSlider();
+
+        }
+
+
+        if (prevButton) {
+
+            prevButton.addEventListener("click", function () {
+
+                goToSlide(currentIndex - 1);
+
+            });
+
+        }
+
+
+        if (nextButton) {
+
+            nextButton.addEventListener("click", function () {
+
+                goToSlide(currentIndex + 1);
+
+            });
+
+        }
+
+
+        /* =========================================
+           タッチスワイプ
+        ========================================= */
+
+        track.addEventListener("touchstart", function (event) {
+
+            startX =
+                event.touches[0].clientX;
+
+            isDragging = true;
+
+        }, { passive: true });
+
+
+        track.addEventListener("touchend", function (event) {
+
+            if (!isDragging) {
+                return;
+            }
+
+            isDragging = false;
+
+            const endX =
+                event.changedTouches[0].clientX;
+
+            const diff =
+                startX - endX;
+
+            const threshold = 50;
+
+            if (Math.abs(diff) < threshold) {
+                return;
+            }
+
+            if (diff > 0) {
+
+                goToSlide(currentIndex + 1);
+
+            } else {
+
+                goToSlide(currentIndex - 1);
+
+            }
+
+        }, { passive: true });
+
+
+        updateSlider();
+
+    });
+
+});

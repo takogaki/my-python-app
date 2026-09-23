@@ -219,15 +219,66 @@
 
             {% endif %}
 
-            {% if post.image %}
-
-            <div class="post-image-wrapper">
-
-                <img src="{{ post.image.url }}" class="post-media-thumb post-image"
-                    alt="{{ post.title|default:'投稿画像' }}" loading="lazy">
-
+            {% if post.images.all %}
+            
+            <div class="post-image-slider" data-slider>
+            
+                <div class="post-image-track">
+            
+                    {% for post_image in post.images.all %}
+            
+                    <div class="post-image-slide">
+            
+                        <img src="{{ post_image.image.url }}" class="post-media-thumb post-image"
+                            alt="{{ post.title|default:'投稿画像' }}" loading="lazy">
+            
+                    </div>
+            
+                    {% endfor %}
+            
+                </div>
+            
+                {% if post.images.count > 1 %}
+            
+                <button type="button" class="slider-button slider-prev" aria-label="前の画像">
+                    ‹
+                </button>
+            
+                <button type="button" class="slider-button slider-next" aria-label="次の画像">
+                    ›
+                </button>
+            
+                <div class="slider-dots">
+            
+                    {% for post_image in post.images.all %}
+            
+                    <span class="slider-dot {% if forloop.first %}active{% endif %}"></span>
+            
+                    {% endfor %}
+            
+                </div>
+            
+                <div class="slider-counter">
+                    <span class="slider-current">1</span>
+                    /
+                    <span class="slider-total">{{ post.images.count }}</span>
+                </div>
+            
+                {% endif %}
+            
             </div>
-
+            
+            {% elif post.image %}
+            
+            {# 既存の1枚画像投稿 #}
+            
+            <div class="post-image-wrapper">
+            
+                <img src="{{ post.image.url }}" class="post-media-thumb post-image" alt="{{ post.title|default:'投稿画像' }}"
+                    loading="lazy">
+            
+            </div>
+            
             {% endif %}
 
             {% if post.video_url %}
