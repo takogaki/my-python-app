@@ -700,7 +700,8 @@ body:has(.chat-container) .feed-footer {
 /* ==================================================
    21. 📱 スマホでキーボード表示中
    header / footer 非表示
-   DMメッセージだけスクロール
+   DMスクロール可能
+   入力バーはキーボード直上
    ================================================== */
 
 @media (max-width: 600px) {
@@ -738,14 +739,7 @@ body:has(.chat-container) .feed-footer {
 
         width: 100% !important;
 
-        /*
-         * ★ここが重要
-         *
-         * 100dvhではなく
-         * 上下の位置で高さを決める
-         */
         height: auto !important;
-
         min-height: 0 !important;
 
         display: flex !important;
@@ -761,8 +755,8 @@ body:has(.chat-container) .feed-footer {
 
 
     /* ==============================================
-       ★★★ DMメッセージ領域 ★★★
-       ここだけスクロール
+       ★ DMメッセージ
+       ★ ここだけスクロール
        ============================================== */
 
     body:has(.chat-container).ui-chrome-hidden .chat-box {
@@ -775,38 +769,30 @@ body:has(.chat-container) .feed-footer {
         right: 0 !important;
 
         /*
-         * 入力バーの高さを確保
+         * 入力バーより上まで
          */
-        bottom: 56px !important;
+        bottom:
+            calc(
+                56px
+                +
+                var(--chat-keyboard-height, 0px)
+            )
+            !important;
 
         width: 100% !important;
 
         height: auto !important;
-
         min-height: 0 !important;
 
-        /*
-         * ★★★ ここがスクロール本体 ★★★
-         */
         overflow-y: scroll !important;
-
         overflow-x: hidden !important;
 
-        /*
-         * iPhone / Android
-         */
         -webkit-overflow-scrolling: touch !important;
 
-        /*
-         * タッチ操作を縦スクロールに限定
-         */
         touch-action: pan-y !important;
 
         overscroll-behavior: auto !important;
 
-        /*
-         * スクロール可能領域を確保
-         */
         box-sizing: border-box !important;
 
         padding-top: 14px !important;
@@ -814,6 +800,9 @@ body:has(.chat-container) .feed-footer {
         padding-left: 9px !important;
         padding-right: 9px !important;
 
+        /*
+         * 入力バーに隠れないための余白
+         */
         padding-bottom:
             calc(
                 90px
@@ -827,7 +816,8 @@ body:has(.chat-container) .feed-footer {
 
 
     /* ==============================================
-       入力バー
+       ★★★ 入力バー ★★★
+       ★ キーボードの直上
        ============================================== */
 
     body:has(.chat-container).ui-chrome-hidden .chat-input-bar {
@@ -837,7 +827,12 @@ body:has(.chat-container) .feed-footer {
         left: 0 !important;
         right: 0 !important;
 
-        bottom: 0 !important;
+        /*
+         * ★ キーボードの高さだけ上へ
+         */
+        bottom:
+            var(--chat-keyboard-height, 0px)
+            !important;
 
         width: 100% !important;
 
