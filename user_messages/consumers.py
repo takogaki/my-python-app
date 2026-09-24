@@ -115,12 +115,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # =====================================================
         # 🔥 ルーム名を共通化
+        #    ※ Redis Group名にはユーザー名を使用しない
+        #    ※ 日本語ユーザー名にも対応するためIDを使用
         # =====================================================
-        user1 = user.username
-        user2 = recipient.username
+        user1_id = user.id
+        user2_id = recipient.id
 
         self.room_group_name = (
-            f"chat_{min(user1, user2)}_{max(user1, user2)}"
+            f"chat_{min(user1_id, user2_id)}_{max(user1_id, user2_id)}"
         )
 
         # =====================================================

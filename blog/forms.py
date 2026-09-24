@@ -15,27 +15,22 @@ class MultipleFileInput(forms.ClearableFileInput):
 
 
 class MultipleFileField(forms.FileField):
-
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault(
-            "widget",
-            MultipleFileInput()
-        )
+        kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
-
         if not data:
             return []
 
         if isinstance(data, (list, tuple)):
             return [
-                super().clean(item, initial)
+                forms.FileField.clean(self, item, initial)
                 for item in data
             ]
 
         return [
-            super().clean(data, initial)
+            forms.FileField.clean(self, data, initial)
         ]
 
 # =======================
