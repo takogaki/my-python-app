@@ -705,14 +705,16 @@ body:has(.chat-container) .feed-footer {
 @media (max-width: 600px) {
 
     /*
-     * diary_base.html が
-     * キーボード表示時に付けるクラス
+     * キーボード表示中
+     * diary_base.html が body に
+     * .ui-chrome-hidden を付ける
      */
-    body.dm-page.ui-chrome-hidden .site-header {
+
+    body:has(.chat-container).ui-chrome-hidden .site-header {
         display: none !important;
     }
 
-    body.dm-page.ui-chrome-hidden .feed-footer {
+    body:has(.chat-container).ui-chrome-hidden .feed-footer {
         display: none !important;
     }
 
@@ -721,7 +723,7 @@ body:has(.chat-container) .feed-footer {
      * header / footer が消えた分、
      * DMを画面いっぱいにする
      */
-    body.dm-page.ui-chrome-hidden .chat-container {
+    body:has(.chat-container).ui-chrome-hidden .chat-container {
 
         top: 0 !important;
 
@@ -733,7 +735,6 @@ body:has(.chat-container) .feed-footer {
         width: 100% !important;
 
         height: 100dvh !important;
-
         min-height: 100dvh !important;
 
         margin: 0 !important;
@@ -747,24 +748,20 @@ body:has(.chat-container) .feed-footer {
 
     /*
      * キーボード表示中は
-     * footer分の余白も不要
+     * footer分の余白を削除
      */
-    body.dm-page.ui-chrome-hidden .chat-box {
+    body:has(.chat-container).ui-chrome-hidden .chat-box {
 
         padding-bottom:
-            calc(
-                80px
-                +
-                env(safe-area-inset-bottom)
-            )
+            80px
             !important;
     }
 
 
     /*
-     * 入力バーも画面最下部へ
+     * 入力バーを画面下部へ
      */
-    body.dm-page.ui-chrome-hidden .chat-input-bar {
+    body:has(.chat-container).ui-chrome-hidden .chat-input-bar {
 
         bottom: 0 !important;
 
