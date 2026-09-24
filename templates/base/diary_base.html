@@ -660,6 +660,73 @@
     });
 </script>
 
+{% if user.is_authenticated %}
+<script>
+    // ==============================
+    // 🔴 SPIRYTUS PWA 未読バッジ
+    // ==============================
+
+    async function updateSpirytusAppBadge() {
+
+        // App Badge APIに対応していない環境では何もしない
+        if (!("setAppBadge" in navigator)) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                "{% url 'user_messages:unread_count' %}",
+                {
+                    credentials: "same-origin",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    cache: "no-store"
+                }
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            const count = Number(data.count) || 0;
+
+            if (count > 0) {
+
+                await navigator.setAppBadge(count);
+
+            } else if ("clearAppBadge" in navigator) {
+
+                await navigator.clearAppBadge();
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "SPIRYTUS badge update error:",
+                error
+            );
+
+        }
+    }
+
+
+    // ページを開いたときに更新
+    updateSpirytusAppBadge();
+
+
+    // 30秒ごとに未読件数を確認
+    setInterval(
+        updateSpirytusAppBadge,
+        30000
+    );
+</script>
+{% endif %}
+
 </body>
 
 </html>

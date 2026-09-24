@@ -21,6 +21,61 @@ User = get_user_model()
 
 
 
+# =========================
+# 🔴 SPIRYTUS総未読件数API
+# =========================
+
+@login_required
+def unread_count(request):
+
+    user = request.user
+
+    # =========================
+    # 💬 通常DM未読
+    # =========================
+    dm_unread_total = Message.objects.filter(
+        recipient=user,
+        is_read=False,
+    ).count()
+
+    # =========================
+    # 🔔 通知未読
+    # ※ message はDMと重複するため除外
+    # =========================
+    notification_unread_total = Notification.objects.filter(
+        recipient=user,
+        is_read=False,
+        type__in=[
+            "tag_match",
+            "footprint",
+            "like",
+            "match",
+        ],
+    ).count()
+
+    # =========================
+    # 💬 募集チャット未読
+    # =========================
+    from videos.context_processors import recruit_unread_count
+
+    recruit_unread_total = recruit_unread_count(
+        request
+    )["recruit_unread_total"]
+
+    # =========================
+    # 🔴 総未読
+    # =========================
+    total = (
+        dm_unread_total
+        + notification_unread_total
+        + recruit_unread_total
+    )
+
+    return JsonResponse({
+        "count": total,
+    })
+
+
 @login_required
 def message_box(request):
 

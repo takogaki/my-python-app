@@ -71,7 +71,6 @@ def notification_unread_count(request):
             "footprint",
             "like",
             "match",
-            "message",
         ],
     ).count()
 
