@@ -696,3 +696,84 @@ body:has(.chat-container) .feed-footer {
         padding-right: 14px !important;
     }
 }
+
+/* ==================================================
+   21. 📱 スマホでキーボード表示中のみ
+   header / footer を完全非表示
+   ================================================== */
+
+@media (max-width: 600px) {
+
+    /*
+     * diary_base.html が
+     * キーボード表示時に付けるクラス
+     */
+    body.dm-page.ui-chrome-hidden .site-header {
+        display: none !important;
+    }
+
+    body.dm-page.ui-chrome-hidden .feed-footer {
+        display: none !important;
+    }
+
+
+    /*
+     * header / footer が消えた分、
+     * DMを画面いっぱいにする
+     */
+    body.dm-page.ui-chrome-hidden .chat-container {
+
+        top: 0 !important;
+
+        bottom: 0 !important;
+
+        left: 0 !important;
+        right: 0 !important;
+
+        width: 100% !important;
+
+        height: 100dvh !important;
+
+        min-height: 100dvh !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        box-sizing: border-box !important;
+
+        overflow: hidden !important;
+    }
+
+
+    /*
+     * キーボード表示中は
+     * footer分の余白も不要
+     */
+    body.dm-page.ui-chrome-hidden .chat-box {
+
+        padding-bottom:
+            calc(
+                80px
+                +
+                env(safe-area-inset-bottom)
+            )
+            !important;
+    }
+
+
+    /*
+     * 入力バーも画面最下部へ
+     */
+    body.dm-page.ui-chrome-hidden .chat-input-bar {
+
+        bottom: 0 !important;
+
+        padding-bottom:
+            calc(
+                7px
+                +
+                env(safe-area-inset-bottom)
+            )
+            !important;
+    }
+}
