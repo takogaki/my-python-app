@@ -408,6 +408,21 @@ document.addEventListener("DOMContentLoaded", function () {
             "";
 
 
+        /*
+        * 全画面画像をもう一度クリックすると閉じる
+        */
+        newImage.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                closeMediaModal();
+
+            }
+        );
+
+
         modalContent.appendChild(
             newImage
         );
