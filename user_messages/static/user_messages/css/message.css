@@ -698,113 +698,137 @@ body:has(.chat-container) .feed-footer {
 }
 
 /* ==================================================
-   21. 📱 スマホでキーボード表示中のみ
-   header / footer を完全非表示
-   DMはスクロール可能
+   21. 📱 スマホでキーボード表示中
+   header / footer 非表示
+   DMメッセージだけスクロール
    ================================================== */
 
 @media (max-width: 600px) {
 
-    /*
-     * -----------------------------------------------
-     * header / footer を非表示
-     * -----------------------------------------------
-     */
+    /* ==============================================
+       header
+       ============================================== */
 
     body:has(.chat-container).ui-chrome-hidden .site-header {
         display: none !important;
     }
+
+
+    /* ==============================================
+       footer
+       ============================================== */
 
     body:has(.chat-container).ui-chrome-hidden .feed-footer {
         display: none !important;
     }
 
 
-    /*
-     * -----------------------------------------------
-     * DM本体を画面いっぱいにする
-     * -----------------------------------------------
-     */
+    /* ==============================================
+       DM本体
+       ============================================== */
 
     body:has(.chat-container).ui-chrome-hidden .chat-container {
 
-        top: 0 !important;
-        bottom: 0 !important;
+        position: fixed !important;
 
+        top: 0 !important;
         left: 0 !important;
         right: 0 !important;
+        bottom: 0 !important;
 
         width: 100% !important;
 
-        height: 100dvh !important;
+        /*
+         * ★ここが重要
+         *
+         * 100dvhではなく
+         * 上下の位置で高さを決める
+         */
+        height: auto !important;
+
         min-height: 0 !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow: hidden !important;
 
         margin: 0 !important;
         padding: 0 !important;
 
         box-sizing: border-box !important;
-
-        display: flex !important;
-        flex-direction: column !important;
-
-        /*
-         * 本体そのものはスクロールさせない
-         */
-        overflow: hidden !important;
     }
 
 
-    /*
-     * -----------------------------------------------
-     * ★ DMメッセージ部分
-     * ★ ここだけスクロール
-     * -----------------------------------------------
-     */
+    /* ==============================================
+       ★★★ DMメッセージ領域 ★★★
+       ここだけスクロール
+       ============================================== */
 
     body:has(.chat-container).ui-chrome-hidden .chat-box {
 
-        flex: 1 1 auto !important;
+        position: absolute !important;
+
+        top: 0 !important;
+
+        left: 0 !important;
+        right: 0 !important;
+
+        /*
+         * 入力バーの高さを確保
+         */
+        bottom: 56px !important;
 
         width: 100% !important;
 
-        min-height: 0 !important;
         height: auto !important;
 
-        overflow-y: auto !important;
+        min-height: 0 !important;
+
+        /*
+         * ★★★ ここがスクロール本体 ★★★
+         */
+        overflow-y: scroll !important;
+
         overflow-x: hidden !important;
 
         /*
-         * 入力バーに隠れないための余白
+         * iPhone / Android
          */
+        -webkit-overflow-scrolling: touch !important;
+
+        /*
+         * タッチ操作を縦スクロールに限定
+         */
+        touch-action: pan-y !important;
+
+        overscroll-behavior: auto !important;
+
+        /*
+         * スクロール可能領域を確保
+         */
+        box-sizing: border-box !important;
+
+        padding-top: 14px !important;
+
+        padding-left: 9px !important;
+        padding-right: 9px !important;
+
         padding-bottom:
             calc(
-                80px
+                90px
                 +
                 env(safe-area-inset-bottom)
             )
             !important;
 
-        box-sizing: border-box !important;
-
-        /*
-         * iPhone / Android の
-         * 指スクロールを有効化
-         */
-        -webkit-overflow-scrolling: touch !important;
-
-        overscroll-behavior-y: contain !important;
-
-        touch-action: pan-y !important;
-
-        scroll-behavior: auto !important;
+        margin: 0 !important;
     }
 
 
-    /*
-     * -----------------------------------------------
-     * 入力バー
-     * -----------------------------------------------
-     */
+    /* ==============================================
+       入力バー
+       ============================================== */
 
     body:has(.chat-container).ui-chrome-hidden .chat-input-bar {
 
@@ -817,17 +841,18 @@ body:has(.chat-container) .feed-footer {
 
         width: 100% !important;
 
+        height: 56px !important;
+
+        min-height: 56px !important;
+
+        box-sizing: border-box !important;
+
         z-index: 999999 !important;
 
         padding:
             7px 10px
-            calc(
-                7px
-                +
-                env(safe-area-inset-bottom)
-            )
             !important;
 
-        box-sizing: border-box !important;
+        margin: 0 !important;
     }
 }
