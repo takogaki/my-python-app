@@ -294,6 +294,19 @@ class UserDetailView(DetailView):
         )
 
         # =========================
+        # 🖼️ ブログ画像投稿
+        # =========================
+        context["blog_image_posts"] = (
+            Post.objects
+            .filter(
+                author=user,
+                image__isnull=False,
+            )
+            .exclude(image="")
+            .order_by("-posted_date")
+        )
+
+        # =========================
         # 🎥 動画
         # =========================
         context["video_posts"] = (
@@ -771,7 +784,22 @@ def mypage(request):
     diaries = Page.objects.filter(author=user).order_by("-page_date")
     blog_posts = Post.objects.filter(author=user).order_by("-posted_date")
     # 投稿（動画・画像）
-    video_posts = PostVideo.objects.filter(user=user).order_by("-created_at")
+    video_posts = (
+        PostVideo.objects
+        .filter(user=user)
+        .order_by("-created_at")
+    )
+
+    # Blog画像
+    blog_image_posts = (
+        Post.objects
+        .filter(
+            author=user,
+            image__isnull=False,
+        )
+        .exclude(image="")
+        .order_by("-posted_date")
+    )
 
     # =========================
     # 🌟 SPIRIT集計
@@ -929,6 +957,7 @@ def mypage(request):
             "diaries": diaries,
             "blog_posts": blog_posts,
             "video_posts": video_posts,
+            "blog_image_posts": blog_image_posts,
             "profile_tags": profile_tags,
             "messages": messages,
             "profile": profile,

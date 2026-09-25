@@ -169,25 +169,67 @@
 画像・動画投稿一覧
 ===================== -->
 <div class="card">
+
     <h2 class="card-title">
-        {{ user.username }}さんの動画・画像
+        {{ user.username }}さんの画像・動画
     </h2>
 
-    {% if video_posts %}
+    {% if video_posts or blog_image_posts %}
 
     <div class="post-grid">
 
+        <!-- =========================
+             Feed投稿
+        ========================= -->
         {% for post in video_posts %}
-        <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 %}">
 
-            {% if post.media_type == "video" and post.video %}
-            <video src="{{ post.video.url }}" muted preload="metadata"></video>
+        {% if post.media_type == "video" and post.video %}
 
-            {% elif post.image %}
-            <img src="{{ post.image.url }}">
-            {% endif %}
+        <div class="user-detail-media-item media-video">
 
-        </a>
+            <video src="{{ post.video.url }}" muted preload="metadata" playsinline>
+            </video>
+
+            <span class="media-type-badge">
+                ▶
+            </span>
+
+        </div>
+
+        {% elif post.image %}
+
+        <button type="button" class="user-detail-media-item media-image" data-full-image="{{ post.image.url }}"
+            aria-label="画像を拡大">
+
+            <img src="{{ post.image.url }}" alt="Feed投稿画像" loading="lazy">
+
+            <span class="media-type-badge">
+                📷
+            </span>
+
+        </button>
+
+        {% endif %}
+
+        {% endfor %}
+
+
+        <!-- =========================
+             Blog画像投稿
+        ========================= -->
+        {% for post in blog_image_posts %}
+
+        <button type="button" class="user-detail-media-item media-image" data-full-image="{{ post.image.url }}"
+            aria-label="画像を拡大">
+
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+
+            <span class="media-type-badge blog-badge">
+                📝
+            </span>
+
+        </button>
+
         {% endfor %}
 
     </div>
@@ -199,6 +241,7 @@
     </p>
 
     {% endif %}
+
 </div>
 
 <!-- =====================
@@ -300,6 +343,20 @@
         戻る
 
     </button>
+
+</div>
+
+<!-- =========================
+     🖼️ 投稿画像 全画面表示
+========================= -->
+
+<div id="user-detail-image-modal" class="user-detail-image-modal">
+
+    <button type="button" class="user-detail-image-modal-close" aria-label="閉じる">
+        ×
+    </button>
+
+    <img id="user-detail-modal-image" class="user-detail-modal-image" src="" alt="拡大画像">
 
 </div>
 

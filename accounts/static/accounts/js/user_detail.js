@@ -74,3 +74,167 @@ document.addEventListener("click", async (e) => {
         }
     });
 });
+
+/* ==================================================
+   🖼️ 投稿画像 全画面表示
+   初回表示・動的表示どちらにも対応
+================================================== */
+
+(function () {
+
+    function openImageModal(imageUrl) {
+
+        const imageModal = document.getElementById(
+            "user-detail-image-modal"
+        );
+
+        const modalImage = document.getElementById(
+            "user-detail-modal-image"
+        );
+
+        if (!imageUrl || !imageModal || !modalImage) {
+            return;
+        }
+
+        modalImage.src = imageUrl;
+
+        imageModal.classList.add("is-open");
+
+        document.body.style.overflow = "hidden";
+    }
+
+
+    function closeImageModal() {
+
+        const imageModal = document.getElementById(
+            "user-detail-image-modal"
+        );
+
+        const modalImage = document.getElementById(
+            "user-detail-modal-image"
+        );
+
+        if (!imageModal) {
+            return;
+        }
+
+        imageModal.classList.remove("is-open");
+
+        document.body.style.overflow = "";
+
+        if (modalImage) {
+            modalImage.src = "";
+        }
+    }
+
+
+    /* ==================================================
+       📸 投稿画像クリック
+       イベント委譲方式
+    ================================================== */
+
+    document.addEventListener("click", function (event) {
+
+        /* ==================================================
+           🔍 拡大前の画像
+        ================================================== */
+
+        const mediaItem = event.target.closest(
+            ".user-detail-media-item[data-full-image]"
+        );
+
+        if (mediaItem) {
+
+            event.preventDefault();
+
+            const imageUrl = mediaItem.dataset.fullImage;
+
+            openImageModal(imageUrl);
+
+            return;
+        }
+
+
+        /* ==================================================
+           🔍 拡大表示中の画像をもう一度クリック
+           → モーダルを閉じる
+        ================================================== */
+
+        const modalImage = event.target.closest(
+            "#user-detail-modal-image"
+        );
+
+        if (modalImage) {
+
+            event.preventDefault();
+
+            closeImageModal();
+
+            return;
+        }
+
+
+        /* ==================================================
+           ❌ 閉じるボタン
+        ================================================== */
+
+        const closeButton = event.target.closest(
+            ".user-detail-image-modal-close"
+        );
+
+        if (closeButton) {
+
+            event.preventDefault();
+
+            closeImageModal();
+
+            return;
+        }
+
+
+        /* ==================================================
+           🖤 モーダル背景クリック
+        ================================================== */
+
+        const imageModal = document.getElementById(
+            "user-detail-image-modal"
+        );
+
+        if (
+            imageModal &&
+            event.target === imageModal
+        ) {
+
+            closeImageModal();
+
+        }
+
+    });
+
+
+    /* ==================================================
+       ⌨️ ESCキーで閉じる
+    ================================================== */
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+
+            const imageModal = document.getElementById(
+                "user-detail-image-modal"
+            );
+
+            if (
+                imageModal &&
+                imageModal.classList.contains("is-open")
+            ) {
+
+                closeImageModal();
+
+            }
+
+        }
+
+    });
+
+})();

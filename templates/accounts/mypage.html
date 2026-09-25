@@ -371,26 +371,70 @@
     </section>
 
     <!-- 投稿グリッド -->
+    <!-- =========================
+         📸 投稿したメディア
+    ========================= -->
+    
     <section class="content-card">
+    
         <h3 class="section-title">
-            📹画像・動画の投稿一覧
+            📸 投稿したメディア
         </h3>
     
-        {% if video_posts %}
+        {% if video_posts or blog_image_posts %}
     
         <div class="post-grid">
     
+            <!-- =========================
+                 Feed
+            ========================= -->
+    
             {% for post in video_posts %}
-            <a href="{% url 'video_feed_user' user.username %}?start={{ forloop.counter0 %}">
     
-                {% if post.media_type == "video" and post.video %}
-                <video src="{{ post.video.url }}" muted preload="metadata"></video>
+            {% if post.media_type == "video" and post.video %}
     
-                {% elif post.image %}
-                <img src="{{ post.image.url }}">
-                {% endif %}
+            <div class="mypage-media-item media-video">
     
-            </a>
+                <video src="{{ post.video.url }}" muted preload="metadata" playsinline>
+                </video>
+    
+                <span class="media-type-badge">
+                    ▶
+                </span>
+    
+            </div>
+    
+            {% elif post.image %}
+    
+            <button type="button" class="mypage-media-item media-image" data-full-image="{{ post.image.url }}"
+                aria-label="画像を拡大">
+    
+                <img src="{{ post.image.url }}" alt="Feed投稿画像" loading="lazy">
+    
+            </button>
+    
+            {% endif %}
+    
+            {% endfor %}
+    
+    
+            <!-- =========================
+                 Blog画像
+            ========================= -->
+    
+            {% for post in blog_image_posts %}
+    
+            <button type="button" class="mypage-media-item media-image" data-full-image="{{ post.image.url }}"
+                aria-label="画像を拡大">
+    
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+    
+                <span class="media-type-badge blog-badge">
+                    📝
+                </span>
+    
+            </button>
+    
             {% endfor %}
     
         </div>
@@ -402,6 +446,7 @@
         </p>
     
         {% endif %}
+    
     </section>
 
     <!-- 日記 -->
@@ -629,6 +674,20 @@
         しなくても、今まで通りすべての機能をご利用いただけます。
     </p>
 </section>
+
+<!-- =========================
+     🖼️ 投稿画像 全画面表示
+========================= -->
+
+<div id="mypage-image-modal" class="mypage-image-modal">
+
+    <button type="button" class="mypage-image-modal-close" aria-label="閉じる">
+        ×
+    </button>
+
+    <img id="mypage-modal-image" class="mypage-modal-image" src="" alt="拡大画像">
+
+</div>
 
 {% endblock %}
 
