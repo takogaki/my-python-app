@@ -80,9 +80,27 @@ document.addEventListener("click", async (e) => {
    初回表示・動的表示どちらにも対応
 ================================================== */
 
+/* ==================================================
+   🖼️ 投稿画像 全画面表示
+   ・複数画像対応
+   ・左右スワイプ対応
+   ・画像タップで閉じる
+================================================== */
+
 (function () {
 
-    function openImageModal(imageUrl) {
+    let currentImages = [];
+    let currentIndex = 0;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+
+    /* ==================================================
+       画像を開く
+    ================================================== */
+
+    function openImageModal(images, startIndex) {
 
         const imageModal = document.getElementById(
             "user-detail-image-modal"
@@ -92,17 +110,38 @@ document.addEventListener("click", async (e) => {
             "user-detail-modal-image"
         );
 
-        if (!imageUrl || !imageModal || !modalImage) {
+        if (
+            !images ||
+            !images.length ||
+            !imageModal ||
+            !modalImage
+        ) {
             return;
         }
 
-        modalImage.src = imageUrl;
+        currentImages = images;
+        currentIndex = startIndex || 0;
+
+        /* 範囲外防止 */
+        if (currentIndex < 0) {
+            currentIndex = 0;
+        }
+
+        if (currentIndex >= currentImages.length) {
+            currentIndex = currentImages.length - 1;
+        }
+
+        modalImage.src = currentImages[currentIndex];
 
         imageModal.classList.add("is-open");
 
         document.body.style.overflow = "hidden";
     }
 
+
+    /* ==================================================
+       閉じる
+    ================================================== */
 
     function closeImageModal() {
 
@@ -124,6 +163,63 @@ document.addEventListener("click", async (e) => {
 
         if (modalImage) {
             modalImage.src = "";
+        }
+
+        currentImages = [];
+        currentIndex = 0;
+    }
+
+
+    /* ==================================================
+       次の画像
+    ================================================== */
+
+    function showNextImage() {
+
+        if (currentImages.length <= 1) {
+            return;
+        }
+
+        currentIndex++;
+
+        /* 最後 → 最初 */
+        if (currentIndex >= currentImages.length) {
+            currentIndex = 0;
+        }
+
+        const modalImage = document.getElementById(
+            "user-detail-modal-image"
+        );
+
+        if (modalImage) {
+            modalImage.src = currentImages[currentIndex];
+        }
+    }
+
+
+    /* ==================================================
+       前の画像
+    ================================================== */
+
+    function showPreviousImage() {
+
+        if (currentImages.length <= 1) {
+            return;
+        }
+
+        currentIndex--;
+
+        /* 最初 → 最後 */
+        if (currentIndex < 0) {
+            currentIndex = currentImages.length - 1;
+        }
+
+        const modalImage = document.getElementById(
+            "user-detail-modal-image"
+        );
+
+        if (modalImage) {
+            modalImage.src = currentImages[currentIndex];
         }
     }
 
@@ -147,9 +243,54 @@ document.addEventListener("click", async (e) => {
 
             event.preventDefault();
 
+
+            /* ==================================================
+               複数画像投稿
+            ================================================== */
+
+            const stack = mediaItem.closest(
+                ".user-detail-media-stack"
+            );
+
+            if (stack) {
+
+                const cards = Array.from(
+                    stack.querySelectorAll(
+                        ".user-detail-media-stack-card[data-full-image]"
+                    )
+                );
+
+                const images = cards.map(function (card) {
+                    return card.dataset.fullImage;
+                });
+
+                const clickedIndex = cards.indexOf(
+                    mediaItem
+                );
+
+                openImageModal(
+                    images,
+                    clickedIndex >= 0 ? clickedIndex : 0
+                );
+
+                return;
+            }
+
+
+            /* ==================================================
+               通常の1枚画像
+            ================================================== */
+
             const imageUrl = mediaItem.dataset.fullImage;
 
-            openImageModal(imageUrl);
+            if (imageUrl) {
+
+                openImageModal(
+                    [imageUrl],
+                    0
+                );
+
+            }
 
             return;
         }
@@ -213,28 +354,154 @@ document.addEventListener("click", async (e) => {
 
 
     /* ==================================================
-       ⌨️ ESCキーで閉じる
+       👆 スワイプ開始
     ================================================== */
 
-    document.addEventListener("keydown", function (event) {
-
-        if (event.key === "Escape") {
+    document.addEventListener(
+        "touchstart",
+        function (event) {
 
             const imageModal = document.getElementById(
                 "user-detail-image-modal"
             );
 
             if (
-                imageModal &&
-                imageModal.classList.contains("is-open")
+                !imageModal ||
+                !imageModal.classList.contains("is-open")
             ) {
+                return;
+            }
 
-                closeImageModal();
+            if (!event.touches.length) {
+                return;
+            }
+
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+
+        },
+        { passive: true }
+    );
+
+
+    /* ==================================================
+       👆 スワイプ終了
+    ================================================== */
+
+    document.addEventListener(
+        "touchend",
+        function (event) {
+
+            const imageModal = document.getElementById(
+                "user-detail-image-modal"
+            );
+
+            if (
+                !imageModal ||
+                !imageModal.classList.contains("is-open")
+            ) {
+                return;
+            }
+
+            if (!event.changedTouches.length) {
+                return;
+            }
+
+            const touchEndX =
+                event.changedTouches[0].clientX;
+
+            const touchEndY =
+                event.changedTouches[0].clientY;
+
+            const diffX =
+                touchEndX - touchStartX;
+
+            const diffY =
+                touchEndY - touchStartY;
+
+
+            /* 縦方向の操作は無視 */
+            if (
+                Math.abs(diffY) >
+                Math.abs(diffX)
+            ) {
+                return;
+            }
+
+
+            /* 小さい移動は無視 */
+            if (Math.abs(diffX) < 50) {
+                return;
+            }
+
+
+            /* 左スワイプ → 次 */
+            if (diffX < 0) {
+
+                showNextImage();
 
             }
 
-        }
 
-    });
+            /* 右スワイプ → 前 */
+            else {
+
+                showPreviousImage();
+
+            }
+
+        },
+        { passive: true }
+    );
+
+
+    /* ==================================================
+       ⌨️ ESCで閉じる
+    ================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            const imageModal = document.getElementById(
+                "user-detail-image-modal"
+            );
+
+            if (
+                !imageModal ||
+                !imageModal.classList.contains("is-open")
+            ) {
+                return;
+            }
+
+
+            /* ESC */
+            if (event.key === "Escape") {
+
+                closeImageModal();
+
+                return;
+            }
+
+
+            /* ← */
+            if (event.key === "ArrowLeft") {
+
+                showPreviousImage();
+
+                return;
+            }
+
+
+            /* → */
+            if (event.key === "ArrowRight") {
+
+                showNextImage();
+
+                return;
+            }
+
+        }
+    );
 
 })();

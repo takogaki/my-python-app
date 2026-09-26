@@ -755,3 +755,254 @@ LIKEボタン
 
     pointer-events: none;
 }
+
+/* ==================================================
+   🖼️ User Detail 投稿画像
+   複数画像カードスタック
+================================================== */
+
+.user-detail-media-stack {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin: 0;
+    overflow: visible;
+}
+
+
+/* --------------------------------
+   スタックしている画像
+-------------------------------- */
+
+.user-detail-media-stack-card {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+    margin: 0;
+
+    border: 0;
+    border-radius: 14px;
+
+    background: #fff;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* 後ろのカード */
+
+.user-detail-media-stack-card:nth-child(2) {
+    transform: translate(7px, 7px);
+    z-index: 1;
+}
+
+.user-detail-media-stack-card:nth-child(3) {
+    transform: translate(12px, 12px);
+    z-index: 0;
+}
+
+
+/* 一番前のカード */
+
+.user-detail-media-stack-card.is-front {
+    transform: translate(0, 0);
+    z-index: 3;
+}
+
+
+/* 画像 */
+
+.user-detail-media-stack-card img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+
+    pointer-events: none;
+}
+
+
+/* --------------------------------
+   「3枚」などの枚数表示
+-------------------------------- */
+
+.user-detail-media-stack .media-stack-count {
+    position: absolute;
+
+    right: 10px;
+    bottom: 10px;
+
+    z-index: 10;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1;
+
+    pointer-events: none;
+}
+
+
+/* ==================================================
+   🖼️ User Detail 全画面画像モーダル
+================================================== */
+
+.user-detail-image-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 99999;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.92);
+
+    padding: 20px;
+
+    box-sizing: border-box;
+}
+
+
+/* JSで開いた状態 */
+
+.user-detail-image-modal.is-open {
+    display: flex;
+}
+
+
+/* --------------------------------
+   拡大画像
+-------------------------------- */
+
+.user-detail-modal-image {
+    display: block;
+
+    max-width: 100%;
+    max-height: 90vh;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    /*
+     * 横スワイプをJSで取得しつつ、
+     * 縦方向のブラウザ操作は許可
+     */
+    touch-action: pan-y;
+
+    -webkit-user-select: none;
+    user-select: none;
+
+    -webkit-touch-callout: none;
+}
+
+
+/* --------------------------------
+   閉じるボタン
+-------------------------------- */
+
+.user-detail-image-modal-close {
+    position: absolute;
+
+    top: 15px;
+    right: 15px;
+
+    z-index: 100000;
+
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    color: #fff;
+
+    font-size: 32px;
+    font-weight: 300;
+
+    line-height: 44px;
+    text-align: center;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* ==================================================
+   📱 スマホ
+================================================== */
+
+@media (max-width: 600px) {
+
+    .user-detail-media-stack {
+        border-radius: 12px;
+    }
+
+    .user-detail-media-stack-card {
+        border-radius: 12px;
+    }
+
+    .user-detail-media-stack-card img {
+        border-radius: 12px;
+    }
+
+    .user-detail-modal-image {
+        max-width: 100%;
+        max-height: 85vh;
+
+        border-radius: 4px;
+    }
+
+    .user-detail-image-modal {
+        padding: 10px;
+    }
+
+    .user-detail-image-modal-close {
+        top: 10px;
+        right: 10px;
+
+        width: 42px;
+        height: 42px;
+
+        font-size: 30px;
+        line-height: 42px;
+    }
+}
