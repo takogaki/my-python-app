@@ -218,18 +218,59 @@
              Blog画像投稿
         ========================= -->
         {% for post in blog_image_posts %}
-
+        
+        {% if post.images.all %}
+        
+        <!-- =========================
+             📝 Blog複数画像
+        ========================= -->
+        
+        <div class="user-detail-media-stack">
+        
+            {% for post_image in post.images.all %}
+        
+            <button type="button" class="user-detail-media-stack-card {% if forloop.first %}is-front{% endif %}"
+                data-full-image="{{ post_image.image.url }}" aria-label="投稿画像を拡大">
+        
+                <img src="{{ post_image.image.url }}" alt="{{ post.title }}" loading="lazy">
+        
+                {% if forloop.first %}
+                <span class="media-type-badge blog-badge">
+                    📝
+                </span>
+                {% endif %}
+        
+            </button>
+        
+            {% endfor %}
+        
+            {% if post.images.count > 1 %}
+            <span class="media-stack-count">
+                {{ post.images.count }}枚
+            </span>
+            {% endif %}
+        
+        </div>
+        
+        {% elif post.image %}
+        
+        <!-- =========================
+             📝 Blog旧1枚画像
+        ========================= -->
+        
         <button type="button" class="user-detail-media-item media-image" data-full-image="{{ post.image.url }}"
             aria-label="画像を拡大">
-
+        
             <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
-
+        
             <span class="media-type-badge blog-badge">
                 📝
             </span>
-
+        
         </button>
-
+        
+        {% endif %}
+        
         {% endfor %}
 
     </div>

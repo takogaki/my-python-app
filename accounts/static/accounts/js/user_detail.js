@@ -140,7 +140,7 @@ document.addEventListener("click", async (e) => {
         ================================================== */
 
         const mediaItem = event.target.closest(
-            ".user-detail-media-item[data-full-image]"
+            ".user-detail-media-item[data-full-image], .user-detail-media-stack-card[data-full-image]"
         );
 
         if (mediaItem) {

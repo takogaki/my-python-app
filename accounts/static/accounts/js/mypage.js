@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ========================= */
 
         const mediaItem = event.target.closest(
-            ".mypage-media-item[data-full-image]"
+            ".mypage-media-item[data-full-image], .mypage-media-stack-card[data-full-image]"
         );
 
         if (mediaItem) {

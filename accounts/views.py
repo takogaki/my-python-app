@@ -298,11 +298,13 @@ class UserDetailView(DetailView):
         # =========================
         context["blog_image_posts"] = (
             Post.objects
+            .filter(author=user)
             .filter(
-                author=user,
-                image__isnull=False,
+                Q(image__isnull=False, image__gt="")
+                | Q(images__isnull=False)
             )
-            .exclude(image="")
+            .prefetch_related("images")
+            .distinct()
             .order_by("-posted_date")
         )
 
@@ -793,14 +795,15 @@ def mypage(request):
     # Blog画像
     blog_image_posts = (
         Post.objects
+        .filter(author=user)
         .filter(
-            author=user,
-            image__isnull=False,
+            Q(image__isnull=False, image__gt="")
+            | Q(images__isnull=False)
         )
-        .exclude(image="")
+        .prefetch_related("images")
+        .distinct()
         .order_by("-posted_date")
     )
-
     # =========================
     # 🌟 SPIRIT集計
     # =========================
