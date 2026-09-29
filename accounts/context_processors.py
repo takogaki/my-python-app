@@ -60,7 +60,7 @@ def notification_unread_count(request):
 
     if not request.user.is_authenticated:
         return {
-            "notification_unread_total": 9999
+            "notification_unread_total": 0
         }
 
     notification_unread_total = Notification.objects.filter(
@@ -81,5 +81,5 @@ def notification_unread_count(request):
     )
 
     return {
-        "notification_unread_total": 9999
+        "notification_unread_total": notification_unread_total
     }
