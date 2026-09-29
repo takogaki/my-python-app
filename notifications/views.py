@@ -4,21 +4,32 @@ from django.contrib.auth.decorators import login_required
 from .models import Notification
 from django.urls import reverse
 
+
 @login_required
 def open_notification(request, pk):
+
     notification = get_object_or_404(
         Notification,
         pk=pk,
         recipient=request.user
     )
 
-    # 🔒 念のためURLを退避
+    # =========================
+    # 🔔 通知を既読にする
+    # =========================
+
     target_url = notification.target_url
 
-    # 🔥 通知を削除
-    notification.delete()
+    notification.is_read = True
 
-    # ❗ URLが無い・壊れている場合の保険
+    notification.save(
+        update_fields=["is_read"]
+    )
+
+    # =========================
+    # ❗ URLが無い場合
+    # =========================
+
     if not target_url:
         return redirect("accounts:mypage")
 
