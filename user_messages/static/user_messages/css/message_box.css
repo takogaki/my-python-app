@@ -96,7 +96,61 @@
  中央
 ========================= */
 .dm-main {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 0;
+}
+
+
+/* ユーザー情報も必ずカード内に収める */
+.dm-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+
+/* 上段も横幅を超えない */
+.dm-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    min-width: 0;
+    width: 100%;
+}
+
+
+/* 名前 */
+.dm-name {
+    font-weight: 600;
+    font-size: 15px;
+
+    min-width: 0;
+    max-width: 100%;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* 称号 */
+.dm-user-info .user-spirit-title {
+    display: block;
+
+    max-width: 100%;
+
+    margin-bottom: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dm-top {
@@ -140,6 +194,10 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 6px;
+
+    flex: 0 0 auto;
+    min-width: 0;
+    margin-left: 8px;
 }
 
 /* 未読バッジ */
