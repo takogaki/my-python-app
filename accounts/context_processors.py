@@ -77,7 +77,24 @@ def notification_unread_count(request):
     print(
         "★★★ NOTIFICATION DEBUG ★★★",
         request.user.username,
-        notification_unread_total
+        notification_unread_total,
+        list(
+            Notification.objects.filter(
+                recipient=request.user,
+                is_read=False,
+                type__in=[
+                    "tag_match",
+                    "footprint",
+                    "like",
+                    "match",
+                ],
+            ).values(
+                "id",
+                "type",
+                "verb",
+                "is_read",
+            )
+        )
     )
 
     return {
