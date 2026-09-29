@@ -406,3 +406,245 @@
     display: block;
 }
 
+
+/* ==================================================
+   MESSAGE BOX
+   HEADER / FOOTER 完全固定
+   ================================================== */
+
+
+/* ==================================================
+   1. このページだけ全体スクロールを停止
+   ================================================== */
+
+html:has(.message-tabs),
+body:has(.message-tabs) {
+
+    width: 100% !important;
+    height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+}
+
+
+/* ==================================================
+   2. HEADER 完全固定
+   ================================================== */
+
+body:has(.message-tabs) .site-header {
+
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+
+    height: 60px !important;
+
+    z-index: 1000000 !important;
+
+    margin: 0 !important;
+
+}
+
+
+/* ==================================================
+   3. FOOTER 完全固定
+   ================================================== */
+
+body:has(.message-tabs) .feed-footer {
+
+    position: fixed !important;
+
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+
+    height:
+        calc(
+            70px
+            +
+            env(safe-area-inset-bottom)
+        )
+        !important;
+
+    padding-bottom:
+        env(safe-area-inset-bottom)
+        !important;
+
+    box-sizing: border-box !important;
+
+    z-index: 1000000 !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+}
+
+
+/* ==================================================
+   4. ページ本体
+   HEADER ～ FOOTER の間だけスクロール
+   ================================================== */
+
+body:has(.message-tabs) .page-container {
+
+    position: fixed !important;
+
+    top: 60px !important;
+
+    bottom:
+        calc(
+            70px
+            +
+            env(safe-area-inset-bottom)
+        )
+        !important;
+
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    height: auto !important;
+
+    margin: 0 !important;
+
+    padding:
+        0
+        10px
+        20px
+        10px
+        !important;
+
+    box-sizing: border-box !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    -webkit-overflow-scrolling: touch !important;
+
+    overscroll-behavior-y: contain !important;
+
+}
+
+
+/* ==================================================
+   5. タブ固定
+   HEADERの直下
+   ================================================== */
+
+body:has(.message-tabs) .message-tabs {
+
+    position: fixed !important;
+
+    top: 60px !important;
+
+    left: 50% !important;
+
+    transform: translateX(-50%) !important;
+
+    width: calc(100% - 20px) !important;
+
+    max-width: 580px !important;
+
+    z-index: 999999 !important;
+
+}
+
+
+/* ==================================================
+   6. タブの下に余白
+   ================================================== */
+
+body:has(.message-tabs) .tab-panel {
+
+    padding-top: 80px !important;
+
+    padding-bottom: 20px !important;
+
+}
+
+
+/* ==================================================
+   7. スクロールバー
+   ================================================== */
+
+body:has(.message-tabs) .page-container::-webkit-scrollbar {
+
+    width: 4px !important;
+
+}
+
+
+body:has(.message-tabs) .page-container::-webkit-scrollbar-track {
+
+    background: transparent !important;
+
+}
+
+
+body:has(.message-tabs) .page-container::-webkit-scrollbar-thumb {
+
+    background: rgba(0, 0, 0, 0.25) !important;
+
+    border-radius: 10px !important;
+
+}
+
+
+/* ==================================================
+   8. スマホ
+   ================================================== */
+
+@media (max-width: 600px) {
+
+    body:has(.message-tabs) .site-header {
+
+        height: 60px !important;
+
+    }
+
+
+    body:has(.message-tabs) .page-container {
+
+        top: 60px !important;
+
+        bottom:
+            calc(
+                70px
+                +
+                env(safe-area-inset-bottom)
+            )
+            !important;
+
+        padding:
+            0
+            6px
+            16px
+            6px
+            !important;
+
+    }
+
+
+    body:has(.message-tabs) .message-tabs {
+
+        top: 60px !important;
+
+        width:
+            calc(100% - 16px)
+            !important;
+
+    }
+
+}
