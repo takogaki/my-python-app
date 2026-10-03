@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let touchStartX = 0;
     let touchStartY = 0;
 
+    let currentPostUrl = "";
+    let postLinkTimer = null;
 
     /* ==================================================
        DOM
@@ -76,6 +78,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.getElementById("mypage-modal-image");
     }
 
+    function getModalPostLink() {
+        return document.getElementById("mypage-modal-post-link");
+    }
 
     /* ==================================================
        モーダルにナビゲーションボタンを作成
@@ -218,10 +223,15 @@ document.addEventListener("DOMContentLoaded", function () {
        画像を開く
     ================================================== */
 
-    function openMypageImageModal(images, startIndex) {
+    function openMypageImageModal(
+        images,
+        startIndex,
+        postUrl
+    ) {
 
         const modal = getModal();
         const modalImage = getModalImage();
+        const postLink = getModalPostLink();
 
         if (
             !modal ||
@@ -230,6 +240,43 @@ document.addEventListener("DOMContentLoaded", function () {
             !images.length
         ) {
             return;
+        }
+
+
+        /* =========================
+        投稿URL
+        ========================= */
+
+        currentPostUrl = postUrl || "";
+
+
+        /* =========================
+        投稿リンクを初期化
+        ========================= */
+
+        if (postLink) {
+
+            postLink.classList.remove(
+                "is-visible"
+            );
+
+            postLink.removeAttribute("href");
+
+        }
+
+
+        /* =========================
+        既存タイマー解除
+        ========================= */
+
+        if (postLinkTimer) {
+
+            clearTimeout(
+                postLinkTimer
+            );
+
+            postLinkTimer = null;
+
         }
 
 
@@ -256,6 +303,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.body.style.overflow = "hidden";
 
+
+        /* =========================
+        📝 0.5秒後に投稿リンク表示
+        ========================= */
+
+        if (
+            currentPostUrl &&
+            postLink
+        ) {
+
+            postLinkTimer = setTimeout(
+                function () {
+
+                    postLink.href =
+                        currentPostUrl;
+
+                    postLink.classList.add(
+                        "is-visible"
+                    );
+
+                },
+                500
+            );
+
+        }
+
     }
 
 
@@ -267,9 +340,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const modal = getModal();
         const modalImage = getModalImage();
+        const postLink = getModalPostLink();
 
         if (!modal) {
             return;
+        }
+
+
+        /* =========================
+        📝 投稿リンクタイマー解除
+        ========================= */
+
+        if (postLinkTimer) {
+
+            clearTimeout(
+                postLinkTimer
+            );
+
+            postLinkTimer = null;
+
+        }
+
+
+        /* =========================
+        投稿リンク初期化
+        ========================= */
+
+        currentPostUrl = "";
+
+        if (postLink) {
+
+            postLink.classList.remove(
+                "is-visible"
+            );
+
+            postLink.removeAttribute(
+                "href"
+            );
+
         }
 
         modal.classList.remove("is-open");
@@ -376,15 +484,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
+                const postUrl =
+                    mediaItem.dataset.postUrl || "";
+
+
                 openMypageImageModal(
                     images,
-                    clickedIndex >= 0 ? clickedIndex : 0
+                    clickedIndex >= 0 ? clickedIndex : 0,
+                    postUrl
                 );
 
 
                 return;
             }
-
 
             /* ==================================================
                通常の1枚画像
@@ -394,9 +506,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (imageUrl) {
 
+                const postUrl =
+                    mediaItem.dataset.postUrl || "";
+
+
                 openMypageImageModal(
                     [imageUrl],
-                    0
+                    0,
+                    postUrl
                 );
 
             }

@@ -92,15 +92,17 @@ document.addEventListener("click", async (e) => {
     let currentImages = [];
     let currentIndex = 0;
 
+    let currentPostUrl = "";
+    let postLinkTimer = null;
+
     let touchStartX = 0;
     let touchStartY = 0;
-
 
     /* ==================================================
        画像を開く
     ================================================== */
 
-    function openImageModal(images, startIndex) {
+    function openImageModal(images, startIndex, postUrl) {
 
         const imageModal = document.getElementById(
             "user-detail-image-modal"
@@ -121,6 +123,7 @@ document.addEventListener("click", async (e) => {
 
         currentImages = images;
         currentIndex = startIndex || 0;
+        currentPostUrl = postUrl || "";
 
         /* 範囲外防止 */
         if (currentIndex < 0) {
@@ -133,9 +136,42 @@ document.addEventListener("click", async (e) => {
 
         modalImage.src = currentImages[currentIndex];
 
+        /* ==================================================
+        📝 投稿ページボタン
+        ================================================== */
+
+        const postLink = document.getElementById(
+            "user-detail-modal-post-link"
+        );
+
+        /* 前回のタイマーを解除 */
+        if (postLinkTimer) {
+            clearTimeout(postLinkTimer);
+            postLinkTimer = null;
+        }
+
+        /* 最初は非表示 */
+        if (postLink) {
+            postLink.classList.remove("is-visible");
+            postLink.removeAttribute("href");
+        }
+
+        /* モーダル表示 */
         imageModal.classList.add("is-open");
 
         document.body.style.overflow = "hidden";
+
+        /* 0.5秒後にふんわり表示 */
+        if (currentPostUrl && postLink) {
+
+            postLinkTimer = setTimeout(function () {
+
+                postLink.href = currentPostUrl;
+
+                postLink.classList.add("is-visible");
+
+            }, 500);
+        }
     }
 
 
@@ -153,6 +189,10 @@ document.addEventListener("click", async (e) => {
             "user-detail-modal-image"
         );
 
+        const postLink = document.getElementById(
+            "user-detail-modal-post-link"
+        );
+
         if (!imageModal) {
             return;
         }
@@ -160,6 +200,22 @@ document.addEventListener("click", async (e) => {
         imageModal.classList.remove("is-open");
 
         document.body.style.overflow = "";
+
+        /* ==================================================
+        📝 投稿ボタンをリセット
+        ================================================== */
+
+        if (postLinkTimer) {
+            clearTimeout(postLinkTimer);
+            postLinkTimer = null;
+        }
+
+        currentPostUrl = "";
+
+        if (postLink) {
+            postLink.classList.remove("is-visible");
+            postLink.removeAttribute("href");
+        }
 
         if (modalImage) {
             modalImage.src = "";
@@ -270,7 +326,8 @@ document.addEventListener("click", async (e) => {
 
                 openImageModal(
                     images,
-                    clickedIndex >= 0 ? clickedIndex : 0
+                    clickedIndex >= 0 ? clickedIndex : 0,
+                    mediaItem.dataset.postUrl || ""
                 );
 
                 return;
@@ -287,7 +344,8 @@ document.addEventListener("click", async (e) => {
 
                 openImageModal(
                     [imageUrl],
-                    0
+                    0,
+                    mediaItem.dataset.postUrl || ""
                 );
 
             }

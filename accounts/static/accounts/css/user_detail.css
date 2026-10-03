@@ -1006,3 +1006,76 @@ LIKEボタン
         line-height: 42px;
     }
 }
+
+/* ==================================================
+   📝 画像拡大 → 投稿ページへ
+================================================== */
+
+.user-detail-modal-post-link {
+    display: block;
+
+    position: fixed;
+    left: 50%;
+
+    /* footerに隠れない位置 */
+    bottom: 90px;
+
+    transform: translateX(-50%) translateY(10px);
+
+    z-index: 100002;
+
+    padding: 13px 22px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.95);
+    color: #222;
+
+    text-decoration: none;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 4px 18px rgba(0, 0, 0, 0.25);
+
+    /* 最初は見えない */
+    opacity: 0;
+    visibility: hidden;
+
+    /* ふんわり表示 */
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease,
+        visibility 0.35s;
+}
+
+
+/* ==================================================
+   📝 0.5秒後にふんわり表示
+================================================== */
+
+.user-detail-modal-post-link.is-visible {
+
+    opacity: 1;
+    visibility: visible;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+
+/* ==================================================
+   👆 タップ時
+================================================== */
+
+.user-detail-modal-post-link:active {
+
+    transform:
+        translateX(-50%)
+        translateY(0)
+        scale(0.96);
+}

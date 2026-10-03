@@ -199,14 +199,14 @@
         {% elif post.image %}
 
         <button type="button" class="user-detail-media-item media-image" data-full-image="{{ post.image.url }}"
-            aria-label="画像を拡大">
-
+            data-post-url="{% url 'feed' %}#post-{{ post.id }}" aria-label="画像を拡大">
+        
             <img src="{{ post.image.url }}" alt="Feed投稿画像" loading="lazy">
-
+        
             <span class="media-type-badge">
                 📷
             </span>
-
+        
         </button>
 
         {% endif %}
@@ -230,7 +230,7 @@
             {% for post_image in post.images.all %}
         
             <button type="button" class="user-detail-media-stack-card {% if forloop.first %}is-front{% endif %}"
-                data-full-image="{{ post_image.image.url }}" aria-label="投稿画像を拡大">
+                data-full-image="{{ post_image.image.url }}" data-post-url="{{ post.get_absolute_url }}" aria-label="投稿画像を拡大">
         
                 <img src="{{ post_image.image.url }}" alt="{{ post.title }}" loading="lazy">
         
@@ -259,7 +259,7 @@
         ========================= -->
         
         <button type="button" class="user-detail-media-item media-image" data-full-image="{{ post.image.url }}"
-            aria-label="画像を拡大">
+            data-post-url="{{ post.get_absolute_url }}" aria-label="画像を拡大">
         
             <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
         
@@ -398,6 +398,10 @@
     </button>
 
     <img id="user-detail-modal-image" class="user-detail-modal-image" src="" alt="拡大画像">
+
+    <a id="user-detail-modal-post-link" class="user-detail-modal-post-link" href="#">
+        📝 投稿を見る
+    </a>
 
 </div>
 

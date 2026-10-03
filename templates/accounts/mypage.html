@@ -407,10 +407,10 @@
             {% elif post.image %}
     
             <button type="button" class="mypage-media-item media-image" data-full-image="{{ post.image.url }}"
-                aria-label="画像を拡大">
-    
+                data-post-url="/feed/#post-{{ post.id }}" aria-label="画像を拡大">
+            
                 <img src="{{ post.image.url }}" alt="Feed投稿画像" loading="lazy">
-    
+            
             </button>
     
             {% endif %}
@@ -435,18 +435,19 @@
                 {% for post_image in post.images.all %}
             
                 <button type="button" class="mypage-media-stack-card {% if forloop.first %}is-front{% endif %}"
-                    data-full-image="{{ post_image.image.url }}" aria-label="投稿画像を拡大">
-            
+                    data-full-image="{{ post_image.image.url }}" data-post-url="{% url 'blog:post_detail' post.slug %}"
+                    aria-label="投稿画像を拡大">
+                
                     <img src="{{ post_image.image.url }}" alt="{{ post.title }}" loading="lazy">
-            
+                
                     {% if forloop.first %}
                     <span class="media-type-badge blog-badge">
                         📝
                     </span>
                     {% endif %}
-            
+                
                 </button>
-            
+
                 {% endfor %}
             
                 {% if post.images.count > 1 %}
@@ -463,7 +464,8 @@
                  📝 Blog旧1枚画像
             ========================= -->
             
-            <button type="button" class="mypage-media-item media-image" data-full-image="{{ post.image.url }}" aria-label="画像を拡大">
+            <button type="button" class="mypage-media-item media-image" data-full-image="{{ post.image.url }}"
+                data-post-url="{% url 'blog:post_detail' post.slug %}" aria-label="画像を拡大">
             
                 <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
             
@@ -726,6 +728,11 @@
     </button>
 
     <img id="mypage-modal-image" class="mypage-modal-image" src="" alt="拡大画像">
+
+    <!-- 投稿ページへ -->
+    <a id="mypage-modal-post-link" class="mypage-modal-post-link" href="#">
+        📝 投稿を見る
+    </a>
 
 </div>
 

@@ -68,7 +68,7 @@ Spirytus動画｜SPIRYTUS
             
             {% if item.type == "post" %}
             {% with post=item.data %}
-            <div class="video-card snap-item">
+            <div id="post-{{ post.id }}" class="video-card snap-item">
             
                 <div class="double-heart">❤️</div>
             
