@@ -148,15 +148,73 @@
 
         {% endif %}
 
-        {% if post.image %}
-
+        {% if post.images.all %}
+        
+        <div class="post-image-slider">
+        
+            <div class="post-image-track">
+        
+                {% for post_image in post.images.all %}
+        
+                <div class="post-image-slide">
+                
+                    <img src="{{ post_image.image.url }}" class="post-media-thumb post-image" alt="{{ post.title|default:'投稿画像' }}">
+                
+                </div>
+        
+                {% endfor %}
+        
+            </div>
+        
+        
+            {% if post.images.count > 1 %}
+        
+            <!-- 左ボタン -->
+            <button type="button" class="slider-button slider-prev" aria-label="前の画像">
+                ‹
+            </button>
+        
+        
+            <!-- 右ボタン -->
+            <button type="button" class="slider-button slider-next" aria-label="次の画像">
+                ›
+            </button>
+        
+        
+            <!-- ドット -->
+            <div class="slider-dots">
+        
+                {% for post_image in post.images.all %}
+        
+                <span class="slider-dot {% if forloop.first %}active{% endif %}"></span>
+        
+                {% endfor %}
+        
+            </div>
+        
+        
+            <!-- 枚数 -->
+            <div class="slider-counter">
+                <span class="slider-current">1</span>
+                /
+                {{ post.images.count }}
+            </div>
+        
+            {% endif %}
+        
+        </div>
+        
+        {% elif post.image %}
+        
+        <!-- 旧形式：1枚画像 -->
+        
         <div class="post-image-wrapper">
-
+        
             <img src="{{ post.image.url }}" class="post-media-thumb post-image" alt="{{ post.title|default:'投稿画像' }}"
                 loading="lazy">
-
+        
         </div>
-
+        
         {% endif %}
 
         {% if post.video_url %}
@@ -350,6 +408,118 @@
 
 <script src="{% static 'blog/js/blog.js' %}"></script>
 
+<script src="{% static 'blog/js/blog.js' %}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const slider = document.querySelector(".post-image-slider");
+
+        if (!slider) {
+            return;
+        }
+
+        const track = slider.querySelector(".post-image-track");
+        const slides = slider.querySelectorAll(".post-image-slide");
+
+        const prevButton = slider.querySelector(".slider-prev");
+        const nextButton = slider.querySelector(".slider-next");
+
+        const dots = slider.querySelectorAll(".slider-dot");
+        const currentCounter = slider.querySelector(".slider-current");
+
+        if (!track || slides.length <= 1) {
+            return;
+        }
+
+        let currentIndex = 0;
+
+
+        function updateSlider() {
+
+            track.style.transform =
+                `translateX(-${currentIndex * 100}%)`;
+
+
+            /* ドット */
+            dots.forEach(function (dot, index) {
+
+                dot.classList.toggle(
+                    "active",
+                    index === currentIndex
+                );
+
+            });
+
+
+            /* 枚数 */
+            if (currentCounter) {
+
+                currentCounter.textContent =
+                    currentIndex + 1;
+
+            }
+
+
+            /* ボタン */
+            if (prevButton) {
+
+                prevButton.disabled =
+                    currentIndex === 0;
+
+            }
+
+            if (nextButton) {
+
+                nextButton.disabled =
+                    currentIndex === slides.length - 1;
+
+            }
+
+        }
+
+
+        /* 前へ */
+        if (prevButton) {
+
+            prevButton.addEventListener("click", function () {
+
+                if (currentIndex > 0) {
+
+                    currentIndex--;
+
+                    updateSlider();
+
+                }
+
+            });
+
+        }
+
+
+        /* 次へ */
+        if (nextButton) {
+
+            nextButton.addEventListener("click", function () {
+
+                if (currentIndex < slides.length - 1) {
+
+                    currentIndex++;
+
+                    updateSlider();
+
+                }
+
+            });
+
+        }
+
+
+        /* 初期状態 */
+        updateSlider();
+
+    });
+</script>
 
 <script async src="https://www.tiktok.com/embed.js"></script>
 
