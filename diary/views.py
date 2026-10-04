@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .forms import PageForm 
-from .models import Page, LikeRecord, GuestLikeRecord
+from .models import Page, LikeRecord, GuestLikeRecord, SiteNotice
 from django.contrib.auth import get_user_model
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -14,32 +14,43 @@ from django.db.models import F
 from accounts.utils import save_page_log
 import uuid
 from django.db import transaction
+from django.contrib import messages
 
 User = get_user_model()
 
 
-def index(request):
-    # =========================
-    # ページログ保存
-    # =========================
-    if request.user.is_authenticated:
-        save_page_log(request, "index")
-    
-    return render(request, "diary/index.html")
-
-
 class IndexView(View):
+
     def get(self, request):
+
+        # =========================
+        # ページログ保存
+        # =========================
+        if request.user.is_authenticated:
+            save_page_log(request, "index")
+
+        # =========================
+        # 現在日時
+        # =========================
         datetime_now = datetime.now(
             ZoneInfo("Asia/Tokyo")
         ).strftime("%Y年%m月%d日 %H:%M:%S")
 
-        return render(request, "diary/index.html", {
-            "datetime_now": datetime_now
-        })
+        # =========================
+        # 🔔 お知らせ
+        # =========================
+        notices = SiteNotice.objects.filter(
+            is_active=True
+        ).order_by("-published_at")
 
-
-from django.contrib import messages
+        return render(
+            request,
+            "diary/index.html",
+            {
+                "datetime_now": datetime_now,
+                "notices": notices,
+            }
+        )
 
 
 class PageCreateView(LoginRequiredMixin, CreateView):

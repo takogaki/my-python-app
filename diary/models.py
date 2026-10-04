@@ -127,3 +127,41 @@ class GuestLikeRecord(models.Model):
 
     class Meta:
         unique_together = ("guest_id", "page")
+
+
+# ==========================================
+# 🔔 サイトお知らせ
+# ==========================================
+class SiteNotice(models.Model):
+
+    title = models.CharField(
+        "タイトル",
+        max_length=200
+    )
+
+    message = models.TextField(
+        "本文"
+    )
+
+    published_at = models.DateTimeField(
+        "公開日時",
+        auto_now_add=True
+    )
+
+    is_active = models.BooleanField(
+        "公開する",
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        "作成日時",
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = "サイトお知らせ"
+        verbose_name_plural = "サイトお知らせ"
+        ordering = ["-published_at"]
+
+    def __str__(self):
+        return self.title

@@ -12,6 +12,68 @@
 
 {% block body %}
 
+<!-- 🔔 お知らせ -->
+<div class="site-notice">
+
+        <button type="button" class="site-notice-button" id="noticeButton" aria-expanded="false"
+                aria-controls="noticePanel">
+                <span class="site-notice-icon">🔔</span>
+                <span>お知らせ</span>
+
+                {% if notices %}
+                <span class="site-notice-new">NEW</span>
+                {% endif %}
+        </button>
+
+
+        <div class="site-notice-panel" id="noticePanel" hidden>
+
+                <div class="site-notice-header">
+
+                        <span>📢 お知らせ</span>
+
+                        <button type="button" id="noticeClose" aria-label="閉じる">
+                                ×
+                        </button>
+
+                </div>
+
+
+                <div class="site-notice-list">
+
+                        {% for notice in notices %}
+
+                        <div class="site-notice-item">
+
+                                <span class="notice-date">
+                                        {{ notice.published_at|date:"Y.m.d" }}
+                                </span>
+
+                                <h4>
+                                        {{ notice.title }}
+                                </h4>
+
+                                <p>
+                                        {{ notice.message|linebreaksbr }}
+                                </p>
+
+                        </div>
+
+                        {% empty %}
+
+                        <div class="site-notice-empty">
+                                現在、お知らせはありません。
+                        </div>
+
+                        {% endfor %}
+
+                </div>
+
+        </div>
+
+</div>
+
+
 <main class="top">
         <div class="dashboard">
 
@@ -132,5 +194,105 @@
         </p>
 
 </footer>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+                const noticeButton = document.getElementById("noticeButton");
+                const noticePanel = document.getElementById("noticePanel");
+                const noticeClose = document.getElementById("noticeClose");
+
+                if (!noticeButton || !noticePanel) {
+                        return;
+                }
+
+
+                // =====================================
+                // 🔔 お知らせを開く
+                // =====================================
+
+                noticeButton.addEventListener("click", function (event) {
+
+                        event.stopPropagation();
+
+                        const isHidden = noticePanel.hasAttribute("hidden");
+
+                        if (isHidden) {
+
+                                noticePanel.removeAttribute("hidden");
+
+                                noticeButton.setAttribute(
+                                        "aria-expanded",
+                                        "true"
+                                );
+
+                        } else {
+
+                                noticePanel.setAttribute(
+                                        "hidden",
+                                        ""
+                                );
+
+                                noticeButton.setAttribute(
+                                        "aria-expanded",
+                                        "false"
+                                );
+                        }
+
+                });
+
+
+                // =====================================
+                // × 閉じる
+                // =====================================
+
+                if (noticeClose) {
+
+                        noticeClose.addEventListener("click", function (event) {
+
+                                event.stopPropagation();
+
+                                noticePanel.setAttribute(
+                                        "hidden",
+                                        ""
+                                );
+
+                                noticeButton.setAttribute(
+                                        "aria-expanded",
+                                        "false"
+                                );
+
+                        });
+
+                }
+
+
+                // =====================================
+                // 外側をクリックしたら閉じる
+                // =====================================
+
+                document.addEventListener("click", function (event) {
+
+                        if (
+                                !noticePanel.contains(event.target) &&
+                                !noticeButton.contains(event.target)
+                        ) {
+
+                                noticePanel.setAttribute(
+                                        "hidden",
+                                        ""
+                                );
+
+                                noticeButton.setAttribute(
+                                        "aria-expanded",
+                                        "false"
+                                );
+
+                        }
+
+                });
+
+        });
+</script>
 
 {% endblock %}

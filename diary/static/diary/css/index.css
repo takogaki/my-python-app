@@ -274,3 +274,221 @@
     }
 
 }
+
+/* =========================================
+   🔔 お知らせ
+========================================= */
+
+.site-notice {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+
+        z-index: 99999;
+}
+
+
+/* =========================================
+   お知らせボタン
+========================================= */
+
+.site-notice-button {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+
+        padding: 9px 13px;
+
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+
+        background: rgba(20, 20, 20, 0.9);
+        color: #fff;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+
+        transition: transform 0.2s ease,
+                    background 0.2s ease;
+}
+
+.site-notice-button:hover {
+        transform: translateY(-1px);
+        background: rgba(35, 35, 35, 0.95);
+}
+
+.site-notice-icon {
+        font-size: 15px;
+}
+
+
+/* =========================================
+   NEW
+========================================= */
+
+.site-notice-new {
+        padding: 2px 6px;
+
+        border-radius: 999px;
+
+        background: #ff3b30;
+        color: #fff;
+
+        font-size: 9px;
+        font-weight: 700;
+}
+
+
+/* =========================================
+   お知らせパネル
+========================================= */
+
+.site-notice-panel {
+        position: absolute;
+
+        top: 48px;
+        left: 0;
+
+        width: 310px;
+        max-width: calc(100vw - 28px);
+
+        background: #fff;
+        color: #111;
+
+        border-radius: 16px;
+
+        box-shadow:
+                0 15px 45px rgba(0, 0, 0, 0.25);
+
+        overflow: hidden;
+}
+
+
+/*
+   hidden属性が付いている間は
+   必ず非表示
+*/
+.site-notice-panel[hidden] {
+        display: none !important;
+}
+
+
+/* =========================================
+   ヘッダー
+========================================= */
+
+.site-notice-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 15px 17px;
+
+        border-bottom: 1px solid #eee;
+
+        font-size: 14px;
+        font-weight: 700;
+}
+
+.site-notice-header button {
+        border: none;
+        background: none;
+
+        color: #777;
+
+        font-size: 24px;
+        line-height: 1;
+
+        cursor: pointer;
+}
+
+
+/* =========================================
+   お知らせ一覧
+========================================= */
+
+.site-notice-list {
+        max-height: 400px;
+        overflow-y: auto;
+}
+
+.site-notice-item {
+        padding: 16px 17px;
+
+        border-bottom: 1px solid #eee;
+}
+
+.site-notice-item:last-child {
+        border-bottom: none;
+}
+
+.notice-date {
+        display: block;
+
+        margin-bottom: 6px;
+
+        color: #999;
+
+        font-size: 11px;
+}
+
+.site-notice-item h4 {
+        margin: 0 0 7px;
+
+        font-size: 14px;
+        line-height: 1.5;
+}
+
+.site-notice-item p {
+        margin: 0;
+
+        color: #666;
+
+        font-size: 12px;
+        line-height: 1.7;
+}
+
+
+/* =========================================
+   お知らせなし
+========================================= */
+
+.site-notice-empty {
+        padding: 25px 17px;
+
+        color: #888;
+
+        font-size: 13px;
+        text-align: center;
+}
+
+
+/* =========================================
+   スマホ
+========================================= */
+
+@media (max-width: 600px) {
+
+        .site-notice {
+                top: 10px;
+                left: 10px;
+        }
+
+        .site-notice-button {
+                padding: 8px 11px;
+                font-size: 12px;
+        }
+
+        .site-notice-panel {
+                top: 44px;
+                width: 290px;
+        }
+
+}

@@ -93,33 +93,29 @@
             
                     <!-- 通報フォーム -->
                     <form method="post" action="{% url 'blog:report_post' post.id %}" class="post-report-form" hidden>
-                        <form method="post" action="{% url 'blog:report_post' post.id %}" class="post-report-form">
-                        
-                            {% csrf_token %}
-                        
-                            <label for="report-reason-{{ post.id }}">
-                                通報理由を選択
-                            </label>
-                        
-                            <select id="report-reason-{{ post.id }}" name="reason" required>
-                        
-                                <option value="" selected disabled>
-                                    選択してください
-                                </option>
-                        
-                                <option value="sexual">卑猥</option>
-                                <option value="violent">暴力</option>
-                                <option value="harassment">嫌がらせ</option>
-                                <option value="spam">スパム</option>
-                                <option value="other">その他</option>
-                        
-                            </select>
-                        
-                            <button type="submit" class="post-menu-item">
-                                通報を送信
-                            </button>
-                        
-                        </form>
+                    
+                        {% csrf_token %}
+                    
+                        <label for="report-reason-{{ post.id }}">
+                            通報理由を選択
+                        </label>
+                    
+                        <select id="report-reason-{{ post.id }}" name="reason" required>
+                            <option value="" selected disabled>
+                                選択してください
+                            </option>
+                            <option value="sexual">卑猥</option>
+                            <option value="violent">暴力</option>
+                            <option value="harassment">嫌がらせ</option>
+                            <option value="spam">スパム</option>
+                            <option value="other">その他</option>
+                        </select>
+                    
+                        <button type="submit" class="post-menu-item">
+                            通報を送信
+                        </button>
+                    
+                    </form>
             
                 </div>
             </div>
@@ -408,8 +404,6 @@
 
 <script src="{% static 'blog/js/blog.js' %}"></script>
 
-<script src="{% static 'blog/js/blog.js' %}"></script>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -521,7 +515,7 @@
     });
 </script>
 
-<script async src="https://www.tiktok.com/embed.js"></script>
+<script async src="https://www.tiktok.com/embed.js"></>
 
 <script async src="https://www.instagram.com/embed.js"></script>
 
