@@ -151,6 +151,9 @@
 <body {% if post is not None %} data-post="{{ post.id }}" {% endif %}
     class="{% block body_class %}{% endblock %}">
 
+    {% block site_notice %}
+    {% endblock %}
+
     <!-- =========================
     📤 投稿中表示
     ========================= -->

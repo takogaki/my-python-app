@@ -12,59 +12,40 @@
 
 {% block body %}
 
-<!-- 🔔 お知らせ -->
+{% if notices %}
 <div class="site-notice">
 
         <button type="button" class="site-notice-button" id="noticeButton" aria-expanded="false"
                 aria-controls="noticePanel">
                 <span class="site-notice-icon">🔔</span>
                 <span>お知らせ</span>
-
-                {% if notices %}
                 <span class="site-notice-new">NEW</span>
-                {% endif %}
         </button>
-
 
         <div class="site-notice-panel" id="noticePanel" hidden>
 
                 <div class="site-notice-header">
-
                         <span>📢 お知らせ</span>
 
                         <button type="button" id="noticeClose" aria-label="閉じる">
                                 ×
                         </button>
-
                 </div>
-
 
                 <div class="site-notice-list">
 
                         {% for notice in notices %}
-
                         <div class="site-notice-item">
 
                                 <span class="notice-date">
                                         {{ notice.published_at|date:"Y.m.d" }}
                                 </span>
 
-                                <h4>
-                                        {{ notice.title }}
-                                </h4>
+                                <h4>{{ notice.title }}</h4>
 
-                                <p>
-                                        {{ notice.message|linebreaksbr }}
-                                </p>
+                                <p>{{ notice.message|linebreaksbr }}</p>
 
                         </div>
-
-                        {% empty %}
-
-                        <div class="site-notice-empty">
-                                現在、お知らせはありません。
-                        </div>
-
                         {% endfor %}
 
                 </div>
@@ -72,7 +53,7 @@
         </div>
 
 </div>
-
+{% endif %}
 
 <main class="top">
         <div class="dashboard">
