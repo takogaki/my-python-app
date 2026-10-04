@@ -110,13 +110,70 @@ Spirytus動画｜SPIRYTUS
             
                 </div>
             
-                <!-- メディア -->
+                <!-- =========================
+                     メディア
+                ========================= -->
+                
                 {% if post.media_type == "video" %}
+                
                 <video muted playsinline preload="metadata">
                     <source src="{{ post.video.url }}">
                 </video>
+                
                 {% elif post.media_type == "image" %}
+                
+                {% with images=post.images.all %}
+                
+                {% if images %}
+                
+                <div class="feed-image-slider">
+                
+                    <div class="feed-image-track">
+                
+                        {% for post_image in images %}
+                
+                        <div class="feed-image-slide">
+                            <img src="{{ post_image.image.url }}" class="feed-post-image" alt="">
+                        </div>
+                
+                        {% endfor %}
+                
+                    </div>
+                
+                    {% if images|length > 1 %}
+                
+                    <button type="button" class="feed-image-prev" aria-label="前の画像">
+                        ‹
+                    </button>
+                
+                    <button type="button" class="feed-image-next" aria-label="次の画像">
+                        ›
+                    </button>
+                
+                    <div class="feed-image-dots">
+                
+                        {% for post_image in images %}
+                
+                        <span class="feed-image-dot {% if forloop.first %}active{% endif %}"></span>
+                
+                        {% endfor %}
+                
+                    </div>
+                
+                    {% endif %}
+                
+                </div>
+                
+                {% elif post.image %}
+                
+                {# 旧仕様の1枚画像 #}
+                
                 <img src="{{ post.image.url }}" class="feed-post-image" alt="">
+                
+                {% endif %}
+                
+                {% endwith %}
+                
                 {% endif %}
                 
                 {% if post.caption %}

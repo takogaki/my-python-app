@@ -747,3 +747,213 @@ document.addEventListener("keydown", (event) => {
     }
 
 });
+
+/* ==================================================
+📷 Feed複数画像スライダー
+================================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const sliders =
+        document.querySelectorAll(".feed-image-slider");
+
+    sliders.forEach(slider => {
+
+        const track =
+            slider.querySelector(".feed-image-track");
+
+        const slides =
+            slider.querySelectorAll(".feed-image-slide");
+
+        const prev =
+            slider.querySelector(".feed-image-prev");
+
+        const next =
+            slider.querySelector(".feed-image-next");
+
+        const dots =
+            slider.querySelectorAll(".feed-image-dot");
+
+        if (!track || slides.length <= 1) {
+            return;
+        }
+
+        let currentIndex = 0;
+
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+
+        /* =========================
+        表示更新
+        ========================= */
+
+        function updateSlider() {
+
+            track.style.transform =
+                `translateX(-${currentIndex * 100}%)`;
+
+            dots.forEach((dot, index) => {
+
+                dot.classList.toggle(
+                    "active",
+                    index === currentIndex
+                );
+
+            });
+
+        }
+
+
+        /* =========================
+        次へ
+        ========================= */
+
+        next?.addEventListener("click", (event) => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (currentIndex < slides.length - 1) {
+
+                currentIndex++;
+
+                updateSlider();
+
+            }
+
+        });
+
+
+        /* =========================
+        前へ
+        ========================= */
+
+        prev?.addEventListener("click", (event) => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (currentIndex > 0) {
+
+                currentIndex--;
+
+                updateSlider();
+
+            }
+
+        });
+
+
+        /* =========================
+        ドット
+        ========================= */
+
+        dots.forEach((dot, index) => {
+
+            dot.addEventListener("click", (event) => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                currentIndex = index;
+
+                updateSlider();
+
+            });
+
+        });
+
+
+        /* =========================
+        タッチ開始
+        ========================= */
+
+        slider.addEventListener(
+            "touchstart",
+            (event) => {
+
+                startX =
+                    event.touches[0].clientX;
+
+                currentX = startX;
+
+                isDragging = true;
+
+            },
+            { passive: true }
+        );
+
+
+        /* =========================
+        タッチ移動
+        ========================= */
+
+        slider.addEventListener(
+            "touchmove",
+            (event) => {
+
+                if (!isDragging) return;
+
+                currentX =
+                    event.touches[0].clientX;
+
+            },
+            { passive: true }
+        );
+
+
+        /* =========================
+        タッチ終了
+        ========================= */
+
+        slider.addEventListener(
+            "touchend",
+            () => {
+
+                if (!isDragging) return;
+
+                isDragging = false;
+
+                const diff =
+                    currentX - startX;
+
+                const threshold = 50;
+
+
+                // 左へスワイプ
+                if (
+                    diff < -threshold &&
+                    currentIndex < slides.length - 1
+                ) {
+
+                    currentIndex++;
+
+                }
+
+                // 右へスワイプ
+                else if (
+                    diff > threshold &&
+                    currentIndex > 0
+                ) {
+
+                    currentIndex--;
+
+                }
+
+                updateSlider();
+
+            }
+        );
+
+
+        /* =========================
+        初期状態
+        ========================= */
+
+        updateSlider();
+
+    });
+
+});

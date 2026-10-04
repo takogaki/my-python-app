@@ -1,5 +1,5 @@
 import uuid
-from .models import PostVideo, PostVideoLike, PostVideoComment, Recruit, RecruitParticipant, RecruitChatRoom, RecruitChatMessage, RecruitChatRead
+from .models import PostVideo, PostVideoImage, PostVideoLike, PostVideoComment, Recruit, RecruitParticipant, RecruitChatRoom, RecruitChatMessage, RecruitChatRead
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, Http404
@@ -29,6 +29,7 @@ def feed(request):
     posts = (
         PostVideo.objects
         .select_related("user")
+        .prefetch_related("images")
         .annotate(
             likes_total=Count("likes", distinct=True),
             user_likes=Count("user__received_likes", distinct=True)
@@ -160,40 +161,80 @@ def feed(request):
 # =========================
 @login_required
 def upload(request):
+
     if request.method == "POST":
 
-        media = request.FILES.get("media")  # ← name変更済み前提
         media_type = request.POST.get("media_type")
+        caption = request.POST.get("caption", "")
 
-        if not media:
+        # 複数ファイル取得
+        media_list = request.FILES.getlist("media")
+
+        # ファイルがない
+        if not media_list:
             return render(request, "videos/upload.html", {
                 "error": "ファイルを選択してください"
             })
 
-        post = PostVideo.objects.create(
-            user=request.user,
-            media_type=media_type,
-            caption=request.POST.get("caption")
+        # =========================
+        # 🖼️ 画像投稿
+        # =========================
+        if media_type == "image":
+
+            post = PostVideo.objects.create(
+                user=request.user,
+                media_type="image",
+                caption=caption
+            )
+
+            # 選択された画像をすべて保存
+            for media in media_list:
+
+                PostVideoImage.objects.create(
+                    post=post,
+                    image=media
+                )
+
+        # =========================
+        # 🎬 動画投稿
+        # =========================
+        elif media_type == "video":
+
+            # 動画は今まで通り1本だけ
+            if len(media_list) > 1:
+                return render(request, "videos/upload.html", {
+                    "error": "動画は1本だけ選択してください"
+                })
+
+            post = PostVideo.objects.create(
+                user=request.user,
+                media_type="video",
+                caption=caption,
+                video=media_list[0]
+            )
+
+        # =========================
+        # ❌ 不正なタイプ
+        # =========================
+        else:
+
+            return render(request, "videos/upload.html", {
+                "error": "投稿タイプが正しくありません"
+            })
+        
+        # =========================
+        # ✅ 投稿完了メッセージ
+        # =========================
+        messages.success(
+            request,
+            "投稿しました。"
         )
-
-        # 🔥 分岐保存
-        if media:
-            if media_type == "image":
-                post.image = media
-            elif media_type == "video":
-                post.video = media
-
-        post.save()
 
         return redirect("feed")
 
     return render(request, "videos/upload.html")
 
 
-
-# =========================
-# ❤️ Feedいいね
-# =========================
 # =========================
 # ❤️ Feedいいね
 # =========================

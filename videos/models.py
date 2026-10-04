@@ -58,6 +58,29 @@ class PostVideo(models.Model):
 
     def comment_count(self):
         return self.comments.count()
+    
+
+
+class PostVideoImage(models.Model):
+    post = models.ForeignKey(
+        PostVideo,
+        on_delete=models.CASCADE,
+        related_name="images"
+    )
+
+    image = CloudinaryField(
+        "image"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"{self.post.id} - {self.id}"
 
 
 # =========================

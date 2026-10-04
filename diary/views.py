@@ -39,6 +39,9 @@ class IndexView(View):
         })
 
 
+from django.contrib import messages
+
+
 class PageCreateView(LoginRequiredMixin, CreateView):
     model = Page
     form_class = PageForm
@@ -48,8 +51,15 @@ class PageCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.is_public = form.cleaned_data.get('is_public', True)
-        return super().form_valid(form)
 
+        response = super().form_valid(form)
+
+        messages.success(
+            self.request,
+            "投稿しました。"
+        )
+
+        return response
 
 class PageListView(LoginRequiredMixin, ListView):
     model = Page

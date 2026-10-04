@@ -170,6 +170,14 @@ def frontpage(request):
                     order=index,
                 )
 
+            # =========================
+            # ✅ 投稿完了メッセージ
+            # =========================
+            messages.success(
+                request,
+                "投稿しました。"
+            )
+
             response = redirect("blog:frontpage")
 
             if device_id and not request.COOKIES.get("device_id"):
