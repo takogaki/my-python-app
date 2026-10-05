@@ -498,78 +498,165 @@
 .past-notices {
     width: 100%;
     max-width: 760px;
-    margin: 50px auto 40px;
-    padding: 0 16px;
+    margin: 40px auto;
+    padding: 0 15px;
     box-sizing: border-box;
+    text-align: center;
 }
 
-.past-notices-title {
-    display: flex;
+
+/* ボタン */
+
+.past-notices-button {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 18px;
+    justify-content: center;
+
+    padding: 10px 18px;
+
+    border: 1px solid #ddd;
+    border-radius: 999px;
+
+    background: #fff;
+    color: #333;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+
+    list-style: none;
 }
 
-.past-notices-title span {
-    font-size: 20px;
+
+/* Safari / Chromeの三角マークを消す */
+
+.past-notices-button::-webkit-details-marker {
+    display: none;
 }
 
-.past-notices-title h2 {
-    margin: 0;
-    font-size: 18px;
+.past-notices-button::marker {
+    display: none;
+}
+
+
+/* ホバー */
+
+.past-notices-button:hover {
+    background: #f7f7f7;
+}
+
+
+/* ==========================================
+   開いた中身
+========================================== */
+
+.past-notices-panel {
+    width: 100%;
+    margin-top: 14px;
+
+    background: #fff;
+
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+
+    overflow: hidden;
+
+    text-align: left;
+}
+
+
+/* ヘッダー */
+
+.past-notices-header {
+    padding: 14px 16px;
+
+    background: #fafafa;
+
+    border-bottom: 1px solid #eee;
+
+    font-size: 14px;
     font-weight: 700;
-    color: #222;
 }
+
+
+/* 一覧 */
 
 .past-notices-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    max-height: 450px;
+    overflow-y: auto;
 }
 
+
+/* 個別のお知らせ */
+
 .past-notice-item {
-    padding: 16px 18px;
-    background: #fff;
-    border: 1px solid #e8e8e8;
-    border-radius: 14px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    padding: 17px 18px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.past-notice-item:last-child {
+    border-bottom: none;
 }
 
 .past-notice-date {
-    margin-bottom: 6px;
-    color: #888;
-    font-size: 12px;
+    margin-bottom: 5px;
+
+    color: #999;
+
+    font-size: 11px;
 }
 
 .past-notice-item h3 {
     margin: 0 0 8px;
+
     color: #222;
+
     font-size: 15px;
     font-weight: 700;
 }
 
 .past-notice-item p {
     margin: 0;
+
     color: #555;
-    font-size: 14px;
+
+    font-size: 13px;
     line-height: 1.7;
+
     word-break: break-word;
 }
+
+
+/* スマホ */
 
 @media (max-width: 600px) {
 
     .past-notices {
-        margin-top: 40px;
+        margin: 30px auto;
         padding: 0 12px;
     }
 
-    .past-notices-title h2 {
-        font-size: 16px;
+    .past-notices-button {
+        padding: 9px 15px;
+        font-size: 12px;
+    }
+
+    .past-notices-panel {
+        border-radius: 14px;
+    }
+
+    .past-notices-list {
+        max-height: 60vh;
     }
 
     .past-notice-item {
-        padding: 14px 15px;
-        border-radius: 12px;
+        padding: 15px;
     }
 
     .past-notice-item h3 {

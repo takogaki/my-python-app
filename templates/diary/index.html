@@ -155,6 +155,64 @@
         </div>
 </main>
 
+{% if all_notices %}
+<details class="past-notices">
+
+        <summary class="past-notices-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-list-check">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M3.5 5.5l1.5 1.5l2.5 -2.5" />
+                        <path d="M3.5 11.5l1.5 1.5l2.5 -2.5" />
+                        <path d="M3.5 17.5l1.5 1.5l2.5 -2.5" />
+                        <path d="M11 6l9 0" />
+                        <path d="M11 12l9 0" />
+                        <path d="M11 18l9 0" />
+                </svg>過去のお知らせ
+        </summary>
+
+        <div class="past-notices-panel">
+
+                <div class="past-notices-header">
+                        <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-bell">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                                <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                        </svg>過去のお知らせ</span>
+                </div>
+
+                <div class="past-notices-list">
+
+                        {% for notice in all_notices %}
+
+                        <article class="past-notice-item">
+
+                                <div class="past-notice-date">
+                                        {{ notice.published_at|date:"Y.m.d" }}
+                                </div>
+
+                                <h3>
+                                        {{ notice.title }}
+                                </h3>
+
+                                <p>
+                                        {{ notice.message|linebreaksbr }}
+                                </p>
+
+                        </article>
+
+                        {% endfor %}
+
+                </div>
+
+        </div>
+
+</details>
+{% endif %}
+
 <footer class="site-footer">
         <div class="footer-links">
                 <a href="{% url 'accounts:terms' %}">
