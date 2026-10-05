@@ -280,11 +280,10 @@
 ========================================= */
 
 .site-notice {
-        position: fixed;
-        top: 14px;
-        left: 14px;
-
-        z-index: 99999;
+    position: fixed;
+    top: 75px;
+    left: 14px;
+    z-index: 99999;
 }
 
 
@@ -475,20 +474,18 @@
 ========================================= */
 
 @media (max-width: 600px) {
+    .site-notice {
+        top: 65px;
+        left: 10px;
+    }
 
-        .site-notice {
-                top: 10px;
-                left: 10px;
-        }
+    .site-notice-button {
+        padding: 8px 11px;
+        font-size: 12px;
+    }
 
-        .site-notice-button {
-                padding: 8px 11px;
-                font-size: 12px;
-        }
-
-        .site-notice-panel {
-                top: 44px;
-                width: 290px;
-        }
-
+    .site-notice-panel {
+        top: 44px;
+        width: 290px;
+    }
 }
