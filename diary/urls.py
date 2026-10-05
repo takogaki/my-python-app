@@ -5,6 +5,7 @@ from . import views
 app_name = "diary"
 urlpatterns = [
     path("", views.index, name="index"),
+    path("notices/mark-read/", views.mark_site_notices_read, name="mark_site_notices_read"),
     path("page/create/", views.page_create, name="page_create"),
     path("pages/", views.page_list, name="page_list"),
     path("page/<uuid:pk>/", views.page_detail, name="page_detail"),

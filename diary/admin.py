@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Page, LikeRecord, SiteNotice
+from .models import Page, LikeRecord, SiteNotice, SiteNoticeRead
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
@@ -59,4 +59,31 @@ class SiteNoticeAdmin(admin.ModelAdmin):
 
     ordering = (
         "-published_at",
+    )
+
+
+@admin.register(SiteNoticeRead)
+class SiteNoticeReadAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "notice",
+        "read_at",
+    )
+
+    list_filter = (
+        "read_at",
+    )
+
+    search_fields = (
+        "user__username",
+        "notice__title",
+    )
+
+    autocomplete_fields = (
+        "user",
+        "notice",
+    )
+
+    ordering = (
+        "-read_at",
     )

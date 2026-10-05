@@ -165,3 +165,40 @@ class SiteNotice(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+# ==========================================
+# 🔔 サイトお知らせ既読管理
+# ==========================================
+class SiteNoticeRead(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="read_site_notices",
+        verbose_name="ユーザー"
+    )
+
+    notice = models.ForeignKey(
+        SiteNotice,
+        on_delete=models.CASCADE,
+        related_name="read_records",
+        verbose_name="お知らせ"
+    )
+
+    read_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="既読日時"
+    )
+
+    class Meta:
+        verbose_name = "お知らせ既読"
+        verbose_name_plural = "お知らせ既読"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "notice"],
+                name="unique_user_site_notice_read"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.notice.title}"

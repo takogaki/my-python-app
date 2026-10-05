@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View, CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.views.decorators.http import require_POST
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .forms import PageForm 
-from .models import Page, LikeRecord, GuestLikeRecord, SiteNotice
+from .models import Page, LikeRecord, GuestLikeRecord, SiteNotice, SiteNoticeRead
 from django.contrib.auth import get_user_model
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -20,28 +21,51 @@ User = get_user_model()
 
 
 class IndexView(View):
-
     def get(self, request):
-
-        # =========================
-        # ページログ保存
-        # =========================
         if request.user.is_authenticated:
             save_page_log(request, "index")
 
-        # =========================
-        # 現在日時
-        # =========================
         datetime_now = datetime.now(
             ZoneInfo("Asia/Tokyo")
         ).strftime("%Y年%m月%d日 %H:%M:%S")
 
-        # =========================
-        # 🔔 お知らせ
-        # =========================
-        notices = SiteNotice.objects.filter(
+        # ==========================================
+        # 🔔 すべてのお知らせ
+        # ==========================================
+        all_notices = SiteNotice.objects.all().order_by(
+            "-published_at"
+        )
+
+        # ==========================================
+        # 🔔 未読のお知らせ
+        # ==========================================
+        active_notices = SiteNotice.objects.filter(
             is_active=True
         ).order_by("-published_at")
+
+        if request.user.is_authenticated:
+
+            read_notice_ids = SiteNoticeRead.objects.filter(
+                user=request.user
+            ).values_list(
+                "notice_id",
+                flat=True
+            )
+
+            notices = active_notices.exclude(
+                id__in=read_notice_ids
+            )
+
+        else:
+
+            read_notice_ids = request.session.get(
+                "read_site_notice_ids",
+                []
+            )
+
+            notices = active_notices.exclude(
+                id__in=read_notice_ids
+            )
 
         return render(
             request,
@@ -49,9 +73,81 @@ class IndexView(View):
             {
                 "datetime_now": datetime_now,
                 "notices": notices,
+                "all_notices": all_notices,
             }
         )
+    
 
+
+@require_POST
+def mark_site_notices_read(request):
+    try:
+        import json
+
+        data = json.loads(
+            request.body.decode("utf-8")
+        )
+
+        notice_ids = data.get("notice_ids", [])
+
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse(
+            {"success": False},
+            status=400
+        )
+
+    if not isinstance(notice_ids, list):
+        return JsonResponse(
+            {"success": False},
+            status=400
+        )
+
+    # ==========================================
+    # 🔔 ログインユーザー
+    # ==========================================
+    if request.user.is_authenticated:
+
+        notices = SiteNotice.objects.filter(
+            id__in=notice_ids
+        )
+
+        for notice in notices:
+            SiteNoticeRead.objects.get_or_create(
+                user=request.user,
+                notice=notice
+            )
+
+    # ==========================================
+    # 🔔 未ログインユーザー
+    # ==========================================
+    else:
+
+        current_read_ids = request.session.get(
+            "read_site_notice_ids",
+            []
+        )
+
+        current_read_ids = set(
+            int(x) for x in current_read_ids
+        )
+
+        for notice_id in notice_ids:
+            try:
+                current_read_ids.add(
+                    int(notice_id)
+                )
+            except (TypeError, ValueError):
+                continue
+
+        request.session["read_site_notice_ids"] = list(
+            current_read_ids
+        )
+
+        request.session.modified = True
+
+    return JsonResponse(
+        {"success": True}
+    )
 
 class PageCreateView(LoginRequiredMixin, CreateView):
     model = Page

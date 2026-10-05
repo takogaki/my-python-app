@@ -13,7 +13,7 @@
 {% block body %}
 
 {% if notices %}
-<div class="site-notice">
+<div class="site-notice" id="siteNotice">
 
         <button type="button" class="site-notice-button" id="noticeButton" aria-expanded="false"
                 aria-controls="noticePanel">
@@ -35,7 +35,7 @@
                 <div class="site-notice-list">
 
                         {% for notice in notices %}
-                        <div class="site-notice-item">
+                        <div class="site-notice-item" data-notice-id="{{ notice.id }}">
 
                                 <span class="notice-date">
                                         {{ notice.published_at|date:"Y.m.d" }}
@@ -179,24 +179,84 @@
 <script>
         document.addEventListener("DOMContentLoaded", function () {
 
+                const noticeContainer = document.getElementById("siteNotice");
                 const noticeButton = document.getElementById("noticeButton");
                 const noticePanel = document.getElementById("noticePanel");
                 const noticeClose = document.getElementById("noticeClose");
 
-                if (!noticeButton || !noticePanel) {
+                if (!noticeContainer || !noticeButton || !noticePanel) {
                         return;
                 }
 
+                // ==========================================
+                // CSRFトークン取得
+                // ==========================================
+                function getCookie(name) {
+                        let cookieValue = null;
 
-                // =====================================
-                // 🔔 お知らせを開く
-                // =====================================
+                        if (document.cookie && document.cookie !== "") {
+                                const cookies = document.cookie.split(";");
 
+                                for (let cookie of cookies) {
+                                        cookie = cookie.trim();
+
+                                        if (cookie.startsWith(name + "=")) {
+                                                cookieValue = decodeURIComponent(
+                                                        cookie.substring(name.length + 1)
+                                                );
+                                                break;
+                                        }
+                                }
+                        }
+
+                        return cookieValue;
+                }
+
+                // ==========================================
+                // お知らせを既読にする
+                // ==========================================
+                function markNoticesAsRead() {
+
+                        const noticeItems = noticePanel.querySelectorAll(
+                                ".site-notice-item[data-notice-id]"
+                        );
+
+                        const noticeIds = [];
+
+                        noticeItems.forEach(function (item) {
+                                noticeIds.push(
+                                        Number(item.dataset.noticeId)
+                                );
+                        });
+
+                        if (noticeIds.length === 0) {
+                                return Promise.resolve();
+                        }
+
+                        return fetch(
+                                "{% url 'diary:mark_site_notices_read' %}",
+                                {
+                                        method: "POST",
+                                        headers: {
+                                                "Content-Type": "application/json",
+                                                "X-CSRFToken": getCookie("csrftoken")
+                                        },
+                                        body: JSON.stringify({
+                                                notice_ids: noticeIds
+                                        })
+                                }
+                        );
+                }
+
+                // ==========================================
+                // 開く
+                // ==========================================
                 noticeButton.addEventListener("click", function (event) {
 
                         event.stopPropagation();
 
-                        const isHidden = noticePanel.hasAttribute("hidden");
+                        const isHidden =
+                                noticePanel.hasAttribute("hidden");
 
                         if (isHidden) {
 
@@ -206,6 +266,9 @@
                                         "aria-expanded",
                                         "true"
                                 );
+
+                                // 開いた時点で既読にする
+                                markNoticesAsRead();
 
                         } else {
 
@@ -219,59 +282,63 @@
                                         "false"
                                 );
                         }
-
                 });
 
-
-                // =====================================
-                // × 閉じる
-                // =====================================
-
+                // ==========================================
+                // 閉じる
+                // ==========================================
                 if (noticeClose) {
 
-                        noticeClose.addEventListener("click", function (event) {
+                        noticeClose.addEventListener(
+                                "click",
+                                function (event) {
 
-                                event.stopPropagation();
+                                        event.stopPropagation();
 
-                                noticePanel.setAttribute(
-                                        "hidden",
-                                        ""
-                                );
+                                        noticePanel.setAttribute(
+                                                "hidden",
+                                                ""
+                                        );
 
-                                noticeButton.setAttribute(
-                                        "aria-expanded",
-                                        "false"
-                                );
+                                        noticeButton.setAttribute(
+                                                "aria-expanded",
+                                                "false"
+                                        );
 
-                        });
-
+                                        // 一度見たので、このページでは
+                                        // お知らせボタン自体も消す
+                                        noticeContainer.remove();
+                                }
+                        );
                 }
 
-
-                // =====================================
+                // ==========================================
                 // 外側をクリックしたら閉じる
-                // =====================================
+                // ==========================================
+                document.addEventListener(
+                        "click",
+                        function (event) {
 
-                document.addEventListener("click", function (event) {
+                                if (
+                                        !noticePanel.contains(event.target) &&
+                                        !noticeButton.contains(event.target)
+                                ) {
 
-                        if (
-                                !noticePanel.contains(event.target) &&
-                                !noticeButton.contains(event.target)
-                        ) {
+                                        noticePanel.setAttribute(
+                                                "hidden",
+                                                ""
+                                        );
 
-                                noticePanel.setAttribute(
-                                        "hidden",
-                                        ""
-                                );
+                                        noticeButton.setAttribute(
+                                                "aria-expanded",
+                                                "false"
+                                        );
 
-                                noticeButton.setAttribute(
-                                        "aria-expanded",
-                                        "false"
-                                );
-
+                                        // 既読済みなのでボタンも消す
+                                        noticeContainer.remove();
+                                }
                         }
-
-                });
+                );
 
         });
 </script>
