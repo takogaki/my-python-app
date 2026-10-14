@@ -141,6 +141,58 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+# =========================
+# 💼 職業
+# =========================
+class JobCategory(models.Model):
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name="職業大枠"
+    )
+
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="表示順"
+    )
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "職業カテゴリ"
+        verbose_name_plural = "職業カテゴリ"
+
+    def __str__(self):
+        return self.name
+
+
+class Job(models.Model):
+
+    category = models.ForeignKey(
+        JobCategory,
+        on_delete=models.CASCADE,
+        related_name="jobs",
+        verbose_name="職業カテゴリ"
+    )
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name="職業"
+    )
+
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="表示順"
+    )
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "職業"
+        verbose_name_plural = "職業"
+
+    def __str__(self):
+        return f"{self.category.name} - {self.name}"
 
 
 class Profile(models.Model):
@@ -165,7 +217,15 @@ class Profile(models.Model):
     drinking = models.CharField(max_length=20, blank=True)
     smoking = models.CharField(max_length=20, blank=True)
 
-    job = models.CharField(max_length=100, blank=True)
+    job = models.ForeignKey(
+        "Job",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="profiles",
+        verbose_name="職業"
+    )
+    
     income = models.CharField(max_length=50, blank=True)
 
     def __str__(self):

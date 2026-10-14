@@ -26,7 +26,7 @@ urlpatterns = [
     ),
 
     # 🔥 トップをfeedにする
-    path("", RedirectView.as_view(url="/accounts/app/")),
+    path("", RedirectView.as_view(url="/feed/", permanent=False)),
     path("feed/", feed, name="feed"),
 
     # 🔥 indexは別URLに逃がす

@@ -2,7 +2,7 @@ from django import forms
 from .models import CustomUser, KYCSubmission
 from django.contrib.auth.forms import UserCreationForm
 from datetime import datetime
-from .models import Profile
+from .models import Profile, JobCategory, Job
 from django.contrib.auth import get_user_model
 import re
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
@@ -386,10 +386,82 @@ class ProfileForm(forms.ModelForm):
         })
     )
 
+    # ==========================================================
+    # 職業大分類
+    # ==========================================================
+    job_category = forms.ModelChoiceField(
+        queryset=JobCategory.objects.all(),
+        required=False,
+        empty_label="職業の大分類を選択",
+        label="職業大分類",
+        widget=forms.Select(attrs={
+            "id": "jobCategory",
+            "class": "job-select",
+        })
+    )
+
+    # ==========================================================
+    # 職業
+    # ==========================================================
+    job = forms.ModelChoiceField(
+        queryset=Job.objects.none(),
+        required=False,
+        empty_label="職業を選択",
+        label="職業",
+        widget=forms.Select(attrs={
+            "id": "jobSelect",
+            "class": "job-select",
+        })
+    )
+
     class Meta:
         model = Profile
-        fields = ["bio", "profile_image"]
+        fields = [
+            "bio",
+            "profile_image",
+            "job",
+        ]
 
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        # ------------------------------------------------------
+        # 現在登録されている職業
+        # ------------------------------------------------------
+        current_job = self.instance.job
+
+        # ------------------------------------------------------
+        # POSTされた職業大分類
+        # ------------------------------------------------------
+        category_id = self.data.get("job_category")
+
+        # ------------------------------------------------------
+        # POST時
+        # 選択された大分類の職業だけ表示
+        # ------------------------------------------------------
+        if category_id:
+            try:
+                self.fields["job"].queryset = Job.objects.filter(
+                    category_id=category_id
+                ).order_by("order", "id")
+            except (ValueError, TypeError):
+                self.fields["job"].queryset = Job.objects.none()
+
+        # ------------------------------------------------------
+        # 既存プロフィールに職業がある場合
+        # ------------------------------------------------------
+        elif current_job:
+
+            self.fields["job"].queryset = Job.objects.filter(
+                category=current_job.category
+            ).order_by("order", "id")
+
+            self.fields["job_category"].initial = current_job.category
+
+    # ==========================================================
+    # プロフィール画像チェック
+    # ==========================================================
     def clean_profile_image(self):
         image = self.cleaned_data.get("profile_image")
 
@@ -400,18 +472,49 @@ class ProfileForm(forms.ModelForm):
             img = Image.open(image)
             img.verify()
             image.seek(0)
+
         except Exception:
-            raise forms.ValidationError("有効な画像ファイルをアップロードしてください")
+            raise forms.ValidationError(
+                "有効な画像ファイルをアップロードしてください"
+            )
 
         if image.size > 5 * 1024 * 1024:
-            raise forms.ValidationError("画像サイズは5MB以下にしてください")
+            raise forms.ValidationError(
+                "画像サイズは5MB以下にしてください"
+            )
 
         return image
 
+    # ==========================================================
+    # 職業チェック
+    # ==========================================================
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        job_category = cleaned_data.get("job_category")
+        job = cleaned_data.get("job")
+
+        if job and job_category:
+
+            if job.category_id != job_category.id:
+                self.add_error(
+                    "job",
+                    "選択した職業大分類と職業が一致していません。"
+                )
+
+        return cleaned_data
+
+    # ==========================================================
+    # 保存
+    # ==========================================================
     def save(self, commit=True):
+
         profile = super().save(commit=False)
+
         if commit:
             profile.save()
+
         return profile
 
 

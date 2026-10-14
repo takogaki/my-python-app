@@ -21,7 +21,7 @@ from datetime import date, timedelta
 from diary.models import Page, LikeRecord          # 日記
 from blog.models import Post, Comment, PostLike      # ブログ投稿
 from videos.models import PostVideo, PostVideoLike
-from accounts.models import SavedPost      # 保存した投稿
+from accounts.models import SavedPost, JobCategory      # 保存した投稿
 from user_messages.models import Message   # メッセージ（※名前は実物に合わせて）
 from django.db.models import Count, Q, F, Exists, OuterRef, Sum
 from django.utils.encoding import force_str, force_bytes
@@ -1091,6 +1091,9 @@ def profile_edit(request):
                         "profile_form": profile_form,
                         "user_form": user_form,
                         "categories": TagCategory.objects.prefetch_related("tags").order_by("order"),
+                        "job_categories": JobCategory.objects.prefetch_related(
+                            "jobs"
+                        ).order_by("order"),
                         "completion": profile_completion(profile),
                         "selected_tags": {
                             pt.tag_id: pt.level
@@ -1192,6 +1195,10 @@ def profile_edit(request):
 
     categories = TagCategory.objects.prefetch_related("tags").order_by("order")
 
+    job_categories = JobCategory.objects.prefetch_related(
+        "jobs"
+    ).order_by("order")
+
     selected_tags = {
         pt.tag_id: pt.level
         for pt in ProfileTag.objects.filter(profile=profile)
@@ -1216,6 +1223,7 @@ def profile_edit(request):
         "profile_form": profile_form,
         "user_form": user_form,
         "categories": categories,
+        "job_categories": job_categories,
         "completion": completion,
         "selected_tags": selected_tags,
         "force_profile_image": force_profile_image,

@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.db.models.deletion import Collector
 from django.db import router
-from .models import CustomUser, KYCSubmission, TagCategory, Profile, Tag, ProfileTag, SpiritTitle, SpiritTitlePart
+from .models import CustomUser, KYCSubmission, TagCategory, Profile, Tag, ProfileTag, JobCategory, Job, SpiritTitle, SpiritTitlePart
 from django.utils import timezone
 
 
@@ -12,6 +12,11 @@ from django.utils import timezone
 admin.site.register(TagCategory)
 admin.site.register(Tag)
 admin.site.register(ProfileTag)
+# =========================
+# 職業関連
+# =========================
+admin.site.register(JobCategory)
+admin.site.register(Job)
 
 # =========================
 # 🔥 ユーザー完全削除（関連データごと）

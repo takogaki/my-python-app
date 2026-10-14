@@ -264,6 +264,55 @@
             </div>
         </div>
 
+        <!-- =========================
+             職業
+        ========================= -->
+        <div class="job-section">
+        
+            <h3 class="setting-title">
+                職業
+            </h3>
+        
+            <p class="setting-subtitle">
+                あなたの職業を選択してください。
+            </p>
+        
+            <!-- 職業大分類 -->
+            <div class="form-group">
+        
+                <label for="{{ profile_form.job_category.id_for_label }}">
+                    職業大分類
+                </label>
+        
+                {{ profile_form.job_category }}
+        
+                {% if profile_form.job_category.errors %}
+                <div class="error-text">
+                    {{ profile_form.job_category.errors }}
+                </div>
+                {% endif %}
+        
+            </div>
+        
+            <!-- 職業 -->
+            <div class="form-group">
+        
+                <label for="{{ profile_form.job.id_for_label }}">
+                    職業
+                </label>
+        
+                {{ profile_form.job }}
+        
+                {% if profile_form.job.errors %}
+                <div class="error-text">
+                    {{ profile_form.job.errors }}
+                </div>
+                {% endif %}
+        
+            </div>
+        
+        </div>
+
         <!-- 一言 -->
         <div class="form-group">
             <label>ひとこと</label>
@@ -371,5 +420,22 @@
 {% endblock %}
 
 {% block extra_js %}
+
+<script>
+    window.JOB_DATA = {
+        {% for category in job_categories %}
+        "{{ category.id }}": [
+            {% for job in category.jobs.all %}
+            {
+                "id": "{{ job.id }}",
+                "name": "{{ job.name|escapejs }}"
+            } {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        ]{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    };
+</script>
+
 <script src="{% static 'accounts/js/profile_edit.js' %}"></script>
+
 {% endblock %}

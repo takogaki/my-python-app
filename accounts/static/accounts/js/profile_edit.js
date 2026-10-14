@@ -217,3 +217,68 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+// ==========================================================
+// 職業大分類 → 職業 連動
+// ==========================================================
+document.addEventListener("DOMContentLoaded", function () {
+
+    const categorySelect = document.getElementById("jobCategory");
+    const jobSelect = document.getElementById("jobSelect");
+
+    if (!categorySelect || !jobSelect) {
+        return;
+    }
+
+    function updateJobs(categoryId, selectedJobId = "") {
+
+        jobSelect.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "職業を選択";
+
+        jobSelect.appendChild(defaultOption);
+
+        if (!categoryId) {
+            jobSelect.disabled = true;
+            return;
+        }
+
+        const jobs = window.JOB_DATA[categoryId] || [];
+
+        jobs.forEach(function (job) {
+
+            const option = document.createElement("option");
+
+            option.value = job.id;
+            option.textContent = job.name;
+
+            if (String(job.id) === String(selectedJobId)) {
+                option.selected = true;
+            }
+
+            jobSelect.appendChild(option);
+        });
+
+        jobSelect.disabled = jobs.length === 0;
+    }
+
+    // ------------------------------------------------------
+    // ページ表示時
+    // ------------------------------------------------------
+    const initialCategoryId = categorySelect.value;
+    const initialJobId = jobSelect.value;
+
+    updateJobs(initialCategoryId, initialJobId);
+
+    // ------------------------------------------------------
+    // 大分類変更時
+    // ------------------------------------------------------
+    categorySelect.addEventListener("change", function () {
+
+        updateJobs(this.value, "");
+
+    });
+
+});
