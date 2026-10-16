@@ -591,7 +591,12 @@ document.addEventListener("DOMContentLoaded", () => {
         peerConnection.addEventListener(
             "icecandidate",
             event => {
-
+                console.log(
+                    "RANDOM CALL: ICE candidate:",
+                    event.candidate
+                        ? event.candidate.candidate
+                        : "ICE gathering complete"
+                );
                 if (!event.candidate) {
 
                     return;
