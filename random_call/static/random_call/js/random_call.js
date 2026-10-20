@@ -283,32 +283,24 @@ document.addEventListener("DOMContentLoaded", () => {
     ================================================== */
 
     function initializeRemoteStream() {
-
-        remoteStream =
-            new MediaStream();
-
+        remoteStream = new MediaStream();
 
         if (remoteVideo) {
-
-            remoteVideo.srcObject =
-                remoteStream;
-
+            remoteVideo.srcObject = remoteStream;
             remoteVideo.autoplay = true;
-
             remoteVideo.playsInline = true;
 
+            // 音声は remoteAudio 側で再生する
+            remoteVideo.muted = true;
         }
-
 
         if (remoteAudio) {
-
-            remoteAudio.srcObject =
-                remoteStream;
-
+            remoteAudio.srcObject = remoteStream;
             remoteAudio.autoplay = true;
-
+            remoteAudio.muted = false;
+            remoteAudio.volume = 1;
+            remoteAudio.playsInline = true;
         }
-
     }
 
 
@@ -381,173 +373,70 @@ document.addEventListener("DOMContentLoaded", () => {
            Remote Track
         ================================================== */
 
-        peerConnection.addEventListener(
-            "track",
-            async event => {
+        peerConnection.addEventListener("track", async event => {
+            console.log(
+                "RANDOM CALL: Remote track received",
+                event.track.kind,
+                event.track.readyState,
+                "enabled:",
+                event.track.enabled
+            );
 
-                console.log(
-                    "RANDOM CALL: Remote track received:",
-                    event.track.kind,
-                    event.track.id
-                );
+            // 受信トラックを共通のリモートストリームへ追加
+            const exists = remoteStream
+                .getTracks()
+                .some(track => track.id === event.track.id);
 
-
-                /* --------------------------------------
-                   event.streams が存在する場合
-                -------------------------------------- */
-
-                if (
-                    event.streams &&
-                    event.streams[0]
-                ) {
-
-                    const incomingStream =
-                        event.streams[0];
-
-
-                    incomingStream
-                        .getTracks()
-                        .forEach(track => {
-
-                            const exists =
-                                remoteStream
-                                    .getTracks()
-                                    .some(
-                                        existing =>
-                                            existing.id ===
-                                            track.id
-                                    );
-
-
-                            if (!exists) {
-
-                                remoteStream.addTrack(
-                                    track
-                                );
-
-                            }
-
-                        });
-
-                } else {
-
-                    /*
-                     * 念のため event.streams が
-                     * 無い場合にも対応
-                     */
-
-                    const exists =
-                        remoteStream
-                            .getTracks()
-                            .some(
-                                existing =>
-                                    existing.id ===
-                                    event.track.id
-                            );
-
-
-                    if (!exists) {
-
-                        remoteStream.addTrack(
-                            event.track
-                        );
-
-                    }
-
-                }
-
-
-                /* --------------------------------------
-                   Remote Video
-                -------------------------------------- */
-
-                if (
-                    event.track.kind ===
-                    "video"
-                ) {
-
-                    console.log(
-                        "RANDOM CALL: Remote VIDEO received"
-                    );
-
-
-                    if (videoArea) {
-
-                        videoArea.classList.add(
-                            "remote-video-active"
-                        );
-
-                    }
-
-
-                    if (remoteVideo) {
-
-                        remoteVideo.srcObject =
-                            remoteStream;
-
-                        remoteVideo.style.display =
-                            "block";
-
-                        try {
-
-                            await remoteVideo.play();
-
-                        } catch (error) {
-
-                            console.warn(
-                                "Remote video play error:",
-                                error
-                            );
-
-                        }
-
-                    }
-
-                }
-
-
-                /* --------------------------------------
-                   Remote Audio
-                -------------------------------------- */
-
-                if (
-                    event.track.kind ===
-                    "audio"
-                ) {
-
-                    console.log(
-                        "RANDOM CALL: Remote AUDIO received"
-                    );
-
-
-                    if (remoteAudio) {
-
-                        remoteAudio.srcObject =
-                            remoteStream;
-
-                        try {
-
-                            await remoteAudio.play();
-
-                        } catch (error) {
-
-                            console.warn(
-                                "Remote audio play error:",
-                                error
-                            );
-
-                        }
-
-                    }
-
-                }
-
-
-                hideVideoPlaceholder();
-
+            if (!exists) {
+                remoteStream.addTrack(event.track);
             }
-        );
 
+            event.track.addEventListener("ended", () => {
+                console.warn(
+                    "RANDOM CALL: Remote track ended",
+                    event.track.kind
+                );
+            });
+
+            // 音声を再生
+            if (event.track.kind === "audio" && remoteAudio) {
+                remoteAudio.srcObject = remoteStream;
+                remoteAudio.muted = false;
+                remoteAudio.volume = 1;
+
+                try {
+                    await remoteAudio.play();
+                    console.log("RANDOM CALL: Remote audio playback started");
+                } catch (error) {
+                    console.error(
+                        "RANDOM CALL: Audio playback blocked",
+                        error
+                    );
+                }
+            }
+
+            // 相手の映像を表示
+            if (event.track.kind === "video" && remoteVideo) {
+                remoteVideo.srcObject = remoteStream;
+                remoteVideo.muted = true;
+                remoteVideo.playsInline = true;
+                remoteVideo.style.display = "block";
+
+                try {
+                    await remoteVideo.play();
+                    console.log("RANDOM CALL: Remote video playback started");
+                } catch (error) {
+                    console.error(
+                        "RANDOM CALL: Video playback blocked",
+                        error
+                    );
+                }
+            }
+
+            if (videoArea && event.track.kind === "video") {
+                videoArea.classList.add("remote-video-active");
+            }
+        });
 
         /* ==================================================
            ICE Candidate
@@ -1560,88 +1449,37 @@ document.addEventListener("DOMContentLoaded", () => {
     ================================================== */
 
     async function toggleSpeaker() {
-
         if (!remoteAudio) {
-            console.warn(
-                "RANDOM CALL: remoteAudio not found"
-            );
-
+            console.error("RANDOM CALL: remoteAudio element not found");
             return;
         }
 
+        isSpeakerEnabled = !isSpeakerEnabled;
 
-        /*
-        * 現在の状態を反転
-        */
-        isSpeakerEnabled =
-            !isSpeakerEnabled;
+        remoteAudio.muted = !isSpeakerEnabled;
+        remoteAudio.volume = isSpeakerEnabled ? 1 : 0;
 
-
-        /*
-        * スピーカーON
-        *
-        * remoteAudio の音声を有効化
-        */
         if (isSpeakerEnabled) {
-
-            remoteAudio.muted = false;
-
-            remoteAudio.volume = 1.0;
-
             try {
-
                 await remoteAudio.play();
-
+                console.log("RANDOM CALL: Speaker enabled");
             } catch (error) {
-
-                console.warn(
-                    "RANDOM CALL: remoteAudio play:",
+                console.error(
+                    "RANDOM CALL: Speaker playback failed",
                     error
                 );
-
             }
-
         }
 
-
-        /*
-        * スピーカーOFF
-        *
-        * 音声をミュート
-        */
-        else {
-
-            remoteAudio.muted = true;
-
-        }
-
-
-        /*
-        * UI更新
-        */
         if (speakerButton) {
-
             speakerButton.classList.toggle(
                 "is-active",
                 isSpeakerEnabled
             );
 
-
             speakerButton.textContent =
-                isSpeakerEnabled
-                    ? "🔊"
-                    : "🔈";
-
+                isSpeakerEnabled ? "🔊" : "🔈";
         }
-
-
-        console.log(
-            "RANDOM CALL: Speaker",
-            isSpeakerEnabled
-                ? "ON"
-                : "OFF"
-        );
-
     }
 
 
