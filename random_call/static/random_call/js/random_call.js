@@ -98,13 +98,16 @@ document.addEventListener("DOMContentLoaded", () => {
     ================================================== */
 
     const rtcConfiguration = {
-
         iceServers: [
             {
                 urls: "stun:stun.l.google.com:19302"
-            }
-        ]
+            },
 
+            // TURNサーバーの情報を設定できる場合に使用する
+            ...(window.RANDOM_CALL_TURN_CONFIG || [])
+        ],
+
+        iceCandidatePoolSize: 10
     };
 
 
@@ -207,110 +210,72 @@ document.addEventListener("DOMContentLoaded", () => {
     ================================================== */
 
     async function getLocalMedia() {
-
         if (localStream) {
-
             return localStream;
-
         }
 
+        if (!navigator.mediaDevices?.getUserMedia) {
+            throw new Error(
+                "この環境ではマイク・カメラを利用できません。HTTPS接続を確認してください。"
+            );
+        }
 
+        // まず音声と映像を取得する
         try {
-
-            localStream =
-                await navigator.mediaDevices.getUserMedia({
-
-                    audio: true,
-
-                    video: true
-
-                });
-
-
-            /* ------------------------------------------
-               初期状態ではカメラOFF
-            ------------------------------------------ */
-
-            const videoTracks =
-                localStream.getVideoTracks();
-
-
-            videoTracks.forEach(track => {
-
-                track.enabled = false;
-
+            localStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: {
+                    facingMode: "user"
+                }
             });
 
-
-            /* ------------------------------------------
-               自分の映像
-            ------------------------------------------ */
-
-            if (localVideo) {
-
-                localVideo.srcObject =
-                    localStream;
-
-                localVideo.muted = true;
-
-                localVideo.playsInline = true;
-
-                try {
-
-                    await localVideo.play();
-
-                } catch (error) {
-
-                    console.warn(
-                        "Local video autoplay:",
-                        error
-                    );
-
-                }
-
-            }
-
-
-            console.log(
-                "RANDOM CALL: Local media ready"
+            console.log("RANDOM CALL: Audio + video ready");
+        } catch (videoError) {
+            console.warn(
+                "RANDOM CALL: Video unavailable. Falling back to audio-only.",
+                videoError
             );
 
+            // 映像が取得できない場合も音声通話を試みる
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: false
+                });
 
-            return localStream;
+                isCameraEnabled = false;
 
-        } catch (error) {
+                console.log("RANDOM CALL: Audio-only mode");
+            } catch (audioError) {
+                console.error(
+                    "RANDOM CALL: Audio unavailable",
+                    audioError
+                );
 
-            console.error(
-                "RANDOM CALL: getUserMedia error",
-                error
-            );
-
-
-            if (matchedStatus) {
-
-                if (
-                    error.name ===
-                    "NotAllowedError"
-                ) {
-
-                    matchedStatus.textContent =
-                        "カメラとマイクの使用を許可してください。";
-
-                } else {
-
-                    matchedStatus.textContent =
-                        "カメラ・マイクを取得できませんでした。";
-
-                }
-
+                throw audioError;
             }
-
-
-            throw error;
-
         }
 
+        // 初期状態ではカメラをOFFにする
+        localStream.getVideoTracks().forEach(track => {
+            track.enabled = false;
+        });
+
+        if (localVideo) {
+            localVideo.srcObject = localStream;
+            localVideo.muted = true;
+            localVideo.playsInline = true;
+
+            try {
+                await localVideo.play();
+            } catch (error) {
+                console.warn("Local video playback:", error);
+            }
+        }
+
+        return localStream;
     }
+
 
 
     /* ==================================================
@@ -926,6 +891,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         try {
+
+            console.log(
+                "RANDOM CALL: Received ICE candidate:",
+                candidate.candidate
+            );
 
             await peerConnection.addIceCandidate(
                 new RTCIceCandidate(

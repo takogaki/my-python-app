@@ -2012,3 +2012,46 @@ h1,
         0 8px 30px
         rgba(0, 0, 0, 0.4);
 }
+
+/* =========================================
+   Tabler風SVGアイコン共通設定
+========================================= */
+
+.random-call-page svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+/* アイコン付きボタン */
+.random-call-page .button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* メインアイコン */
+.random-call-page .random-call-icon,
+.random-call-page .search-center,
+.random-call-page .matched-icon,
+.random-call-page .ended-icon,
+.random-call-page .voice-call-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 通話操作アイコン */
+.random-call-page .call-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* 戻るボタン */
+.random-call-page .random-call-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}

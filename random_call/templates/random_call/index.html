@@ -13,27 +13,24 @@
 
 <main class="random-call-page">
 
-    <!-- =========================================
-         メインコンテナ
-    ========================================== -->
-
     <section class="random-call-container">
 
-        <!-- =====================================
-             ヘッダー
-        ====================================== -->
-
+        <!-- ヘッダー -->
         <header class="random-call-header">
 
-            <a href="{% url 'diary:index' %}" class="random-call-back">
-                ←
+            <a href="{% url 'diary:index' %}" class="random-call-back" aria-label="トップページへ戻る">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="m15 18-6-6 6-6" />
+                </svg>
+
             </a>
 
             <div class="random-call-brand">
                 <span class="brand-mark">SPIRYTUS</span>
-                <span class="brand-subtitle">
-                    RANDOM CALL
-                </span>
+                <span class="brand-subtitle">RANDOM CALL</span>
             </div>
 
             <div class="random-call-header-space"></div>
@@ -41,29 +38,28 @@
         </header>
 
 
-        <!-- =====================================
-             メイン
-        ====================================== -->
-
+        <!-- メイン -->
         <div class="random-call-main">
 
-            <!-- ---------------------------------
-                 待機前
-            ---------------------------------- -->
-
+            <!-- 待機前 -->
             <section id="state-idle" class="random-call-state is-active">
 
                 <div class="random-call-icon">
-                    <span>◉</span>
+
+                    <!-- message-circle -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <path d="M8 9h8" />
+                        <path d="M8 13h6" />
+                        <path d="M12 21a9 9 0 1 0-9-9c0 2.4.9 4.6 2.5 6.3L5 21l3.1-.9A9 9 0 0 0 12 21z" />
+                    </svg>
+
                 </div>
 
-                <p class="random-call-eyebrow">
-                    RANDOM CALL
-                </p>
+                <p class="random-call-eyebrow">RANDOM CALL</p>
 
-                <h1>
-                    誰かと話す
-                </h1>
+                <h1>誰かと話す</h1>
 
                 <p class="random-call-description">
                     今この瞬間、SPIRYTUSにいる<br>
@@ -71,8 +67,17 @@
                 </p>
 
                 <button type="button" id="call-button" class="random-call-button">
-                    <span class="button-icon">📞</span>
+
+                    <span class="button-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+                        </svg>
+                    </span>
+
                     <span>誰かと話す</span>
+
                 </button>
 
                 <p class="random-call-note">
@@ -82,10 +87,7 @@
             </section>
 
 
-            <!-- ---------------------------------
-                 マッチング中
-            ---------------------------------- -->
-
+            <!-- マッチング中 -->
             <section id="state-searching" class="random-call-state">
 
                 <div class="search-animation">
@@ -95,18 +97,22 @@
                     <div class="search-ring ring-3"></div>
 
                     <div class="search-center">
-                        <span>📞</span>
+
+                        <!-- search -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <circle cx="10.5" cy="10.5" r="6.5" />
+                            <path d="m16 16 4 4" />
+                        </svg>
+
                     </div>
 
                 </div>
 
-                <p class="random-call-eyebrow">
-                    SEARCHING
-                </p>
+                <p class="random-call-eyebrow">SEARCHING</p>
 
-                <h1>
-                    相手を探しています
-                </h1>
+                <h1>相手を探しています</h1>
 
                 <p id="search-status" class="random-call-description">
                     SPIRYTUSにいる誰かを探しています。
@@ -119,169 +125,185 @@
             </section>
 
 
-            <!-- ---------------------------------
-                 マッチ成立
-            ---------------------------------- -->
-
+            <!-- マッチ成立 -->
             <section id="state-matched" class="random-call-state">
 
                 <div class="voice-call-center-text">
-                
+
                     <div class="matched-icon">
-                        ✓
+
+                        <!-- check -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <path d="m5 12 4 4L19 6" />
+                        </svg>
+
                     </div>
-                
-                    <p class="random-call-eyebrow">
-                        CONNECTED
-                    </p>
-                
-                    <h1>
-                        相手が見つかりました
-                    </h1>
-                
+
+                    <p class="random-call-eyebrow">CONNECTED</p>
+
+                    <h1>相手が見つかりました</h1>
+
                     <p id="matched-status" class="random-call-description">
                         通話を開始しています。
                     </p>
-                
+
                 </div>
 
-                <!--
-                    ② WebRTC実装時に
-                    ここへ映像エリアを追加
-                -->
 
+                <!-- 通話映像エリア -->
                 <div id="video-area" class="random-call-video-area">
-                
-                    <!-- ==================================================
-                         音声通話用
-                    ================================================== -->
-                
+
                     <audio id="remote-audio" autoplay playsinline>
                     </audio>
-                
-                
-                    <!-- ==================================================
-                         相手映像
-                    ================================================== -->
-                
+
                     <video id="remote-video" autoplay playsinline>
                     </video>
-                
-                
-                    <!-- ==================================================
-                         自分の映像
-                    ================================================== -->
-                
+
                     <video id="local-video" autoplay muted playsinline>
                     </video>
-                
-                
-                    <!-- ==================================================
-                         電話画面
-                         カメラOFF時に表示
-                    ================================================== -->
-                
+
+
+                    <!-- カメラOFF時の音声通話画面 -->
                     <div id="voice-call-screen" class="voice-call-screen">
-                
+
                         <div class="voice-call-avatar">
-                            <span>◉</span>
+
+                            <!-- user-circle -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10" />
+                                <circle cx="12" cy="8" r="3" />
+                                <path d="M6.2 18a6.5 6.5 0 0 1 11.6 0" />
+                            </svg>
+
                         </div>
-                
-                        <p class="voice-call-label">
-                            SPIRYTUS
-                        </p>
-                
+
+                        <p class="voice-call-label">SPIRYTUS</p>
+
                         <p id="voice-call-status" class="voice-call-status">
                             接続しています…
                         </p>
-                
+
                     </div>
-                
-                
-                    <!-- ==================================================
-                         接続中
-                    ================================================== -->
-                
+
+
+                    <!-- 接続中表示 -->
                     <div id="video-placeholder" class="video-placeholder">
-                
-                        <span>📞</span>
-                
-                        <p>
-                            接続しています…
-                        </p>
-                
+
+                        <!-- phone-call -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <path
+                                d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+                        </svg>
+
+                        <p>接続しています…</p>
+
                     </div>
-                
+
                 </div>
-                
-                
+
+
+                <!-- 通話操作 -->
                 <div class="call-controls">
-                
+
                     <!-- マイク -->
-                
-                    <button type="button" id="mic-button" class="call-control" aria-label="マイク">
-                
-                        🎤
-                
+                    <button type="button" id="mic-button" class="call-control" aria-label="マイク" title="マイク">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <rect x="9" y="2" width="6" height="12" rx="3" />
+                            <path d="M5 10a7 7 0 0 0 14 0" />
+                            <path d="M12 17v5" />
+                            <path d="M8 22h8" />
+                        </svg>
+
                     </button>
-                
-                
+
+
                     <!-- スピーカー -->
-                
-                    <button type="button" id="speaker-button" class="call-control" aria-label="スピーカー">
-                
-                        🔊
-                
+                    <button type="button" id="speaker-button" class="call-control" aria-label="スピーカー" title="スピーカー">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <path d="M4 10v4h4l5 4V6l-5 4H4z" />
+                            <path d="M17 9a5 5 0 0 1 0 6" />
+                            <path d="M19.5 5.5a9 9 0 0 1 0 13" />
+                        </svg>
+
                     </button>
-                
-                
+
+
                     <!-- カメラ -->
-                
-                    <button type="button" id="camera-button" class="call-control" aria-label="カメラ">
-                
-                        📹
-                
+                    <button type="button" id="camera-button" class="call-control" aria-label="カメラ" title="カメラ">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <rect x="3" y="6" width="13" height="12" rx="2" />
+                            <path d="m16 10 5-3v10l-5-3" />
+                        </svg>
+
                     </button>
-                
-                
+
+
                     <!-- 通話終了 -->
-                
-                    <button type="button" id="leave-button" class="call-control end" aria-label="通話終了">
-                
-                        📞
-                
+                    <button type="button" id="leave-button" class="call-control end" aria-label="通話終了" title="通話終了">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                            aria-hidden="true">
+                            <path d="M3 14c5-4 13-4 18 0l-2 4-5-2v-2a7 7 0 0 0-4 0v2l-5 2-2-4z" />
+                        </svg>
+
                     </button>
-                
+
                 </div>
 
             </section>
 
 
-            <!-- ---------------------------------
-                 終了
-            ---------------------------------- -->
-
+            <!-- 通話終了 -->
             <section id="state-ended" class="random-call-state">
 
                 <div class="ended-icon">
-                    ×
+
+                    <!-- x -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <path d="m18 6-12 12" />
+                        <path d="m6 6 12 12" />
+                    </svg>
+
                 </div>
 
-                <p class="random-call-eyebrow">
-                    CALL ENDED
-                </p>
+                <p class="random-call-eyebrow">CALL ENDED</p>
 
-                <h1>
-                    通話が終了しました
-                </h1>
+                <h1>通話が終了しました</h1>
 
                 <p id="ended-status" class="random-call-description">
                     また誰かと話してみませんか？
                 </p>
 
                 <button type="button" id="retry-button" class="random-call-button">
-                    <span class="button-icon">📞</span>
+
+                    <span class="button-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+                        </svg>
+                    </span>
+
                     <span>もう一度話す</span>
+
                 </button>
 
             </section>
@@ -289,19 +311,12 @@
         </div>
 
 
-        <!-- =====================================
-             フッター
-        ====================================== -->
-
+        <!-- フッター -->
         <footer class="random-call-footer">
 
-            <p>
-                SPIRYTUS
-            </p>
+            <p>SPIRYTUS</p>
 
-            <span>
-                誰かと、今つながる。
-            </span>
+            <span>誰かと、今つながる。</span>
 
         </footer>
 

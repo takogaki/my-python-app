@@ -38,6 +38,7 @@ class RandomCallConsumer(AsyncJsonWebsocketConsumer):
 
         self.user = self.scope["user"]
         self.call_id = None
+        self.partner_user_id = None
         self.is_waiting = False
 
         # このWebSocket固有のID
@@ -494,6 +495,8 @@ class RandomCallConsumer(AsyncJsonWebsocketConsumer):
 
         self.call_id = call_id
 
+        self.partner_user_id = str(partner_id)
+
         # --------------------------------------------------
         # 相手専用グループ
         # --------------------------------------------------
@@ -565,46 +568,13 @@ class RandomCallConsumer(AsyncJsonWebsocketConsumer):
     # ==================================================
 
     async def call_matched(self, event):
-
-        # ==================================================
-        # すでに別の通話に入っている場合
-        # ==================================================
-
-        if self.call_id:
-
-            print(
-                "RANDOM CALL MATCH ERROR:",
-                self.user_id,
-                "already has call:",
-                self.call_id,
-            )
-
-            return
-
-        # ==================================================
-        # 待機状態解除
-        # ==================================================
-
-        self.is_waiting = False
-
-        # ==================================================
-        # 通話ID
-        # ==================================================
-
         self.call_id = event["call_id"]
-
-        # ==================================================
-        # 通話グループ
-        # ==================================================
+        self.partner_user_id = str(event["partner_id"])
 
         await self.channel_layer.group_add(
             f"random_call_{self.call_id}",
             self.channel_name,
         )
-
-        # ==================================================
-        # マッチ通知
-        # ==================================================
 
         await self.send_json({
             "type": "matched",
@@ -684,32 +654,21 @@ class RandomCallConsumer(AsyncJsonWebsocketConsumer):
     # ==================================================
 
     async def leave_call(self):
-
         if not self.call_id:
-
-            await self.send_json({
-                "type": "not_in_call",
-            })
-
             return
 
         call_id = self.call_id
+        partner_user_id = self.partner_user_id
 
-        # ==================================================
-        # 相手へ通知
-        # ==================================================
-
-        await self.channel_layer.group_send(
-            f"random_call_{call_id}",
-            {
-                "type": "partner_left",
-                "user_id": self.user_id,
-            },
-        )
-
-        # ==================================================
-        # 自分を通話グループから削除
-        # ==================================================
+        if partner_user_id:
+            await self.channel_layer.group_send(
+                f"random_call_user_{partner_user_id}",
+                {
+                    "type": "partner_left",
+                    "call_id": call_id,
+                    "sender_user_id": str(self.user.id),
+                },
+            )
 
         await self.channel_layer.group_discard(
             f"random_call_{call_id}",
@@ -717,42 +676,49 @@ class RandomCallConsumer(AsyncJsonWebsocketConsumer):
         )
 
         self.call_id = None
+        self.partner_user_id = None
 
         await self.send_json({
             "type": "left",
         })
 
-        print(
-            "RANDOM CALL LEAVE:",
-            self.user_id,
-            "CALL:",
-            call_id,
-        )
-
-    # ==================================================
-    # 相手が通話終了
-    # ==================================================
 
     async def partner_left(self, event):
+        if not self.call_id:
+            return
+
+        if event.get("call_id") != self.call_id:
+            return
+
+        if str(event.get("sender_user_id")) != str(
+            self.partner_user_id
+        ):
+            return
+
+        call_id = self.call_id
+
+        await self.channel_layer.group_discard(
+            f"random_call_{call_id}",
+            self.channel_name,
+        )
+
+        self.call_id = None
+        self.partner_user_id = None
 
         await self.send_json({
             "type": "partner_left",
         })
-
-        self.call_id = None
-
-        print(
-            "RANDOM CALL PARTNER LEFT:",
-            self.user_id,
-        )
 
     # ==================================================
     # WebRTC シグナリング
     # ==================================================
 
     async def forward_signal(self, content):
-
-        if not self.call_id:
+        if not self.call_id or not self.partner_user_id:
+            print(
+                "RANDOM CALL: Signal ignored; no active partner",
+                self.user.id,
+            )
             return
 
         signal_data = content.get("data")
@@ -760,27 +726,32 @@ class RandomCallConsumer(AsyncJsonWebsocketConsumer):
         if signal_data is None:
             return
 
+        partner_group = (
+            f"random_call_user_{self.partner_user_id}"
+        )
+
         await self.channel_layer.group_send(
-            f"random_call_{self.call_id}",
+            partner_group,
             {
                 "type": "webrtc_signal",
-                "sender_channel": self.channel_name,
+                "call_id": self.call_id,
+                "sender_user_id": str(self.user.id),
                 "data": signal_data,
             },
         )
 
-    # ==================================================
-    # WebRTC シグナル受信
-    # ==================================================
 
     async def webrtc_signal(self, event):
+        # 現在の通話相手からのシグナルだけを受け付ける
+        if not self.call_id:
+            return
 
-        # ==================================================
-        # 自分が送ったシグナルは自分に返さない
-        # ==================================================
+        if event.get("call_id") != self.call_id:
+            return
 
-        if event["sender_channel"] == self.channel_name:
-
+        if str(event.get("sender_user_id")) != str(
+            self.partner_user_id
+        ):
             return
 
         await self.send_json({
